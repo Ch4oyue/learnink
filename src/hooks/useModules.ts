@@ -12,6 +12,10 @@ export interface Module {
   created_by: string | null;
   created_at: string | null;
   updated_at: string | null;
+  category: string | null;
+  content: string | null;
+  generated_at: string | null;
+  source_request_id: string | null;
 }
 
 export function useModules(publishedOnly = false) {

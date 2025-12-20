@@ -77,6 +77,8 @@ export const RequestSection = () => {
         userId: user.id,
         topic: data.topic,
         description: data.description,
+        category: data.category,
+        priority: data.priority,
       });
 
       setIsSubmitted(true);

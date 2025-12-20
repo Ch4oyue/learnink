@@ -131,7 +131,7 @@ export const ModulesSection = () => {
             const IconComponent = iconMap[module.icon_name || "BookOpen"] || BookOpen;
             const progress = getModuleProgress(module.id);
             const level = module.level || "Pemula";
-            const category = (module as any).category || "Umum";
+            const category = module.category || "Umum";
 
             return (
               <div

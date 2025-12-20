@@ -1,9 +1,26 @@
 import { cn } from "@/lib/utils";
+import DOMPurify from "dompurify";
 
 interface MarkdownRendererProps {
   content: string;
   className?: string;
 }
+
+// Configure DOMPurify to allow safe HTML elements
+const purifyConfig = {
+  ALLOWED_TAGS: [
+    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+    'p', 'br', 'hr',
+    'ul', 'ol', 'li',
+    'strong', 'em', 'b', 'i',
+    'code', 'pre',
+    'blockquote',
+    'a',
+    'span', 'div'
+  ],
+  ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
+  ALLOW_DATA_ATTR: false,
+};
 
 export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
   // Simple markdown parser for common elements
@@ -67,10 +84,13 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
     return html;
   };
 
+  // Sanitize the parsed HTML to prevent XSS attacks
+  const sanitizedHtml = DOMPurify.sanitize(parseMarkdown(content), purifyConfig);
+
   return (
     <div 
       className={cn("prose prose-slate dark:prose-invert max-w-none", className)}
-      dangerouslySetInnerHTML={{ __html: parseMarkdown(content) }}
+      dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
     />
   );
 }

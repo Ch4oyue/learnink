@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Mail, Lock, User } from "lucide-react";
+import { Loader2, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Form,
   FormField,
@@ -37,15 +38,24 @@ type RegisterFormData = z.infer<typeof registerSchema>;
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const { user, signIn, signUp } = useAuth();
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const { user, role, signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Redirect to role-based dashboard if already logged in
   useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
+    if (user && role) {
+      const dashboardPath = role === 'admin' 
+        ? '/dashboard/admin' 
+        : role === 'tutor' 
+          ? '/dashboard/tutor' 
+          : '/dashboard/user';
+      navigate(dashboardPath);
     }
-  }, [user, navigate]);
+  }, [user, role, navigate]);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -122,13 +132,109 @@ export default function Auth() {
 
   const toggleMode = () => {
     setIsLogin(!isLogin);
+    setIsForgotPassword(false);
     loginForm.reset();
     registerForm.reset();
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail.trim()) {
+      toast({
+        title: "Email diperlukan",
+        description: "Masukkan email Anda untuk reset password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setForgotLoading(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+    setForgotLoading(false);
+
+    if (error) {
+      toast({
+        title: "Gagal mengirim email",
+        description: getErrorMessage(error.message),
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Email terkirim",
+        description: "Cek inbox Anda untuk link reset password.",
+      });
+      setIsForgotPassword(false);
+      setForgotEmail("");
+    }
+  };
+
+  // Forgot Password View
+  if (isForgotPassword) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center px-4">
+        <div className="w-full max-w-md animate-fade-in">
+          {/* Logo */}
+          <div className="text-center mb-8">
+            <a href="/" className="text-2xl font-semibold tracking-tight text-foreground">
+              Learn<span className="text-primary">AI</span>
+            </a>
+            <p className="text-muted-foreground mt-2">
+              Reset password Anda
+            </p>
+          </div>
+
+          {/* Forgot Password Card */}
+          <div className="bg-card border border-border rounded-2xl p-8 shadow-soft">
+            <form onSubmit={handleForgotPassword} className="space-y-5">
+              <div>
+                <label className="text-sm font-medium text-foreground">Email</label>
+                <div className="relative mt-2">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                  <Input
+                    type="email"
+                    placeholder="nama@email.com"
+                    className="pl-10"
+                    value={forgotEmail}
+                    onChange={(e) => setForgotEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={forgotLoading}
+              >
+                {forgotLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Mengirim...
+                  </>
+                ) : (
+                  "Kirim Link Reset"
+                )}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <button
+                onClick={() => setIsForgotPassword(false)}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Kembali ke login
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md animate-fade-in">
         {/* Logo */}
         <div className="text-center mb-8">
           <a href="/" className="text-2xl font-semibold tracking-tight text-foreground">
@@ -168,7 +274,16 @@ export default function Auth() {
                   name="password"
                   render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel className="text-foreground">Password</FormLabel>
+                      <div className="flex items-center justify-between">
+                        <FormLabel className="text-foreground">Password</FormLabel>
+                        <button
+                          type="button"
+                          onClick={() => setIsForgotPassword(true)}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Lupa password?
+                        </button>
+                      </div>
                       <div className="relative">
                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <Input
@@ -328,9 +443,10 @@ export default function Auth() {
         <div className="mt-6 text-center">
           <a
             href="/"
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1"
           >
-            ← Kembali ke beranda
+            <ArrowLeft className="h-4 w-4" />
+            Kembali ke beranda
           </a>
         </div>
       </div>

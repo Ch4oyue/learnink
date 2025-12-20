@@ -10,6 +10,9 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Modules from "./pages/Modules";
+import ModuleDetail from "./pages/ModuleDetail";
+import RequestDetail from "./pages/RequestDetail";
 import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { TutorDashboard } from "@/components/dashboard/TutorDashboard";
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
@@ -27,6 +30,16 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route path="/modules" element={<Modules />} />
+              <Route path="/module/:id" element={<ModuleDetail />} />
+              <Route
+                path="/request/:id"
+                element={
+                  <ProtectedRoute>
+                    <RequestDetail />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/dashboard"
                 element={

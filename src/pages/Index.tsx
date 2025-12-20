@@ -8,47 +8,48 @@ import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
 import { Button } from "@/components/ui/button";
 import { 
-  BookOpen, 
-  Code, 
-  Calculator, 
-  Globe, 
-  Microscope,
+  Bot, 
+  Cpu, 
+  Workflow, 
+  Zap,
   ArrowRight,
   GraduationCap,
+  BookOpen,
 } from "lucide-react";
 
+// Learning paths focused on AI & Automation
 const learningPaths = [
   {
-    title: "Teknologi & Pemrograman",
-    description: "Pelajari dasar-dasar coding hingga pengembangan aplikasi",
-    icon: Code,
+    title: "Dasar-Dasar AI",
+    description: "Pahami konsep fundamental Artificial Intelligence dan Machine Learning",
+    icon: Bot,
     color: "from-cyan-500/20 to-blue-500/20",
     textColor: "text-cyan-600",
-    modules: 12,
+    modules: 8,
   },
   {
-    title: "Matematika",
-    description: "Dari aritmatika dasar hingga kalkulus lanjutan",
-    icon: Calculator,
-    color: "from-blue-500/20 to-indigo-500/20",
-    textColor: "text-blue-600",
-    modules: 15,
-  },
-  {
-    title: "Sains & Fisika",
-    description: "Eksplorasi dunia sains dengan eksperimen interaktif",
-    icon: Microscope,
-    color: "from-emerald-500/20 to-teal-500/20",
-    textColor: "text-emerald-600",
+    title: "Automation Fundamentals",
+    description: "Pelajari dasar otomatisasi workflow dan proses bisnis",
+    icon: Cpu,
+    color: "from-purple-500/20 to-pink-500/20",
+    textColor: "text-purple-600",
     modules: 10,
   },
   {
-    title: "Bahasa & Komunikasi",
-    description: "Tingkatkan kemampuan berbahasa dan komunikasi",
-    icon: Globe,
-    color: "from-purple-500/20 to-pink-500/20",
-    textColor: "text-purple-600",
-    modules: 8,
+    title: "AI Tools & Aplikasi",
+    description: "Kuasai ChatGPT, Midjourney, dan tools AI populer lainnya",
+    icon: Zap,
+    color: "from-orange-500/20 to-red-500/20",
+    textColor: "text-orange-600",
+    modules: 12,
+  },
+  {
+    title: "Advanced Automation",
+    description: "Bangun sistem automation kompleks dengan AI integration",
+    icon: Workflow,
+    color: "from-emerald-500/20 to-teal-500/20",
+    textColor: "text-emerald-600",
+    modules: 6,
   },
 ];
 
@@ -71,13 +72,13 @@ const Index = () => {
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
                 <GraduationCap className="h-4 w-4" />
-                Kurikulum Terstruktur
+                Kurikulum AI & Automation
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Jalur Pembelajaran
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Pilih jalur belajar sesuai minat Anda. Setiap jalur dirancang dengan 
+                Pilih jalur belajar AI dan Automation sesuai minat Anda. Setiap jalur dirancang dengan 
                 modul-modul yang sistematis dari pemula hingga mahir.
               </p>
             </div>

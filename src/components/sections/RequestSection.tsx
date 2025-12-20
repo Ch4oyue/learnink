@@ -29,13 +29,14 @@ const requestSchema = z.object({
 
 type RequestFormData = z.infer<typeof requestSchema>;
 
+// Categories focused on AI & Automation
 const categories = [
-  "Pemula",
+  "AI Dasar",
   "Automation",
-  "Data Analysis",
-  "Content Creation",
-  "Chatbot",
-  "Productivity",
+  "AI Tools",
+  "Prompt Engineering",
+  "No-Code AI",
+  "Chatbot & Assistant",
   "Lainnya",
 ];
 

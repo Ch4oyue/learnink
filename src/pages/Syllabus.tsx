@@ -8,11 +8,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import {
-  BookOpen,
-  Calculator,
-  Code,
-  FlaskConical,
-  Globe,
+  Bot,
+  Cpu,
+  Workflow,
+  Zap,
   CheckCircle2,
   Circle,
   Lock,
@@ -20,60 +19,67 @@ import {
   Sparkles,
   Target,
   Trophy,
-  Zap,
+  Brain,
+  Cog,
+  Code,
+  BookOpen,
 } from "lucide-react";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  BookOpen,
-  Calculator,
+  Bot,
+  Cpu,
+  Workflow,
+  Zap,
+  Brain,
+  Cog,
   Code,
-  FlaskConical,
-  Globe,
+  BookOpen,
 };
 
+// Learning paths focused on AI & Automation
 const learningPaths = [
   {
-    id: "fundamentals",
-    title: "Dasar-Dasar",
-    description: "Pelajari konsep fundamental sebelum melanjutkan",
-    icon: BookOpen,
+    id: "ai-fundamentals",
+    title: "Dasar-Dasar AI",
+    description: "Pahami konsep dasar Artificial Intelligence dan Machine Learning",
+    icon: Brain,
     color: "from-blue-500 to-cyan-500",
     bgColor: "bg-blue-500/10",
     textColor: "text-blue-500",
-    categories: ["Umum"],
+    categories: ["AI Dasar"],
     levels: ["Pemula"],
   },
   {
-    id: "core-skills",
-    title: "Kemampuan Inti",
-    description: "Bangun kemampuan inti yang dibutuhkan",
-    icon: Target,
+    id: "automation-basics",
+    title: "Automation Fundamentals",
+    description: "Pelajari dasar-dasar otomatisasi workflow dan proses",
+    icon: Cog,
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-500/10",
     textColor: "text-purple-500",
-    categories: ["Matematika", "Sains"],
+    categories: ["Automation"],
     levels: ["Pemula", "Menengah"],
   },
   {
-    id: "advanced",
-    title: "Tingkat Lanjut",
-    description: "Kuasai topik tingkat lanjut",
-    icon: Zap,
+    id: "ai-tools",
+    title: "AI Tools & Aplikasi",
+    description: "Kuasai tools AI populer seperti ChatGPT, Midjourney, dan lainnya",
+    icon: Bot,
     color: "from-orange-500 to-red-500",
     bgColor: "bg-orange-500/10",
     textColor: "text-orange-500",
-    categories: ["Teknologi"],
+    categories: ["AI Tools"],
     levels: ["Menengah", "Lanjutan"],
   },
   {
-    id: "mastery",
-    title: "Penguasaan",
-    description: "Capai penguasaan penuh materi",
-    icon: Trophy,
+    id: "advanced-automation",
+    title: "Advanced Automation",
+    description: "Bangun sistem automation kompleks dengan AI integration",
+    icon: Workflow,
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-500/10",
     textColor: "text-amber-500",
-    categories: [],
+    categories: ["Advanced"],
     levels: ["Lanjutan"],
   },
 ];
@@ -86,9 +92,11 @@ export default function Syllabus() {
   const getModulesForPath = (path: (typeof learningPaths)[0]) => {
     if (!modules) return [];
     return modules.filter((m) => {
+      // Match by category
       if (path.categories.length > 0 && !path.categories.includes(m.category || "")) {
         return false;
       }
+      // Match by level
       if (path.levels.length > 0 && !path.levels.includes(m.level || "")) {
         return false;
       }
@@ -113,6 +121,17 @@ export default function Syllabus() {
   const completedModules = progress?.filter((p) => p.is_completed).length || 0;
   const overallProgress = totalModules > 0 ? Math.round((completedModules / totalModules) * 100) : 0;
 
+  // All paths are unlocked for new users - no 50% requirement
+  const isPathUnlocked = (pathIndex: number) => {
+    if (!user) return true; // Allow viewing for non-logged in users
+    if (pathIndex === 0) return true; // First path always unlocked
+    // Unlock if previous path has any progress OR no modules yet
+    const prevPath = learningPaths[pathIndex - 1];
+    const prevModules = getModulesForPath(prevPath);
+    if (prevModules.length === 0) return true; // Unlock if no modules in prev path
+    return calculatePathProgress(prevPath) >= 25; // Lower threshold to 25%
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -126,10 +145,10 @@ export default function Syllabus() {
               Learning Path
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Silabus <span className="text-gradient">Pembelajaran</span>
+              Silabus <span className="text-gradient">AI & Automation</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Ikuti jalur pembelajaran yang terstruktur untuk mencapai tujuan belajar Anda
+              Ikuti jalur pembelajaran terstruktur untuk menguasai AI dan Automation dari dasar hingga mahir
             </p>
           </div>
 
@@ -159,7 +178,7 @@ export default function Syllabus() {
               const PathIcon = path.icon;
               const pathModules = getModulesForPath(path);
               const pathProgress = calculatePathProgress(path);
-              const isUnlocked = pathIndex === 0 || calculatePathProgress(learningPaths[pathIndex - 1]) >= 50;
+              const isUnlocked = isPathUnlocked(pathIndex);
 
               return (
                 <div key={path.id} className="relative">
@@ -211,8 +230,12 @@ export default function Syllabus() {
                     <div
                       className={`p-8 rounded-xl border-2 border-dashed ${path.bgColor} text-center`}
                     >
+                      <PathIcon className={`h-8 w-8 mx-auto mb-3 ${path.textColor}`} />
                       <p className={`${path.textColor} font-medium`}>
-                        Modul untuk jalur ini akan segera tersedia
+                        Modul untuk "{path.title}" akan segera tersedia
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Tambahkan modul dengan kategori: {path.categories.join(", ")}
                       </p>
                     </div>
                   ) : (
@@ -297,7 +320,7 @@ export default function Syllabus() {
         <section className="py-16 px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-2xl font-semibold mb-4">
-              Mulai Perjalanan Belajar Anda
+              Mulai Perjalanan AI & Automation Anda
             </h2>
             <p className="text-muted-foreground mb-6">
               Daftar sekarang untuk melacak progress belajar dan dapatkan rekomendasi

@@ -1,11 +1,12 @@
+import { Link } from "react-router-dom";
 import { Mail, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 
 const quickLinks = [
-  { label: "Home", href: "#home" },
-  { label: "Fitur", href: "#fitur" },
-  { label: "Silabus", href: "#silabus" },
-  { label: "Modul", href: "#modul" },
-  { label: "Request", href: "#request" },
+  { label: "Home", href: "/", isRoute: true },
+  { label: "Fitur", href: "/#fitur", isRoute: false },
+  { label: "Silabus", href: "/syllabus", isRoute: true },
+  { label: "Modul", href: "/modules", isRoute: true },
+  { label: "Request", href: "/#request", isRoute: false },
 ];
 
 const socialLinks = [
@@ -24,13 +25,13 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8 mb-12 md:mb-16">
           {/* Logo & Tagline */}
           <div className="lg:col-span-2">
-            <a href="#home" className="inline-block mb-4">
+            <Link to="/" className="inline-block mb-4">
               <span className="text-2xl font-semibold tracking-tight text-background">
-                Learning
+                Learn<span className="text-primary">AI</span>
               </span>
-            </a>
+            </Link>
             <p className="text-background/70 max-w-sm leading-relaxed">
-              Platform belajar AI automation yang dirancang untuk membantu Anda
+              Platform belajar AI dan Automation yang dirancang untuk membantu Anda
               menguasai teknologi masa depan dengan cara yang mudah dan terarah.
             </p>
           </div>
@@ -43,12 +44,21 @@ export const Footer = () => {
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-background/70 hover:text-background transition-colors duration-200 text-sm"
-                  >
-                    {link.label}
-                  </a>
+                  {link.isRoute ? (
+                    <Link
+                      to={link.href}
+                      className="text-background/70 hover:text-background transition-colors duration-200 text-sm"
+                    >
+                      {link.label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={link.href}
+                      className="text-background/70 hover:text-background transition-colors duration-200 text-sm"
+                    >
+                      {link.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
@@ -60,11 +70,11 @@ export const Footer = () => {
               Contact
             </h4>
             <a
-              href="mailto:hello@learning.id"
+              href="mailto:hello@learnai.id"
               className="inline-flex items-center gap-2 text-background/70 hover:text-background transition-colors duration-200 text-sm mb-6"
             >
               <Mail className="w-4 h-4" />
-              hello@learning.id
+              hello@learnai.id
             </a>
 
             <h4 className="text-sm font-semibold text-background mb-4 tracking-wide uppercase mt-6">
@@ -89,7 +99,7 @@ export const Footer = () => {
         <div className="border-t border-background/10 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-background/50 text-sm">
-              © {currentYear} Learning. All rights reserved.
+              © {currentYear} LearnAI. All rights reserved.
             </p>
             <div className="flex items-center gap-6 text-sm">
               <a

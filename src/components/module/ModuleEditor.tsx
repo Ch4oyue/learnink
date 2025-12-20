@@ -105,6 +105,8 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
         await createModule.mutateAsync({
           ...formData,
           created_by: user?.id,
+          generated_at: null,
+          source_request_id: null,
         });
         navigate("/dashboard/modules");
       } else if (module) {

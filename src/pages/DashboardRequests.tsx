@@ -30,7 +30,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useMaterialRequests, useUpdateRequest } from "@/hooks/useMaterialRequests";
+import { useAllRequests, useUpdateRequest } from "@/hooks/useMaterialRequests";
 import { useGenerateModule } from "@/hooks/useGenerateModule";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
@@ -73,7 +73,7 @@ export default function DashboardRequests() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [generateId, setGenerateId] = useState<string | null>(null);
 
-  const { data: requests, isLoading } = useMaterialRequests();
+  const { data: requests, isLoading } = useAllRequests();
   const updateRequest = useUpdateRequest();
   const generateModule = useGenerateModule();
 
@@ -93,7 +93,7 @@ export default function DashboardRequests() {
       await updateRequest.mutateAsync({
         id: generateId,
         status: "reviewing",
-        assigned_to: user.id,
+        assignedTo: user.id,
       });
 
       // Generate module

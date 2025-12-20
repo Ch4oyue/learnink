@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.generate-module]
 verify_jwt = true
+
+[functions.generate-quiz]
+verify_jwt = true

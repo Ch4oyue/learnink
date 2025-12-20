@@ -13,6 +13,13 @@ import NotFound from "./pages/NotFound";
 import Modules from "./pages/Modules";
 import ModuleDetail from "./pages/ModuleDetail";
 import RequestDetail from "./pages/RequestDetail";
+import Syllabus from "./pages/Syllabus";
+import ModuleCreate from "./pages/ModuleCreate";
+import ModuleEdit from "./pages/ModuleEdit";
+import DashboardModules from "./pages/DashboardModules";
+import DashboardRequests from "./pages/DashboardRequests";
+import DashboardNotifications from "./pages/DashboardNotifications";
+import DashboardProfile from "./pages/DashboardProfile";
 import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { TutorDashboard } from "@/components/dashboard/TutorDashboard";
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
@@ -32,6 +39,7 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/modules" element={<Modules />} />
               <Route path="/module/:id" element={<ModuleDetail />} />
+              <Route path="/syllabus" element={<Syllabus />} />
               <Route
                 path="/request/:id"
                 element={
@@ -70,6 +78,54 @@ const App = () => (
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <AdminDashboard />
                   </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/modules"
+                element={
+                  <ProtectedRoute>
+                    <DashboardModules />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/modules/create"
+                element={
+                  <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                    <ModuleCreate />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/modules/edit/:id"
+                element={
+                  <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                    <ModuleEdit />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/requests"
+                element={
+                  <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                    <DashboardRequests />
+                  </RoleProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/notifications"
+                element={
+                  <ProtectedRoute>
+                    <DashboardNotifications />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/profile"
+                element={
+                  <ProtectedRoute>
+                    <DashboardProfile />
+                  </ProtectedRoute>
                 }
               />
               <Route path="*" element={<NotFound />} />

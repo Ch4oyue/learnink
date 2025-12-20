@@ -162,12 +162,28 @@
 }
 
 @layer utilities {
-  /* Glass morphism */
+  /* Glass morphism - with vendor prefixes */
   .glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
     border: 1px solid var(--glass-border);
+  }
+
+  /* Ensure animations work across browsers */
+  .animate-fade-in {
+    -webkit-animation: fadeIn 0.5s ease-out forwards;
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    -webkit-animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation: scaleIn 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+  }
+
+  .animate-slide-up {
+    -webkit-animation: slideUp 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation: slideUp 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
   }
 
   /* Smooth transitions */

@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
+import { FeaturesSection } from "@/components/sections/FeaturesSection";
 
 const Index = () => {
   return (
@@ -8,12 +9,12 @@ const Index = () => {
       
       <main className="pt-[4.5rem]">
         <HeroSection />
+        
+        <div id="fitur">
+          <FeaturesSection />
+        </div>
 
         {/* Placeholder sections for scroll testing */}
-        <section id="fitur" className="min-h-screen flex items-center justify-center bg-secondary/30">
-          <h2 className="text-3xl font-semibold text-foreground">Fitur</h2>
-        </section>
-
         <section id="silabus" className="min-h-screen flex items-center justify-center">
           <h2 className="text-3xl font-semibold text-foreground">Silabus</h2>
         </section>

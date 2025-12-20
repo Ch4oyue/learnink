@@ -2,6 +2,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { FeaturesSection } from "@/components/sections/FeaturesSection";
 import { ModulesSection } from "@/components/sections/ModulesSection";
+import { RequestSection } from "@/components/sections/RequestSection";
+import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
   return (
@@ -24,10 +26,12 @@ const Index = () => {
           <ModulesSection />
         </div>
 
-        <section id="request" className="min-h-screen flex items-center justify-center">
-          <h2 className="text-3xl font-semibold text-foreground">Request Materi</h2>
-        </section>
+        <div id="request">
+          <RequestSection />
+        </div>
       </main>
+
+      <Toaster />
     </div>
   );
 };

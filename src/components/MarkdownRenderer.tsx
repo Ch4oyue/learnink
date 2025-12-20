@@ -18,19 +18,37 @@ const purifyConfig = {
     'a',
     'span', 'div'
   ],
-  ALLOWED_ATTR: ['class', 'href', 'target', 'rel'],
+  ALLOWED_ATTR: ['class', 'href', 'target', 'rel', 'id'],
   ALLOW_DATA_ATTR: false,
 };
+
+// Helper to generate ID from text
+const generateId = (text: string, index: number): string => {
+  return `heading-${index}`;
+};
+
+// Track header index for ID generation
+let headerIndex = 0;
 
 export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
   // Simple markdown parser for common elements
   const parseMarkdown = (text: string): string => {
     let html = text;
+    let localHeaderIndex = 0;
     
-    // Headers
-    html = html.replace(/^### (.*$)/gim, '<h3 class="text-lg font-semibold mt-6 mb-3 text-foreground">$1</h3>');
-    html = html.replace(/^## (.*$)/gim, '<h2 class="text-xl font-bold mt-8 mb-4 text-foreground">$1</h2>');
-    html = html.replace(/^# (.*$)/gim, '<h1 class="text-2xl font-bold mt-8 mb-4 text-foreground">$1</h1>');
+    // Headers with IDs for TOC navigation
+    html = html.replace(/^### (.*$)/gim, (_, p1) => {
+      const id = `heading-${localHeaderIndex++}`;
+      return `<h3 id="${id}" class="text-lg font-semibold mt-6 mb-3 text-foreground scroll-mt-24">${p1}</h3>`;
+    });
+    html = html.replace(/^## (.*$)/gim, (_, p1) => {
+      const id = `heading-${localHeaderIndex++}`;
+      return `<h2 id="${id}" class="text-xl font-bold mt-8 mb-4 text-foreground scroll-mt-24">${p1}</h2>`;
+    });
+    html = html.replace(/^# (.*$)/gim, (_, p1) => {
+      const id = `heading-${localHeaderIndex++}`;
+      return `<h1 id="${id}" class="text-2xl font-bold mt-8 mb-4 text-foreground scroll-mt-24">${p1}</h1>`;
+    });
     
     // Bold and italic
     html = html.replace(/\*\*\*(.*?)\*\*\*/gim, '<strong class="font-bold"><em>$1</em></strong>');

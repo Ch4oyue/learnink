@@ -152,7 +152,7 @@ export default function Auth() {
                     <FormItem>
                       <FormLabel className="text-foreground">Email</FormLabel>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <FormControl>
                           <Input
                             placeholder="nama@email.com"
@@ -172,7 +172,7 @@ export default function Auth() {
                     <FormItem>
                       <FormLabel className="text-foreground">Password</FormLabel>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <FormControl>
                           <Input
                             type="password"
@@ -212,7 +212,7 @@ export default function Auth() {
                     <FormItem>
                       <FormLabel className="text-foreground">Nama</FormLabel>
                       <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <FormControl>
                           <Input
                             placeholder="Nama lengkap"
@@ -232,7 +232,7 @@ export default function Auth() {
                     <FormItem>
                       <FormLabel className="text-foreground">Email</FormLabel>
                       <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <FormControl>
                           <Input
                             placeholder="nama@email.com"
@@ -252,7 +252,7 @@ export default function Auth() {
                     <FormItem>
                       <FormLabel className="text-foreground">Password</FormLabel>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <FormControl>
                           <Input
                             type="password"
@@ -273,7 +273,7 @@ export default function Auth() {
                     <FormItem>
                       <FormLabel className="text-foreground">Konfirmasi Password</FormLabel>
                       <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
                         <FormControl>
                           <Input
                             type="password"

@@ -27,6 +27,7 @@ interface ModuleHeaderProps {
   };
   currentProgress: number;
   isCompleted: boolean;
+  hasStartedLearning?: boolean;
   onStartLearning: () => void;
   onContinue: () => void;
   onMarkComplete: () => void;
@@ -52,6 +53,7 @@ export function ModuleHeader({
   module,
   currentProgress,
   isCompleted,
+  hasStartedLearning = false,
   onStartLearning,
   onContinue,
   onMarkComplete,
@@ -109,7 +111,7 @@ export function ModuleHeader({
           <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             {/* CTA Buttons */}
             <div className="flex items-center gap-3">
-              {currentProgress === 0 ? (
+              {!hasStartedLearning ? (
                 <Button onClick={onStartLearning} disabled={isUpdating} size="lg">
                   <Play className="h-4 w-4 mr-2" />
                   Mulai Belajar
@@ -137,14 +139,16 @@ export function ModuleHeader({
               )}
             </div>
 
-            {/* Compact Progress */}
-            <div className="flex items-center gap-3 sm:ml-auto">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Progress:</span>
-                <Progress value={currentProgress} className="h-2 w-24" />
-                <span className="font-medium text-foreground">{currentProgress}%</span>
+            {/* Compact Progress - only show if started */}
+            {hasStartedLearning && (
+              <div className="flex items-center gap-3 sm:ml-auto">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span>Progress:</span>
+                  <Progress value={currentProgress} className="h-2 w-24" />
+                  <span className="font-medium text-foreground">{currentProgress}%</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">

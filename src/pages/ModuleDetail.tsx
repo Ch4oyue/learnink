@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
-import { useQuizzes, useQuizQuestionsSafe, useUserQuizAttempts, Quiz } from "@/hooks/useQuiz";
+import { useQuizzes, useQuizQuestionsSafe, Quiz } from "@/hooks/useQuiz";
+import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { QuizPlayer } from "@/components/quiz/QuizPlayer";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -31,7 +32,7 @@ export default function ModuleDetail() {
   const { toast } = useToast();
   
   const { data: modules, isLoading: modulesLoading } = useModules(true);
-  const { data: userProgress } = useUserProgress(user?.id);
+  const { data: userProgress, refetch: refetchProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
   
   // Quiz state
@@ -43,15 +44,63 @@ export default function ModuleDetail() {
   
   // Sticky progress bar state
   const [showStickyProgress, setShowStickyProgress] = useState(false);
+  
+  // Content ref for scroll tracking
+  const contentRef = useRef<HTMLElement>(null);
 
   const module = modules?.find(m => m.id === id);
   const progress = userProgress?.find(p => p.module_id === id);
   const canManageQuiz = role === 'tutor' || role === 'admin';
   const currentProgress = progress?.progress_percent || 0;
   const isCompleted = progress?.is_completed || false;
+  
+  // Determine if user has started learning (has any progress)
+  const hasStartedLearning = currentProgress > 0 || isCompleted;
+  
+  // Content is locked if user hasn't started learning (or not logged in)
+  const isContentLocked = !hasStartedLearning;
 
   // Extract TOC from content
   const tocItems = module?.content ? extractTOC(module.content) : [];
+
+  // Handle scroll progress update
+  const handleScrollProgressChange = useCallback((scrollProgress: number) => {
+    if (!user || !id || isCompleted) return;
+    
+    // Only update if scroll progress is higher than current
+    // Cap at 80% from scrolling alone - completion requires quiz or manual action
+    const maxScrollProgress = 80;
+    const newProgress = Math.min(scrollProgress, maxScrollProgress);
+    
+    if (newProgress > currentProgress) {
+      updateProgress.mutate(
+        {
+          userId: user.id,
+          moduleId: id,
+          progressPercent: newProgress,
+          isCompleted: false,
+        },
+        {
+          onSuccess: () => {
+            refetchProgress();
+          },
+        }
+      );
+    }
+  }, [user, id, currentProgress, isCompleted, updateProgress, refetchProgress]);
+
+  const { setInitialProgress } = useScrollProgress({
+    contentRef,
+    onProgressChange: handleScrollProgressChange,
+    debounceMs: 1000,
+  });
+
+  // Set initial progress when loaded
+  useEffect(() => {
+    if (currentProgress > 0) {
+      setInitialProgress(currentProgress);
+    }
+  }, [currentProgress, setInitialProgress]);
 
   // Handle scroll for sticky progress bar
   useEffect(() => {
@@ -72,15 +121,21 @@ export default function ModuleDetail() {
   const handleStartLearning = () => {
     if (!user || !id) return;
     
-    updateProgress.mutate({
-      userId: user.id,
-      moduleId: id,
-      progressPercent: progress?.progress_percent || 10,
-      isCompleted: false,
-    });
-    
-    // Scroll to content after starting
-    setTimeout(scrollToContent, 100);
+    updateProgress.mutate(
+      {
+        userId: user.id,
+        moduleId: id,
+        progressPercent: 10,
+        isCompleted: false,
+      },
+      {
+        onSuccess: () => {
+          refetchProgress();
+          // Scroll to content after starting
+          setTimeout(scrollToContent, 100);
+        },
+      }
+    );
   };
 
   const handleContinueLearning = () => {
@@ -135,9 +190,29 @@ export default function ModuleDetail() {
     setShowQuizPlayer(true);
   };
 
-  const handleQuizComplete = () => {
+  const handleQuizComplete = (attempt?: { passed?: boolean; percentage?: number }) => {
     setShowQuizPlayer(false);
     setSelectedQuiz(null);
+    
+    // Update progress based on quiz result
+    if (user && id && attempt) {
+      const quizBonus = attempt.passed ? 20 : 10;
+      const newProgress = Math.min(100, currentProgress + quizBonus);
+      
+      updateProgress.mutate(
+        {
+          userId: user.id,
+          moduleId: id,
+          progressPercent: newProgress,
+          isCompleted: attempt.passed && newProgress >= 90,
+        },
+        {
+          onSuccess: () => {
+            refetchProgress();
+          },
+        }
+      );
+    }
   };
 
   if (modulesLoading) {
@@ -185,7 +260,7 @@ export default function ModuleDetail() {
       <StickyProgressBar
         title={module.title}
         progress={currentProgress}
-        isVisible={showStickyProgress && !!user}
+        isVisible={showStickyProgress && !!user && hasStartedLearning}
       />
       
       <main className="container mx-auto px-4 py-8">
@@ -195,6 +270,7 @@ export default function ModuleDetail() {
             module={module}
             currentProgress={currentProgress}
             isCompleted={isCompleted}
+            hasStartedLearning={hasStartedLearning}
             onStartLearning={handleStartLearning}
             onContinue={handleContinueLearning}
             onMarkComplete={handleMarkComplete}
@@ -205,8 +281,8 @@ export default function ModuleDetail() {
 
         {/* Main Content Layout */}
         <div className="flex gap-8">
-          {/* TOC Sidebar - Desktop only */}
-          {tocItems.length > 0 && (
+          {/* TOC Sidebar - Desktop only, hidden when content is locked */}
+          {tocItems.length > 0 && hasStartedLearning && (
             <ModuleTOC
               items={tocItems}
               className="hidden lg:block w-56 flex-shrink-0"
@@ -216,17 +292,26 @@ export default function ModuleDetail() {
           {/* Main Content Area */}
           <div className="flex-1 min-w-0 space-y-8">
             {/* 1. Learning Content (FIRST - Most Important) */}
-            <ContentSection content={module.content} />
-
-            {/* 2. Quiz Section (AFTER content) */}
-            <QuizSection
-              quizzes={quizzes}
-              isLoading={quizzesLoading}
-              canManageQuiz={canManageQuiz}
-              isGenerating={isGeneratingQuiz}
-              onGenerateQuiz={handleGenerateQuiz}
-              onStartQuiz={handleStartQuiz}
+            <ContentSection
+              ref={contentRef}
+              content={module.content}
+              isLocked={isContentLocked}
+              isAuthenticated={!!user}
+              onStartLearning={handleStartLearning}
+              isLoading={updateProgress.isPending}
             />
+
+            {/* 2. Quiz Section (AFTER content) - Only show when learning started */}
+            {hasStartedLearning && (
+              <QuizSection
+                quizzes={quizzes}
+                isLoading={quizzesLoading}
+                canManageQuiz={canManageQuiz}
+                isGenerating={isGeneratingQuiz}
+                onGenerateQuiz={handleGenerateQuiz}
+                onStartQuiz={handleStartQuiz}
+              />
+            )}
           </div>
         </div>
       </main>
@@ -245,7 +330,7 @@ export default function ModuleDetail() {
               quiz={selectedQuiz}
               questions={quizQuestions}
               onComplete={handleQuizComplete}
-              onCancel={handleQuizComplete}
+              onCancel={() => handleQuizComplete()}
             />
           )}
         </DialogContent>

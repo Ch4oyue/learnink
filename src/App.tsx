@@ -1,3 +1,4 @@
+import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,23 +8,27 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { RoleProtectedRoute } from "@/components/auth/RoleProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import NotFound from "./pages/NotFound";
-import Modules from "./pages/Modules";
-import ModuleDetail from "./pages/ModuleDetail";
-import RequestDetail from "./pages/RequestDetail";
-import Syllabus from "./pages/Syllabus";
-import ModuleCreate from "./pages/ModuleCreate";
-import ModuleEdit from "./pages/ModuleEdit";
-import DashboardModules from "./pages/DashboardModules";
-import DashboardRequests from "./pages/DashboardRequests";
-import DashboardNotifications from "./pages/DashboardNotifications";
-import DashboardProfile from "./pages/DashboardProfile";
-import DashboardUsers from "./pages/DashboardUsers";
-import { UserDashboard } from "@/components/dashboard/UserDashboard";
-import { TutorDashboard } from "@/components/dashboard/TutorDashboard";
-import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
+
+// Lazy load page components for code splitting
+const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Modules = lazy(() => import("./pages/Modules"));
+const ModuleDetail = lazy(() => import("./pages/ModuleDetail"));
+const RequestDetail = lazy(() => import("./pages/RequestDetail"));
+const Syllabus = lazy(() => import("./pages/Syllabus"));
+const ModuleCreate = lazy(() => import("./pages/ModuleCreate"));
+const ModuleEdit = lazy(() => import("./pages/ModuleEdit"));
+const DashboardModules = lazy(() => import("./pages/DashboardModules"));
+const DashboardRequests = lazy(() => import("./pages/DashboardRequests"));
+const DashboardNotifications = lazy(() => import("./pages/DashboardNotifications"));
+const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
+const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
+
+// Lazy load dashboard components
+const UserDashboard = lazy(() => import("@/components/dashboard/UserDashboard").then(m => ({ default: m.UserDashboard })));
+const TutorDashboard = lazy(() => import("@/components/dashboard/TutorDashboard").then(m => ({ default: m.TutorDashboard })));
+const AdminDashboard = lazy(() => import("@/components/dashboard/AdminDashboard").then(m => ({ default: m.AdminDashboard })));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -36,6 +41,13 @@ const queryClient = new QueryClient({
   },
 });
 
+// Minimal loading fallback to prevent layout shift
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -44,110 +56,112 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/modules" element={<Modules />} />
-              <Route path="/module/:id" element={<ModuleDetail />} />
-              <Route path="/syllabus" element={<Syllabus />} />
-              <Route
-                path="/request/:id"
-                element={
-                  <ProtectedRoute>
-                    <RequestDetail />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Navigate to="/dashboard/user" replace />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/user"
-                element={
-                  <RoleProtectedRoute allowedRoles={['user', 'tutor', 'admin']}>
-                    <UserDashboard />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/tutor"
-                element={
-                  <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
-                    <TutorDashboard />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/admin"
-                element={
-                  <RoleProtectedRoute allowedRoles={['admin']}>
-                    <AdminDashboard />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/modules"
-                element={
-                  <ProtectedRoute>
-                    <DashboardModules />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/modules/create"
-                element={
-                  <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
-                    <ModuleCreate />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/modules/edit/:id"
-                element={
-                  <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
-                    <ModuleEdit />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/requests"
-                element={
-                  <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
-                    <DashboardRequests />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/notifications"
-                element={
-                  <ProtectedRoute>
-                    <DashboardNotifications />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/profile"
-                element={
-                  <ProtectedRoute>
-                    <DashboardProfile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/dashboard/users"
-                element={
-                  <RoleProtectedRoute allowedRoles={['admin']}>
-                    <DashboardUsers />
-                  </RoleProtectedRoute>
-                }
-              />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/modules" element={<Modules />} />
+                <Route path="/module/:id" element={<ModuleDetail />} />
+                <Route path="/syllabus" element={<Syllabus />} />
+                <Route
+                  path="/request/:id"
+                  element={
+                    <ProtectedRoute>
+                      <RequestDetail />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Navigate to="/dashboard/user" replace />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/user"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['user', 'tutor', 'admin']}>
+                      <UserDashboard />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/tutor"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                      <TutorDashboard />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/admin"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['admin']}>
+                      <AdminDashboard />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/modules"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardModules />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/modules/create"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                      <ModuleCreate />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/modules/edit/:id"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                      <ModuleEdit />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/requests"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                      <DashboardRequests />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/notifications"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardNotifications />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/profile"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardProfile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/users"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['admin']}>
+                      <DashboardUsers />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
         </AuthProvider>
       </TooltipProvider>

@@ -1,0 +1,158 @@
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+interface ValidateRequest {
+  quiz_id: string;
+  answers: Record<string, string>;
+}
+
+serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Get user from auth header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authorization required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Verify user token
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.error('Auth error:', authError);
+      return new Response(
+        JSON.stringify({ error: 'Invalid token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { quiz_id, answers }: ValidateRequest = await req.json();
+    console.log(`Validating quiz ${quiz_id} for user ${user.id}`);
+
+    if (!quiz_id || !answers) {
+      return new Response(
+        JSON.stringify({ error: 'quiz_id and answers are required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Fetch quiz details
+    const { data: quiz, error: quizError } = await supabase
+      .from('quizzes')
+      .select('*, modules!inner(is_published)')
+      .eq('id', quiz_id)
+      .single();
+
+    if (quizError || !quiz) {
+      console.error('Quiz fetch error:', quizError);
+      return new Response(
+        JSON.stringify({ error: 'Quiz not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Fetch questions with correct answers (server-side only)
+    const { data: questions, error: questionsError } = await supabase
+      .from('quiz_questions')
+      .select('id, correct_answer, explanation, points')
+      .eq('quiz_id', quiz_id);
+
+    if (questionsError || !questions) {
+      console.error('Questions fetch error:', questionsError);
+      return new Response(
+        JSON.stringify({ error: 'Questions not found' }),
+        { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Calculate score
+    let score = 0;
+    let totalPoints = 0;
+    const correctAnswers: Record<string, boolean> = {};
+    const explanations: Record<string, string | null> = {};
+    const correctAnswerValues: Record<string, string> = {};
+
+    for (const question of questions) {
+      totalPoints += question.points || 10;
+      const userAnswer = (answers[question.id] || '').toLowerCase().trim();
+      const correctAnswer = (question.correct_answer || '').toLowerCase().trim();
+      
+      const isCorrect = userAnswer === correctAnswer;
+      correctAnswers[question.id] = isCorrect;
+      explanations[question.id] = question.explanation;
+      correctAnswerValues[question.id] = question.correct_answer;
+      
+      if (isCorrect) {
+        score += question.points || 10;
+      }
+    }
+
+    const percentage = Math.round((score / totalPoints) * 100);
+    const passed = percentage >= (quiz.passing_score || 70);
+
+    console.log(`Quiz results: ${score}/${totalPoints} (${percentage}%) - ${passed ? 'PASSED' : 'FAILED'}`);
+
+    // Save attempt to database
+    const { data: attempt, error: attemptError } = await supabase
+      .from('user_quiz_attempts')
+      .insert({
+        user_id: user.id,
+        quiz_id,
+        score,
+        total_points: totalPoints,
+        percentage,
+        passed,
+        answers,
+        completed_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (attemptError) {
+      console.error('Error saving attempt:', attemptError);
+      return new Response(
+        JSON.stringify({ error: 'Failed to save quiz attempt' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        attempt,
+        results: {
+          score,
+          totalPoints,
+          percentage,
+          passed,
+          correctAnswers,
+          explanations,
+          correctAnswerValues,
+        },
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return new Response(
+      JSON.stringify({ error: 'Internal server error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});

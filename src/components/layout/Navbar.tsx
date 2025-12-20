@@ -1,15 +1,22 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
+import { Menu, X, LogOut, User, LayoutDashboard, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 
 const navLinks = [
   { href: "#home", label: "Home" },
   { href: "#fitur", label: "Fitur" },
-  { href: "#silabus", label: "Silabus" },
-  { href: "#modul", label: "Daftar Modul" },
+  { href: "/syllabus", label: "Silabus", isRoute: true },
+  { href: "/modules", label: "Modul", isRoute: true },
   { href: "#request", label: "Request Materi" },
 ];
 
@@ -33,7 +40,7 @@ export function Navbar() {
     setIsMobileMenuOpen(false);
   };
 
-  const handleAuthClick = (isRegister: boolean) => {
+  const handleAuthClick = () => {
     navigate("/auth");
     setIsMobileMenuOpen(false);
   };
@@ -44,6 +51,14 @@ export function Navbar() {
   };
 
   const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
+  const initials = displayName.charAt(0).toUpperCase();
+
+  const handleNavClick = (href: string, isRoute?: boolean) => {
+    setIsMobileMenuOpen(false);
+    if (isRoute) {
+      navigate(href);
+    }
+  };
 
   return (
     <header
@@ -57,23 +72,33 @@ export function Navbar() {
       <nav className="container mx-auto px-6 lg:px-8">
         <div className="flex h-[4.5rem] items-center justify-between">
           {/* Logo */}
-          <a
-            href="#home"
+          <Link
+            to="/"
             className="text-xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80"
           >
             Learn<span className="text-primary">AI</span>
-          </a>
+          </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex lg:items-center lg:gap-8">
             {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="nav-link text-sm font-medium"
-              >
-                {link.label}
-              </a>
+              link.isRoute ? (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="nav-link text-sm font-medium"
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="nav-link text-sm font-medium"
+                >
+                  {link.label}
+                </a>
+              )
             ))}
           </div>
 
@@ -84,33 +109,54 @@ export function Navbar() {
             ) : user ? (
               <>
                 <Button
-                  variant="ghost"
                   onClick={handleDashboardClick}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent gap-2"
+                  variant="outline"
+                  size="sm"
+                  className="gap-2"
                 >
-                  <User className="h-4 w-4" />
-                  {displayName}
+                  <LayoutDashboard className="h-4 w-4" />
+                  Dashboard
                 </Button>
-                <Button
-                  variant="ghost"
-                  onClick={handleSignOut}
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent gap-2"
-                >
-                  <LogOut className="h-4 w-4" />
-                  Keluar
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2">
+                      <div className="h-7 w-7 rounded-full bg-primary flex items-center justify-center">
+                        <span className="text-xs font-medium text-primary-foreground">
+                          {initials}
+                        </span>
+                      </div>
+                      <span className="max-w-[100px] truncate">{displayName}</span>
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>
+                      <User className="h-4 w-4 mr-2" />
+                      Profil Saya
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDashboardClick}>
+                      <LayoutDashboard className="h-4 w-4 mr-2" />
+                      Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Keluar
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </>
             ) : (
               <>
                 <Button
                   variant="ghost"
-                  onClick={() => handleAuthClick(false)}
+                  onClick={handleAuthClick}
                   className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
                 >
                   Masuk
                 </Button>
                 <Button
-                  onClick={() => handleAuthClick(true)}
+                  onClick={handleAuthClick}
                   className="text-sm font-medium shadow-soft hover:shadow-medium transition-shadow"
                 >
                   Daftar
@@ -144,15 +190,27 @@ export function Navbar() {
         <div className="container mx-auto px-6 pb-6 bg-background/95 backdrop-blur-lg">
           <div className="flex flex-col gap-1 pt-4 border-t border-border">
             {navLinks.map((link, index) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground animate-fade-in"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                {link.label}
-              </a>
+              link.isRoute ? (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  onClick={() => handleNavClick(link.href, link.isRoute)}
+                  className="py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => handleNavClick(link.href)}
+                  className="py-3 text-base font-medium text-muted-foreground transition-colors hover:text-foreground animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  {link.label}
+                </a>
+              )
             ))}
             <div className="flex flex-col gap-3 pt-4 mt-2 border-t border-border">
               {loading ? (
@@ -160,8 +218,19 @@ export function Navbar() {
               ) : user ? (
                 <>
                   <Button
-                    variant="ghost"
                     onClick={handleDashboardClick}
+                    variant="outline"
+                    className="justify-start gap-2"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    Dashboard
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      navigate("/dashboard/profile");
+                      setIsMobileMenuOpen(false);
+                    }}
                     className="justify-start text-base font-medium text-muted-foreground hover:text-foreground hover:bg-transparent px-0 gap-2"
                   >
                     <User className="h-4 w-4" />
@@ -170,7 +239,7 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     onClick={handleSignOut}
-                    className="justify-start text-base font-medium text-muted-foreground hover:text-foreground hover:bg-transparent px-0 gap-2"
+                    className="justify-start text-base font-medium text-destructive hover:text-destructive hover:bg-transparent px-0 gap-2"
                   >
                     <LogOut className="h-4 w-4" />
                     Keluar
@@ -180,13 +249,13 @@ export function Navbar() {
                 <>
                   <Button
                     variant="ghost"
-                    onClick={() => handleAuthClick(false)}
+                    onClick={handleAuthClick}
                     className="justify-start text-base font-medium text-muted-foreground hover:text-foreground hover:bg-transparent px-0"
                   >
                     Masuk
                   </Button>
                   <Button
-                    onClick={() => handleAuthClick(true)}
+                    onClick={handleAuthClick}
                     className="w-full text-base font-medium"
                   >
                     Daftar

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { QuizQuestion, Quiz, QuizAttempt, useSubmitQuizAttempt } from "@/hooks/useQuiz";
+import { Quiz, QuizQuestionSafe, QuizAttempt, QuizValidationResult, useValidateQuizAnswers } from "@/hooks/useQuiz";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Clock,
@@ -15,31 +15,25 @@ import {
   Check,
   X,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
 
 interface QuizPlayerProps {
   quiz: Quiz;
-  questions: QuizQuestion[];
+  questions: QuizQuestionSafe[];
   onComplete: (attempt: QuizAttempt) => void;
   onCancel: () => void;
 }
 
 export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayerProps) {
   const { user } = useAuth();
-  const submitAttempt = useSubmitQuizAttempt();
+  const validateQuiz = useValidateQuizAnswers();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [timeLeft, setTimeLeft] = useState(quiz.time_limit_minutes * 60);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [showResults, setShowResults] = useState(false);
-  const [results, setResults] = useState<{
-    score: number;
-    totalPoints: number;
-    percentage: number;
-    passed: boolean;
-    correctAnswers: Record<string, boolean>;
-  } | null>(null);
+  const [results, setResults] = useState<QuizValidationResult["results"] | null>(null);
 
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
@@ -83,57 +77,21 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
     }
   };
 
-  const calculateResults = () => {
-    let score = 0;
-    let totalPoints = 0;
-    const correctAnswers: Record<string, boolean> = {};
-
-    questions.forEach((q) => {
-      totalPoints += q.points;
-      const userAnswer = answers[q.id]?.toLowerCase().trim();
-      const correct = q.correct_answer.toLowerCase().trim();
-      
-      if (userAnswer === correct) {
-        score += q.points;
-        correctAnswers[q.id] = true;
-      } else {
-        correctAnswers[q.id] = false;
-      }
-    });
-
-    const percentage = Math.round((score / totalPoints) * 100);
-    const passed = percentage >= quiz.passing_score;
-
-    return { score, totalPoints, percentage, passed, correctAnswers };
-  };
-
   const handleSubmit = async () => {
-    if (isSubmitting) return;
-    setIsSubmitting(true);
+    if (validateQuiz.isPending || !user) return;
 
-    const calculatedResults = calculateResults();
-    setResults(calculatedResults);
-    setShowResults(true);
-
-    if (user) {
-      try {
-        const attempt = await submitAttempt.mutateAsync({
-          user_id: user.id,
-          quiz_id: quiz.id,
-          score: calculatedResults.score,
-          total_points: calculatedResults.totalPoints,
-          percentage: calculatedResults.percentage,
-          passed: calculatedResults.passed,
-          answers,
-          completed_at: new Date().toISOString(),
-        });
-        onComplete(attempt);
-      } catch (error) {
-        console.error("Error submitting quiz:", error);
-      }
+    try {
+      const result = await validateQuiz.mutateAsync({
+        quiz_id: quiz.id,
+        answers,
+      });
+      
+      setResults(result.results);
+      setShowResults(true);
+      onComplete(result.attempt);
+    } catch (error) {
+      console.error("Error submitting quiz:", error);
     }
-
-    setIsSubmitting(false);
   };
 
   if (showResults && results) {
@@ -142,11 +100,11 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
         <CardHeader className="text-center pb-2">
           <div
             className={`mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-4 ${
-              results.passed ? "bg-success/10" : "bg-destructive/10"
+              results.passed ? "bg-green-500/10" : "bg-destructive/10"
             }`}
           >
             {results.passed ? (
-              <Check className="h-8 w-8 text-success" />
+              <Check className="h-8 w-8 text-green-500" />
             ) : (
               <X className="h-8 w-8 text-destructive" />
             )}
@@ -177,14 +135,14 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                 key={q.id}
                 className={`p-4 rounded-lg border ${
                   results.correctAnswers[q.id]
-                    ? "border-success/30 bg-success/5"
+                    ? "border-green-500/30 bg-green-500/5"
                     : "border-destructive/30 bg-destructive/5"
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div
                     className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      results.correctAnswers[q.id] ? "bg-success" : "bg-destructive"
+                      results.correctAnswers[q.id] ? "bg-green-500" : "bg-destructive"
                     }`}
                   >
                     {results.correctAnswers[q.id] ? (
@@ -201,13 +159,13 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                       Jawaban Anda: {answers[q.id] || "(tidak dijawab)"}
                     </p>
                     {!results.correctAnswers[q.id] && (
-                      <p className="text-sm text-success mt-1">
-                        Jawaban benar: {q.correct_answer}
+                      <p className="text-sm text-green-600 mt-1">
+                        Jawaban benar: {results.correctAnswerValues[q.id]}
                       </p>
                     )}
-                    {q.explanation && (
+                    {results.explanations[q.id] && (
                       <p className="text-sm text-muted-foreground mt-2 italic">
-                        {q.explanation}
+                        {results.explanations[q.id]}
                       </p>
                     )}
                   </div>
@@ -307,7 +265,6 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
               value={answers[currentQuestion.id] || ""}
               onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
               placeholder="Ketik jawaban Anda..."
-              className="input-apple"
             />
           )}
         </div>
@@ -322,7 +279,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                 i === currentIndex
                   ? "bg-primary text-primary-foreground"
                   : answers[q.id]
-                  ? "bg-success/20 text-success"
+                  ? "bg-green-500/20 text-green-600"
                   : "bg-muted hover:bg-muted/80"
               }`}
             >
@@ -346,11 +303,20 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           {currentIndex === questions.length - 1 ? (
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
+              disabled={validateQuiz.isPending}
               className="gap-2"
             >
-              {isSubmitting ? "Menyimpan..." : "Selesai"}
-              <Check className="h-4 w-4" />
+              {validateQuiz.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Menyimpan...
+                </>
+              ) : (
+                <>
+                  Selesai
+                  <Check className="h-4 w-4" />
+                </>
+              )}
             </Button>
           ) : (
             <Button onClick={handleNext} className="gap-2">
@@ -362,7 +328,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
 
         {/* Unanswered Warning */}
         {Object.keys(answers).length < questions.length && (
-          <div className="flex items-center gap-2 p-3 rounded-lg bg-warning/10 text-warning text-sm">
+          <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 text-amber-600 text-sm">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>
               {questions.length - Object.keys(answers).length} soal belum dijawab

@@ -14,6 +14,9 @@ export interface MaterialRequest {
   admin_notes: string | null;
   created_at: string | null;
   updated_at: string | null;
+  category: string | null;
+  priority: string | null;
+  ai_summary: string | null;
 }
 
 export interface MaterialRequestWithUser extends MaterialRequest {
@@ -87,11 +90,15 @@ export function useCreateRequest() {
     mutationFn: async ({ 
       userId, 
       topic, 
-      description 
+      description,
+      category,
+      priority
     }: { 
       userId: string; 
       topic: string; 
       description?: string;
+      category?: string;
+      priority?: string;
     }) => {
       const { data, error } = await supabase
         .from('material_requests')
@@ -99,6 +106,8 @@ export function useCreateRequest() {
           user_id: userId,
           topic,
           description,
+          category,
+          priority,
         })
         .select()
         .single();

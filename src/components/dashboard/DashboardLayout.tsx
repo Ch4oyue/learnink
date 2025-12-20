@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, forwardRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,6 @@ import {
   BookOpen,
   FileQuestion,
   Users,
-  Settings,
   ChevronLeft,
 } from "lucide-react";
 
@@ -30,7 +29,7 @@ const roleBadgeVariants = {
   admin: 'destructive',
 } as const;
 
-export function DashboardLayout({ children }: DashboardLayoutProps) {
+export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(function DashboardLayout({ children }, ref) {
   const { user, role, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -59,7 +58,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div ref={ref} className="min-h-screen bg-background">
       {/* Sidebar */}
       <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-sm">
         <div className="flex h-full flex-col">
@@ -133,4 +132,6 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       </main>
     </div>
   );
-}
+});
+
+DashboardLayout.displayName = "DashboardLayout";

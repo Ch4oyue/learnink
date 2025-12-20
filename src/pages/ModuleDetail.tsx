@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
-import { useQuizzes, useQuizQuestions, useUserQuizAttempts, Quiz } from "@/hooks/useQuiz";
+import { useQuizzes, useQuizQuestionsSafe, useUserQuizAttempts, Quiz } from "@/hooks/useQuiz";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { QuizPlayer } from "@/components/quiz/QuizPlayer";
 import { Navbar } from "@/components/layout/Navbar";
@@ -62,7 +62,7 @@ export default function ModuleDetail() {
   // Quiz state
   const { data: quizzes, isLoading: quizzesLoading, refetch: refetchQuizzes } = useQuizzes(id);
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
-  const { data: quizQuestions } = useQuizQuestions(selectedQuiz?.id);
+  const { data: quizQuestions } = useQuizQuestionsSafe(selectedQuiz?.id);
   const { data: quizAttempts } = useUserQuizAttempts(user?.id, selectedQuiz?.id);
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
   const [showQuizPlayer, setShowQuizPlayer] = useState(false);

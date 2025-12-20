@@ -26,6 +26,17 @@ export interface QuizQuestion {
   order_index: number;
 }
 
+// Safe version without correct_answer for students
+export interface QuizQuestionSafe {
+  id: string;
+  quiz_id: string;
+  question_text: string;
+  question_type: "multiple_choice" | "true_false" | "fill_blank";
+  options: string[] | null;
+  points: number;
+  order_index: number;
+}
+
 export interface QuizAttempt {
   id: string;
   user_id: string;
@@ -37,6 +48,19 @@ export interface QuizAttempt {
   answers: Record<string, string>;
   started_at: string;
   completed_at: string | null;
+}
+
+export interface QuizValidationResult {
+  attempt: QuizAttempt;
+  results: {
+    score: number;
+    totalPoints: number;
+    percentage: number;
+    passed: boolean;
+    correctAnswers: Record<string, boolean>;
+    explanations: Record<string, string | null>;
+    correctAnswerValues: Record<string, string>;
+  };
 }
 
 export function useQuizzes(moduleId?: string) {
@@ -72,6 +96,25 @@ export function useQuiz(quizId?: string) {
   });
 }
 
+// Fetch questions WITHOUT correct_answer for students (security)
+export function useQuizQuestionsSafe(quizId?: string) {
+  return useQuery({
+    queryKey: ["quiz-questions-safe", quizId],
+    queryFn: async () => {
+      if (!quizId) return [];
+      const { data, error } = await supabase
+        .from("quiz_questions")
+        .select("id, quiz_id, question_text, question_type, options, points, order_index")
+        .eq("quiz_id", quizId)
+        .order("order_index", { ascending: true });
+      if (error) throw error;
+      return data as QuizQuestionSafe[];
+    },
+    enabled: !!quizId,
+  });
+}
+
+// Fetch full questions WITH correct_answer (for tutors/admins only)
 export function useQuizQuestions(quizId?: string) {
   return useQuery({
     queryKey: ["quiz-questions", quizId],
@@ -165,6 +208,44 @@ export function useCreateQuizQuestions() {
   });
 }
 
+// Server-side quiz validation (secure)
+export function useValidateQuizAnswers() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (params: { quiz_id: string; answers: Record<string, string> }) => {
+      const { data, error } = await supabase.functions.invoke('validate-quiz-answers', {
+        body: params,
+      });
+      
+      if (error) throw error;
+      if (data.error) throw new Error(data.error);
+      
+      return data as QuizValidationResult;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["quiz-attempts"] });
+      toast({
+        title: data.results.passed ? "Selamat!" : "Coba Lagi",
+        description: data.results.passed 
+          ? `Anda lulus dengan skor ${data.results.percentage}%` 
+          : `Skor Anda ${data.results.percentage}%. Minimal untuk lulus adalah skor tertentu.`,
+        variant: data.results.passed ? "default" : "destructive",
+      });
+    },
+    onError: (error) => {
+      console.error("Error validating quiz:", error);
+      toast({
+        title: "Error",
+        description: "Gagal memproses hasil kuis",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+// Deprecated: Use useValidateQuizAnswers instead for security
 export function useSubmitQuizAttempt() {
   const queryClient = useQueryClient();
   const { toast } = useToast();

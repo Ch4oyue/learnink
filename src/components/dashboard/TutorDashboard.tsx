@@ -263,7 +263,9 @@ export function TutorDashboard() {
         <TabsContent value="modules" className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Modul yang Saya Buat</h2>
-            <Button size="sm">+ Buat Modul</Button>
+            <Button size="sm" asChild>
+              <Link to="/dashboard/modules/create">+ Buat Modul</Link>
+            </Button>
           </div>
 
           {modulesLoading ? (
@@ -292,8 +294,8 @@ export function TutorDashboard() {
                         <Eye className="h-4 w-4 mr-1" /> Preview
                       </Link>
                     </Button>
-                    <Button size="sm" variant="outline" className="flex-1">
-                      Edit
+                    <Button size="sm" variant="outline" className="flex-1" asChild>
+                      <Link to={`/dashboard/modules/edit/${module.id}`}>Edit</Link>
                     </Button>
                   </div>
                 </div>
@@ -303,7 +305,9 @@ export function TutorDashboard() {
             <div className="bg-card border border-border rounded-xl p-12 text-center shadow-soft">
               <BookOpen className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
               <p className="text-muted-foreground mb-4">Anda belum membuat modul</p>
-              <Button>Buat Modul Pertama</Button>
+              <Button asChild>
+                <Link to="/dashboard/modules/create">Buat Modul Pertama</Link>
+              </Button>
             </div>
           )}
         </TabsContent>

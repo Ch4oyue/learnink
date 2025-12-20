@@ -8,6 +8,7 @@ import {
   FileQuestion,
   Bell,
   User,
+  Users,
 } from "lucide-react";
 
 export function BottomNavigation() {
@@ -39,6 +40,12 @@ export function BottomNavigation() {
       label: "Request",
       icon: FileQuestion,
       roles: ["tutor", "admin"],
+    },
+    {
+      href: "/dashboard/users",
+      label: "Users",
+      icon: Users,
+      roles: ["admin"],
     },
     {
       href: "/dashboard/notifications",

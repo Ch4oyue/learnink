@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      material_requests: {
+        Row: {
+          admin_notes: string | null
+          assigned_to: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          status: Database["public"]["Enums"]["request_status"] | null
+          topic: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["request_status"] | null
+          topic: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          admin_notes?: string | null
+          assigned_to?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          status?: Database["public"]["Enums"]["request_status"] | null
+          topic?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      modules: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          icon_name: string | null
+          id: string
+          is_published: boolean | null
+          level: string | null
+          summary: string | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          icon_name?: string | null
+          id?: string
+          is_published?: boolean | null
+          level?: string | null
+          summary?: string | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          icon_name?: string | null
+          id?: string
+          is_published?: boolean | null
+          level?: string | null
+          summary?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -37,6 +109,44 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      user_progress: {
+        Row: {
+          completed_at: string | null
+          id: string
+          is_completed: boolean | null
+          module_id: string
+          progress_percent: number | null
+          started_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          id?: string
+          is_completed?: boolean | null
+          module_id: string
+          progress_percent?: number | null
+          started_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          id?: string
+          is_completed?: boolean | null
+          module_id?: string
+          progress_percent?: number | null
+          started_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_progress_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -70,7 +180,8 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "user" | "moderator" | "admin"
+      app_role: "user" | "moderator" | "admin" | "tutor"
+      request_status: "pending" | "reviewing" | "completed" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -198,7 +309,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["user", "moderator", "admin"],
+      app_role: ["user", "moderator", "admin", "tutor"],
+      request_status: ["pending", "reviewing", "completed", "rejected"],
     },
   },
 } as const

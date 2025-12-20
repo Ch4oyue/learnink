@@ -2,13 +2,16 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { RoleProtectedRoute } from "@/components/auth/RoleProtectedRoute";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import { UserDashboard } from "@/components/dashboard/UserDashboard";
+import { TutorDashboard } from "@/components/dashboard/TutorDashboard";
+import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -26,11 +29,34 @@ const App = () => (
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <Navigate to="/dashboard/user" replace />
                 </ProtectedRoute>
               }
             />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route
+              path="/dashboard/user"
+              element={
+                <RoleProtectedRoute allowedRoles={['user', 'tutor', 'admin']}>
+                  <UserDashboard />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/tutor"
+              element={
+                <RoleProtectedRoute allowedRoles={['tutor', 'admin']}>
+                  <TutorDashboard />
+                </RoleProtectedRoute>
+              }
+            />
+            <Route
+              path="/dashboard/admin"
+              element={
+                <RoleProtectedRoute allowedRoles={['admin']}>
+                  <AdminDashboard />
+                </RoleProtectedRoute>
+              }
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

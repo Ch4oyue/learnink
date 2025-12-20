@@ -419,6 +419,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_quiz_questions_safe: {
+        Args: { p_quiz_id: string }
+        Returns: {
+          id: string
+          options: Json
+          order_index: number
+          points: number
+          question_text: string
+          question_type: string
+          quiz_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

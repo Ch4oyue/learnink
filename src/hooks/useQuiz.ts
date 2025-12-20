@@ -96,19 +96,23 @@ export function useQuiz(quizId?: string) {
   });
 }
 
-// Fetch questions WITHOUT correct_answer for students (security)
+// Fetch questions WITHOUT correct_answer for students (security via RPC function)
 export function useQuizQuestionsSafe(quizId?: string) {
   return useQuery({
     queryKey: ["quiz-questions-safe", quizId],
     queryFn: async () => {
       if (!quizId) return [];
+      
+      // Use secure RPC function that doesn't expose correct_answer
       const { data, error } = await supabase
-        .from("quiz_questions")
-        .select("id, quiz_id, question_text, question_type, options, points, order_index")
-        .eq("quiz_id", quizId)
-        .order("order_index", { ascending: true });
-      if (error) throw error;
-      return data as QuizQuestionSafe[];
+        .rpc("get_quiz_questions_safe", { p_quiz_id: quizId });
+      
+      if (error) {
+        console.error("Error fetching quiz questions:", error);
+        throw error;
+      }
+      
+      return (data || []) as QuizQuestionSafe[];
     },
     enabled: !!quizId,
   });

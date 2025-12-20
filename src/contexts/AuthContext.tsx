@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -104,6 +104,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
     });
+
+    // If signup successful and user exists, create profile and default role
+    if (!error && data.user) {
+      // Create profile with display name
+      await supabase.from('profiles').upsert({
+        id: data.user.id,
+        display_name: displayName || null,
+      });
+
+      // Assign default 'user' role
+      await supabase.from('user_roles').upsert({
+        user_id: data.user.id,
+        role: 'user',
+      });
+    }
+
     return { error };
   };
 

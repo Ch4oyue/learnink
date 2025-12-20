@@ -39,7 +39,9 @@ export function useUpdateUserRole() {
       return data;
     },
     onSuccess: (_, variables) => {
+      // Invalidate specific user role and all user role queries
       queryClient.invalidateQueries({ queryKey: ['user-role', variables.userId] });
+      queryClient.invalidateQueries({ queryKey: ['user-role'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
         title: "Berhasil",

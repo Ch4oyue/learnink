@@ -26,12 +26,41 @@ function validateAndSanitizeInput(text: string | null | undefined, maxLength: nu
   return cleaned;
 }
 
-// Validate generated content for potential XSS
+// Comprehensive XSS sanitization for generated content
 function sanitizeGeneratedContent(content: string): string {
-  // Remove script tags and javascript: URLs
-  let sanitized = content.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  let sanitized = content;
+  
+  // Remove script tags
+  sanitized = sanitized.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
+  
+  // Remove javascript: and vbscript: URLs
   sanitized = sanitized.replace(/javascript:/gi, '');
+  sanitized = sanitized.replace(/vbscript:/gi, '');
+  
+  // Remove event handlers (onclick, onerror, onload, etc.)
   sanitized = sanitized.replace(/on\w+\s*=/gi, '');
+  
+  // Remove data URIs that could contain JavaScript
+  sanitized = sanitized.replace(/data:text\/html[^"'\s]*/gi, '');
+  
+  // Remove SVG data URIs (can contain scripts)
+  sanitized = sanitized.replace(/data:image\/svg\+xml[^"'\s]*/gi, '');
+  
+  // Remove iframe tags
+  sanitized = sanitized.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '');
+  
+  // Remove object and embed tags
+  sanitized = sanitized.replace(/<object[^>]*>[\s\S]*?<\/object>/gi, '');
+  sanitized = sanitized.replace(/<embed[^>]*>/gi, '');
+  
+  // Remove base tags (can redirect all URLs)
+  sanitized = sanitized.replace(/<base[^>]*>/gi, '');
+  
+  // Sanitize markdown links with javascript: URIs
+  sanitized = sanitized.replace(/\[([^\]]+)\]\(javascript:[^\)]*\)/gi, '[$1](#)');
+  sanitized = sanitized.replace(/\[([^\]]+)\]\(vbscript:[^\)]*\)/gi, '[$1](#)');
+  sanitized = sanitized.replace(/\[([^\]]+)\]\(data:[^\)]*\)/gi, '[$1](#)');
+  
   return sanitized;
 }
 

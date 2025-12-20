@@ -93,6 +93,14 @@ export function useMarkAllNotificationsAsRead() {
   });
 }
 
+/**
+ * Create a notification.
+ * 
+ * IMPORTANT: This hook only works for users with 'admin' or 'tutor' roles
+ * due to RLS policies. Regular users cannot create notifications.
+ * For system-generated notifications (e.g., from Edge Functions),
+ * use the service role client which bypasses RLS.
+ */
 export function useCreateNotification() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -117,6 +125,11 @@ export function useCreateNotification() {
     },
     onError: (error) => {
       console.error("Error creating notification:", error);
+      toast({
+        title: "Error",
+        description: "Gagal membuat notifikasi. Pastikan Anda memiliki izin yang tepat.",
+        variant: "destructive",
+      });
     },
   });
 }

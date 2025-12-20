@@ -3,6 +3,7 @@ import { HeroSection } from "@/components/sections/HeroSection";
 import { FeaturesSection } from "@/components/sections/FeaturesSection";
 import { ModulesSection } from "@/components/sections/ModulesSection";
 import { RequestSection } from "@/components/sections/RequestSection";
+import { Footer } from "@/components/layout/Footer";
 import { Toaster } from "@/components/ui/toaster";
 
 const Index = () => {
@@ -31,6 +32,7 @@ const Index = () => {
         </div>
       </main>
 
+      <Footer />
       <Toaster />
     </div>
   );

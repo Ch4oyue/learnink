@@ -5,8 +5,12 @@ import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
-import { Send, CheckCircle } from "lucide-react";
+import { Send, CheckCircle, LogIn, AlertCircle } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCreateRequest } from "@/hooks/useMaterialRequests";
+import { useNavigate } from "react-router-dom";
 
 const requestSchema = z.object({
   topic: z
@@ -19,41 +23,76 @@ const requestSchema = z.object({
     .trim()
     .min(10, { message: "Deskripsi minimal 10 karakter" })
     .max(500, { message: "Deskripsi maksimal 500 karakter" }),
+  priority: z.enum(["low", "medium", "high"]).default("medium"),
+  category: z.string().optional(),
 });
 
 type RequestFormData = z.infer<typeof requestSchema>;
 
+const categories = [
+  "Pemula",
+  "Automation",
+  "Data Analysis",
+  "Content Creation",
+  "Chatbot",
+  "Productivity",
+  "Lainnya",
+];
+
 export const RequestSection = () => {
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const createRequest = useCreateRequest();
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<RequestFormData>({
     resolver: zodResolver(requestSchema),
+    defaultValues: {
+      priority: "medium",
+    },
   });
 
+  const priority = watch("priority");
+  const category = watch("category");
+
   const onSubmit = async (data: RequestFormData) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    if (!user) {
+      toast({
+        title: "Login Diperlukan",
+        description: "Silakan login terlebih dahulu untuk mengirim request.",
+        variant: "destructive",
+      });
+      return;
+    }
 
-    setIsSubmitted(true);
-    toast({
-      title: "Request Terkirim!",
-      description: "Kami akan segera meninjau permintaan materi Anda.",
-    });
+    try {
+      await createRequest.mutateAsync({
+        userId: user.id,
+        topic: data.topic,
+        description: data.description,
+      });
 
-    // Reset form after showing success
-    setTimeout(() => {
-      reset();
-      setIsSubmitted(false);
-    }, 3000);
+      setIsSubmitted(true);
+
+      // Reset form after showing success
+      setTimeout(() => {
+        reset();
+        setIsSubmitted(false);
+      }, 3000);
+    } catch (error) {
+      console.error("Error submitting request:", error);
+    }
   };
 
   return (
-    <section className="py-24 md:py-32 bg-background">
+    <section id="request" className="py-24 md:py-32 bg-background">
       <div className="container mx-auto px-6 md:px-8">
         <div className="max-w-2xl mx-auto">
           {/* Section Header */}
@@ -65,22 +104,41 @@ export const RequestSection = () => {
               Butuh Materi Khusus?
             </h2>
             <p className="text-muted-foreground text-lg">
-              Kirim request Anda dan tim kami akan membuatkan materi sesuai kebutuhan.
+              Kirim request Anda dan tim kami akan membuatkan materi sesuai kebutuhan dengan bantuan AI.
             </p>
           </div>
 
           {/* Form Card */}
-          <div className="bg-card rounded-2xl p-8 md:p-10 shadow-soft border border-border/50">
-            {isSubmitted ? (
+          <div className="card-apple p-8 md:p-10">
+            {!user ? (
+              // Login prompt
               <div className="text-center py-8 animate-fade-in">
-                <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-8 h-8 text-emerald-600" />
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                  <LogIn className="w-8 h-8 text-primary" />
+                </div>
+                <h3 className="text-xl font-semibold text-foreground mb-2">
+                  Login Diperlukan
+                </h3>
+                <p className="text-muted-foreground mb-6">
+                  Silakan login terlebih dahulu untuk mengirim request materi.
+                </p>
+                <Button
+                  onClick={() => navigate("/auth")}
+                  className="rounded-xl press-effect"
+                >
+                  Login Sekarang
+                </Button>
+              </div>
+            ) : isSubmitted ? (
+              <div className="text-center py-8 animate-scale-in">
+                <div className="w-16 h-16 rounded-full bg-success/10 flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-8 h-8 text-success" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
                   Terima Kasih!
                 </h3>
                 <p className="text-muted-foreground">
-                  Request Anda telah kami terima. Kami akan menghubungi Anda segera.
+                  Request Anda telah dikirim. Kami akan memprosesnya dengan AI dan mengirim notifikasi saat selesai.
                 </p>
               </div>
             ) : (
@@ -96,12 +154,77 @@ export const RequestSection = () => {
                   <Input
                     id="topic"
                     placeholder="Contoh: Automasi Email dengan AI"
-                    className="h-12 rounded-xl border-border/60 bg-background focus:border-primary focus:ring-primary/20 transition-all duration-200"
+                    className="input-apple"
                     {...register("topic")}
                   />
                   {errors.topic && (
-                    <p className="text-sm text-destructive">{errors.topic.message}</p>
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {errors.topic.message}
+                    </p>
                   )}
+                </div>
+
+                {/* Category & Priority Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Category */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-foreground">
+                      Kategori
+                    </label>
+                    <Select
+                      value={category}
+                      onValueChange={(value) => setValue("category", value)}
+                    >
+                      <SelectTrigger className="h-11 rounded-xl">
+                        <SelectValue placeholder="Pilih kategori" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Priority */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-foreground">
+                      Prioritas
+                    </label>
+                    <Select
+                      value={priority}
+                      onValueChange={(value: "low" | "medium" | "high") =>
+                        setValue("priority", value)
+                      }
+                    >
+                      <SelectTrigger className="h-11 rounded-xl">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-success" />
+                            Rendah
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="medium">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-warning" />
+                            Sedang
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="high">
+                          <span className="flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-destructive" />
+                            Tinggi
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {/* Description Field */}
@@ -116,11 +239,12 @@ export const RequestSection = () => {
                     id="description"
                     placeholder="Jelaskan apa yang ingin Anda capai dengan mempelajari topik ini..."
                     rows={5}
-                    className="rounded-xl border-border/60 bg-background focus:border-primary focus:ring-primary/20 transition-all duration-200 resize-none"
+                    className="rounded-xl border-border/60 bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 resize-none"
                     {...register("description")}
                   />
                   {errors.description && (
-                    <p className="text-sm text-destructive">
+                    <p className="text-sm text-destructive flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
                       {errors.description.message}
                     </p>
                   )}
@@ -130,10 +254,10 @@ export const RequestSection = () => {
                 <Button
                   type="submit"
                   size="lg"
-                  disabled={isSubmitting}
-                  className="w-full h-12 rounded-xl text-base font-medium transition-all duration-300"
+                  disabled={isSubmitting || createRequest.isPending}
+                  className="w-full h-12 rounded-xl text-base font-medium transition-all duration-300 press-effect"
                 >
-                  {isSubmitting ? (
+                  {isSubmitting || createRequest.isPending ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
                       Mengirim...
@@ -151,7 +275,7 @@ export const RequestSection = () => {
 
           {/* Helper Text */}
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Biasanya kami merespons dalam 1-2 hari kerja.
+            Request akan diproses dengan AI dan biasanya selesai dalam 1-2 hari kerja.
           </p>
         </div>
       </div>

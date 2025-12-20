@@ -1,7 +1,27 @@
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap, Brain, Bot, ArrowRight } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 export function HeroSection() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const handleStartLearning = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/auth");
+    }
+  };
+
+  const handleViewModules = () => {
+    const modulesSection = document.getElementById("modul");
+    if (modulesSection) {
+      modulesSection.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section
       id="home"
@@ -10,7 +30,7 @@ export function HeroSection() {
       {/* Background Gradient Orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div
-          className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl animate-fade-in"
+          className="absolute -top-40 -right-40 w-80 h-80 bg-primary/8 rounded-full blur-3xl animate-fade-in"
           style={{ animationDelay: "0.2s" }}
         />
         <div
@@ -18,7 +38,7 @@ export function HeroSection() {
           style={{ animationDelay: "0.4s" }}
         />
         <div
-          className="absolute -bottom-20 right-1/4 w-64 h-64 bg-accent/10 rounded-full blur-3xl animate-fade-in"
+          className="absolute -bottom-20 right-1/4 w-64 h-64 bg-accent/8 rounded-full blur-3xl animate-fade-in"
           style={{ animationDelay: "0.6s" }}
         />
       </div>
@@ -40,7 +60,7 @@ export function HeroSection() {
             style={{ animationDelay: "0.2s" }}
           >
             Kuasai{" "}
-            <span className="text-primary">AI Automation</span>
+            <span className="text-gradient">AI Automation</span>
             <br />
             Tanpa Ribet
           </h1>
@@ -61,7 +81,8 @@ export function HeroSection() {
           >
             <Button
               size="lg"
-              className="w-full sm:w-auto px-8 py-6 text-base font-medium shadow-soft hover:shadow-medium transition-all duration-300 group"
+              onClick={handleStartLearning}
+              className="w-full sm:w-auto px-8 py-6 text-base font-medium shadow-soft hover:shadow-medium transition-all duration-300 group press-effect rounded-xl"
             >
               Mulai Belajar
               <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -69,7 +90,8 @@ export function HeroSection() {
             <Button
               variant="outline"
               size="lg"
-              className="w-full sm:w-auto px-8 py-6 text-base font-medium border-border/60 hover:bg-secondary/50 transition-all duration-300"
+              onClick={handleViewModules}
+              className="w-full sm:w-auto px-8 py-6 text-base font-medium border-border/60 hover:bg-secondary/50 transition-all duration-300 press-effect rounded-xl"
             >
               Lihat Modul
             </Button>

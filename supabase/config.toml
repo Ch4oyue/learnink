@@ -1,1 +1,7 @@
 project_id = "imkghltdscefumdmbrld"
+
+[functions.summarize-request]
+verify_jwt = true
+
+[functions.generate-module]
+verify_jwt = true

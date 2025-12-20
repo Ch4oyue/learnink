@@ -17,10 +17,13 @@ export type Database = {
       material_requests: {
         Row: {
           admin_notes: string | null
+          ai_summary: string | null
           assigned_to: string | null
+          category: string | null
           created_at: string | null
           description: string | null
           id: string
+          priority: string | null
           status: Database["public"]["Enums"]["request_status"] | null
           topic: string
           updated_at: string | null
@@ -28,10 +31,13 @@ export type Database = {
         }
         Insert: {
           admin_notes?: string | null
+          ai_summary?: string | null
           assigned_to?: string | null
+          category?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
+          priority?: string | null
           status?: Database["public"]["Enums"]["request_status"] | null
           topic: string
           updated_at?: string | null
@@ -39,10 +45,13 @@ export type Database = {
         }
         Update: {
           admin_notes?: string | null
+          ai_summary?: string | null
           assigned_to?: string | null
+          category?: string | null
           created_at?: string | null
           description?: string | null
           id?: string
+          priority?: string | null
           status?: Database["public"]["Enums"]["request_status"] | null
           topic?: string
           updated_at?: string | null
@@ -52,39 +61,110 @@ export type Database = {
       }
       modules: {
         Row: {
+          category: string | null
+          content: string | null
           created_at: string | null
           created_by: string | null
+          generated_at: string | null
           icon_name: string | null
           id: string
           is_published: boolean | null
           level: string | null
+          source_request_id: string | null
           summary: string | null
           title: string
           updated_at: string | null
         }
         Insert: {
+          category?: string | null
+          content?: string | null
           created_at?: string | null
           created_by?: string | null
+          generated_at?: string | null
           icon_name?: string | null
           id?: string
           is_published?: boolean | null
           level?: string | null
+          source_request_id?: string | null
           summary?: string | null
           title: string
           updated_at?: string | null
         }
         Update: {
+          category?: string | null
+          content?: string | null
           created_at?: string | null
           created_by?: string | null
+          generated_at?: string | null
           icon_name?: string | null
           id?: string
           is_published?: boolean | null
           level?: string | null
+          source_request_id?: string | null
           summary?: string | null
           title?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "modules_source_request_id_fkey"
+            columns: ["source_request_id"]
+            isOneToOne: false
+            referencedRelation: "material_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_read: boolean | null
+          message: string
+          related_module_id: string | null
+          related_request_id: string | null
+          title: string
+          type: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message: string
+          related_module_id?: string | null
+          related_request_id?: string | null
+          title: string
+          type?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_read?: boolean | null
+          message?: string
+          related_module_id?: string | null
+          related_request_id?: string | null
+          title?: string
+          type?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_related_module_id_fkey"
+            columns: ["related_module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_related_request_id_fkey"
+            columns: ["related_request_id"]
+            isOneToOne: false
+            referencedRelation: "material_requests"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -107,6 +187,36 @@ export type Database = {
           display_name?: string | null
           id?: string
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      role_change_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string | null
+          id: string
+          new_role: Database["public"]["Enums"]["app_role"]
+          old_role: Database["public"]["Enums"]["app_role"]
+          reason: string | null
+          user_id: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_role: Database["public"]["Enums"]["app_role"]
+          old_role: Database["public"]["Enums"]["app_role"]
+          reason?: string | null
+          user_id: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string | null
+          id?: string
+          new_role?: Database["public"]["Enums"]["app_role"]
+          old_role?: Database["public"]["Enums"]["app_role"]
+          reason?: string | null
+          user_id?: string
         }
         Relationships: []
       }

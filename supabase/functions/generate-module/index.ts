@@ -1,0 +1,225 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const { request_id } = await req.json();
+
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
+    }
+
+    if (!request_id) {
+      throw new Error("request_id is required");
+    }
+
+    console.log("Processing request:", request_id);
+
+    // Create Supabase client with service role
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Fetch the request
+    const { data: request, error: requestError } = await supabase
+      .from("material_requests")
+      .select("*")
+      .eq("id", request_id)
+      .single();
+
+    if (requestError || !request) {
+      throw new Error(`Request not found: ${requestError?.message}`);
+    }
+
+    console.log("Found request:", request.topic);
+
+    // Generate module content with Gemini
+    const prompt = `Kamu adalah instruktur AI yang ahli dalam membuat materi pembelajaran. 
+Buatkan materi pembelajaran lengkap berdasarkan request berikut:
+
+Topik: ${request.topic}
+Deskripsi/Tujuan: ${request.description || "Tidak ada deskripsi spesifik"}
+Kategori: ${request.category || "Umum"}
+
+Buatkan materi pembelajaran dengan format:
+
+# ${request.topic}
+
+## Pendahuluan
+[Penjelasan singkat tentang topik dan mengapa penting dipelajari]
+
+## Tujuan Pembelajaran
+- [Tujuan 1]
+- [Tujuan 2]
+- [Tujuan 3]
+
+## Materi Inti
+
+### 1. [Subtopik 1]
+[Penjelasan detail dengan contoh praktis]
+
+### 2. [Subtopik 2]
+[Penjelasan detail dengan contoh praktis]
+
+### 3. [Subtopik 3]
+[Penjelasan detail dengan contoh praktis]
+
+## Contoh Praktis
+[Berikan contoh nyata penggunaan dalam pekerjaan sehari-hari]
+
+## Tips & Best Practices
+- [Tip 1]
+- [Tip 2]
+- [Tip 3]
+
+## Kesimpulan
+[Ringkasan materi dan langkah selanjutnya]
+
+## Latihan
+1. [Latihan 1]
+2. [Latihan 2]
+3. [Latihan 3]
+
+Pastikan materi:
+- Mudah dipahami untuk pemula non-IT
+- Menggunakan bahasa Indonesia yang baik
+- Menyertakan contoh praktis yang relevan
+- Tidak terlalu teknis tapi tetap informatif`;
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.8,
+            maxOutputTokens: 4000,
+          },
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API error:", response.status, errorText);
+      throw new Error(`Gemini API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (!content) {
+      throw new Error("Failed to generate content from Gemini");
+    }
+
+    console.log("Content generated, length:", content.length);
+
+    // Determine level based on description
+    let level = "Pemula";
+    const desc = (request.description || "").toLowerCase();
+    if (desc.includes("advanced") || desc.includes("lanjutan") || desc.includes("kompleks")) {
+      level = "Lanjutan";
+    } else if (desc.includes("intermediate") || desc.includes("menengah")) {
+      level = "Menengah";
+    }
+
+    // Create the module
+    const { data: module, error: moduleError } = await supabase
+      .from("modules")
+      .insert({
+        title: request.topic,
+        summary: `Materi pembelajaran tentang ${request.topic} yang dibuat berdasarkan request pengguna.`,
+        content: content,
+        level: level,
+        category: request.category || "Umum",
+        icon_name: "Sparkles",
+        is_published: true,
+        source_request_id: request_id,
+        generated_at: new Date().toISOString(),
+      })
+      .select()
+      .single();
+
+    if (moduleError) {
+      console.error("Error creating module:", moduleError);
+      throw new Error(`Failed to create module: ${moduleError.message}`);
+    }
+
+    console.log("Module created:", module.id);
+
+    // Update request status to completed
+    const { error: updateError } = await supabase
+      .from("material_requests")
+      .update({
+        status: "completed",
+        admin_notes: `Modul berhasil di-generate dengan AI. Module ID: ${module.id}`,
+      })
+      .eq("id", request_id);
+
+    if (updateError) {
+      console.error("Error updating request:", updateError);
+    }
+
+    // Create notification for the user
+    if (request.user_id) {
+      const { error: notifError } = await supabase
+        .from("notifications")
+        .insert({
+          user_id: request.user_id,
+          title: "Materi Baru Tersedia! 🎉",
+          message: `Request Anda untuk "${request.topic}" telah selesai diproses. Materi pembelajaran sudah tersedia dan dapat diakses sekarang.`,
+          type: "module",
+          related_request_id: request_id,
+          related_module_id: module.id,
+        });
+
+      if (notifError) {
+        console.error("Error creating notification:", notifError);
+      } else {
+        console.log("Notification created for user:", request.user_id);
+      }
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        module_id: module.id,
+        message: "Module generated successfully",
+      }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    console.error("Error in generate-module function:", error);
+    return new Response(
+      JSON.stringify({ error: errorMessage, success: false }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
+  }
+});

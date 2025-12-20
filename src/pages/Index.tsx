@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { FeaturesSection } from "@/components/sections/FeaturesSection";
+import { ModulesSection } from "@/components/sections/ModulesSection";
 
 const Index = () => {
   return (
@@ -14,14 +15,14 @@ const Index = () => {
           <FeaturesSection />
         </div>
 
-        {/* Placeholder sections for scroll testing */}
+        {/* Placeholder section */}
         <section id="silabus" className="min-h-screen flex items-center justify-center">
           <h2 className="text-3xl font-semibold text-foreground">Silabus</h2>
         </section>
 
-        <section id="modul" className="min-h-screen flex items-center justify-center bg-secondary/30">
-          <h2 className="text-3xl font-semibold text-foreground">Daftar Modul</h2>
-        </section>
+        <div id="modul">
+          <ModulesSection />
+        </div>
 
         <section id="request" className="min-h-screen flex items-center justify-center">
           <h2 className="text-3xl font-semibold text-foreground">Request Materi</h2>

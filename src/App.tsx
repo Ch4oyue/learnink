@@ -20,6 +20,7 @@ import DashboardModules from "./pages/DashboardModules";
 import DashboardRequests from "./pages/DashboardRequests";
 import DashboardNotifications from "./pages/DashboardNotifications";
 import DashboardProfile from "./pages/DashboardProfile";
+import DashboardUsers from "./pages/DashboardUsers";
 import { UserDashboard } from "@/components/dashboard/UserDashboard";
 import { TutorDashboard } from "@/components/dashboard/TutorDashboard";
 import { AdminDashboard } from "@/components/dashboard/AdminDashboard";
@@ -126,6 +127,14 @@ const App = () => (
                   <ProtectedRoute>
                     <DashboardProfile />
                   </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/users"
+                element={
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <DashboardUsers />
+                  </RoleProtectedRoute>
                 }
               />
               <Route path="*" element={<NotFound />} />

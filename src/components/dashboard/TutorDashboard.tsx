@@ -1,10 +1,12 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useMyModules } from "@/hooks/useModules";
 import { useAllRequests, useUpdateRequest, RequestStatus } from "@/hooks/useMaterialRequests";
 import { useAllProgress } from "@/hooks/useUserProgress";
-import { BookOpen, FileQuestion, Users, CheckCircle, Clock, Eye } from "lucide-react";
+import { useGenerateModule } from "@/hooks/useGenerateModule";
+import { BookOpen, FileQuestion, Users, CheckCircle, Clock, Eye, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +25,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const statusLabels: Record<RequestStatus, string> = {
   pending: 'Menunggu',
@@ -41,6 +53,11 @@ const statusColors: Record<RequestStatus, string> = {
 export function TutorDashboard() {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all');
+  const [generateDialog, setGenerateDialog] = useState<{
+    open: boolean;
+    requestId: string;
+    topic: string;
+  }>({ open: false, requestId: '', topic: '' });
   
   const { data: myModules, isLoading: modulesLoading } = useMyModules(user?.id);
   const { data: requests, isLoading: requestsLoading } = useAllRequests(
@@ -48,6 +65,7 @@ export function TutorDashboard() {
   );
   const { data: allProgress } = useAllProgress();
   const updateRequest = useUpdateRequest();
+  const generateModule = useGenerateModule();
 
   const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Tutor";
 
@@ -56,6 +74,15 @@ export function TutorDashboard() {
 
   const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
     updateRequest.mutate({ id: requestId, status: newStatus });
+  };
+
+  const handleGenerateClick = (requestId: string, topic: string) => {
+    setGenerateDialog({ open: true, requestId, topic });
+  };
+
+  const confirmGenerate = () => {
+    generateModule.mutate(generateDialog.requestId);
+    setGenerateDialog({ open: false, requestId: '', topic: '' });
   };
 
   return (
@@ -171,7 +198,9 @@ export function TutorDashboard() {
                 ) : requests && requests.length > 0 ? (
                   requests.map((request) => (
                     <TableRow key={request.id}>
-                      <TableCell className="font-medium">{request.topic}</TableCell>
+                      <TableCell className="font-medium max-w-[200px] truncate">
+                        {request.topic}
+                      </TableCell>
                       <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
                       <TableCell>
                         {request.created_at 
@@ -184,20 +213,38 @@ export function TutorDashboard() {
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right">
-                        <Select
-                          value={request.status || 'pending'}
-                          onValueChange={(value) => handleStatusChange(request.id, value as RequestStatus)}
-                        >
-                          <SelectTrigger className="w-32">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="pending">Menunggu</SelectItem>
-                            <SelectItem value="reviewing">Ditinjau</SelectItem>
-                            <SelectItem value="completed">Selesai</SelectItem>
-                            <SelectItem value="rejected">Ditolak</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        <div className="flex items-center justify-end gap-2">
+                          {(request.status === 'pending' || request.status === 'reviewing') && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleGenerateClick(request.id, request.topic)}
+                              disabled={generateModule.isPending}
+                              className="gap-1"
+                            >
+                              {generateModule.isPending ? (
+                                <Loader2 className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Sparkles className="h-3 w-3" />
+                              )}
+                              Generate AI
+                            </Button>
+                          )}
+                          <Select
+                            value={request.status || 'pending'}
+                            onValueChange={(value) => handleStatusChange(request.id, value as RequestStatus)}
+                          >
+                            <SelectTrigger className="w-28">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="pending">Menunggu</SelectItem>
+                              <SelectItem value="reviewing">Ditinjau</SelectItem>
+                              <SelectItem value="completed">Selesai</SelectItem>
+                              <SelectItem value="rejected">Ditolak</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -240,8 +287,10 @@ export function TutorDashboard() {
                   <h3 className="font-medium text-foreground mb-1">{module.title}</h3>
                   <p className="text-sm text-muted-foreground line-clamp-2">{module.summary}</p>
                   <div className="flex items-center gap-2 mt-4">
-                    <Button size="sm" variant="outline" className="flex-1">
-                      <Eye className="h-4 w-4 mr-1" /> Preview
+                    <Button size="sm" variant="outline" className="flex-1" asChild>
+                      <Link to={`/module/${module.id}`}>
+                        <Eye className="h-4 w-4 mr-1" /> Preview
+                      </Link>
                     </Button>
                     <Button size="sm" variant="outline" className="flex-1">
                       Edit
@@ -259,6 +308,32 @@ export function TutorDashboard() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Generate Confirmation Dialog */}
+      <AlertDialog 
+        open={generateDialog.open} 
+        onOpenChange={(open) => setGenerateDialog(prev => ({ ...prev, open }))}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Sparkles className="h-5 w-5 text-primary" />
+              Generate Modul dengan AI
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}". 
+              Proses ini mungkin membutuhkan waktu beberapa detik.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmGenerate}>
+              <Sparkles className="h-4 w-4 mr-2" />
+              Generate Modul
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

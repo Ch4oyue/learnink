@@ -19,35 +19,37 @@ import { useCreateModule, useUpdateModule, Module } from "@/hooks/useModules";
 import { useAuth } from "@/contexts/AuthContext";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import {
-  BookOpen,
-  Calculator,
+  Bot,
+  Cpu,
+  Workflow,
+  Zap,
+  Brain,
+  Cog,
   Code,
-  FlaskConical,
-  Globe,
+  BookOpen,
   Lightbulb,
-  Palette,
-  Music,
-  Heart,
-  Briefcase,
+  Sparkles,
   Save,
   Eye,
   ArrowLeft,
 } from "lucide-react";
 
+// Icons focused on AI & Automation
 const icons = [
-  { name: "BookOpen", icon: BookOpen },
-  { name: "Calculator", icon: Calculator },
+  { name: "Bot", icon: Bot },
+  { name: "Cpu", icon: Cpu },
+  { name: "Workflow", icon: Workflow },
+  { name: "Zap", icon: Zap },
+  { name: "Brain", icon: Brain },
+  { name: "Cog", icon: Cog },
   { name: "Code", icon: Code },
-  { name: "FlaskConical", icon: FlaskConical },
-  { name: "Globe", icon: Globe },
+  { name: "BookOpen", icon: BookOpen },
   { name: "Lightbulb", icon: Lightbulb },
-  { name: "Palette", icon: Palette },
-  { name: "Music", icon: Music },
-  { name: "Heart", icon: Heart },
-  { name: "Briefcase", icon: Briefcase },
+  { name: "Sparkles", icon: Sparkles },
 ];
 
-const categories = ["Umum", "Matematika", "Sains", "Bahasa", "Teknologi", "Seni"];
+// Categories focused on AI & Automation
+const categories = ["AI Dasar", "Automation", "AI Tools", "Advanced", "Prompt Engineering", "No-Code AI"];
 const levels = ["Pemula", "Menengah", "Lanjutan"];
 
 interface ModuleEditorProps {
@@ -66,9 +68,9 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
     title: module?.title || "",
     summary: module?.summary || "",
     content: module?.content || "",
-    category: module?.category || "Umum",
+    category: module?.category || "AI Dasar",
     level: module?.level || "Pemula",
-    icon_name: module?.icon_name || "BookOpen",
+    icon_name: module?.icon_name || "Bot",
     is_published: module?.is_published || false,
   });
 
@@ -80,9 +82,9 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
         title: module.title,
         summary: module.summary || "",
         content: module.content || "",
-        category: module.category || "Umum",
+        category: module.category || "AI Dasar",
         level: module.level || "Pemula",
-        icon_name: module.icon_name || "BookOpen",
+        icon_name: module.icon_name || "Bot",
         is_published: module.is_published || false,
       });
     }
@@ -121,7 +123,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
     }
   };
 
-  const SelectedIcon = icons.find((i) => i.name === formData.icon_name)?.icon || BookOpen;
+  const SelectedIcon = icons.find((i) => i.name === formData.icon_name)?.icon || Bot;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

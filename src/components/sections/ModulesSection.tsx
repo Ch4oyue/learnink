@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useModules } from "@/hooks/useModules";
@@ -6,10 +7,10 @@ import { useUserProgress } from "@/hooks/useUserProgress";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
   Zap, MessageSquare, Settings, BarChart, FileText, Bot, 
-  BookOpen, Sparkles, Brain, Cpu, Code, Lightbulb 
+  BookOpen, Sparkles, Brain, Cpu, Code, Lightbulb, Workflow, Cog
 } from "lucide-react";
 
-// Icon mapping
+// Icon mapping for AI & Automation focused modules
 const iconMap: Record<string, React.ElementType> = {
   Zap,
   MessageSquare,
@@ -23,6 +24,8 @@ const iconMap: Record<string, React.ElementType> = {
   Cpu,
   Code,
   Lightbulb,
+  Workflow,
+  Cog,
 };
 
 const levelColors: Record<string, string> = {
@@ -31,13 +34,15 @@ const levelColors: Record<string, string> = {
   Lanjutan: "bg-destructive/10 text-destructive",
 };
 
+// Categories focused on AI & Automation
 const categoryColors: Record<string, string> = {
-  Umum: "bg-primary/10 text-primary",
-  Automation: "bg-purple-100 text-purple-700",
-  "Data Analysis": "bg-blue-100 text-blue-700",
-  "Content Creation": "bg-pink-100 text-pink-700",
-  Chatbot: "bg-cyan-100 text-cyan-700",
-  Productivity: "bg-orange-100 text-orange-700",
+  "AI Dasar": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+  "Automation": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+  "AI Tools": "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+  "Advanced": "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+  "Prompt Engineering": "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
+  "No-Code AI": "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-300",
+  "Umum": "bg-primary/10 text-primary",
 };
 
 export const ModulesSection = () => {
@@ -134,9 +139,10 @@ export const ModulesSection = () => {
             const category = module.category || "Umum";
 
             return (
-              <div
+              <Link
+                to={`/module/${module.id}`}
                 key={module.id}
-                className="group card-apple p-8 hover-lift cursor-pointer animate-fade-in"
+                className="group card-apple p-8 hover-lift cursor-pointer animate-fade-in block"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
                 {/* Header with Icon and Level */}
@@ -150,9 +156,9 @@ export const ModulesSection = () => {
                     >
                       {level}
                     </span>
-                    {category && category !== "Umum" && (
+                    {category && (
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[category] || categoryColors.Umum}`}
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[category] || categoryColors["Umum"]}`}
                       >
                         {category}
                       </span>
@@ -165,7 +171,7 @@ export const ModulesSection = () => {
                   {module.title}
                 </h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6 line-clamp-2">
-                  {module.summary || "Materi pembelajaran AI yang terstruktur dan mudah dipahami."}
+                  {module.summary || "Materi pembelajaran AI & Automation yang terstruktur dan mudah dipahami."}
                 </p>
 
                 {/* Progress Bar */}
@@ -181,7 +187,7 @@ export const ModulesSection = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>

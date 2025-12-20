@@ -1,0 +1,136 @@
+import { ReactNode } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import {
+  LogOut,
+  LayoutDashboard,
+  BookOpen,
+  FileQuestion,
+  Users,
+  Settings,
+  ChevronLeft,
+} from "lucide-react";
+
+interface DashboardLayoutProps {
+  children: ReactNode;
+}
+
+const roleLabels = {
+  user: 'Pelajar',
+  tutor: 'Tutor',
+  admin: 'Admin',
+};
+
+const roleBadgeVariants = {
+  user: 'secondary',
+  tutor: 'default',
+  admin: 'destructive',
+} as const;
+
+export function DashboardLayout({ children }: DashboardLayoutProps) {
+  const { user, role, signOut } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const navItems = [
+    { 
+      href: role === 'admin' ? '/dashboard/admin' : role === 'tutor' ? '/dashboard/tutor' : '/dashboard/user', 
+      label: 'Dashboard', 
+      icon: LayoutDashboard,
+      roles: ['user', 'tutor', 'admin'] 
+    },
+    { href: '/dashboard/modules', label: 'Modul', icon: BookOpen, roles: ['user', 'tutor', 'admin'] },
+    { href: '/dashboard/requests', label: 'Request Materi', icon: FileQuestion, roles: ['tutor', 'admin'] },
+    { href: '/dashboard/users', label: 'Manajemen User', icon: Users, roles: ['admin'] },
+  ];
+
+  const filteredNavItems = navItems.filter(item => 
+    role && item.roles.includes(role)
+  );
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Sidebar */}
+      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card/50 backdrop-blur-sm">
+        <div className="flex h-full flex-col">
+          {/* Logo */}
+          <div className="flex h-16 items-center border-b border-border px-6">
+            <Link to="/" className="flex items-center gap-2 text-lg font-semibold">
+              <ChevronLeft className="h-4 w-4 text-muted-foreground" />
+              <span>Learn<span className="text-primary">AI</span></span>
+            </Link>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 space-y-1 p-4">
+            {filteredNavItems.map((item) => {
+              const isActive = location.pathname === item.href || 
+                (item.href.includes('/dashboard/user') && location.pathname === '/dashboard/user') ||
+                (item.href.includes('/dashboard/tutor') && location.pathname === '/dashboard/tutor') ||
+                (item.href.includes('/dashboard/admin') && location.pathname === '/dashboard/admin');
+              
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                    isActive 
+                      ? "bg-primary/10 text-primary" 
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  )}
+                >
+                  <item.icon className="h-4 w-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* User info */}
+          <div className="border-t border-border p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-sm font-medium text-primary">
+                  {displayName.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-foreground truncate">{displayName}</p>
+                <Badge variant={role ? roleBadgeVariants[role] : 'secondary'} className="text-xs">
+                  {role ? roleLabels[role] : 'Loading...'}
+                </Badge>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleSignOut}
+              className="w-full justify-start text-muted-foreground hover:text-foreground"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Keluar
+            </Button>
+          </div>
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <main className="ml-64 min-h-screen">
+        <div className="p-8">
+          {children}
+        </div>
+      </main>
+    </div>
+  );
+}

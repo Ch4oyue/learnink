@@ -277,12 +277,22 @@ export default function ModuleLearn() {
     deleteNote.mutate(noteId);
   };
 
-  // Redirect if not authenticated or no progress
+  // Redirect if not authenticated or hasn't started learning (no progress record)
   useEffect(() => {
-    if (!user && !modulesLoading) {
+    if (modulesLoading) return;
+    
+    if (!user) {
+      navigate(`/module/${id}`);
+      return;
+    }
+    
+    // Check if user has started learning (has a progress record for this module)
+    const hasProgress = userProgress?.some(p => p.module_id === id);
+    if (userProgress !== undefined && !hasProgress) {
+      // User hasn't clicked "Mulai Belajar" yet, redirect to overview
       navigate(`/module/${id}`);
     }
-  }, [user, modulesLoading, id, navigate]);
+  }, [user, modulesLoading, id, navigate, userProgress]);
 
   if (modulesLoading) {
     return (

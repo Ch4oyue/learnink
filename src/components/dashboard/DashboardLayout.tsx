@@ -14,6 +14,7 @@ import {
   Users,
   ChevronLeft,
   Bell,
+  Settings,
 } from "lucide-react";
 
 interface DashboardLayoutProps {
@@ -56,6 +57,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
     { href: '/dashboard/request-material', label: 'Request Materi', icon: FileQuestion, roles: ['user'] },
     { href: '/dashboard/requests', label: 'Kelola Request', icon: FileQuestion, roles: ['tutor', 'admin'] },
     { href: '/dashboard/users', label: 'Manajemen User', icon: Users, roles: ['admin'] },
+    { href: '/dashboard/settings', label: 'Pengaturan', icon: Settings, roles: ['admin'] },
     { href: '/dashboard/notifications', label: 'Notifikasi', icon: Bell, badge: unreadCount, roles: ['user', 'tutor', 'admin'] },
   ];
 

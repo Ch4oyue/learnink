@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppRole } from "@/contexts/AuthContext";
 
@@ -11,6 +12,38 @@ export interface UserWithRole {
 }
 
 export function useUsers() {
+  const queryClient = useQueryClient();
+
+  // Set up realtime subscription for profiles and user_roles
+  useEffect(() => {
+    const profilesChannel = supabase
+      .channel('users-profiles-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'profiles' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['users'] });
+        }
+      )
+      .subscribe();
+
+    const rolesChannel = supabase
+      .channel('users-roles-changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'user_roles' },
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['users'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(profilesChannel);
+      supabase.removeChannel(rolesChannel);
+    };
+  }, [queryClient]);
+
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {

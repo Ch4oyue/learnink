@@ -14,6 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      learning_notes: {
+        Row: {
+          content: string
+          created_at: string | null
+          highlighted_text: string | null
+          id: string
+          module_id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          highlighted_text?: string | null
+          id?: string
+          module_id: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          highlighted_text?: string | null
+          id?: string
+          module_id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "learning_notes_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       material_requests: {
         Row: {
           admin_notes: string | null
@@ -56,6 +94,63 @@ export type Database = {
           topic?: string
           updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      module_categories: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          icon_name: string | null
+          id: string
+          name: string
+          order_index: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          name: string
+          order_index?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          icon_name?: string | null
+          id?: string
+          name?: string
+          order_index?: number | null
+        }
+        Relationships: []
+      }
+      module_levels: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          name: string
+          order_index: number | null
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          order_index?: number | null
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          name?: string
+          order_index?: number | null
         }
         Relationships: []
       }

@@ -53,7 +53,8 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
       roles: ['user', 'tutor', 'admin'] 
     },
     { href: '/dashboard/modules', label: 'Modul', icon: BookOpen, roles: ['user', 'tutor', 'admin'] },
-    { href: '/dashboard/requests', label: 'Request Materi', icon: FileQuestion, roles: ['tutor', 'admin'] },
+    { href: '/dashboard/request-material', label: 'Request Materi', icon: FileQuestion, roles: ['user'] },
+    { href: '/dashboard/requests', label: 'Kelola Request', icon: FileQuestion, roles: ['tutor', 'admin'] },
     { href: '/dashboard/users', label: 'Manajemen User', icon: Users, roles: ['admin'] },
     { href: '/dashboard/notifications', label: 'Notifikasi', icon: Bell, badge: unreadCount, roles: ['user', 'tutor', 'admin'] },
   ];

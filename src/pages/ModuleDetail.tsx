@@ -1,218 +1,88 @@
-import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
-import { useQuizzes, useQuizQuestionsSafe, Quiz } from "@/hooks/useQuiz";
-import { useScrollProgress } from "@/hooks/useScrollProgress";
-import { QuizPlayer } from "@/components/quiz/QuizPlayer";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { ModuleHeader } from "@/components/module/ModuleHeader";
-import { StickyProgressBar } from "@/components/module/StickyProgressBar";
-import { ContentSection } from "@/components/module/ContentSection";
-import { QuizSection } from "@/components/module/QuizSection";
-import { ModuleTOC, extractTOC } from "@/components/module/ModuleTOC";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
 import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { BookOpen, ArrowLeft } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
+  BookOpen, 
+  ArrowLeft, 
+  Play, 
+  CheckCircle, 
+  BarChart3,
+  Brain,
+  Cpu,
+  Workflow,
+  Sparkles,
+  Bot,
+  Clock,
+  ListChecks,
+} from "lucide-react";
+
+const levelColors: Record<string, string> = {
+  Pemula: "bg-green-500/10 text-green-600 border-green-500/20",
+  Menengah: "bg-amber-500/10 text-amber-600 border-amber-500/20",
+  Lanjutan: "bg-red-500/10 text-red-600 border-red-500/20",
+};
+
+const categoryIcons: Record<string, React.ReactNode> = {
+  "AI Dasar": <Brain className="h-4 w-4" />,
+  "Machine Learning": <Cpu className="h-4 w-4" />,
+  Automation: <Workflow className="h-4 w-4" />,
+  "AI Tools": <Sparkles className="h-4 w-4" />,
+  Chatbot: <Bot className="h-4 w-4" />,
+};
 
 export default function ModuleDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, role } = useAuth();
-  const { toast } = useToast();
+  const { user } = useAuth();
   
   const { data: modules, isLoading: modulesLoading } = useModules(true);
-  const { data: userProgress, refetch: refetchProgress } = useUserProgress(user?.id);
+  const { data: userProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
-  
-  // Quiz state
-  const { data: quizzes, isLoading: quizzesLoading, refetch: refetchQuizzes } = useQuizzes(id);
-  const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null);
-  const { data: quizQuestions } = useQuizQuestionsSafe(selectedQuiz?.id);
-  const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
-  const [showQuizPlayer, setShowQuizPlayer] = useState(false);
-  
-  // Sticky progress bar state
-  const [showStickyProgress, setShowStickyProgress] = useState(false);
-  
-  // Content ref for scroll tracking
-  const contentRef = useRef<HTMLElement>(null);
 
   const module = modules?.find(m => m.id === id);
   const progress = userProgress?.find(p => p.module_id === id);
-  const canManageQuiz = role === 'tutor' || role === 'admin';
   const currentProgress = progress?.progress_percent || 0;
   const isCompleted = progress?.is_completed || false;
-  
-  // Determine if user has started learning (has any progress)
   const hasStartedLearning = currentProgress > 0 || isCompleted;
-  
-  // Content is locked if user hasn't started learning (or not logged in)
-  const isContentLocked = !hasStartedLearning;
 
-  // Extract TOC from content
-  const tocItems = module?.content ? extractTOC(module.content) : [];
+  const level = module?.level || "Pemula";
+  const category = module?.category || "AI Dasar";
 
-  // Handle scroll progress update
-  const handleScrollProgressChange = useCallback((scrollProgress: number) => {
-    if (!user || !id || isCompleted) return;
-    
-    // Only update if scroll progress is higher than current
-    // Cap at 80% from scrolling alone - completion requires quiz or manual action
-    const maxScrollProgress = 80;
-    const newProgress = Math.min(scrollProgress, maxScrollProgress);
-    
-    if (newProgress > currentProgress) {
-      updateProgress.mutate(
-        {
-          userId: user.id,
-          moduleId: id,
-          progressPercent: newProgress,
-          isCompleted: false,
-        },
-        {
-          onSuccess: () => {
-            refetchProgress();
-          },
-        }
-      );
-    }
-  }, [user, id, currentProgress, isCompleted, updateProgress, refetchProgress]);
-
-  const { setInitialProgress } = useScrollProgress({
-    contentRef,
-    onProgressChange: handleScrollProgressChange,
-    debounceMs: 1000,
-  });
-
-  // Set initial progress when loaded
-  useEffect(() => {
-    if (currentProgress > 0) {
-      setInitialProgress(currentProgress);
-    }
-  }, [currentProgress, setInitialProgress]);
-
-  // Handle scroll for sticky progress bar
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowStickyProgress(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToContent = () => {
-    document.getElementById('learning-content')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  };
-
+  // Handle "Mulai Belajar" - creates progress record and navigates to learn page
   const handleStartLearning = () => {
-    if (!user || !id) return;
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
     
+    if (!id) return;
+    
+    // Create initial progress record then navigate
     updateProgress.mutate(
       {
         userId: user.id,
         moduleId: id,
-        progressPercent: 10,
+        progressPercent: 5,
         isCompleted: false,
       },
       {
         onSuccess: () => {
-          refetchProgress();
-          // Scroll to content after starting
-          setTimeout(scrollToContent, 100);
+          navigate(`/module/${id}/learn`);
         },
       }
     );
   };
 
+  // Handle "Lanjutkan Belajar" - just navigate (progress already exists)
   const handleContinueLearning = () => {
-    scrollToContent();
-  };
-
-  const handleMarkComplete = () => {
-    if (!user || !id) return;
-    
-    updateProgress.mutate({
-      userId: user.id,
-      moduleId: id,
-      progressPercent: 100,
-      isCompleted: true,
-    });
-  };
-
-  const handleGenerateQuiz = async () => {
-    if (!id) return;
-    
-    setIsGeneratingQuiz(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-quiz', {
-        body: { moduleId: id, questionCount: 5 }
-      });
-      
-      if (error) throw error;
-      
-      if (data.success) {
-        toast({
-          title: "Kuis Berhasil Dibuat",
-          description: `${data.quiz.questions_count} soal telah dibuat untuk modul ini.`,
-        });
-        refetchQuizzes();
-      } else {
-        throw new Error(data.error || "Gagal membuat kuis");
-      }
-    } catch (error: any) {
-      console.error("Error generating quiz:", error);
-      toast({
-        title: "Gagal Membuat Kuis",
-        description: error.message || "Terjadi kesalahan saat membuat kuis.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsGeneratingQuiz(false);
-    }
-  };
-
-  const handleStartQuiz = (quiz: Quiz) => {
-    setSelectedQuiz(quiz);
-    setShowQuizPlayer(true);
-  };
-
-  const handleQuizComplete = (attempt?: { passed?: boolean; percentage?: number }) => {
-    setShowQuizPlayer(false);
-    setSelectedQuiz(null);
-    
-    // Update progress based on quiz result
-    if (user && id && attempt) {
-      const quizBonus = attempt.passed ? 20 : 10;
-      const newProgress = Math.min(100, currentProgress + quizBonus);
-      
-      updateProgress.mutate(
-        {
-          userId: user.id,
-          moduleId: id,
-          progressPercent: newProgress,
-          isCompleted: attempt.passed && newProgress >= 90,
-        },
-        {
-          onSuccess: () => {
-            refetchProgress();
-          },
-        }
-      );
-    }
+    navigate(`/module/${id}/learn`);
   };
 
   if (modulesLoading) {
@@ -256,85 +126,151 @@ export default function ModuleDetail() {
     <div className="min-h-screen bg-background">
       <Navbar />
       
-      {/* Sticky Progress Bar */}
-      <StickyProgressBar
-        title={module.title}
-        progress={currentProgress}
-        isVisible={showStickyProgress && !!user && hasStartedLearning}
-      />
-      
       <main className="container mx-auto px-4 py-8">
-        {/* Header with compact progress */}
-        <div className="mb-8">
-          <ModuleHeader
-            module={module}
-            currentProgress={currentProgress}
-            isCompleted={isCompleted}
-            hasStartedLearning={hasStartedLearning}
-            onStartLearning={handleStartLearning}
-            onContinue={handleContinueLearning}
-            onMarkComplete={handleMarkComplete}
-            isUpdating={updateProgress.isPending}
-            onBack={() => navigate(-1)}
-          />
-        </div>
+        {/* Back Button */}
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={() => navigate(-1)}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Kembali
+        </Button>
 
-        {/* Main Content Layout */}
-        <div className="flex gap-8">
-          {/* TOC Sidebar - Desktop only, hidden when content is locked */}
-          {tocItems.length > 0 && hasStartedLearning && (
-            <ModuleTOC
-              items={tocItems}
-              className="hidden lg:block w-56 flex-shrink-0"
-            />
-          )}
+        {/* Module Overview Card */}
+        <Card className="overflow-hidden">
+          <CardContent className="p-0">
+            {/* Header Section */}
+            <div className="p-6 md:p-8 border-b border-border">
+              {/* Badges */}
+              <div className="flex flex-wrap items-center gap-2 mb-4">
+                <Badge className={levelColors[level]} variant="outline">
+                  <BarChart3 className="h-3 w-3 mr-1" />
+                  {level}
+                </Badge>
+                <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                  {categoryIcons[category] || <Brain className="h-3 w-3" />}
+                  <span className="ml-1">{category}</span>
+                </Badge>
+                {isCompleted && (
+                  <Badge className="bg-green-500/10 text-green-600 border-green-500/20" variant="outline">
+                    <CheckCircle className="h-3 w-3 mr-1" />
+                    Selesai
+                  </Badge>
+                )}
+              </div>
 
-          {/* Main Content Area */}
-          <div className="flex-1 min-w-0 space-y-8">
-            {/* 1. Learning Content (FIRST - Most Important) */}
-            <ContentSection
-              ref={contentRef}
-              content={module.content}
-              isLocked={isContentLocked}
-              isAuthenticated={!!user}
-              onStartLearning={handleStartLearning}
-              isLoading={updateProgress.isPending}
-            />
+              {/* Title */}
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground mb-3">
+                {module.title}
+              </h1>
 
-            {/* 2. Quiz Section (AFTER content) - Only show when learning started */}
-            {hasStartedLearning && (
-              <QuizSection
-                quizzes={quizzes}
-                isLoading={quizzesLoading}
-                canManageQuiz={canManageQuiz}
-                isGenerating={isGeneratingQuiz}
-                onGenerateQuiz={handleGenerateQuiz}
-                onStartQuiz={handleStartQuiz}
-              />
-            )}
-          </div>
-        </div>
+              {/* Summary */}
+              {module.summary && (
+                <p className="text-muted-foreground mb-6 leading-relaxed max-w-3xl">
+                  {module.summary}
+                </p>
+              )}
+
+              {/* CTA Section */}
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                {user ? (
+                  <>
+                    {!hasStartedLearning ? (
+                      <Button 
+                        onClick={handleStartLearning} 
+                        disabled={updateProgress.isPending}
+                        size="lg"
+                        className="gap-2"
+                      >
+                        <Play className="h-5 w-5" />
+                        Mulai Belajar
+                      </Button>
+                    ) : isCompleted ? (
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 text-green-600 bg-green-500/10 px-4 py-2 rounded-lg">
+                          <CheckCircle className="h-5 w-5" />
+                          <span className="font-medium">Modul selesai!</span>
+                        </div>
+                        <Button 
+                          onClick={handleContinueLearning}
+                          variant="outline"
+                          size="lg"
+                        >
+                          Lihat Materi
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button 
+                        onClick={handleContinueLearning} 
+                        size="lg"
+                        className="gap-2"
+                      >
+                        <Play className="h-5 w-5" />
+                        Lanjutkan Belajar
+                      </Button>
+                    )}
+
+                    {/* Progress indicator */}
+                    {hasStartedLearning && !isCompleted && (
+                      <div className="flex items-center gap-3">
+                        <Progress value={currentProgress} className="h-2 w-32" />
+                        <span className="text-sm text-muted-foreground font-medium">
+                          {currentProgress}%
+                        </span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
+                    <p className="text-muted-foreground text-sm">
+                      Masuk untuk melacak progress belajar Anda
+                    </p>
+                    <Button onClick={() => navigate("/auth")} size="sm">
+                      Masuk
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* What You'll Learn Section */}
+            <div className="p-6 md:p-8 bg-muted/30">
+              <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+                <ListChecks className="h-5 w-5 text-primary" />
+                Apa yang akan Anda pelajari
+              </h2>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">Materi pembelajaran lengkap dan terstruktur</span>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">Contoh kode dan praktik langsung</span>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">Quiz untuk menguji pemahaman</span>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-sm text-foreground">Fitur catatan untuk highlight penting</span>
+                </div>
+              </div>
+              
+              {/* Estimated time */}
+              <div className="mt-6 flex items-center gap-2 text-muted-foreground text-sm">
+                <Clock className="h-4 w-4" />
+                <span>Estimasi waktu belajar: 15-30 menit</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </main>
 
       <Footer />
-
-      {/* Quiz Player Dialog */}
-      <Dialog open={showQuizPlayer} onOpenChange={(open) => !open && handleQuizComplete()}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{selectedQuiz?.title}</DialogTitle>
-            <DialogDescription>{selectedQuiz?.description}</DialogDescription>
-          </DialogHeader>
-          {selectedQuiz && quizQuestions && quizQuestions.length > 0 && (
-            <QuizPlayer
-              quiz={selectedQuiz}
-              questions={quizQuestions}
-              onComplete={handleQuizComplete}
-              onCancel={() => handleQuizComplete()}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

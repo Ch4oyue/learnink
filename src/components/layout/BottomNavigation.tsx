@@ -36,16 +36,16 @@ export function BottomNavigation() {
       roles: ["user", "tutor", "admin"],
     },
     {
+      href: "/dashboard/request-material",
+      label: "Request",
+      icon: FileQuestion,
+      roles: ["user"],
+    },
+    {
       href: "/dashboard/requests",
       label: "Request",
       icon: FileQuestion,
       roles: ["tutor", "admin"],
-    },
-    {
-      href: "/dashboard/users",
-      label: "Users",
-      icon: Users,
-      roles: ["admin"],
     },
     {
       href: "/dashboard/notifications",

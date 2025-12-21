@@ -15,10 +15,13 @@ const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Modules = lazy(() => import("./pages/Modules"));
 const ModuleDetail = lazy(() => import("./pages/ModuleDetail"));
+const ModuleLearn = lazy(() => import("./pages/ModuleLearn"));
 const RequestDetail = lazy(() => import("./pages/RequestDetail"));
 const Syllabus = lazy(() => import("./pages/Syllabus"));
 const ModuleCreate = lazy(() => import("./pages/ModuleCreate"));
 const ModuleEdit = lazy(() => import("./pages/ModuleEdit"));
+const DashboardRequestMaterial = lazy(() => import("./pages/DashboardRequestMaterial"));
+const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
 const DashboardModules = lazy(() => import("./pages/DashboardModules"));
 const DashboardRequests = lazy(() => import("./pages/DashboardRequests"));
 const DashboardNotifications = lazy(() => import("./pages/DashboardNotifications"));
@@ -62,6 +65,7 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/modules" element={<Modules />} />
                 <Route path="/module/:id" element={<ModuleDetail />} />
+                <Route path="/module/:id/learn" element={<ProtectedRoute><ModuleLearn /></ProtectedRoute>} />
                 <Route path="/syllabus" element={<Syllabus />} />
                 <Route
                   path="/request/:id"
@@ -156,6 +160,22 @@ const App = () => (
                   element={
                     <RoleProtectedRoute allowedRoles={['admin']}>
                       <DashboardUsers />
+                    </RoleProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/request-material"
+                  element={
+                    <ProtectedRoute>
+                      <DashboardRequestMaterial />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/dashboard/settings"
+                  element={
+                    <RoleProtectedRoute allowedRoles={['admin']}>
+                      <DashboardSettings />
                     </RoleProtectedRoute>
                   }
                 />

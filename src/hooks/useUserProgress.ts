@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +27,7 @@ export function useUserProgress(userId?: string) {
     queryKey: ['user-progress', userId],
     queryFn: async () => {
       if (!userId) return [];
-      
+
       const { data, error } = await supabase
         .from('user_progress')
         .select(`
@@ -40,7 +41,7 @@ export function useUserProgress(userId?: string) {
         `)
         .eq('user_id', userId)
         .order('started_at', { ascending: false });
-      
+
       if (error) throw error;
       return data as UserProgressWithModule[];
     },
@@ -63,7 +64,7 @@ export function useAllProgress() {
           )
         `)
         .order('started_at', { ascending: false });
-      
+
       if (error) throw error;
       return data;
     },
@@ -75,21 +76,21 @@ export function useUpdateProgress() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async ({ 
-      userId, 
-      moduleId, 
+    mutationFn: async ({
+      userId,
+      moduleId,
       progressPercent,
-      isCompleted 
-    }: { 
-      userId: string; 
-      moduleId: string; 
+      isCompleted
+    }: {
+      userId: string;
+      moduleId: string;
       progressPercent: number;
       isCompleted?: boolean;
     }) => {
       const updateData: Record<string, unknown> = {
         progress_percent: progressPercent,
       };
-      
+
       if (isCompleted !== undefined) {
         updateData.is_completed = isCompleted;
         if (isCompleted) {
@@ -108,7 +109,7 @@ export function useUpdateProgress() {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -132,17 +133,20 @@ export function useUpdateProgress() {
 
 export function useProgressStats(userId?: string) {
   const { data: progress } = useUserProgress(userId);
-  
-  const totalModules = progress?.length || 0;
-  const completedModules = progress?.filter(p => p.is_completed).length || 0;
-  const averageProgress = totalModules > 0 
-    ? Math.round(progress!.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / totalModules)
-    : 0;
-  
-  return {
-    totalModules,
-    completedModules,
-    averageProgress,
-    inProgressModules: totalModules - completedModules,
-  };
+
+  return useMemo(() => {
+    const totalModules = progress?.length || 0;
+    const completedModules = progress?.filter(p => p.is_completed).length || 0;
+    const averageProgress = totalModules > 0
+      ? Math.round(progress!.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / totalModules)
+      : 0;
+
+    return {
+      totalModules,
+      completedModules,
+      averageProgress,
+      inProgressModules: totalModules - completedModules,
+    };
+  }, [progress]);
 }
+

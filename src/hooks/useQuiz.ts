@@ -75,7 +75,7 @@ export function useQuizzes(moduleId?: string) {
       if (error) throw error;
       return data as Quiz[];
     },
-    enabled: !!moduleId || true,
+    enabled: true,
   });
 }
 
@@ -102,16 +102,16 @@ export function useQuizQuestionsSafe(quizId?: string) {
     queryKey: ["quiz-questions-safe", quizId],
     queryFn: async () => {
       if (!quizId) return [];
-      
+
       // Use secure RPC function that doesn't expose correct_answer
       const { data, error } = await supabase
         .rpc("get_quiz_questions_safe", { p_quiz_id: quizId });
-      
+
       if (error) {
         console.error("Error fetching quiz questions:", error);
         throw error;
       }
-      
+
       return (data || []) as QuizQuestionSafe[];
     },
     enabled: !!quizId,
@@ -222,18 +222,18 @@ export function useValidateQuizAnswers() {
       const { data, error } = await supabase.functions.invoke('validate-quiz-answers', {
         body: params,
       });
-      
+
       if (error) throw error;
       if (data.error) throw new Error(data.error);
-      
+
       return data as QuizValidationResult;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["quiz-attempts"] });
       toast({
         title: data.results.passed ? "Selamat!" : "Coba Lagi",
-        description: data.results.passed 
-          ? `Anda lulus dengan skor ${data.results.percentage}%` 
+        description: data.results.passed
+          ? `Anda lulus dengan skor ${data.results.percentage}%`
           : `Skor Anda ${data.results.percentage}%. Minimal untuk lulus adalah skor tertentu.`,
         variant: data.results.passed ? "default" : "destructive",
       });
@@ -271,8 +271,8 @@ export function useSubmitQuizAttempt() {
       queryClient.invalidateQueries({ queryKey: ["quiz-attempts"] });
       toast({
         title: data.passed ? "Selamat!" : "Coba Lagi",
-        description: data.passed 
-          ? `Anda lulus dengan skor ${data.percentage}%` 
+        description: data.passed
+          ? `Anda lulus dengan skor ${data.percentage}%`
           : `Skor Anda ${data.percentage}%. Minimal ${70}% untuk lulus.`,
         variant: data.passed ? "default" : "destructive",
       });

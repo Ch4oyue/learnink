@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
@@ -17,7 +17,7 @@ import { LearningNotesSidebar } from "@/components/module/LearningNotesSidebar";
 import { TextSelectionMenu } from "@/components/module/TextSelectionMenu";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -33,11 +33,11 @@ export default function ModuleLearn() {
   const navigate = useNavigate();
   const { user, role } = useAuth();
   const { toast } = useToast();
-  
+
   const { data: modules, isLoading: modulesLoading } = useModules(true);
   const { data: userProgress, refetch: refetchProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
-  
+
   // Quiz state
   const { data: quizzes, isLoading: quizzesLoading, refetch: refetchQuizzes } = useQuizzes(id);
   const { data: userQuizAttempts } = useUserQuizAttempts(user?.id);
@@ -45,35 +45,42 @@ export default function ModuleLearn() {
   const { data: quizQuestions } = useQuizQuestionsSafe(selectedQuiz?.id);
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
   const [showQuizPlayer, setShowQuizPlayer] = useState(false);
-  
+
   // Notes state
   const { data: notes, isLoading: notesLoading } = useLearningNotes(user?.id, id);
   const createNote = useCreateLearningNote();
   const deleteNote = useDeleteLearningNote();
-  
+
   // Text selection state
   const [selectedText, setSelectedText] = useState("");
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
-  
+
   // Sticky progress bar state
   const [showStickyProgress, setShowStickyProgress] = useState(false);
-  
+
   // Content ref for scroll tracking
   const contentRef = useRef<HTMLElement>(null);
 
-  const module = modules?.find(m => m.id === id);
-  const progress = userProgress?.find(p => p.module_id === id);
+  // Memoize derived values to prevent recalculation on every render
+  const module = useMemo(() => modules?.find(m => m.id === id), [modules, id]);
+  const progress = useMemo(() => userProgress?.find(p => p.module_id === id), [userProgress, id]);
   const canManageQuiz = role === 'tutor' || role === 'admin';
   const currentProgress = progress?.progress_percent || 0;
   const isCompleted = progress?.is_completed || false;
-  
+
   // Check if user has passed any quiz for this module
-  const hasPassedQuiz = userQuizAttempts?.some(
-    attempt => quizzes?.some(q => q.id === attempt.quiz_id) && attempt.passed
-  ) || false;
+  const hasPassedQuiz = useMemo(() =>
+    userQuizAttempts?.some(
+      attempt => quizzes?.some(q => q.id === attempt.quiz_id) && attempt.passed
+    ) || false,
+    [userQuizAttempts, quizzes]
+  );
 
   // Extract TOC from content
-  const tocItems = module?.content ? extractTOC(module.content) : [];
+  const tocItems = useMemo(() =>
+    module?.content ? extractTOC(module.content) : [],
+    [module?.content]
+  );
 
   // Disable right-click on learning page
   useEffect(() => {
@@ -89,7 +96,7 @@ export default function ModuleLearn() {
     const handleMouseUp = () => {
       const selection = window.getSelection();
       const text = selection?.toString().trim();
-      
+
       if (text && text.length > 0) {
         const range = selection?.getRangeAt(0);
         const rect = range?.getBoundingClientRect();
@@ -113,10 +120,10 @@ export default function ModuleLearn() {
   // Handle scroll progress update
   const handleScrollProgressChange = useCallback((scrollProgress: number) => {
     if (!user || !id || isCompleted) return;
-    
+
     const maxScrollProgress = 80;
     const newProgress = Math.min(scrollProgress, maxScrollProgress);
-    
+
     if (newProgress > currentProgress) {
       updateProgress.mutate(
         {
@@ -163,7 +170,7 @@ export default function ModuleLearn() {
       });
       return;
     }
-    
+
     updateProgress.mutate({
       userId: user.id,
       moduleId: id,
@@ -182,15 +189,15 @@ export default function ModuleLearn() {
 
   const handleGenerateQuiz = async () => {
     if (!id) return;
-    
+
     setIsGeneratingQuiz(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-quiz', {
         body: { moduleId: id, questionCount: 5 }
       });
-      
+
       if (error) throw error;
-      
+
       if (data.success) {
         toast({
           title: "Kuis Berhasil Dibuat",
@@ -220,11 +227,11 @@ export default function ModuleLearn() {
   const handleQuizComplete = (attempt?: { passed?: boolean; percentage?: number }) => {
     setShowQuizPlayer(false);
     setSelectedQuiz(null);
-    
+
     if (user && id && attempt) {
       const quizBonus = attempt.passed ? 20 : 10;
       const newProgress = Math.min(100, currentProgress + quizBonus);
-      
+
       updateProgress.mutate(
         {
           userId: user.id,
@@ -280,12 +287,12 @@ export default function ModuleLearn() {
   // Redirect if not authenticated or hasn't started learning (no progress record)
   useEffect(() => {
     if (modulesLoading) return;
-    
+
     if (!user) {
       navigate(`/module/${id}`);
       return;
     }
-    
+
     // Check if user has started learning (has a progress record for this module)
     const hasProgress = userProgress?.some(p => p.module_id === id);
     if (userProgress !== undefined && !hasProgress) {
@@ -334,14 +341,14 @@ export default function ModuleLearn() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      
+
       {/* Sticky Progress Bar */}
       <StickyProgressBar
         title={module.title}
         progress={currentProgress}
         isVisible={showStickyProgress}
       />
-      
+
       {/* Text Selection Menu */}
       {selectionPosition && selectedText && (
         <TextSelectionMenu
@@ -351,19 +358,19 @@ export default function ModuleLearn() {
           isCreating={createNote.isPending}
         />
       )}
-      
+
       <main className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => navigate(`/module/${id}`)}
             className="mb-4"
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke Detail Modul
           </Button>
-          
+
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-2xl font-bold text-foreground">{module.title}</h1>
@@ -371,10 +378,10 @@ export default function ModuleLearn() {
                 Progress: {currentProgress}% {isCompleted && <span className="text-success">(Selesai)</span>}
               </p>
             </div>
-            
+
             {/* Mark Complete Button - Only show if quiz passed */}
             {!isCompleted && hasPassedQuiz && (
-              <Button 
+              <Button
                 onClick={handleMarkComplete}
                 disabled={updateProgress.isPending}
                 className="gap-2"
@@ -387,7 +394,7 @@ export default function ModuleLearn() {
                 Tandai Selesai
               </Button>
             )}
-            
+
             {!isCompleted && !hasPassedQuiz && quizzes && quizzes.length > 0 && (
               <p className="text-sm text-muted-foreground italic">
                 Selesaikan quiz untuk dapat menandai modul sebagai selesai

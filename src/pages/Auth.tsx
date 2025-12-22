@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
@@ -35,6 +36,213 @@ const registerSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 type RegisterFormData = z.infer<typeof registerSchema>;
 
+// Separate Login Form Component
+function LoginForm({
+  onSubmit,
+  isLoading,
+  onForgotPassword
+}: {
+  onSubmit: (data: LoginFormData) => Promise<void>;
+  isLoading: boolean;
+  onForgotPassword: () => void;
+}) {
+  const form = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">Email</FormLabel>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="nama@email.com"
+                    className="pl-10"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center justify-between">
+                <FormLabel className="text-foreground">Password</FormLabel>
+                <button
+                  type="button"
+                  onClick={onForgotPassword}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Lupa password?
+                </button>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-10"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Memproses...
+            </>
+          ) : (
+            "Masuk"
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+// Separate Register Form Component
+function RegisterForm({
+  onSubmit,
+  isLoading
+}: {
+  onSubmit: (data: RegisterFormData) => Promise<void>;
+  isLoading: boolean;
+}) {
+  const form = useForm<RegisterFormData>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      displayName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    },
+  });
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+        <FormField
+          control={form.control}
+          name="displayName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">Nama</FormLabel>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                <FormControl>
+                  <Input
+                    type="text"
+                    placeholder="Nama lengkap"
+                    className="pl-10"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">Email</FormLabel>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                <FormControl>
+                  <Input
+                    type="email"
+                    placeholder="nama@email.com"
+                    className="pl-10"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">Password</FormLabel>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Minimal 6 karakter"
+                    className="pl-10"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="text-foreground">Konfirmasi Password</FormLabel>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
+                <FormControl>
+                  <Input
+                    type="password"
+                    placeholder="Ulangi password"
+                    className="pl-10"
+                    {...field}
+                  />
+                </FormControl>
+              </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Memproses...
+            </>
+          ) : (
+            "Daftar"
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,36 +252,6 @@ export default function Auth() {
   const { user, role, signIn, signUp } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Redirect to role-based dashboard if already logged in
-  useEffect(() => {
-    if (user && role) {
-      const dashboardPath = role === 'admin' 
-        ? '/dashboard/admin' 
-        : role === 'tutor' 
-          ? '/dashboard/tutor' 
-          : '/dashboard/user';
-      navigate(dashboardPath);
-    }
-  }, [user, role, navigate]);
-
-  const loginForm = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const registerForm = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
-    defaultValues: {
-      displayName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
 
   const getErrorMessage = (errorMessage: string): string => {
     if (errorMessage.includes("Invalid login credentials")) {
@@ -90,6 +268,18 @@ export default function Auth() {
     }
     return "Terjadi kesalahan. Silakan coba lagi.";
   };
+
+  // Redirect to role-based dashboard if already logged in
+  useEffect(() => {
+    if (user && role) {
+      const dashboardPath = role === 'admin'
+        ? '/dashboard/admin'
+        : role === 'tutor'
+          ? '/dashboard/tutor'
+          : '/dashboard/user';
+      navigate(dashboardPath);
+    }
+  }, [user, role, navigate]);
 
   const onLoginSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -133,8 +323,6 @@ export default function Auth() {
   const toggleMode = () => {
     setIsLogin(!isLogin);
     setIsForgotPassword(false);
-    loginForm.reset();
-    registerForm.reset();
   };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -248,169 +436,16 @@ export default function Auth() {
         {/* Form Card */}
         <div className="bg-card border border-border rounded-2xl p-8 shadow-soft">
           {isLogin ? (
-            <Form {...loginForm}>
-              <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-5">
-                <FormField
-                  control={loginForm.control}
-                  name="email"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground">Email</FormLabel>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                        <Input
-                          placeholder="nama@email.com"
-                          className="pl-10"
-                          aria-invalid={!!fieldState.error}
-                          {...field}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={loginForm.control}
-                  name="password"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <div className="flex items-center justify-between">
-                        <FormLabel className="text-foreground">Password</FormLabel>
-                        <button
-                          type="button"
-                          onClick={() => setIsForgotPassword(true)}
-                          className="text-xs text-primary hover:underline"
-                        >
-                          Lupa password?
-                        </button>
-                      </div>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          className="pl-10"
-                          aria-invalid={!!fieldState.error}
-                          {...field}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Memproses...
-                    </>
-                  ) : (
-                    "Masuk"
-                  )}
-                </Button>
-              </form>
-            </Form>
+            <LoginForm
+              onSubmit={onLoginSubmit}
+              isLoading={isLoading}
+              onForgotPassword={() => setIsForgotPassword(true)}
+            />
           ) : (
-            <Form {...registerForm}>
-              <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-5">
-                <FormField
-                  control={registerForm.control}
-                  name="displayName"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground">Nama</FormLabel>
-                      <div className="relative">
-                        <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                        <Input
-                          placeholder="Nama lengkap"
-                          className="pl-10"
-                          aria-invalid={!!fieldState.error}
-                          {...field}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name="email"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground">Email</FormLabel>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                        <Input
-                          placeholder="nama@email.com"
-                          className="pl-10"
-                          aria-invalid={!!fieldState.error}
-                          {...field}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name="password"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground">Password</FormLabel>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                        <Input
-                          type="password"
-                          placeholder="Minimal 6 karakter"
-                          className="pl-10"
-                          aria-invalid={!!fieldState.error}
-                          {...field}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={registerForm.control}
-                  name="confirmPassword"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <FormLabel className="text-foreground">Konfirmasi Password</FormLabel>
-                      <div className="relative">
-                        <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none z-10" />
-                        <Input
-                          type="password"
-                          placeholder="Ulangi password"
-                          className="pl-10"
-                          aria-invalid={!!fieldState.error}
-                          {...field}
-                        />
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Memproses...
-                    </>
-                  ) : (
-                    "Daftar"
-                  )}
-                </Button>
-              </form>
-            </Form>
+            <RegisterForm
+              onSubmit={onRegisterSubmit}
+              isLoading={isLoading}
+            />
           )}
 
           {/* Toggle */}
@@ -419,6 +454,7 @@ export default function Auth() {
               <>
                 Belum punya akun?{" "}
                 <button
+                  type="button"
                   onClick={toggleMode}
                   className="text-primary font-medium hover:underline"
                 >
@@ -429,6 +465,7 @@ export default function Auth() {
               <>
                 Sudah punya akun?{" "}
                 <button
+                  type="button"
                   onClick={toggleMode}
                   className="text-primary font-medium hover:underline"
                 >

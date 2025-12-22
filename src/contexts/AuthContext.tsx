@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, useMemo, useCallback, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -26,51 +26,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchUserRole = useCallback(async (userId: string) => {
+  const fetchUserRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('user_roles')
         .select('role')
         .eq('user_id', userId)
         .single();
-
+      
       if (error) {
         console.error('Error fetching user role:', error);
         // Default to 'user' if no role found
         setRole('user');
         return;
       }
-
+      
       setRole(data?.role as AppRole || 'user');
     } catch (error) {
       console.error('Error fetching user role:', error);
       setRole('user');
     }
-  }, []);
+  };
 
   useEffect(() => {
     let mounted = true;
-
+    
     // Initialize auth by checking existing session first
     const initializeAuth = async () => {
       try {
         const { data: { session }, error } = await supabase.auth.getSession();
-
+        
         if (!mounted) return;
-
+        
         if (error) {
           console.error('Error getting session:', error);
           setLoading(false);
           return;
         }
-
+        
         setSession(session);
         setUser(session?.user ?? null);
-
+        
         if (session?.user) {
           await fetchUserRole(session.user.id);
         }
-
+        
         if (mounted) {
           setLoading(false);
         }
@@ -88,10 +88,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
-
+        
         setSession(session);
         setUser(session?.user ?? null);
-
+        
         if (session?.user) {
           // Defer Supabase call with setTimeout to avoid deadlock
           setTimeout(() => {
@@ -102,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setRole(null);
         }
-
+        
         setLoading(false);
       }
     );
@@ -113,17 +113,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  const signIn = useCallback(async (email: string, password: string) => {
+  const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     return { error };
-  }, []);
+  };
 
-  const signUp = useCallback(async (email: string, password: string, displayName?: string) => {
+  const signUp = async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
-
+    
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -151,9 +151,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return { error };
-  }, []);
+  };
 
-  const signOut = useCallback(async () => {
+  const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
@@ -163,29 +163,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     }
     setRole(null);
-  }, [toast]);
+  };
 
   const isAdmin = role === 'admin';
   const isTutor = role === 'tutor' || role === 'admin';
 
-  // Memoize context value to prevent unnecessary re-renders
-  const contextValue = useMemo(
-    () => ({
-      user,
-      session,
-      role,
-      loading,
-      signIn,
-      signUp,
+  return (
+    <AuthContext.Provider value={{ 
+      user, 
+      session, 
+      role, 
+      loading, 
+      signIn, 
+      signUp, 
       signOut,
       isAdmin,
-      isTutor,
-    }),
-    [user, session, role, loading, signIn, signUp, signOut, isAdmin, isTutor]
-  );
-
-  return (
-    <AuthContext.Provider value={contextValue}>
+      isTutor
+    }}>
       {children}
     </AuthContext.Provider>
   );

@@ -2,17 +2,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  BookOpen, 
-  ArrowLeft, 
-  Play, 
-  CheckCircle, 
+import {
+  BookOpen,
+  ArrowLeft,
+  Play,
+  CheckCircle,
   BarChart3,
   Brain,
   Cpu,
@@ -21,6 +19,9 @@ import {
   Bot,
   Clock,
   ListChecks,
+  User,
+  Wand2,
+  Shield,
 } from "lucide-react";
 
 const levelColors: Record<string, string> = {
@@ -41,7 +42,7 @@ export default function ModuleDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  
+
   const { data: modules, isLoading: modulesLoading } = useModules(true);
   const { data: userProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
@@ -61,9 +62,9 @@ export default function ModuleDetail() {
       navigate("/auth");
       return;
     }
-    
+
     if (!id) return;
-    
+
     // Create initial progress record then navigate
     updateProgress.mutate(
       {
@@ -88,14 +89,26 @@ export default function ModuleDetail() {
   if (modulesLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
+        {/* Simple Header */}
+        <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
+          <div className="container mx-auto px-4 h-14 flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/modules')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Kembali</span>
+            </Button>
+          </div>
+        </header>
+        <main className="container mx-auto px-4 py-8 pt-20">
           <div className="animate-pulse space-y-4">
             <div className="h-8 w-48 bg-muted rounded" />
             <div className="h-64 bg-muted rounded-xl" />
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -103,8 +116,21 @@ export default function ModuleDetail() {
   if (!module) {
     return (
       <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
+        {/* Simple Header */}
+        <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
+          <div className="container mx-auto px-4 h-14 flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate('/modules')}
+              className="gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Kembali</span>
+            </Button>
+          </div>
+        </header>
+        <main className="container mx-auto px-4 py-8 pt-20">
           <div className="text-center py-16">
             <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-foreground mb-2">Modul Tidak Ditemukan</h1>
@@ -117,26 +143,49 @@ export default function ModuleDetail() {
             </Button>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
 
+  // Determine creator type for watermark
+  const getCreatorBadge = () => {
+    // Check if module was AI generated (using optional chaining for type safety)
+    const isAiGenerated = (module as any).is_ai_generated;
+    if (isAiGenerated) {
+      return (
+        <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20 gap-1">
+          <Wand2 className="h-3 w-3" />
+          AI Generated
+        </Badge>
+      );
+    }
+    // Default to showing it's from a tutor/admin
+    return (
+      <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20 gap-1">
+        <User className="h-3 w-3" />
+        Tutor
+      </Badge>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      
-      <main className="container mx-auto px-4 py-8">
-        {/* Back Button */}
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Kembali
-        </Button>
+      {/* Simple Header - Clean, distraction-free */}
+      <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
+        <div className="container mx-auto px-4 h-14 flex items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/modules')}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Kembali ke Modul</span>
+          </Button>
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8 pt-20">
 
         {/* Module Overview Card */}
         <Card className="overflow-hidden">
@@ -145,6 +194,8 @@ export default function ModuleDetail() {
             <div className="p-6 md:p-8 border-b border-border">
               {/* Badges */}
               <div className="flex flex-wrap items-center gap-2 mb-4">
+                {/* Creator Badge */}
+                {getCreatorBadge()}
                 <Badge className={levelColors[level]} variant="outline">
                   <BarChart3 className="h-3 w-3 mr-1" />
                   {level}
@@ -178,8 +229,8 @@ export default function ModuleDetail() {
                 {user ? (
                   <>
                     {!hasStartedLearning ? (
-                      <Button 
-                        onClick={handleStartLearning} 
+                      <Button
+                        onClick={handleStartLearning}
                         disabled={updateProgress.isPending}
                         size="lg"
                         className="gap-2"
@@ -193,7 +244,7 @@ export default function ModuleDetail() {
                           <CheckCircle className="h-5 w-5" />
                           <span className="font-medium">Modul selesai!</span>
                         </div>
-                        <Button 
+                        <Button
                           onClick={handleContinueLearning}
                           variant="outline"
                           size="lg"
@@ -202,8 +253,8 @@ export default function ModuleDetail() {
                         </Button>
                       </div>
                     ) : (
-                      <Button 
-                        onClick={handleContinueLearning} 
+                      <Button
+                        onClick={handleContinueLearning}
                         size="lg"
                         className="gap-2"
                       >
@@ -259,7 +310,7 @@ export default function ModuleDetail() {
                   <span className="text-sm text-foreground">Fitur catatan untuk highlight penting</span>
                 </div>
               </div>
-              
+
               {/* Estimated time */}
               <div className="mt-6 flex items-center gap-2 text-muted-foreground text-sm">
                 <Clock className="h-4 w-4" />
@@ -269,8 +320,6 @@ export default function ModuleDetail() {
           </CardContent>
         </Card>
       </main>
-
-      <Footer />
     </div>
   );
 }

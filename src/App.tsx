@@ -27,6 +27,7 @@ const DashboardRequests = lazy(() => import("./pages/DashboardRequests"));
 const DashboardNotifications = lazy(() => import("./pages/DashboardNotifications"));
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
 
 // Lazy load dashboard components
 const UserDashboard = lazy(() => import("@/components/dashboard/UserDashboard").then(m => ({ default: m.UserDashboard })));

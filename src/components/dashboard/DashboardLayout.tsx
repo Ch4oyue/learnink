@@ -47,11 +47,11 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
   };
 
   const navItems = [
-    { 
-      href: role === 'admin' ? '/dashboard/admin' : role === 'tutor' ? '/dashboard/tutor' : '/dashboard/user', 
-      label: 'Dashboard', 
+    {
+      href: role === 'admin' ? '/dashboard/admin' : role === 'tutor' ? '/dashboard/tutor' : '/dashboard/user',
+      label: 'Dashboard',
       icon: LayoutDashboard,
-      roles: ['user', 'tutor', 'admin'] 
+      roles: ['user', 'tutor', 'admin']
     },
     { href: '/dashboard/modules', label: 'Modul', icon: BookOpen, roles: ['user', 'tutor', 'admin'] },
     { href: '/dashboard/request-material', label: 'Request Materi', icon: FileQuestion, roles: ['user'] },
@@ -61,7 +61,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
     { href: '/dashboard/notifications', label: 'Notifikasi', icon: Bell, badge: unreadCount, roles: ['user', 'tutor', 'admin'] },
   ];
 
-  const filteredNavItems = navItems.filter(item => 
+  const filteredNavItems = navItems.filter(item =>
     role && item.roles.includes(role)
   );
 
@@ -81,19 +81,19 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
           {/* Navigation */}
           <nav className="flex-1 space-y-1 p-4">
             {filteredNavItems.map((item) => {
-              const isActive = location.pathname === item.href || 
+              const isActive = location.pathname === item.href ||
                 (item.href.includes('/dashboard/user') && location.pathname === '/dashboard/user') ||
                 (item.href.includes('/dashboard/tutor') && location.pathname === '/dashboard/tutor') ||
                 (item.href.includes('/dashboard/admin') && location.pathname === '/dashboard/admin');
-              
+
               return (
                 <Link
                   key={item.href}
                   to={item.href}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors relative",
-                    isActive 
-                      ? "bg-primary/10 text-primary" 
+                    isActive
+                      ? "bg-primary/10 text-primary"
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                 >
@@ -145,13 +145,24 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
             <span>Learn<span className="text-primary">AI</span></span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link to="/dashboard/notifications" className="relative p-2">
-              <Bell className="h-5 w-5" />
-              {unreadCount && unreadCount > 0 && (
-                <span className="absolute top-1 right-1 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium flex items-center justify-center">
-                  {unreadCount > 99 ? "99+" : unreadCount}
+            {/* Hide notification icon on notifications page */}
+            {location.pathname !== '/dashboard/notifications' && (
+              <Link to="/dashboard/notifications" className="relative p-2">
+                <Bell className="h-5 w-5" />
+                {unreadCount && unreadCount > 0 && (
+                  <span className="absolute top-1 right-1 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium flex items-center justify-center">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
+                )}
+              </Link>
+            )}
+            {/* Profile link */}
+            <Link to="/dashboard/profile" className="p-2">
+              <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-xs font-medium text-primary">
+                  {displayName.charAt(0).toUpperCase()}
                 </span>
-              )}
+              </div>
             </Link>
           </div>
         </div>

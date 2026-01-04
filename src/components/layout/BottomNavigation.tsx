@@ -9,6 +9,7 @@ import {
   Bell,
   User,
   Users,
+  Settings,
 } from "lucide-react";
 
 export function BottomNavigation() {
@@ -48,11 +49,18 @@ export function BottomNavigation() {
       roles: ["tutor", "admin"],
     },
     {
+      href: "/dashboard/users",
+      label: "Users",
+      icon: Users,
+      roles: ["admin"],
+    },
+    {
       href: "/dashboard/notifications",
       label: "Notifikasi",
       icon: Bell,
       badge: unreadCount,
       roles: ["user", "tutor", "admin"],
+      hideOnPath: "/dashboard/notifications", // Hide when on this page
     },
     {
       href: "/dashboard/profile",
@@ -63,7 +71,8 @@ export function BottomNavigation() {
   ];
 
   const filteredItems = navItems.filter(
-    (item) => role && item.roles.includes(role)
+    (item) => role && item.roles.includes(role) &&
+      (!item.hideOnPath || location.pathname !== item.hideOnPath)
   );
 
   const isActive = (href: string) => {

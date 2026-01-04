@@ -45,9 +45,9 @@ export const ContentSection = forwardRef<HTMLElement, ContentSectionProps>(
               isLoading={isLoading}
             />
           )}
-          
+
           {content ? (
-            <div className={isLocked ? "blur-sm select-none pointer-events-none" : ""}>
+            <div className={`reading-content ${isLocked ? "blur-sm select-none pointer-events-none" : ""}`}>
               <MarkdownRenderer content={content} />
             </div>
           ) : (

@@ -7,8 +7,6 @@ import { useQuizzes, useQuizQuestionsSafe, Quiz, useUserQuizAttempts } from "@/h
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "@/hooks/useLearningNotes";
 import { QuizPlayer } from "@/components/quiz/QuizPlayer";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
 import { StickyProgressBar } from "@/components/module/StickyProgressBar";
 import { ContentSection } from "@/components/module/ContentSection";
 import { QuizSection } from "@/components/module/QuizSection";
@@ -16,15 +14,23 @@ import { ModuleTOC, extractTOC } from "@/components/module/ModuleTOC";
 import { LearningNotesSidebar } from "@/components/module/LearningNotesSidebar";
 import { TextSelectionMenu } from "@/components/module/TextSelectionMenu";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BookOpen, ArrowLeft, CheckCircle2, List, StickyNote, Loader2 } from "lucide-react";
+import { BookOpen, ArrowLeft, CheckCircle2, List, StickyNote, Loader2, Menu, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
@@ -33,11 +39,11 @@ export default function ModuleLearn() {
   const navigate = useNavigate();
   const { user, role } = useAuth();
   const { toast } = useToast();
-  
+
   const { data: modules, isLoading: modulesLoading } = useModules(true);
   const { data: userProgress, refetch: refetchProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
-  
+
   // Quiz state
   const { data: quizzes, isLoading: quizzesLoading, refetch: refetchQuizzes } = useQuizzes(id);
   const { data: userQuizAttempts } = useUserQuizAttempts(user?.id);
@@ -45,19 +51,26 @@ export default function ModuleLearn() {
   const { data: quizQuestions } = useQuizQuestionsSafe(selectedQuiz?.id);
   const [isGeneratingQuiz, setIsGeneratingQuiz] = useState(false);
   const [showQuizPlayer, setShowQuizPlayer] = useState(false);
-  
+
   // Notes state
   const { data: notes, isLoading: notesLoading } = useLearningNotes(user?.id, id);
   const createNote = useCreateLearningNote();
   const deleteNote = useDeleteLearningNote();
-  
+
   // Text selection state
   const [selectedText, setSelectedText] = useState("");
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
-  
+
   // Sticky progress bar state
   const [showStickyProgress, setShowStickyProgress] = useState(false);
-  
+
+  // Mobile TOC sheet state
+  const [mobileTocOpen, setMobileTocOpen] = useState(false);
+
+  // Custom note creation state
+  const [showCustomNoteInput, setShowCustomNoteInput] = useState(false);
+  const [customNoteText, setCustomNoteText] = useState("");
+
   // Content ref for scroll tracking
   const contentRef = useRef<HTMLElement>(null);
 
@@ -66,7 +79,7 @@ export default function ModuleLearn() {
   const canManageQuiz = role === 'tutor' || role === 'admin';
   const currentProgress = progress?.progress_percent || 0;
   const isCompleted = progress?.is_completed || false;
-  
+
   // Check if user has passed any quiz for this module
   const hasPassedQuiz = userQuizAttempts?.some(
     attempt => quizzes?.some(q => q.id === attempt.quiz_id) && attempt.passed
@@ -89,7 +102,7 @@ export default function ModuleLearn() {
     const handleMouseUp = () => {
       const selection = window.getSelection();
       const text = selection?.toString().trim();
-      
+
       if (text && text.length > 0) {
         const range = selection?.getRangeAt(0);
         const rect = range?.getBoundingClientRect();
@@ -113,10 +126,10 @@ export default function ModuleLearn() {
   // Handle scroll progress update
   const handleScrollProgressChange = useCallback((scrollProgress: number) => {
     if (!user || !id || isCompleted) return;
-    
+
     const maxScrollProgress = 80;
     const newProgress = Math.min(scrollProgress, maxScrollProgress);
-    
+
     if (newProgress > currentProgress) {
       updateProgress.mutate(
         {
@@ -163,7 +176,7 @@ export default function ModuleLearn() {
       });
       return;
     }
-    
+
     updateProgress.mutate({
       userId: user.id,
       moduleId: id,
@@ -182,15 +195,15 @@ export default function ModuleLearn() {
 
   const handleGenerateQuiz = async () => {
     if (!id) return;
-    
+
     setIsGeneratingQuiz(true);
     try {
       const { data, error } = await supabase.functions.invoke('generate-quiz', {
         body: { moduleId: id, questionCount: 5 }
       });
-      
+
       if (error) throw error;
-      
+
       if (data.success) {
         toast({
           title: "Kuis Berhasil Dibuat",
@@ -220,11 +233,11 @@ export default function ModuleLearn() {
   const handleQuizComplete = (attempt?: { passed?: boolean; percentage?: number }) => {
     setShowQuizPlayer(false);
     setSelectedQuiz(null);
-    
+
     if (user && id && attempt) {
       const quizBonus = attempt.passed ? 20 : 10;
       const newProgress = Math.min(100, currentProgress + quizBonus);
-      
+
       updateProgress.mutate(
         {
           userId: user.id,
@@ -277,15 +290,36 @@ export default function ModuleLearn() {
     deleteNote.mutate(noteId);
   };
 
+  // Handle custom note creation (user types their own note)
+  const handleCreateCustomNote = () => {
+    if (customNoteText.trim() && user && id) {
+      createNote.mutate({
+        user_id: user.id,
+        module_id: id,
+        content: customNoteText.trim(),
+        highlighted_text: null,
+      }, {
+        onSuccess: () => {
+          toast({
+            title: "Catatan Dibuat!",
+            description: "Catatan Anda berhasil disimpan.",
+          });
+          setCustomNoteText("");
+          setShowCustomNoteInput(false);
+        }
+      });
+    }
+  };
+
   // Redirect if not authenticated or hasn't started learning (no progress record)
   useEffect(() => {
     if (modulesLoading) return;
-    
+
     if (!user) {
       navigate(`/module/${id}`);
       return;
     }
-    
+
     // Check if user has started learning (has a progress record for this module)
     const hasProgress = userProgress?.some(p => p.module_id === id);
     if (userProgress !== undefined && !hasProgress) {
@@ -296,52 +330,129 @@ export default function ModuleLearn() {
 
   if (modulesLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 w-48 bg-muted rounded" />
-            <div className="h-64 bg-muted rounded-xl" />
-          </div>
-        </main>
-        <Footer />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="animate-pulse space-y-4 max-w-2xl w-full mx-4">
+          <div className="h-8 w-48 bg-muted rounded" />
+          <div className="h-64 bg-muted rounded-xl" />
+        </div>
       </div>
     );
   }
 
   if (!module) {
     return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-foreground mb-2">Modul Tidak Ditemukan</h1>
-            <p className="text-muted-foreground mb-6">
-              Modul yang Anda cari tidak ada atau belum dipublikasikan.
-            </p>
-            <Button onClick={() => navigate('/modules')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Daftar Modul
-            </Button>
-          </div>
-        </main>
-        <Footer />
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center py-16">
+          <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-2">Modul Tidak Ditemukan</h1>
+          <p className="text-muted-foreground mb-6">
+            Modul yang Anda cari tidak ada atau belum dipublikasikan.
+          </p>
+          <Button onClick={() => navigate('/modules')}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Kembali ke Daftar Modul
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      
+    <div className="min-h-screen bg-background reading-mode">
+      {/* Floating Header - Back button + Mobile TOC */}
+      <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
+        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/modules')}
+            className="gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden sm:inline">Kembali</span>
+          </Button>
+
+          <div className="flex items-center gap-2">
+            {/* Mobile TOC Button */}
+            <Sheet open={mobileTocOpen} onOpenChange={setMobileTocOpen}>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="sm" className="lg:hidden gap-2">
+                  <List className="h-4 w-4" />
+                  <span className="hidden sm:inline">Daftar Isi</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-80">
+                <SheetHeader>
+                  <SheetTitle>Navigasi</SheetTitle>
+                </SheetHeader>
+                <Tabs defaultValue="toc" className="mt-4">
+                  <TabsList className="w-full grid grid-cols-2">
+                    <TabsTrigger value="toc" className="gap-1">
+                      <List className="h-3 w-3" />
+                      <span className="text-xs">Daftar Isi</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="notes" className="gap-1">
+                      <StickyNote className="h-3 w-3" />
+                      <span className="text-xs">Catatan</span>
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="toc" className="mt-4">
+                    {tocItems.length > 0 ? (
+                      <div onClick={() => setMobileTocOpen(false)}>
+                        <ModuleTOC items={tocItems} className="w-full" />
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Tidak ada daftar isi</p>
+                    )}
+                  </TabsContent>
+                  <TabsContent value="notes" className="mt-4">
+                    {/* Custom note creation */}
+                    <div className="mb-4">
+                      {showCustomNoteInput ? (
+                        <div className="space-y-2">
+                          <Input
+                            placeholder="Tulis catatan Anda..."
+                            value={customNoteText}
+                            onChange={(e) => setCustomNoteText(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && handleCreateCustomNote()}
+                          />
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={handleCreateCustomNote} disabled={createNote.isPending}>
+                              {createNote.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Simpan'}
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => setShowCustomNoteInput(false)}>
+                              <X className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </div>
+                      ) : (
+                        <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => setShowCustomNoteInput(true)}>
+                          <Plus className="h-3 w-3" />
+                          Buat Catatan
+                        </Button>
+                      )}
+                    </div>
+                    <LearningNotesSidebar
+                      notes={notes || []}
+                      isLoading={notesLoading}
+                      onDelete={handleDeleteNote}
+                      isDeleting={deleteNote.isPending}
+                    />
+                  </TabsContent>
+                </Tabs>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </div>
+      </header>
+
       {/* Sticky Progress Bar */}
       <StickyProgressBar
         title={module.title}
         progress={currentProgress}
         isVisible={showStickyProgress}
       />
-      
+
       {/* Text Selection Menu */}
       {selectionPosition && selectedText && (
         <TextSelectionMenu
@@ -351,19 +462,10 @@ export default function ModuleLearn() {
           isCreating={createNote.isPending}
         />
       )}
-      
-      <main className="container mx-auto px-4 py-8">
+
+      <main className="container mx-auto px-4 py-8 pt-20">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate(`/module/${id}`)}
-            className="mb-4"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Kembali ke Detail Modul
-          </Button>
-          
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div>
               <h1 className="text-2xl font-bold text-foreground">{module.title}</h1>
@@ -371,10 +473,10 @@ export default function ModuleLearn() {
                 Progress: {currentProgress}% {isCompleted && <span className="text-success">(Selesai)</span>}
               </p>
             </div>
-            
+
             {/* Mark Complete Button - Only show if quiz passed */}
             {!isCompleted && hasPassedQuiz && (
-              <Button 
+              <Button
                 onClick={handleMarkComplete}
                 disabled={updateProgress.isPending}
                 className="gap-2"
@@ -387,7 +489,7 @@ export default function ModuleLearn() {
                 Tandai Selesai
               </Button>
             )}
-            
+
             {!isCompleted && !hasPassedQuiz && quizzes && quizzes.length > 0 && (
               <p className="text-sm text-muted-foreground italic">
                 Selesaikan quiz untuk dapat menandai modul sebagai selesai
@@ -398,7 +500,7 @@ export default function ModuleLearn() {
 
         {/* Main Content Layout */}
         <div className="flex gap-8">
-          {/* Sidebar - TOC + Notes */}
+          {/* Sidebar - TOC + Notes (Desktop) */}
           <div className="hidden lg:block w-64 flex-shrink-0">
             <div className="sticky top-24">
               <Tabs defaultValue="toc" className="w-full">
@@ -420,6 +522,32 @@ export default function ModuleLearn() {
                   )}
                 </TabsContent>
                 <TabsContent value="notes" className="mt-4">
+                  {/* Custom note creation */}
+                  <div className="mb-4">
+                    {showCustomNoteInput ? (
+                      <div className="space-y-2">
+                        <Input
+                          placeholder="Tulis catatan Anda..."
+                          value={customNoteText}
+                          onChange={(e) => setCustomNoteText(e.target.value)}
+                          onKeyDown={(e) => e.key === 'Enter' && handleCreateCustomNote()}
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={handleCreateCustomNote} disabled={createNote.isPending}>
+                            {createNote.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Simpan'}
+                          </Button>
+                          <Button size="sm" variant="ghost" onClick={() => setShowCustomNoteInput(false)}>
+                            <X className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => setShowCustomNoteInput(true)}>
+                        <Plus className="h-3 w-3" />
+                        Buat Catatan
+                      </Button>
+                    )}
+                  </div>
                   <LearningNotesSidebar
                     notes={notes || []}
                     isLoading={notesLoading}
@@ -453,8 +581,6 @@ export default function ModuleLearn() {
           </div>
         </div>
       </main>
-
-      <Footer />
 
       {/* Quiz Player Dialog */}
       <Dialog open={showQuizPlayer} onOpenChange={(open) => !open && handleQuizComplete()}>

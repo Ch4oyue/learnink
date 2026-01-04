@@ -13,16 +13,33 @@ interface ModuleTOCProps {
   className?: string;
 }
 
+// Slugify text to create consistent IDs that match MarkdownRenderer
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
+}
+
 export function extractTOC(content: string): TOCItem[] {
   const lines = content.split("\n");
   const headers: TOCItem[] = [];
+  const usedIds = new Map<string, number>();
 
-  lines.forEach((line, index) => {
+  lines.forEach((line) => {
     const match = line.match(/^(#{1,3})\s+(.+)$/);
     if (match) {
       const level = match[1].length;
       const text = match[2].trim();
-      const id = `heading-${index}`;
+      const baseId = `heading-${slugify(text)}`;
+
+      // Handle duplicate headings by adding a counter
+      const count = usedIds.get(baseId) || 0;
+      const id = count === 0 ? baseId : `${baseId}-${count}`;
+      usedIds.set(baseId, count + 1);
+
       headers.push({ id, text, level });
     }
   });

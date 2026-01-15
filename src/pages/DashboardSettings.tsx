@@ -9,34 +9,46 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useModuleCategories, useModuleLevels, useCreateCategory, useCreateLevel, useDeleteCategory, useDeleteLevel } from "@/hooks/useModuleSettings";
-import { 
-  Settings, 
-  Folder, 
-  Layers, 
-  Plus, 
-  Trash2, 
+import {
+  Settings,
+  Folder,
+  Layers,
+  Plus,
+  Trash2,
   Loader2,
-  Palette
+  Palette,
+  Webhook,
+  Copy,
+  RefreshCw,
+  CheckCircle2,
+  AlertTriangle
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { IncomingNoteAlert } from "@/components/admin/IncomingNoteAlert";
 
 export default function DashboardSettings() {
   const { role } = useAuth();
   const { toast } = useToast();
-  
+
   // Categories
   const { data: categories, isLoading: categoriesLoading } = useModuleCategories();
   const createCategory = useCreateCategory();
   const deleteCategory = useDeleteCategory();
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState("#3B82F6");
-  
+
   // Levels
   const { data: levels, isLoading: levelsLoading } = useModuleLevels();
   const createLevel = useCreateLevel();
   const deleteLevel = useDeleteLevel();
   const [newLevelName, setNewLevelName] = useState("");
   const [newLevelColor, setNewLevelColor] = useState("#10B981");
+
+  // Integrations
+  const [webhookUrl] = useState(`${window.location.origin}/api/webhook/notes`);
+  const [secretKey, setSecretKey] = useState("sk_live_xxxxxxxxxxxxxxxxxxxxxxxx");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   if (role !== 'admin') {
     return (
@@ -56,7 +68,7 @@ export default function DashboardSettings() {
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
-    
+
     createCategory.mutate({
       name: newCategoryName.trim(),
       color: newCategoryColor,
@@ -79,7 +91,7 @@ export default function DashboardSettings() {
 
   const handleAddLevel = () => {
     if (!newLevelName.trim()) return;
-    
+
     createLevel.mutate({
       name: newLevelName.trim(),
       color: newLevelColor,
@@ -121,6 +133,10 @@ export default function DashboardSettings() {
               <Layers className="h-4 w-4" />
               Level
             </TabsTrigger>
+            <TabsTrigger value="integrations" className="gap-2">
+              <Webhook className="h-4 w-4" />
+              Integrasi
+            </TabsTrigger>
           </TabsList>
 
           {/* Categories Tab */}
@@ -156,7 +172,7 @@ export default function DashboardSettings() {
                       <Palette className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </div>
-                  <Button 
+                  <Button
                     onClick={handleAddCategory}
                     disabled={createCategory.isPending || !newCategoryName.trim()}
                   >
@@ -182,12 +198,12 @@ export default function DashboardSettings() {
                 ) : categories && categories.length > 0 ? (
                   <div className="space-y-2">
                     {categories.map((cat) => (
-                      <div 
+                      <div
                         key={cat.id}
                         className="flex items-center justify-between p-3 rounded-lg border"
                       >
                         <div className="flex items-center gap-3">
-                          <div 
+                          <div
                             className="w-4 h-4 rounded-full"
                             style={{ backgroundColor: cat.color }}
                           />
@@ -252,7 +268,7 @@ export default function DashboardSettings() {
                       <Palette className="h-4 w-4 text-muted-foreground" />
                     </div>
                   </div>
-                  <Button 
+                  <Button
                     onClick={handleAddLevel}
                     disabled={createLevel.isPending || !newLevelName.trim()}
                   >
@@ -278,12 +294,12 @@ export default function DashboardSettings() {
                 ) : levels && levels.length > 0 ? (
                   <div className="space-y-2">
                     {levels.map((level) => (
-                      <div 
+                      <div
                         key={level.id}
                         className="flex items-center justify-between p-3 rounded-lg border"
                       >
                         <div className="flex items-center gap-3">
-                          <div 
+                          <div
                             className="w-4 h-4 rounded-full"
                             style={{ backgroundColor: level.color }}
                           />
@@ -311,6 +327,138 @@ export default function DashboardSettings() {
                     Belum ada level
                   </p>
                 )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Integrations Tab */}
+          <TabsContent value="integrations" className="space-y-4 mt-6">
+            {/* Incoming Notes Preview */}
+            <IncomingNoteAlert
+              onApprove={(id) => {
+                toast({
+                  title: "Catatan Diterima",
+                  description: `Catatan #${id} akan ditambahkan ke sistem`,
+                });
+              }}
+              onDiscard={(id) => {
+                toast({
+                  title: "Catatan Dibuang",
+                  description: `Catatan #${id} telah dihapus`,
+                  variant: "destructive",
+                });
+              }}
+            />
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Webhook className="h-5 w-5 text-primary" />
+                  Webhook Configuration
+                </CardTitle>
+                <CardDescription>
+                  Connect your n8n workflows to auto-import notes into LearnInk
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Webhook URL */}
+                <div className="space-y-2">
+                  <Label htmlFor="webhookUrl">Webhook Endpoint URL</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="webhookUrl"
+                      value={webhookUrl}
+                      readOnly
+                      className="font-mono text-sm bg-muted"
+                    />
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => {
+                        navigator.clipboard.writeText(webhookUrl);
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                        toast({
+                          title: "Disalin!",
+                          description: "URL webhook berhasil disalin ke clipboard",
+                        });
+                      }}
+                    >
+                      {copied ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Point your n8n HTTP Request node to this URL
+                  </p>
+                </div>
+
+                <Separator />
+
+                {/* Secret Key */}
+                <div className="space-y-2">
+                  <Label htmlFor="secretKey">Secret Key</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="secretKey"
+                      value={secretKey}
+                      readOnly
+                      type="password"
+                      className="font-mono text-sm bg-muted"
+                    />
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setIsGenerating(true);
+                        // Simulate key generation
+                        setTimeout(() => {
+                          const newKey = `sk_live_${Math.random().toString(36).substring(2, 26)}`;
+                          setSecretKey(newKey);
+                          setIsGenerating(false);
+                          toast({
+                            title: "Key Baru Dibuat",
+                            description: "Secret key baru telah digenerate. Simpan dengan aman!",
+                          });
+                        }, 1000);
+                      }}
+                      disabled={isGenerating}
+                    >
+                      {isGenerating ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      ) : (
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                      )}
+                      Generate New Key
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Add this key as a header: <code className="bg-muted px-1 rounded">X-Webhook-Secret</code>
+                  </p>
+                </div>
+
+                <Separator />
+
+                {/* Instructions */}
+                <div className="bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 rounded-lg p-4">
+                  <div className="flex gap-3">
+                    <AlertTriangle className="h-5 w-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm space-y-2">
+                      <p className="font-medium text-blue-700 dark:text-blue-300">
+                        Cara Menghubungkan n8n:
+                      </p>
+                      <ol className="list-decimal list-inside text-blue-600 dark:text-blue-400 space-y-1 text-xs">
+                        <li>Buat workflow baru di n8n</li>
+                        <li>Tambahkan node "HTTP Request"</li>
+                        <li>Set method ke POST dan URL ke endpoint di atas</li>
+                        <li>Tambahkan header <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">X-Webhook-Secret</code> dengan secret key</li>
+                        <li>Kirim data dalam format JSON dengan field: title, content</li>
+                      </ol>
+                    </div>
+                  </div>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

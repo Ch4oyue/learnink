@@ -3,8 +3,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -40,6 +40,22 @@ const PageLoader = () => (
   </div>
 );
 
+// Smart landing that redirects to dashboard if user is logged in
+const SmartLanding = () => {
+  const { session, loading } = useAuth();
+
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  // If user is already logged in, redirect to dashboard
+  if (session) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <LandingPage />;
+};
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -53,9 +69,9 @@ const App = () => (
                 {/* ============================
                     ESSENTIAL ROUTES ONLY
                     ============================ */}
-                
-                {/* Landing Page */}
-                <Route path="/" element={<LandingPage />} />
+
+                {/* Landing Page - Smart redirect if logged in */}
+                <Route path="/" element={<SmartLanding />} />
 
                 {/* Auth (Login/Register) */}
                 <Route path="/auth" element={<Auth />} />

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Terminal, Moon, Sun } from "lucide-react";
+import { Terminal, Moon, Sun, Heart, Github, BookOpen } from "lucide-react";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { Footer } from "@/components/landing/Footer";
@@ -40,9 +40,6 @@ export default function LandingPage() {
                         {/* Nav Links */}
                         <div className="flex items-center gap-4">
                             <button className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden sm:block">
-                                Pricing
-                            </button>
-                            <button className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden sm:block">
                                 Features
                             </button>
                             <div className="h-4 w-[1px] bg-border mx-2 hidden sm:block" />
@@ -73,6 +70,38 @@ export default function LandingPage() {
             <main className="flex-grow">
                 <Hero />
                 <Features />
+
+                {/* Open Source & Free Section */}
+                <section className="py-20 bg-gradient-to-b from-background to-primary/5 border-t border-border">
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
+                            <Heart className="h-8 w-8 text-primary" />
+                        </div>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+                            Open Source & Forever Free
+                        </h2>
+                        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+                            We believe education should be accessible to everyone. LearnInk is completely free—no premium tiers, no hidden costs.
+                            Just pure, transparent learning materials built for the community, by the community.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Github className="h-5 w-5" />
+                                <span>Open Source Codebase</span>
+                            </div>
+                            <div className="hidden sm:block w-1 h-1 rounded-full bg-muted-foreground" />
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <BookOpen className="h-5 w-5" />
+                                <span>Free Learning Materials</span>
+                            </div>
+                            <div className="hidden sm:block w-1 h-1 rounded-full bg-muted-foreground" />
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <Heart className="h-5 w-5" />
+                                <span>Community Driven</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
                 {/* Trust Section */}
                 <section className="py-12 bg-background border-t border-border">

@@ -39,7 +39,7 @@ export function Hero() {
                         size="lg"
                         className="w-full sm:w-auto px-8 py-3.5 shadow-glow group"
                     >
-                        <Link to="/modules">
+                        <Link to="/auth">
                             Start Learning Now
                             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
                         </Link>
@@ -50,7 +50,7 @@ export function Hero() {
                         asChild
                         className="w-full sm:w-auto px-8 py-3.5"
                     >
-                        <Link to="/demo">
+                        <Link to="/dashboard">
                             <PlayCircle className="mr-2 h-5 w-5" />
                             View Demo
                         </Link>

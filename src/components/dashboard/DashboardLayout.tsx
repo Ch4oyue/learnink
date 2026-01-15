@@ -1,36 +1,18 @@
 import { ReactNode, forwardRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useUnreadNotificationCount } from "@/hooks/useNotifications";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { BottomNavigation } from "@/components/layout/BottomNavigation";
-import {
-  LogOut,
-  LayoutDashboard,
-  BookOpen,
-  FileQuestion,
-  Users,
-  Bell,
-  Settings,
-  Layers,
-  ChevronRight,
-} from "lucide-react";
+import { LogOut, LayoutDashboard, User, Layers, ChevronRight } from "lucide-react";
 
 /**
- * DashboardLayout - Total System Repair
- * =====================================
- * FASE 2: Fixed Sidebar + Stable Main Content Area
- * 
- * Layout Structure:
- * ┌─────────────────────────────────────────────────────────┐
- * │ SIDEBAR (250px, fixed)  │  HEADER (fixed, full width)   │
- * │                         ├───────────────────────────────┤
- * │                         │  MAIN CONTENT (scrollable)    │
- * │                         │                               │
- * └─────────────────────────┴───────────────────────────────┘
+ * DashboardLayout - Cleaned Version
+ * ==================================
+ * Simplified sidebar with only essential navigation:
+ * - Home (/dashboard)
+ * - Profile (/dashboard/profile)
  */
 
 interface DashboardLayoutProps {
@@ -56,7 +38,6 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
     const { user, role, profile, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const { data: unreadCount } = useUnreadNotificationCount(user?.id);
 
     const displayName =
       profile?.full_name ||
@@ -70,60 +51,19 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
       navigate("/");
     };
 
+    // SIMPLIFIED NAV ITEMS - Only Home and Profile
     const navItems = [
       {
-        href:
-          role === "admin"
-            ? "/dashboard/admin"
-            : role === "tutor"
-              ? "/dashboard/tutor"
-              : "/dashboard/user",
-        label: "Dashboard",
+        href: "/dashboard",
+        label: "Home",
         icon: LayoutDashboard,
-        roles: ["user", "tutor", "admin"],
       },
       {
-        href: "/dashboard/modules",
-        label: "Modul",
-        icon: BookOpen,
-        roles: ["user", "tutor", "admin"],
-      },
-      {
-        href: "/dashboard/request-material",
-        label: "Request Materi",
-        icon: FileQuestion,
-        roles: ["user"],
-      },
-      {
-        href: "/dashboard/requests",
-        label: "Kelola Request",
-        icon: FileQuestion,
-        roles: ["tutor", "admin"],
-      },
-      {
-        href: "/dashboard/users",
-        label: "Manajemen User",
-        icon: Users,
-        roles: ["admin"],
-      },
-      {
-        href: "/dashboard/settings",
-        label: "Pengaturan",
-        icon: Settings,
-        roles: ["admin"],
-      },
-      {
-        href: "/dashboard/notifications",
-        label: "Notifikasi",
-        icon: Bell,
-        badge: unreadCount,
-        roles: ["user", "tutor", "admin"],
+        href: "/dashboard/profile",
+        label: "Profile",
+        icon: User,
       },
     ];
-
-    const filteredNavItems = navItems.filter(
-      (item) => role && item.roles.includes(role)
-    );
 
     return (
       <div
@@ -132,7 +72,6 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
       >
         {/* ============================================
             SIDEBAR - Fixed Position, Left Side
-            Width: 250px, Height: 100vh
         ============================================ */}
         <aside
           className="fixed left-0 top-0 z-40 h-screen border-r border-border bg-sidebar hidden md:flex md:flex-col"
@@ -150,17 +89,10 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
             </Link>
           </div>
 
-          {/* Navigation */}
+          {/* Navigation - Simplified */}
           <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-            {filteredNavItems.map((item) => {
-              const isActive =
-                location.pathname === item.href ||
-                (item.href.includes("/dashboard/user") &&
-                  location.pathname === "/dashboard/user") ||
-                (item.href.includes("/dashboard/tutor") &&
-                  location.pathname === "/dashboard/tutor") ||
-                (item.href.includes("/dashboard/admin") &&
-                  location.pathname === "/dashboard/admin");
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.href;
 
               return (
                 <Link
@@ -175,11 +107,6 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
                 >
                   <item.icon className="h-4 w-4 shrink-0" />
                   <span className="flex-1">{item.label}</span>
-                  {item.badge && item.badge > 0 && (
-                    <span className="h-5 min-w-5 px-1.5 rounded-full bg-destructive text-destructive-foreground text-xs font-medium flex items-center justify-center">
-                      {item.badge > 99 ? "99+" : item.badge}
-                    </span>
-                  )}
                   {isActive && (
                     <ChevronRight className="h-4 w-4 text-primary/50" />
                   )}
@@ -229,7 +156,6 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
 
         {/* ============================================
             MAIN CONTENT AREA
-            Margin-left: 250px (sidebar width)
         ============================================ */}
         <main
           className="min-h-screen pb-20 md:pb-0"
@@ -243,16 +169,6 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
               </span>
             </Link>
             <div className="flex items-center gap-2">
-              {location.pathname !== "/dashboard/notifications" && (
-                <Link to="/dashboard/notifications" className="relative p-2">
-                  <Bell className="h-5 w-5" />
-                  {unreadCount && unreadCount > 0 && (
-                    <span className="absolute top-1 right-1 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium flex items-center justify-center">
-                      {unreadCount > 99 ? "99+" : unreadCount}
-                    </span>
-                  )}
-                </Link>
-              )}
               <Link to="/dashboard/profile" className="p-2">
                 <Avatar className="h-7 w-7">
                   <AvatarImage
@@ -280,8 +196,29 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
           }
         `}</style>
 
-        {/* Bottom Navigation - Mobile only */}
-        <BottomNavigation />
+        {/* Mobile Bottom Nav - Simplified */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm">
+          <div className="flex items-center justify-around h-16">
+            {navItems.map((item) => {
+              const isActive = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  className={cn(
+                    "flex flex-col items-center justify-center flex-1 h-full text-xs",
+                    isActive
+                      ? "text-primary"
+                      : "text-muted-foreground"
+                  )}
+                >
+                  <item.icon className="h-5 w-5 mb-1" />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </nav>
       </div>
     );
   }

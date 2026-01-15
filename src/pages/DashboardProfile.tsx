@@ -28,6 +28,7 @@ import {
   Save,
   BookOpen,
   Clock,
+  LogOut,
 } from "lucide-react";
 
 // ============================================
@@ -90,7 +91,7 @@ const achievements = [
 
 export default function DashboardProfile() {
   const navigate = useNavigate();
-  const { user, role, profile } = useAuth();
+  const { user, role, profile, signOut } = useAuth();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
 
@@ -146,6 +147,11 @@ export default function DashboardProfile() {
     }
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
   const formatMinutes = (mins: number) => {
     if (mins >= 60) {
       const hours = Math.floor(mins / 60);
@@ -175,8 +181,8 @@ export default function DashboardProfile() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`relative pb-4 text-sm font-medium transition-colors capitalize ${activeTab === tab
-                    ? "text-primary font-bold"
-                    : "text-muted-foreground hover:text-foreground"
+                  ? "text-primary font-bold"
+                  : "text-muted-foreground hover:text-foreground"
                   }`}
               >
                 {tab === "notes" ? "My Notes" : tab}
@@ -251,14 +257,24 @@ export default function DashboardProfile() {
                 </div>
               </div>
 
-              {/* Edit Button */}
-              <Button
-                onClick={() => setIsEditing(true)}
-                className="w-full md:w-auto px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/25"
-              >
-                <Edit className="h-5 w-5 mr-2" />
-                Edit Profile
-              </Button>
+              {/* Action Buttons */}
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  className="px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/25"
+                >
+                  <Edit className="h-5 w-5 mr-2" />
+                  Edit Profile
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleSignOut}
+                  className="px-6 py-3 rounded-xl font-bold text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <LogOut className="h-5 w-5 mr-2" />
+                  Logout
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -289,8 +305,8 @@ export default function DashboardProfile() {
                   <div className="relative w-full bg-muted rounded-t-lg h-32 flex items-end overflow-hidden">
                     <div
                       className={`w-full transition-all rounded-t-lg relative ${item.isToday
-                          ? "bg-primary hover:bg-primary/90 shadow-glow"
-                          : "bg-primary/40 group-hover:bg-primary/60"
+                        ? "bg-primary hover:bg-primary/90 shadow-glow"
+                        : "bg-primary/40 group-hover:bg-primary/60"
                         }`}
                       style={{ height: `${item.height}%` }}
                     >

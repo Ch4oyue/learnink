@@ -1,124 +1,175 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
-    GraduationCap,
-    BookOpen,
-    Search,
-    LayoutDashboard,
+    Layers,
     Settings,
-    ChevronLeft,
+    Check,
+    Lock,
+    Code,
+    ChevronRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Progress } from "@/components/ui/progress";
 
-interface NavItem {
-    icon: React.ReactNode;
-    label: string;
+// ============================================
+// TYPES
+// ============================================
+
+interface Lesson {
+    id: string;
+    title: string;
+    duration?: string;
+    isCompleted?: boolean;
     isActive?: boolean;
-    onClick?: () => void;
+    isLocked?: boolean;
 }
 
 interface NewSidebarProps {
-    onTableOfContentsClick?: () => void;
-    onSearchClick?: () => void;
-    onBackClick?: () => void;
-    activeTab?: "toc" | "content" | "dashboard";
+    courseName?: string;
+    courseProgress?: number;
+    totalLessons?: number;
+    completedLessons?: number;
+    lessons?: Lesson[];
+    onLessonClick?: (lessonId: string) => void;
+    onSettingsClick?: () => void;
 }
 
+// ============================================
+// MAIN COMPONENT (Fixed Position Sidebar)
+// ============================================
+
 export function NewSidebar({
-    onTableOfContentsClick,
-    onSearchClick,
-    onBackClick,
-    activeTab = "content",
+    courseName = "Course Title",
+    courseProgress = 0,
+    totalLessons = 0,
+    completedLessons = 0,
+    lessons = [],
+    onLessonClick,
+    onSettingsClick,
 }: NewSidebarProps) {
     const navigate = useNavigate();
 
-    const navItems: NavItem[] = [
-        {
-            icon: <BookOpen className="h-5 w-5" />,
-            label: "Table of Contents",
-            isActive: activeTab === "toc",
-            onClick: onTableOfContentsClick,
-        },
-        {
-            icon: <Search className="h-5 w-5" />,
-            label: "Search",
-            onClick: onSearchClick,
-        },
-        {
-            icon: <LayoutDashboard className="h-5 w-5" />,
-            label: "Dashboard",
-            isActive: activeTab === "dashboard",
-            onClick: () => navigate("/dashboard"),
-        },
-    ];
-
     return (
-        <aside className="w-[72px] border-r border-border bg-card flex flex-col items-center py-6 gap-8 shrink-0 z-20">
-            {/* Brand Mark */}
-            <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/30 mb-2">
-                <GraduationCap className="h-5 w-5" />
+        <aside className="fixed top-0 left-0 h-full w-[280px] bg-[#111316] border-r border-zinc-800 flex flex-col shrink-0 z-50">
+            {/* Header with Logo */}
+            <div className="h-14 flex items-center px-5 border-b border-zinc-800 shrink-0">
+                <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-black font-bold">
+                        <Layers className="h-4 w-4" />
+                    </div>
+                    <span className="text-white font-semibold tracking-wide">LearnInk</span>
+                </div>
             </div>
 
-            {/* Back Button */}
-            {onBackClick && (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <button
-                            onClick={onBackClick}
-                            className="w-full aspect-square flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all mx-3"
-                        >
-                            <ChevronLeft className="h-5 w-5" />
-                        </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={10}>
-                        <p className="text-xs font-bold">Back to Modules</p>
-                    </TooltipContent>
-                </Tooltip>
-            )}
+            {/* Course Info Section */}
+            <div className="p-5 border-b border-zinc-800/50">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 mb-2">
+                    Current Course
+                </h3>
+                <h2 className="text-white font-medium mb-3 text-glow">{courseName}</h2>
 
-            {/* Nav Icons */}
-            <div className="flex flex-col gap-4 w-full px-3">
-                {navItems.map((item, index) => (
-                    <Tooltip key={index}>
-                        <TooltipTrigger asChild>
+                {/* Progress Bar */}
+                <div className="relative w-full h-1.5 bg-zinc-800 rounded-full mb-2 overflow-hidden">
+                    <div
+                        className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-full transition-all duration-500"
+                        style={{ width: `${courseProgress}%` }}
+                    />
+                </div>
+                <div className="flex justify-between text-[11px] font-mono text-zinc-500">
+                    <span>{courseProgress}% Complete</span>
+                    <span>
+                        {completedLessons}/{totalLessons}
+                    </span>
+                </div>
+            </div>
+
+            {/* Navigation List */}
+            <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+                {lessons.map((lesson) => {
+                    if (lesson.isActive) {
+                        // Active Item
+                        return (
                             <button
-                                onClick={item.onClick}
-                                className={cn(
-                                    "w-full aspect-square flex items-center justify-center rounded-xl transition-all",
-                                    item.isActive
-                                        ? "text-primary bg-primary/10 shadow-inner"
-                                        : "text-muted-foreground hover:text-primary hover:bg-primary/5"
-                                )}
+                                key={lesson.id}
+                                onClick={() => onLessonClick?.(lesson.id)}
+                                className="group relative block w-full p-3 rounded-r-xl rounded-l-sm bg-zinc-800 border-l-[3px] border-purple-500 shadow-md transition-all mb-1 text-left"
                             >
-                                {item.icon}
+                                <div className="flex items-start justify-between">
+                                    <div className="flex items-start gap-3">
+                                        <div className="mt-1 w-6 h-6 rounded-md bg-purple-500/10 flex items-center justify-center text-purple-400 text-xs shrink-0">
+                                            <Code className="h-3.5 w-3.5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-white text-sm font-medium leading-tight">
+                                                {lesson.title}
+                                            </p>
+                                            {lesson.duration && (
+                                                <p className="text-[11px] text-zinc-500 mt-1">{lesson.duration}</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2 shrink-0" />
+                                </div>
                             </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" sideOffset={10}>
-                            <p className="text-xs font-bold">{item.label}</p>
-                        </TooltipContent>
-                    </Tooltip>
-                ))}
-            </div>
+                        );
+                    }
 
-            {/* Bottom Settings */}
-            <div className="mt-auto px-3 w-full">
-                <Tooltip>
-                    <TooltipTrigger asChild>
+                    if (lesson.isCompleted) {
+                        // Completed Item
+                        return (
+                            <button
+                                key={lesson.id}
+                                onClick={() => onLessonClick?.(lesson.id)}
+                                className="group block w-full p-3 rounded-xl hover:bg-white/5 transition-colors opacity-60 text-left"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 text-[10px] shrink-0">
+                                        <Check className="h-3.5 w-3.5" />
+                                    </div>
+                                    <p className="text-zinc-400 text-sm font-medium line-through decoration-zinc-600">
+                                        {lesson.title}
+                                    </p>
+                                </div>
+                            </button>
+                        );
+                    }
+
+                    // Locked/Default Item
+                    return (
                         <button
-                            onClick={() => navigate("/dashboard/settings")}
-                            className="w-full aspect-square flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                            key={lesson.id}
+                            onClick={() => !lesson.isLocked && onLessonClick?.(lesson.id)}
+                            className={cn(
+                                "group block w-full p-3 rounded-xl transition-colors text-left",
+                                lesson.isLocked
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : "hover:bg-white/5"
+                            )}
+                            disabled={lesson.isLocked}
                         >
-                            <Settings className="h-5 w-5" />
+                            <div className="flex items-center gap-3">
+                                <div className="w-6 h-6 flex items-center justify-center text-zinc-600 text-xs shrink-0">
+                                    {lesson.isLocked ? (
+                                        <Lock className="h-3.5 w-3.5" />
+                                    ) : (
+                                        <ChevronRight className="h-3.5 w-3.5" />
+                                    )}
+                                </div>
+                                <p className="text-zinc-500 text-sm font-medium">{lesson.title}</p>
+                            </div>
                         </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" sideOffset={10}>
-                        <p className="text-xs font-bold">Settings</p>
-                    </TooltipContent>
-                </Tooltip>
+                    );
+                })}
+            </nav>
+
+            {/* Bottom Preferences */}
+            <div className="p-4 border-t border-zinc-800 mt-auto">
+                <button
+                    onClick={onSettingsClick || (() => navigate("/dashboard/settings"))}
+                    className="flex items-center gap-3 text-zinc-500 hover:text-white transition-colors text-sm font-medium w-full py-2 px-3 rounded-lg hover:bg-zinc-800"
+                >
+                    <Settings className="h-4 w-4" />
+                    <span>Preferences</span>
+                </button>
             </div>
         </aside>
     );

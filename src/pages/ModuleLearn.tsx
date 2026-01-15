@@ -321,29 +321,33 @@ export default function ModuleLearn() {
   const userInitials = userName.slice(0, 2).toUpperCase();
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-background antialiased selection:bg-primary/20 selection:text-primary">
-      {/* Top Header */}
-      <header className="h-[60px] flex items-center justify-between px-6 border-b border-border bg-card/80 backdrop-blur-sm relative shrink-0 z-30">
-        {/* Slim Progress Bar at Top Edge */}
-        <div className="absolute top-0 left-0 w-full h-[3px] bg-muted">
-          <div
-            className="h-full bg-primary transition-all duration-1000 ease-out shadow-glow"
-            style={{ width: `${currentProgress}%` }}
-          />
-        </div>
+    <div className="h-screen overflow-hidden bg-[#050505] text-zinc-300 font-sans antialiased selection:bg-purple-500/20 selection:text-purple-200">
+      {/* Top Header - positioned to the right of sidebar */}
+      <header className="fixed top-0 right-0 h-14 border-b border-zinc-800 bg-[#0b0c0e] flex items-center justify-end px-5 z-20 ml-[280px] w-[calc(100%-280px)]">
+        {/* Right: Controls */}
+        <div className="flex items-center gap-4 text-sm">
+          {/* Live Status Pill */}
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-green-900/30 border border-green-800">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span className="text-green-400 font-medium text-xs">v2.0 Live</span>
+          </div>
+          <div className="h-5 w-[1px] bg-zinc-800" />
 
-        {/* Left: Context */}
-        <div className="flex items-center gap-4">
+          {/* Progress */}
+          <span className="text-xs font-bold text-primary tracking-wide">
+            {currentProgress}% COMPLETE
+          </span>
+
           {/* Mobile Menu Button */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden text-zinc-400 hover:text-white">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-80 p-0">
-              <SheetHeader className="p-4 border-b">
-                <SheetTitle>Table of Contents</SheetTitle>
+            <SheetContent side="left" className="w-80 p-0 bg-[#111316] border-zinc-800">
+              <SheetHeader className="p-4 border-b border-zinc-800">
+                <SheetTitle className="text-white">Table of Contents</SheetTitle>
               </SheetHeader>
               <div className="p-4">
                 {tocItems.length > 0 ? (
@@ -351,31 +355,20 @@ export default function ModuleLearn() {
                     <ModuleTOC items={tocItems} className="w-full" />
                   </div>
                 ) : (
-                  <p className="text-sm text-muted-foreground">Tidak ada daftar isi</p>
+                  <p className="text-sm text-zinc-500">No table of contents</p>
                 )}
               </div>
             </SheetContent>
           </Sheet>
 
-          <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground font-medium">Course</span>
-            <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
-            <span className="text-foreground font-bold tracking-tight line-clamp-1">
-              {module.title}
-            </span>
-          </div>
-        </div>
-
-        {/* Right: Profile & Status */}
-        <div className="flex items-center gap-6">
           {/* Mobile Notes Button */}
           <Sheet open={mobileNotesOpen} onOpenChange={setMobileNotesOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden text-zinc-400 hover:text-white">
                 <StickyNote className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-80 p-0">
+            <SheetContent side="right" className="w-80 p-0 bg-[#111316] border-zinc-800">
               <NewGuidedNotes
                 notes={notes || []}
                 isLoading={notesLoading}
@@ -387,24 +380,41 @@ export default function ModuleLearn() {
             </SheetContent>
           </Sheet>
 
-          <div className="hidden sm:flex flex-col items-end">
-            <span className="text-xs font-bold text-primary tracking-wide">
-              {currentProgress}% COMPLETE
-            </span>
-          </div>
-          <div className="hidden sm:block h-8 w-[1px] bg-border" />
-          <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
-            <span className="text-sm font-semibold hidden sm:block">{userName}</span>
-            <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
-              <AvatarImage src={profile?.avatar_url || undefined} alt={userName} />
-              <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
-                {userInitials}
-              </AvatarFallback>
-            </Avatar>
-          </div>
+          <Avatar
+            className="h-8 w-8 ring-2 ring-zinc-800 cursor-pointer"
+            onClick={() => navigate('/dashboard/profile')}
+          >
+            <AvatarImage src={profile?.avatar_url || undefined} alt={userName} />
+            <AvatarFallback className="bg-gradient-to-tr from-primary to-purple-500 text-white text-xs font-bold">
+              {userInitials}
+            </AvatarFallback>
+          </Avatar>
         </div>
       </header>
 
+      {/* Main Layout with Fixed Sidebar */}
+  <div className="flex h-full overflow-hidden">
+    {/* Fixed Left Sidebar (Desktop) */}
+    <div className="hidden lg:block">
+      <NewSidebar
+        courseName={module.title}
+        courseProgress={currentProgress}
+        totalLessons={10}
+        completedLessons={Math.round(currentProgress / 10)}
+        lessons={tocItems.map((item, idx) => ({
+          id: item.id,
+          title: item.title,
+          duration: `${Math.floor(Math.random() * 15) + 5} min read`,
+          isActive: idx === 0,
+          isCompleted: currentProgress > (idx + 1) * 10,
+          isLocked: idx > 3 && !hasPassedQuiz,
+        }))}
+        onSettingsClick={() => navigate('/dashboard/settings')}
+      />
+    </div>
+
+    {/* Main Content Area - offset by sidebar width */}
+    <div className="flex flex-1 overflow-hidden ml-0 lg:ml-[280px] mt-14">
       {/* Text Selection Menu */}
       {selectionPosition && selectedText && (
         <TextSelectionMenu
@@ -415,81 +425,82 @@ export default function ModuleLearn() {
         />
       )}
 
-      {/* Main Workspace Layout */}
-      <div className="flex flex-1 overflow-hidden relative">
-        {/* Left Navigation Rail (Desktop) */}
-        <div className="hidden lg:block">
-          <NewSidebar
-            onBackClick={() => navigate('/modules')}
-            onTableOfContentsClick={() => setMobileMenuOpen(true)}
-          />
-        </div>
+      {/* Resizable Panels for Content and Notes */}
+      <ResizablePanelGroup direction="horizontal" className="flex-1">
+        {/* Center Content Panel */}
+        <ResizablePanel defaultSize={100} minSize={50}>
+          <div className="h-full overflow-y-auto scroll-smooth">
+            <NewContentRenderer
+              ref={contentRef}
+              content={module.content}
+              metadata={{
+                title: module.title,
+                description: module.description || undefined,
+                category: module.category || undefined,
+                moduleNumber: 1,
+              }}
+              isLoading={modulesLoading}
+            />
 
-        {/* Resizable Panels for Content and Notes */}
-        <ResizablePanelGroup direction="horizontal" className="flex-1">
-          {/* Center Content Panel */}
-          <ResizablePanel defaultSize={65} minSize={40}>
-            <div className="h-full overflow-y-auto scroll-smooth no-scrollbar">
-              <NewContentRenderer
-                ref={contentRef}
-                content={module.content}
-                metadata={{
-                  title: module.title,
-                  description: module.description || undefined,
-                  category: module.category || undefined,
-                  readingTime: module.content ? Math.ceil(module.content.split(' ').length / 200) : undefined,
-                }}
-                isLoading={modulesLoading}
+            {/* Quiz Section */}
+            <div className="max-w-3xl mx-auto px-8 pb-16">
+              <QuizSection
+                quizzes={quizzes}
+                isLoading={quizzesLoading}
+                canManageQuiz={canManageQuiz}
+                isGenerating={isGeneratingQuiz}
+                onGenerateQuiz={handleGenerateQuiz}
+                onStartQuiz={handleStartQuiz}
               />
-
-              {/* Quiz Section */}
-              <div className="max-w-[800px] mx-auto px-10 pb-16">
-                <QuizSection
-                  quizzes={quizzes}
-                  isLoading={quizzesLoading}
-                  canManageQuiz={canManageQuiz}
-                  isGenerating={isGeneratingQuiz}
-                  onGenerateQuiz={handleGenerateQuiz}
-                  onStartQuiz={handleStartQuiz}
-                />
-              </div>
             </div>
-          </ResizablePanel>
+          </div>
+        </ResizablePanel>
 
-          {/* Resize Handle */}
-          <ResizableHandle withHandle className="hidden lg:flex" />
+        {/* Resize Handle */}
+        <ResizableHandle withHandle className="hidden lg:flex" />
 
-          {/* Right Notes Panel (Desktop) */}
-          <ResizablePanel defaultSize={35} minSize={25} maxSize={50} className="hidden lg:block">
-            <NewGuidedNotes
-              notes={notes || []}
-              isLoading={notesLoading}
-              onCreateNote={handleCreateCustomNote}
-              onDeleteNote={handleDeleteNote}
-              isCreating={createNote.isPending}
-              isDeleting={deleteNote.isPending}
-            />
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
-
-      {/* Quiz Player Dialog */}
-      <Dialog open={showQuizPlayer} onOpenChange={(open) => !open && handleQuizComplete()}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>{selectedQuiz?.title}</DialogTitle>
-            <DialogDescription>{selectedQuiz?.description}</DialogDescription>
-          </DialogHeader>
-          {selectedQuiz && quizQuestions && quizQuestions.length > 0 && (
-            <QuizPlayer
-              quiz={selectedQuiz}
-              questions={quizQuestions}
-              onComplete={handleQuizComplete}
-              onCancel={() => handleQuizComplete()}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+        {/* Right Notes Panel (Desktop) */}
+        <ResizablePanel defaultSize={0} minSize={0} maxSize={40} className="hidden lg:block">
+          <NewGuidedNotes
+            notes={notes || []}
+            isLoading={notesLoading}
+            onCreateNote={handleCreateCustomNote}
+            onDeleteNote={handleDeleteNote}
+            isCreating={createNote.isPending}
+            isDeleting={deleteNote.isPending}
+            onMarkComplete={() => {
+              if (user && id) {
+                updateProgress.mutate({
+                  userId: user.id,
+                  moduleId: id,
+                  progressPercent: Math.min(100, currentProgress + 10),
+                  isCompleted: currentProgress >= 90,
+                });
+              }
+            }}
+          />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
+  </div>
+
+  {/* Quiz Player Dialog */ }
+  <Dialog open={showQuizPlayer} onOpenChange={(open) => !open && handleQuizComplete()}>
+    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>{selectedQuiz?.title}</DialogTitle>
+        <DialogDescription>{selectedQuiz?.description}</DialogDescription>
+      </DialogHeader>
+      {selectedQuiz && quizQuestions && quizQuestions.length > 0 && (
+        <QuizPlayer
+          quiz={selectedQuiz}
+          questions={quizQuestions}
+          onComplete={handleQuizComplete}
+          onCancel={() => handleQuizComplete()}
+        />
+      )}
+    </DialogContent>
+  </Dialog>
+    </div >
   );
 }

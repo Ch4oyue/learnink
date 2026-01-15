@@ -1,120 +1,149 @@
 import { forwardRef } from "react";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-    Clock,
-    PlusCircle,
-    Bookmark,
-    Lightbulb,
-    Copy,
-    LibraryBig,
-} from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+// ============================================
+// TYPES
+// ============================================
 
 interface ModuleMetadata {
     title: string;
     description?: string;
     category?: string;
-    readingTime?: number;
+    moduleNumber?: number;
 }
 
 interface NewContentRendererProps {
     content?: string | null;
     metadata?: ModuleMetadata;
-    onAddToNotes?: (text: string) => void;
-    onCopyText?: (text: string) => void;
     isLoading?: boolean;
 }
 
-export const NewContentRenderer = forwardRef<HTMLElement, NewContentRendererProps>(
-    ({ content, metadata, onAddToNotes, onCopyText, isLoading }, ref) => {
-        const handleCopyCode = (code: string) => {
-            navigator.clipboard.writeText(code);
-            onCopyText?.(code);
-        };
+// ============================================
+// MAIN COMPONENT
+// ============================================
 
+export const NewContentRenderer = forwardRef<HTMLElement, NewContentRendererProps>(
+    ({ content, metadata, isLoading }, ref) => {
         if (isLoading) {
             return (
-                <div className="max-w-[800px] mx-auto py-16 px-10 flex flex-col gap-10">
-                    <div className="animate-pulse space-y-4">
-                        <div className="h-8 w-32 bg-muted rounded" />
-                        <div className="h-12 w-3/4 bg-muted rounded" />
-                        <div className="h-4 w-1/2 bg-muted rounded" />
+                <main className="flex-1 overflow-y-auto bg-[#0b0c0e] relative">
+                    <div className="max-w-3xl mx-auto px-8 pt-16 pb-10">
+                        <div className="animate-pulse space-y-6">
+                            <div className="flex items-center gap-2">
+                                <div className="h-4 w-16 bg-zinc-800 rounded" />
+                                <div className="h-4 w-4 bg-zinc-800 rounded" />
+                                <div className="h-4 w-12 bg-zinc-800 rounded" />
+                            </div>
+                            <div className="h-12 w-3/4 bg-zinc-800 rounded" />
+                            <div className="space-y-3">
+                                <div className="h-4 bg-zinc-800 rounded" />
+                                <div className="h-4 w-5/6 bg-zinc-800 rounded" />
+                                <div className="h-4 w-4/6 bg-zinc-800 rounded" />
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </main>
             );
         }
 
         return (
             <main
                 ref={ref}
-                className="flex-1 overflow-y-auto bg-background relative scroll-smooth no-scrollbar"
+                className="flex-1 overflow-y-auto bg-[#0b0c0e] relative scroll-smooth"
             >
-                {/* Focus Container */}
-                <div className="max-w-[800px] mx-auto py-16 px-10 flex flex-col gap-10">
-                    {/* Page Title Block */}
+                <div className="max-w-3xl mx-auto px-8 pt-16 pb-10">
+                    {/* Breadcrumbs */}
                     {metadata && (
-                        <div className="group relative -ml-6 pl-6 border-l-4 border-transparent hover:border-primary/20 transition-all duration-500">
-                            <div className="mb-4 flex items-center gap-3">
-                                {metadata.category && (
-                                    <Badge
-                                        variant="secondary"
-                                        className="bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-300 text-xs font-bold uppercase tracking-wider border-0"
-                                    >
-                                        {metadata.category}
-                                    </Badge>
-                                )}
-                                {metadata.readingTime && (
-                                    <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
-                                        <Clock className="h-3.5 w-3.5" />
-                                        {metadata.readingTime} min read
-                                    </span>
-                                )}
-                            </div>
-                            <h1 className="text-5xl font-black tracking-tighter leading-[1.1] text-foreground mb-4">
-                                {metadata.title}
-                            </h1>
-                            {metadata.description && (
-                                <p className="text-xl text-muted-foreground font-light">
-                                    {metadata.description}
-                                </p>
-                            )}
-                            {/* Hover Interaction */}
-                            <div className="absolute top-2 right-0 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="text-muted-foreground hover:text-primary hover:bg-primary/10"
-                                    title="Clone Entire Section"
-                                >
-                                    <LibraryBig className="h-5 w-5" />
-                                </Button>
-                            </div>
+                        <div className="flex items-center gap-2 text-xs font-mono text-zinc-500 mb-6">
+                            <span>Module {metadata.moduleNumber || 1}</span>
+                            <ChevronRight className="h-3 w-3" />
+                            <span className="text-purple-400">{metadata.category || "Lesson"}</span>
                         </div>
                     )}
 
-                    {/* Rendered Content */}
-                    {content ? (
-                        <div className="reading-content prose prose-lg dark:prose-invert max-w-none">
-                            <MarkdownRenderer content={content} />
-                        </div>
-                    ) : (
-                        <div className="text-center py-12">
-                            <p className="text-muted-foreground">
-                                Konten modul belum tersedia
-                            </p>
-                        </div>
+                    {/* Article Header */}
+                    {metadata && (
+                        <h1 className="text-4xl font-bold text-white mb-6 tracking-tight">
+                            {metadata.title}
+                        </h1>
                     )}
 
-                    {/* End of Section Divider */}
-                    <div className="h-32 w-full flex items-center justify-center">
-                        <div className="h-[1px] w-24 bg-border" />
-                        <span className="mx-4 text-muted-foreground text-sm font-medium tracking-widest uppercase">
-                            End of Section
-                        </span>
-                        <div className="h-[1px] w-24 bg-border" />
+                    {/* Prose Content */}
+                    <div className="prose prose-invert prose-lg max-w-none text-zinc-400">
+                        {content ? (
+                            <>
+                                {metadata?.description && (
+                                    <p className="leading-relaxed mb-6 text-lg">{metadata.description}</p>
+                                )}
+                                <div className="reading-content">
+                                    <MarkdownRenderer content={content} />
+                                </div>
+                            </>
+                        ) : (
+                            <div className="text-center py-12">
+                                <p className="text-zinc-500">Content not available yet.</p>
+                            </div>
+                        )}
                     </div>
+
+                    {/* Code Block Demonstration (Optional) */}
+                    {content && (
+                        <div className="my-10 rounded-xl overflow-hidden bg-[#15151a] border border-zinc-800 shadow-2xl shadow-black/50">
+                            {/* Window Header */}
+                            <div className="h-10 bg-[#1e1e24] flex items-center px-4 border-b border-zinc-800 relative">
+                                <div className="flex gap-2 absolute left-4">
+                                    <div className="w-3 h-3 rounded-full bg-red-500" />
+                                    <div className="w-3 h-3 rounded-full bg-amber-500" />
+                                    <div className="w-3 h-3 rounded-full bg-green-500" />
+                                </div>
+                                <div className="mx-auto text-xs text-zinc-500 font-mono">
+                                    example.jsx
+                                </div>
+                            </div>
+                            {/* Preview Code */}
+                            <div className="p-6 font-mono text-sm leading-relaxed overflow-x-auto">
+                                <pre className="text-zinc-300">
+                                    <code>
+                                        <span className="text-purple-400">import</span> React, {"{ useState }"}{" "}
+                                        <span className="text-purple-400">from</span>{" "}
+                                        <span className="text-green-400">'react'</span>;{"\n\n"}
+                                        <span className="text-purple-400">export default function</span>{" "}
+                                        <span className="text-blue-400">Example</span>() {"{"}
+                                        {"\n"}
+                                        {"  "}
+                                        <span className="text-zinc-600 italic">
+                      // Your code here
+                                        </span>
+                                        {"\n"}
+                                        {"  "}
+                                        <span className="text-purple-400">const</span> [value, setValue] ={" "}
+                                        <span className="text-blue-300">useState</span>(
+                                        <span className="text-orange-300">0</span>);{"\n\n"}
+                                        {"  "}
+                                        <span className="text-purple-400">return</span> (
+                                        {"\n"}
+                                        {"    "}
+                                        <span className="text-zinc-400">&lt;</span>
+                                        <span className="text-red-400">div</span>
+                                        <span className="text-zinc-400">&gt;</span>
+                                        {"{value}"}
+                                        <span className="text-zinc-400">&lt;/</span>
+                                        <span className="text-red-400">div</span>
+                                        <span className="text-zinc-400">&gt;</span>
+                                        {"\n"}
+                                        {"  "});{"\n"}
+                                        {"}"}
+                                    </code>
+                                </pre>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* End of Content Spacer */}
+                    <div className="h-20" />
                 </div>
             </main>
         );

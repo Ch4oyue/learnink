@@ -1,5 +1,6 @@
-/* Google Fonts - Manrope */
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+/* Google Fonts - Inter + JetBrains Mono for new design */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,148 +15,133 @@
 @layer base {
   :root {
     /* =========================================
-       LearnInk Design System
-       Primary: #0079a8
-       Based on Master HTML Reference
+       LearnInk V2 Design System
+       Dark-first design with Sky/Zinc palette
+       Primary: #0ea5e9 (Sky 500)
+       Background: #fafafa light / #09090b dark
     ========================================= */
 
-    /* Background - Clean off-white #f9fafa */
-    --background: 168 8% 98%;
-    --foreground: 195 45% 8%;
-    /* #0c181d */
+    /* Light Mode (default) */
+    --background: 0 0% 98%; /* #fafafa - Zinc 50 */
+    --foreground: 240 10% 4%; /* #09090b - Zinc 950 */
 
-    /* Card/Surface - Pure white #ffffff */
-    --card: 0 0% 100%;
-    --card-foreground: 195 45% 8%;
+    --card: 0 0% 100%; /* white */
+    --card-foreground: 240 10% 4%;
 
-    /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 195 45% 8%;
+    --popover-foreground: 240 10% 4%;
 
-    /* Primary - LearnInk Cyan #0079a8 */
-    --primary: 195 100% 33%;
+    /* Primary - Sky 500 #0ea5e9 */
+    --primary: 199 89% 48%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Soft neutral */
-    --secondary: 180 6% 96%;
-    --secondary-foreground: 195 45% 8%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
 
-    /* Muted */
-    --muted: 180 6% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%; /* #71717a */
 
-    /* Accent */
-    --accent: 180 6% 96%;
-    --accent-foreground: 195 45% 8%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 6% 10%;
 
-    /* Success - Green accent #1e8e3e */
-    --success: 142 65% 34%;
+    --success: 142 76% 36%;
     --success-foreground: 0 0% 100%;
 
-    /* Warning - Soft amber */
-    --warning: 38 70% 50%;
+    --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
 
-    /* Destructive - Calm red */
-    --destructive: 0 65% 51%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Border - Soft cyan tint #e6f0f4 */
-    --border: 195 40% 93%;
-    --input: 195 40% 93%;
-    --ring: 195 100% 33%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 199 89% 48%;
 
     --radius: 0.5rem;
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 25%;
-    --sidebar-primary: 195 100% 33%;
+    --sidebar-foreground: 240 4% 46%;
+    --sidebar-primary: 199 89% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 180 6% 96%;
-    --sidebar-accent-foreground: 195 45% 8%;
-    --sidebar-border: 195 40% 93%;
-    --sidebar-ring: 195 100% 33%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-ring: 199 89% 48%;
 
     /* LearnInk Specific */
-    --notes-bg: 190 20% 97%;
-    /* #F3F7F8 */
-    --accent-green: 136 35% 93%;
-    /* #e6f4ea */
-    --accent-green-text: 142 65% 34%;
-    /* #1e8e3e */
+    --notes-bg: 210 40% 98%;
+    --accent-green: 142 76% 93%;
+    --accent-green-text: 142 76% 36%;
 
     /* Layout */
     --nav-height: 4rem;
 
-    /* Shadows - Ultra subtle */
+    /* Shadows */
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
     --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
     --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.05);
     --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 0 10px rgba(0, 121, 168, 0.5);
+    --shadow-glow: 0 0 20px -5px rgba(14, 165, 233, 0.3);
   }
 
   .dark {
-    /* LearnInk Dark Mode */
-    --background: 200 27% 10%;
-    /* #121c21 */
-    --foreground: 0 0% 100%;
+    /* LearnInk V2 Dark Mode - Zinc palette */
+    --background: 240 10% 4%; /* #09090b - Zinc 950 */
+    --foreground: 240 5% 90%; /* #e4e4e7 - Zinc 200 */
 
-    --card: 200 23% 14%;
-    /* #1a262d */
-    --card-foreground: 0 0% 100%;
+    --card: 240 6% 10%; /* #18181b - Zinc 900 */
+    --card-foreground: 240 5% 90%;
 
-    --popover: 200 23% 14%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 240 6% 10%;
+    --popover-foreground: 240 5% 90%;
 
-    --primary: 195 100% 33%;
+    /* Primary - Sky 500 */
+    --primary: 199 89% 48%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 200 20% 12%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 240 4% 16%;
+    --secondary-foreground: 240 5% 90%;
 
-    --muted: 200 20% 12%;
-    --muted-foreground: 0 0% 55%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 5% 65%; /* #a1a1aa */
 
-    --accent: 200 20% 12%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 240 4% 16%;
+    --accent-foreground: 240 5% 90%;
 
-    --success: 142 65% 40%;
+    --success: 142 76% 42%;
     --success-foreground: 0 0% 100%;
 
-    --warning: 38 70% 55%;
+    --warning: 38 92% 55%;
     --warning-foreground: 0 0% 100%;
 
-    --destructive: 0 55% 45%;
+    --destructive: 0 63% 55%;
     --destructive-foreground: 0 0% 98%;
 
-    /* Border - #2a3b45 */
-    --border: 200 22% 22%;
-    --input: 200 22% 22%;
-    --ring: 195 100% 33%;
+    /* Border - Zinc 800 */
+    --border: 240 4% 16%;
+    --input: 240 4% 16%;
+    --ring: 199 89% 48%;
 
-    --sidebar-background: 200 30% 8%;
-    /* #0f161a */
-    --sidebar-foreground: 0 0% 85%;
-    --sidebar-primary: 195 100% 33%;
+    --sidebar-background: 240 10% 4%;
+    --sidebar-foreground: 240 5% 65%;
+    --sidebar-primary: 199 89% 48%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 200 20% 13%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 200 22% 22%;
-    --sidebar-ring: 195 100% 33%;
+    --sidebar-accent: 240 4% 16%;
+    --sidebar-accent-foreground: 240 5% 90%;
+    --sidebar-border: 240 4% 16%;
+    --sidebar-ring: 199 89% 48%;
 
     /* LearnInk Specific */
-    --notes-bg: 200 30% 8%;
-    /* #0f161a */
+    --notes-bg: 240 10% 6%;
     --accent-green: 142 50% 15%;
-    --accent-green-text: 142 65% 50%;
+    --accent-green-text: 142 76% 50%;
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.35);
-    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
-    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 10px rgba(0, 121, 168, 0.5);
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.5);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.5);
+    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 0 20px -5px rgba(14, 165, 233, 0.3);
   }
 }
 

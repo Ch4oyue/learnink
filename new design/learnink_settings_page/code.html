@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Notification Preferences - LearnInk</title>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            // Custom colors derived from the provided description
+            page: '#0a0c10',      // Very dark navy/black
+            card: '#161b22',      // Slightly lighter dark blue/grey
+            accent: '#60a5fa',    // UPDATED: Bright cyan/blue
+            primary: '#f0f6fc',   // White/Light grey for headings
+            secondary: '#9ca3af', // UPDATED: Muted grey for descriptions
+            toggleOff: '#374151'  // Dark grey for inactive toggles
+          },
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+<!-- Custom Styles for Specific Layout Needs -->
+<style data-purpose="toggle-switch-styles">
+    /* 
+      Custom styles to handle the toggle switch animation 
+      using the checkbox state.
+    */
+    .toggle-checkbox:checked {
+      right: 0;
+      border-color: #60a5fa;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #60a5fa;
+    }
+    .toggle-checkbox:checked + .toggle-label:before {
+      transform: translateX(100%);
+    }
+    
+    /* Toggle Base Styles */
+    .toggle-label {
+      width: 3rem; /* 48px */
+      height: 1.5rem; /* 24px */
+      position: relative;
+      display: inline-block;
+      border-radius: 9999px;
+      transition: background-color 0.2s ease-in-out;
+      cursor: pointer;
+    }
+    
+    .toggle-label:before {
+      content: '';
+      position: absolute;
+      top: 0.125rem; /* 2px */
+      left: 0.125rem; /* 2px */
+      width: 1.25rem; /* 20px */
+      height: 1.25rem; /* 20px */
+      background-color: white;
+      border-radius: 50%;
+      transition: transform 0.2s ease-in-out;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body class="bg-page text-primary font-sans antialiased min-h-screen flex flex-col">
+<!-- BEGIN: Header -->
+<!-- This header contains the Logo, Navigation Links, and the Dark Mode Toggle representation -->
+<header class="w-full py-4 px-6 flex items-center justify-between border-b border-gray-800/50">
+<!-- Left: Brand Logo -->
+<div class="flex items-center">
+<a class="text-2xl font-bold text-accent tracking-tight hover:opacity-90 transition-opacity" href="#">
+        LearnInk
+      </a>
+</div>
+<!-- Right: Navigation & Theme Toggle -->
+<nav class="flex items-center gap-6">
+<a class="text-secondary hover:text-primary text-sm font-medium transition-colors" href="#">Settings</a>
+<a class="text-secondary hover:text-primary text-sm font-medium transition-colors" href="#">Log out</a>
+<!-- Theme Toggle Switch (Visual Representation) -->
+<div class="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer hidden" disabled="" id="theme-toggle" name="toggle" type="checkbox"/>
+<label class="block overflow-hidden h-6 rounded-full bg-gray-700 cursor-pointer flex items-center justify-end pr-1" for="theme-toggle">
+<!-- Moon Icon inside the toggle -->
+<svg class="h-4 w-4 text-gray-400" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+</svg>
+</label>
+</div>
+</nav>
+</header>
+<!-- END: Header -->
+<!-- BEGIN: MainContent -->
+<main class="flex-grow flex flex-col items-center pt-12 px-4 sm:px-6">
+<!-- Page Title -->
+<div class="w-full max-w-3xl mb-6">
+<h2 class="text-2xl font-semibold text-primary">Notification Preferences</h2>
+</div>
+<!-- BEGIN: SettingsCard -->
+<!-- Card container for the list of toggles -->
+<section class="w-full max-w-3xl bg-card rounded-xl border shadow-xl overflow-hidden p-6 sm:p-8 border-[#30363d]">
+<form action="#" method="POST" onsubmit="event.preventDefault();">
+<div class="flex flex-col space-y-8">
+<!-- Item 1: New Module Alerts -->
+<div class="flex gap-4 items-center" data-purpose="setting-item">
+<!-- Toggle Switch -->
+<div class="flex-shrink-0">
+<input checked="" class="sr-only peer" id="toggle-module" type="checkbox"/>
+<label class="toggle-label bg-toggleOff peer-checked:bg-accent" for="toggle-module"></label>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col">
+<label class="text-base font-medium text-primary cursor-pointer select-none" for="toggle-module">New Module Alerts</label>
+<p class="text-sm text-secondary mt-0.5">New module alerts are solored in update coding platform.</p>
+</div>
+</div>
+<!-- Item 2: Community Replies -->
+<div class="flex gap-4 items-center" data-purpose="setting-item">
+<!-- Toggle Switch -->
+<div class="flex-shrink-0">
+<input checked="" class="sr-only peer" id="toggle-community" type="checkbox"/>
+<label class="toggle-label bg-toggleOff peer-checked:bg-accent" for="toggle-community"></label>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col">
+<label class="text-base font-medium text-primary cursor-pointer select-none" for="toggle-community">Community Replies</label>
+<p class="text-sm text-secondary mt-0.5">Replies community replies for your community replies.</p>
+</div>
+</div>
+<!-- Item 3: Streak Reminders (OFF STATE) -->
+<div class="flex gap-4 items-center" data-purpose="setting-item">
+<!-- Toggle Switch -->
+<div class="flex-shrink-0">
+<!-- Note: 'checked' attribute is removed here for OFF state -->
+<input class="sr-only peer" id="toggle-streak" type="checkbox"/>
+<label class="toggle-label bg-toggleOff peer-checked:bg-accent" for="toggle-streak"></label>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col">
+<label class="text-base font-medium text-primary cursor-pointer select-none" for="toggle-streak">Streak Reminders</label>
+<p class="text-sm text-secondary mt-0.5">Reminders home streak over for each month.</p>
+</div>
+</div>
+<!-- Item 4: Weekly Digest -->
+<div class="flex gap-4 items-center" data-purpose="setting-item">
+<!-- Toggle Switch -->
+<div class="flex-shrink-0">
+<input checked="" class="sr-only peer" id="toggle-digest" type="checkbox"/>
+<label class="toggle-label bg-toggleOff peer-checked:bg-accent" for="toggle-digest"></label>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col">
+<label class="text-base font-medium text-primary cursor-pointer select-none" for="toggle-digest">Weekly Digest</label>
+<p class="text-sm text-secondary mt-0.5">Digests weekly digest for muntenewees for this month.</p>
+</div>
+</div>
+<!-- Item 5: Product Updates -->
+<div class="flex gap-4 items-center" data-purpose="setting-item">
+<!-- Toggle Switch -->
+<div class="flex-shrink-0">
+<input checked="" class="sr-only peer" id="toggle-product" type="checkbox"/>
+<label class="toggle-label bg-toggleOff peer-checked:bg-accent" for="toggle-product"></label>
+</div>
+<!-- Text Content -->
+<div class="flex flex-col">
+<label class="text-base font-medium text-primary cursor-pointer select-none" for="toggle-product">Product Updates</label>
+<p class="text-sm text-secondary mt-0.5">Promice product updates chently and produits updates.</p>
+</div>
+</div>
+</div>
+</form>
+</section>
+<!-- END: SettingsCard -->
+</main>
+<!-- END: MainContent -->
+</body></html>

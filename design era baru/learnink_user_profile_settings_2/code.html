@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnInk User Profile</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0079a8",
+                        "primary-hover": "#00628a",
+                        "background-light": "#fafafa",
+                        "background-dark": "#22252a",
+                        "card-light": "#ffffff",
+                        "card-dark": "#2b3036",
+                        "text-main": "#0d141c",
+                        "text-muted": "#486f9d",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "2xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        "soft": "0 2px 10px rgba(0, 0, 0, 0.03)",
+                        "card": "0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02)"
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main font-display antialiased transition-colors duration-200">
+<nav class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-card-dark/80 backdrop-blur-md">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex h-16 items-center justify-between">
+<div class="flex items-center gap-8">
+<a class="flex items-center gap-3 group" href="#">
+<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+<span class="material-symbols-outlined text-xl">school</span>
+</div>
+<span class="text-xl font-bold tracking-tight text-slate-900 dark:text-white">LearnInk</span>
+</a>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Courses</a>
+<a class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary transition-colors" href="#">Community</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center w-64 rounded-xl bg-slate-100 dark:bg-slate-800 px-3 py-2 focus-within:ring-2 focus-within:ring-primary/20 transition-all">
+<span class="material-symbols-outlined text-slate-400">search</span>
+<input class="w-full bg-transparent border-none text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:ring-0 px-2" placeholder="Search..." type="text"/>
+</div>
+<button class="relative h-10 w-10 overflow-hidden rounded-full ring-2 ring-transparent hover:ring-primary/20 transition-all">
+<div class="h-full w-full bg-cover bg-center" data-alt="User profile avatar thumbnail" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAvd0b67JR0TtWuC2abFOA96qEWETcBEnu2dKodhNegdclik7l0KP5guC3LJfThpNpnfwZycT4GuD0v04H9r-9da0wSgRH5iBYSqMA8lk1RsZqU6XlPuGZ_RVqGp0zCoX5u0JEnKoynNfpqfUJexA3hZnw2Pfx61T5NMIhiK1Ooo622kLFGsStw2RF1R4Yg2MRgGg4-KcZnJJE8SmB01q2jvNuswVQQmPC5qXzY2B2QGwMD3-QhvgZkDAlOc3yP5Cr0uMtPycacIiNL');"></div>
+</button>
+</div>
+</div>
+</div>
+</nav>
+<main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="mb-6 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined text-[18px]">arrow_back</span>
+<span>Back to Dashboard</span>
+</div>
+<div class="mb-8 border-b border-slate-200 dark:border-slate-700">
+<div class="flex gap-8 overflow-x-auto no-scrollbar">
+<a class="relative pb-4 text-sm font-bold text-primary dark:text-primary" href="#">
+                Profile
+                <span class="absolute bottom-0 left-0 h-0.5 w-full bg-primary rounded-t-full"></span>
+</a>
+<a class="pb-4 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" href="#">
+                My Notes
+            </a>
+<a class="pb-4 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" href="#">
+                Billing
+            </a>
+<a class="pb-4 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" href="#">
+                Settings
+            </a>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-2xl p-6 sm:p-8 shadow-card mb-8 relative overflow-hidden">
+<div class="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl"></div>
+<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
+<div class="flex flex-col sm:flex-row items-center sm:items-start gap-8 w-full md:w-auto">
+<div class="relative group">
+<div class="h-32 w-32 rounded-full overflow-hidden border-4 border-slate-50 dark:border-slate-800 shadow-lg">
+<div class="h-full w-full bg-cover bg-center" data-alt="High resolution user profile photo of a young man" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB74HUXSQkcpV-zPr895141HBeLvqsCHoGyukClAWs2D_vKPNbMW5h8c-SoWeZEYDrn6e2XzTETe3qSSiyxgYRDQltI1Xu6emz8Vzt14YbyZ43NVNuSz9bKuVzCWKGIekqaXvfWqAe0VV9lC6RBVtXOed-W3Dl1sQqjhAt-JEihh2iCRpu7HdP8PQNOKZ4_nsD5HnJdO2GXG6Xp8P78kJQtRFDgBbwvEzQk54WL7Bi1LK-eNX2DA9M8VPKDmOTdjaxXxNebyG1Ds-MZ');"></div>
+</div>
+<div class="absolute -top-2 -right-2 flex flex-col items-center justify-center h-14 w-14 rounded-full bg-orange-50 dark:bg-orange-900/40 border-2 border-white dark:border-card-dark shadow-md z-20" title="7-Day Streak!">
+<span class="material-symbols-outlined text-orange-500 text-2xl fill-1" style="font-variation-settings: 'FILL' 1;">local_fire_department</span>
+<span class="text-[10px] font-bold text-orange-600 dark:text-orange-400 leading-none -mt-0.5">7</span>
+</div>
+<button aria-label="Change Avatar" class="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-white dark:bg-slate-700 shadow-md flex items-center justify-center text-slate-600 dark:text-slate-300 hover:text-primary transition-colors border border-slate-100 dark:border-slate-600 z-10">
+<span class="material-symbols-outlined text-[18px]">photo_camera</span>
+</button>
+</div>
+<div class="text-center sm:text-left pt-2">
+<h1 class="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight mb-2">Abelion</h1>
+<p class="text-slate-500 dark:text-slate-400 text-lg max-w-md leading-relaxed">Lifelong learner &amp; Graphic Design enthusiast based in San Francisco.</p>
+<div class="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-bold border border-emerald-100 dark:border-emerald-800">
+<span class="material-symbols-outlined text-[14px]">verified</span> Pro Member
+                        </span>
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs font-medium">
+<span class="material-symbols-outlined text-[14px]">location_on</span> San Francisco, CA
+                        </span>
+</div>
+</div>
+</div>
+<button class="w-full md:w-auto px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-bold shadow-lg shadow-primary/25 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+                Edit Profile
+            </button>
+</div>
+</div>
+<div class="bg-card-light dark:bg-card-dark rounded-xl p-6 sm:p-8 border border-slate-100 dark:border-slate-700/50 shadow-soft mb-8">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">Learning Activity</h2>
+<p class="text-sm text-slate-500 dark:text-slate-400">Your daily progress over the last week</p>
+</div>
+<div class="hidden sm:flex bg-slate-100 dark:bg-slate-800 p-1 rounded-lg">
+<button class="px-3 py-1 text-xs font-bold text-primary bg-white dark:bg-slate-700 shadow-sm rounded-md">Weekly</button>
+<button class="px-3 py-1 text-xs font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition-colors">Monthly</button>
+</div>
+</div>
+<div class="w-full h-48 flex items-end justify-between gap-2 sm:gap-4 mt-4">
+<div class="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+<div class="relative w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
+<div class="w-full bg-primary/40 group-hover:bg-primary/60 transition-all h-[40%] rounded-t-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">45 mins</div>
+</div>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Mon</span>
+</div>
+<div class="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+<div class="relative w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
+<div class="w-full bg-primary/40 group-hover:bg-primary/60 transition-all h-[65%] rounded-t-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">1h 10m</div>
+</div>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Tue</span>
+</div>
+<div class="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+<div class="relative w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
+<div class="w-full bg-primary/40 group-hover:bg-primary/60 transition-all h-[30%] rounded-t-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">30 mins</div>
+</div>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Wed</span>
+</div>
+<div class="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+<div class="relative w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
+<div class="w-full bg-primary/40 group-hover:bg-primary/60 transition-all h-[85%] rounded-t-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">1h 45m</div>
+</div>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Thu</span>
+</div>
+<div class="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+<div class="relative w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
+<div class="w-full bg-primary group-hover:bg-primary-hover shadow-[0_0_15px_rgba(0,121,168,0.3)] transition-all h-[95%] rounded-t-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-100 transition-opacity whitespace-nowrap z-10">2h 10m</div>
+</div>
+</div>
+<span class="text-xs font-bold text-primary dark:text-primary">Fri</span>
+</div>
+<div class="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+<div class="relative w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
+<div class="w-full bg-primary/40 group-hover:bg-primary/60 transition-all h-[50%] rounded-t-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">55 mins</div>
+</div>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Sat</span>
+</div>
+<div class="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+<div class="relative w-full bg-slate-100 dark:bg-slate-800 rounded-t-lg h-32 flex items-end overflow-hidden">
+<div class="w-full bg-primary/20 group-hover:bg-primary/40 transition-all h-[20%] rounded-t-lg relative">
+<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-10">15 mins</div>
+</div>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400">Sun</span>
+</div>
+</div>
+<div class="mt-6 pt-6 border-t border-slate-100 dark:border-slate-700/50 flex flex-wrap justify-between items-center gap-4">
+<div class="flex items-center gap-6">
+<div>
+<span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Total XP</span>
+<div class="text-xl font-bold text-slate-900 dark:text-white">12,450</div>
+</div>
+<div>
+<span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider font-semibold">Avg. Time</span>
+<div class="text-xl font-bold text-slate-900 dark:text-white">48m <span class="text-sm font-normal text-slate-400">/ day</span></div>
+</div>
+</div>
+<a class="text-sm font-semibold text-primary hover:text-primary-hover flex items-center gap-1 group" href="#">
+                View Detailed Analytics 
+                <span class="material-symbols-outlined text-[16px] group-hover:translate-x-0.5 transition-transform">chevron_right</span>
+</a>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<div class="lg:col-span-2 space-y-6">
+<div class="bg-card-light dark:bg-card-dark rounded-xl border border-slate-100 dark:border-slate-700/50 p-6 sm:p-8">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold text-slate-900 dark:text-white">Personal Information</h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
+<div class="space-y-2">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Full Name</label>
+<div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-900 dark:text-slate-200 text-sm font-medium border border-slate-200 dark:border-slate-700">
+                            Abelion Smythe
+                        </div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Email Address</label>
+<div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-900 dark:text-slate-200 text-sm font-medium border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                            abelion@learnink.com
+                            <span class="material-symbols-outlined text-green-500 text-[18px]" title="Verified">check_circle</span>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Role</label>
+<div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-900 dark:text-slate-200 text-sm font-medium border border-slate-200 dark:border-slate-700">
+                            Student
+                        </div>
+</div>
+<div class="space-y-2">
+<label class="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Language</label>
+<div class="p-3 bg-slate-50 dark:bg-slate-800 rounded-lg text-slate-900 dark:text-slate-200 text-sm font-medium border border-slate-200 dark:border-slate-700">
+                            English (US)
+                        </div>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:col-span-1">
+<div class="bg-card-light dark:bg-card-dark rounded-xl border border-slate-100 dark:border-slate-700/50 p-6 h-full">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-lg font-bold text-slate-900 dark:text-white">Recent Achievements</h2>
+<a class="text-xs font-bold text-primary hover:text-primary-hover" href="#">View All</a>
+</div>
+<div class="space-y-4">
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+<div class="h-12 w-12 rounded-full bg-gradient-to-br from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 flex items-center justify-center shrink-0 border border-yellow-200 dark:border-yellow-800/50">
+<span class="material-symbols-outlined text-yellow-600 dark:text-yellow-500">emoji_events</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white">Fast Learner</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Completed 5 lessons in one day</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+<div class="h-12 w-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 flex items-center justify-center shrink-0 border border-blue-200 dark:border-blue-800/50">
+<span class="material-symbols-outlined text-blue-600 dark:text-blue-500">psychology</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white">Deep Focus</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">2 hours of uninterrupted study</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer opacity-60 grayscale">
+<div class="h-12 w-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-slate-400">lock</span>
+</div>
+<div>
+<h3 class="text-sm font-bold text-slate-900 dark:text-white">Note Master</h3>
+<p class="text-xs text-slate-500 dark:text-slate-400">Create 50 notes (18/50)</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

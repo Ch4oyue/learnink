@@ -1,8 +1,25 @@
 import type { Config } from "tailwindcss";
 
+/**
+ * LearnInk Design System - Total System Repair
+ * =============================================
+ * Color Palette: dark_mode_learning_dashboard
+ * Layout Reference: variant_2
+ * 
+ * Primary: Indigo 500 (#6366f1)
+ * Background: Zinc 950 (#09090b)
+ * Surface: Zinc 900 (#18181b)
+ * Text: Zinc 200 (#e4e4e7)
+ */
+
 export default {
   darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -14,11 +31,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
-        display: ['Inter', 'sans-serif'],
-        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+        sans: ["Manrope", "Inter", "system-ui", "sans-serif"],
+        display: ["Manrope", "sans-serif"],
+        mono: ["JetBrains Mono", "Fira Code", "monospace"],
       },
       colors: {
+        // Semantic Colors via CSS Variables
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
@@ -52,14 +70,7 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        success: {
-          DEFAULT: "hsl(var(--success))",
-          foreground: "hsl(var(--success-foreground))",
-        },
-        warning: {
-          DEFAULT: "hsl(var(--warning))",
-          foreground: "hsl(var(--warning-foreground))",
-        },
+        // Sidebar-specific tokens
         sidebar: {
           DEFAULT: "hsl(var(--sidebar-background))",
           foreground: "hsl(var(--sidebar-foreground))",
@@ -68,13 +79,16 @@ export default {
           accent: "hsl(var(--sidebar-accent))",
           "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
           border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
         },
-        // LearnInk Design Tokens
+        // App-specific colors
         "notes-bg": "hsl(var(--notes-bg))",
-        "accent-green": {
-          DEFAULT: "hsl(var(--accent-green))",
-          text: "hsl(var(--accent-green-text))",
+        success: {
+          DEFAULT: "#22c55e",
+          foreground: "#ffffff",
+        },
+        warning: {
+          DEFAULT: "#f59e0b",
+          foreground: "#ffffff",
         },
       },
       borderRadius: {
@@ -85,14 +99,12 @@ export default {
         "2xl": "calc(var(--radius) + 8px)",
       },
       boxShadow: {
-        xs: "var(--shadow-xs)",
-        soft: "var(--shadow-soft)",
-        medium: "var(--shadow-medium)",
-        elevated: "var(--shadow-elevated)",
-        glow: "var(--shadow-glow)",
         subtle: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
-        float: "0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)",
-        'xl-dark': '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3)',
+        soft: "0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06)",
+        medium: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        elevated: "0 8px 24px rgba(0, 0, 0, 0.2)",
+        glow: "0 0 20px -5px rgba(99, 102, 241, 0.4)",
+        "xl-dark": "0 20px 25px -5px rgba(0, 0, 0, 0.5)",
       },
       keyframes: {
         "accordion-down": {
@@ -104,29 +116,19 @@ export default {
           to: { height: "0" },
         },
         "fade-in": {
-          from: { opacity: "0", transform: "translateY(10px)" },
+          from: { opacity: "0", transform: "translateY(8px)" },
           to: { opacity: "1", transform: "translateY(0)" },
         },
-        "slide-down": {
-          from: { opacity: "0", transform: "translateY(-10px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
-        },
-        "scale-in": {
-          from: { opacity: "0", transform: "scale(0.95)" },
-          to: { opacity: "1", transform: "scale(1)" },
-        },
-        "slide-up": {
-          from: { opacity: "0", transform: "translateY(20px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "fade-in": "fade-in 0.5s ease-out forwards",
-        "slide-down": "slide-down 0.3s ease-out forwards",
-        "scale-in": "scale-in 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards",
-        "slide-up": "slide-up 0.4s cubic-bezier(0.25, 0.1, 0.25, 1) forwards",
+        "fade-in": "fade-in 0.3s ease-out forwards",
+        shimmer: "shimmer 1.5s ease-in-out infinite",
       },
     },
   },

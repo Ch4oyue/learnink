@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnInk - Learning Interface</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0079a8",
+                        "background-light": "#f9fafa",
+                        "background-dark": "#121c21",
+                        "surface-light": "#ffffff",
+                        "surface-dim": "#F3F7F8",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "0.75rem",
+                        "xl": "1rem", 
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "soft": "0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 1px 4px -1px rgba(0, 0, 0, 0.01)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }
+        
+        /* Custom Scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #cbd5e1;
+        }
+
+        /* Hover effect for content blocks */
+        .content-block:hover .clone-action {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Hide clone button by default */
+        .clone-action {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.2s ease;
+        }
+
+        .focus-outline:focus-visible {
+            outline: 2px solid #0079a8;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#121c21] dark:text-[#e0e0e0] overflow-hidden h-screen flex flex-col">
+<!-- Top Navigation (Minimal) -->
+<header class="h-14 border-b border-[#e6f0f4] dark:border-[#2a3b45] flex items-center px-6 bg-surface-light dark:bg-[#1a262e] shrink-0 z-20">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-white font-bold text-lg">L</div>
+<span class="font-bold text-lg tracking-tight">LearnInk</span>
+</div>
+<div class="ml-auto flex items-center gap-4">
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-colors">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</button>
+<button class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/5 text-gray-500 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-primary overflow-hidden border-2 border-white dark:border-[#121c21]">
+<img alt="User avatar" class="w-full h-full object-cover" data-alt="User profile avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCicgA9pwlgyON3eJukn65djDuYD_6lsTNC9usS0TG-75wXAnmoXAhxV0x-tdgVrH5hdfdQkvj8ZNven_qs_KblNRD1hidWfNW1thGgb7zOS4hObGhnHh9TjcBbogpxoczaKgU7Yk70J0xBAHJ7GKg72wDxnY41Yvztqaw7TgPPiGBd3Okdu8h_QUNLCN27GxTInhP-e5WnG9t5ARTN5_uwUewc-zcSHpos4fi-smSSk92R1prkYmWmPpJg90OFLxZ3B0y90eHjF7ZG"/>
+</div>
+</div>
+</header>
+<!-- Main Layout -->
+<div class="flex flex-1 overflow-hidden">
+<!-- LEFT SIDEBAR: Table of Contents -->
+<aside class="w-[260px] flex-shrink-0 flex flex-col border-r border-[#e6f0f4] dark:border-[#2a3b45] bg-[#fdfdfd] dark:bg-[#162025] h-full overflow-y-auto pb-8">
+<div class="p-6 sticky top-0 bg-[#fdfdfd] dark:bg-[#162025] z-10">
+<h2 class="text-xs font-bold text-[#4587a1] uppercase tracking-wider mb-1">Current Course</h2>
+<h1 class="text-lg font-bold leading-tight text-gray-900 dark:text-white">React Mastery: Advanced Patterns</h1>
+<div class="mt-4 w-full bg-gray-200 rounded-full h-1.5 dark:bg-gray-700">
+<div class="bg-primary h-1.5 rounded-full" style="width: 12%"></div>
+</div>
+<div class="mt-2 text-xs text-gray-500 font-medium">12% Complete</div>
+</div>
+<nav class="px-4 flex flex-col gap-1">
+<!-- Module 1 -->
+<div class="mb-4">
+<div class="px-3 py-2 text-sm font-bold text-gray-900 dark:text-gray-100 flex items-center justify-between">
+<span>Module 1: Foundations</span>
+<span class="material-symbols-outlined text-[16px] text-gray-400">expand_more</span>
+</div>
+<div class="flex flex-col gap-1 pl-2 border-l-2 border-gray-100 dark:border-gray-800 ml-3">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-[18px] text-green-500 opacity-0 group-hover:opacity-100">check_circle</span>
+<span class="text-sm font-medium">1.1 Introduction</span>
+</a>
+<!-- Active Item -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary dark:text-blue-400 relative" href="#">
+<div class="absolute -left-[10px] top-1/2 -translate-y-1/2 w-[3px] h-6 bg-primary rounded-r-full"></div>
+<span class="material-symbols-outlined text-[18px]">play_circle</span>
+<span class="text-sm font-bold">1.2 Virtual DOM</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span class="text-sm font-medium">1.3 State &amp; Props</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span class="text-sm font-medium">1.4 Lifecycle</span>
+</a>
+</div>
+</div>
+<!-- Module 2 -->
+<div class="mb-4">
+<div class="px-3 py-2 text-sm font-bold text-gray-900 dark:text-gray-100 flex items-center justify-between opacity-60">
+<span>Module 2: Hooks</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</div>
+</div>
+</nav>
+</aside>
+<!-- CENTER COLUMN: Main Content -->
+<main class="flex-1 flex justify-center overflow-y-auto bg-background-light dark:bg-background-dark relative scroll-smooth">
+<div class="w-full max-w-[760px] px-8 py-12 pb-32">
+<!-- Breadcrumbs -->
+<div class="flex items-center gap-2 text-sm text-gray-400 mb-8 font-medium">
+<span>Module 1</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>1.2 The Virtual DOM</span>
+</div>
+<!-- Page Header -->
+<header class="mb-10">
+<h1 class="text-4xl md:text-[42px] font-black tracking-[-0.02em] text-[#0c181d] dark:text-white leading-tight mb-4">
+                        Understanding the Virtual DOM
+                    </h1>
+<div class="flex items-center gap-4">
+<span class="px-3 py-1 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-bold uppercase tracking-wide rounded-full">Core Concept</span>
+<span class="text-gray-400 text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">schedule</span> 15 min read
+                        </span>
+</div>
+</header>
+<!-- Content Area -->
+<div class="flex flex-col gap-8 text-[#121c21] dark:text-gray-300">
+<!-- Text Block 1 -->
+<div class="content-block group relative -ml-4 pl-4 pr-12 py-2 rounded-xl transition-colors hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-gray-100 dark:hover:bg-[#1a262e] dark:hover:ring-[#2a3b45]">
+<p class="text-lg leading-[1.9] font-normal">
+                            At the heart of React's performance lies the <strong class="font-bold text-primary dark:text-blue-400">Virtual DOM</strong>. Unlike directly manipulating the browser's DOM—which is slow and computationally expensive—React creates a lightweight copy in memory.
+                        </p>
+<!-- Hover Action -->
+<button aria-label="Clone to notes" class="clone-action absolute right-2 top-2 p-2 bg-primary text-white rounded-lg shadow-lg hover:bg-[#006085] active:scale-95 flex items-center gap-2 z-10">
+<span class="material-symbols-outlined text-[18px]">note_add</span>
+<span class="text-xs font-bold pr-1">Save</span>
+</button>
+</div>
+<!-- Text Block 2 -->
+<div class="content-block group relative -ml-4 pl-4 pr-12 py-2 rounded-xl transition-colors hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-gray-100 dark:hover:bg-[#1a262e] dark:hover:ring-[#2a3b45]">
+<p class="text-lg leading-[1.9] font-normal">
+                            When the state of a component changes, React updates the virtual DOM first. It then compares this updated version with the previous version of the virtual DOM. This process is called "diffing".
+                        </p>
+<button aria-label="Clone to notes" class="clone-action absolute right-2 top-2 p-2 bg-surface-dim text-gray-700 dark:bg-[#2a3b45] dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-[#354857] active:scale-95 flex items-center gap-2 z-10">
+<span class="material-symbols-outlined text-[18px]">note_add</span>
+</button>
+</div>
+<!-- Image Block -->
+<div class="content-block group relative -ml-4 pl-4 pr-4 py-4 rounded-xl transition-colors hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-gray-100 dark:hover:bg-[#1a262e] dark:hover:ring-[#2a3b45]">
+<div class="rounded-xl overflow-hidden border border-gray-100 dark:border-gray-800 shadow-sm">
+<img alt="Abstract visualization of React Virtual DOM Diffing Algorithm" class="w-full h-auto object-cover max-h-[400px]" data-alt="Abstract React code diagram" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSXjfpYbhHmc7Oku-qNgSBvY9diYB9pIjUkZTZMRyyjiMec9EZEPaLxNx7sdiUBWSRACeVEOrKiz211YL2GxCumJ6lkPNjIZm0TGshx9gg7fAvo8qfEzzywvlMQfFRlj-Jsu22WiiZgyJvOrg_IuYKDhdPfE92dTaRNKrPF-_RgOqwWoF5YomtVshYkDvWuWT47MCwtKkURzpCzsmmtDnEYbb-IJFVKSyzXZtqq2jWmx2x78GKWRdz9ZV7jqiHOG0bbfwqTQv5gkm4"/>
+</div>
+<p class="mt-3 text-sm text-center text-gray-500 italic">Figure 1.1: Visualizing the diffing algorithm process</p>
+<button aria-label="Clone image to notes" class="clone-action absolute right-6 top-6 p-2 bg-white/90 backdrop-blur text-gray-800 rounded-lg shadow-md hover:bg-white active:scale-95 flex items-center gap-2 z-10">
+<span class="material-symbols-outlined text-[18px]">image</span>
+<span class="text-xs font-bold pr-1">Add to Notes</span>
+</button>
+</div>
+<!-- Subheader -->
+<div class="content-block group relative -ml-4 pl-4 pr-12 py-1 mt-4 rounded-xl transition-colors hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-gray-100 dark:hover:bg-[#1a262e] dark:hover:ring-[#2a3b45]">
+<h2 class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Why is it faster?</h2>
+<button aria-label="Clone header" class="clone-action absolute right-2 top-1 p-1.5 text-gray-400 hover:text-primary rounded-md">
+<span class="material-symbols-outlined text-[20px]">link</span>
+</button>
+</div>
+<!-- Text Block 3 -->
+<div class="content-block group relative -ml-4 pl-4 pr-12 py-2 rounded-xl transition-colors hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-gray-100 dark:hover:bg-[#1a262e] dark:hover:ring-[#2a3b45]">
+<p class="text-lg leading-[1.9] font-normal">
+                           The browser is slow at layout recalculations. By batching updates and only changing the specific nodes that are different, React minimizes the number of reflows and repaints the browser has to perform.
+                        </p>
+<button aria-label="Clone to notes" class="clone-action absolute right-2 top-2 p-2 bg-surface-dim text-gray-700 dark:bg-[#2a3b45] dark:text-white rounded-lg hover:bg-gray-200 dark:hover:bg-[#354857] active:scale-95 flex items-center gap-2 z-10">
+<span class="material-symbols-outlined text-[18px]">note_add</span>
+</button>
+</div>
+<!-- Code Block -->
+<div class="content-block group relative -ml-4 pl-4 pr-4 py-4 rounded-xl transition-colors hover:bg-white hover:shadow-sm hover:ring-1 hover:ring-gray-100 dark:hover:bg-[#1a262e] dark:hover:ring-[#2a3b45]">
+<div class="bg-[#0f171f] rounded-xl p-6 overflow-x-auto border border-gray-800 shadow-md">
+<div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-2">
+<span class="text-xs text-gray-400 font-mono">Counter.jsx</span>
+<div class="flex gap-1.5">
+<div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+<div class="w-3 h-3 rounded-full bg-green-500/20 border border-green-500/50"></div>
+</div>
+</div>
+<pre class="font-mono text-sm leading-relaxed text-gray-300"><code><span class="text-purple-400">function</span> <span class="text-blue-400">Counter</span>() {
+  <span class="text-purple-400">const</span> [count, setCount] = <span class="text-yellow-300">useState</span>(<span class="text-orange-400">0</span>);
+
+  <span class="text-gray-500">// Only the span text updates in the real DOM</span>
+  <span class="text-purple-400">return</span> (
+    &lt;<span class="text-red-400">div</span>&gt;
+      &lt;<span class="text-red-400">p</span>&gt;You clicked {count} times&lt;/<span class="text-red-400">p</span>&gt;
+      &lt;<span class="text-red-400">button</span> <span class="text-blue-300">onClick</span>={() =&gt; <span class="text-yellow-300">setCount</span>(count + <span class="text-orange-400">1</span>)}&gt;
+        Click me
+      &lt;/<span class="text-red-400">button</span>&gt;
+    &lt;/<span class="text-red-400">div</span>&gt;
+  );
+}</code></pre>
+</div>
+<button aria-label="Clone snippet" class="clone-action absolute right-6 top-20 p-2 bg-[#2a3b45] text-white border border-gray-700 rounded-lg shadow-md hover:bg-[#364a57] active:scale-95 flex items-center gap-2 z-10">
+<span class="material-symbols-outlined text-[18px]">code</span>
+<span class="text-xs font-bold pr-1">Snip</span>
+</button>
+</div>
+</div>
+<!-- Next Lesson CTA -->
+<div class="mt-16 pt-8 border-t border-gray-200 dark:border-gray-800 flex justify-between items-center">
+<button class="px-6 py-3 rounded-xl bg-transparent hover:bg-gray-100 dark:hover:bg-white/5 text-gray-600 dark:text-gray-400 font-bold text-sm transition-colors">
+                        ← Previous: Introduction
+                    </button>
+<button class="px-6 py-3 rounded-xl bg-primary hover:bg-[#006085] text-white font-bold text-sm shadow-lg shadow-primary/30 transition-all transform hover:-translate-y-0.5 flex items-center gap-2">
+                        Next Lesson: State &amp; Props →
+                    </button>
+</div>
+</div>
+</main>
+<!-- RIGHT PANEL: Guided Notes -->
+<aside class="w-[380px] flex-shrink-0 flex flex-col border-l border-[#e6f0f4] dark:border-[#2a3b45] bg-surface-dim dark:bg-[#0d1418] shadow-soft z-10 relative">
+<!-- Panel Header -->
+<div class="p-5 flex items-center justify-between border-b border-[#e6f0f4] dark:border-[#2a3b45] bg-surface-dim dark:bg-[#0d1418]">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]">edit_note</span>
+<h2 class="font-bold text-gray-900 dark:text-white text-base">Guided Notes</h2>
+</div>
+<div class="flex gap-1">
+<button class="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 transition-colors" title="Export">
+<span class="material-symbols-outlined text-[20px]">download</span>
+</button>
+<button class="p-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 transition-colors" title="Settings">
+<span class="material-symbols-outlined text-[20px]">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Notes Content Area -->
+<div class="flex-1 overflow-y-auto p-5 space-y-4">
+<!-- Prompt Block -->
+<div class="bg-white dark:bg-[#162025] p-4 rounded-xl border border-gray-100 dark:border-[#2a3b45] shadow-sm">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded-md">Prompt</span>
+</div>
+<p class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">In your own words, define the Virtual DOM.</p>
+<textarea class="w-full bg-transparent resize-none outline-none text-sm text-gray-600 dark:text-gray-400 placeholder-gray-300 dark:placeholder-gray-600 font-normal leading-relaxed" placeholder="Type your answer here..." rows="3"></textarea>
+</div>
+<!-- Cloned Content Block -->
+<div class="group relative bg-white dark:bg-[#162025] p-4 rounded-xl border-l-4 border-primary shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] uppercase font-bold text-gray-400 tracking-wide">Saved Snippet</span>
+<button class="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-opacity">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<p class="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                        "The Virtual DOM is a lightweight copy of the actual DOM. It allows React to perform efficient updates by only re-rendering what has changed."
+                    </p>
+<div class="mt-3 pt-3 border-t border-gray-50 dark:border-gray-800">
+<input class="w-full text-xs bg-transparent outline-none text-gray-600" placeholder="Add a comment..." type="text"/>
+</div>
+</div>
+<!-- Prompt Block 2 -->
+<div class="bg-white dark:bg-[#162025] p-4 rounded-xl border border-gray-100 dark:border-[#2a3b45] shadow-sm">
+<div class="flex items-center gap-2 mb-2">
+<span class="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded-md">Exercise</span>
+</div>
+<p class="text-sm font-bold text-gray-800 dark:text-gray-200 mb-2">What triggers the diffing algorithm?</p>
+<div class="space-y-2">
+<label class="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer group">
+<div class="w-4 h-4 rounded-full border-2 border-gray-300 group-hover:border-primary"></div>
+<span class="text-sm text-gray-600">Page Load</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-lg border border-blue-100 bg-blue-50/50 dark:bg-blue-900/10 dark:border-blue-900/30 cursor-pointer">
+<div class="w-4 h-4 rounded-full border-4 border-primary bg-white"></div>
+<span class="text-sm text-gray-800 dark:text-gray-200 font-medium">State or Prop Change</span>
+</label>
+<label class="flex items-center gap-3 p-2 rounded-lg border border-transparent hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer group">
+<div class="w-4 h-4 rounded-full border-2 border-gray-300 group-hover:border-primary"></div>
+<span class="text-sm text-gray-600">User Hover</span>
+</label>
+</div>
+</div>
+<!-- Empty State / Placeholder for more notes -->
+<div class="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center text-center gap-2 text-gray-400">
+<span class="material-symbols-outlined text-[24px]">add_circle</span>
+<span class="text-xs font-medium">Click any content block <br/>to add to notes</span>
+</div>
+</div>
+<!-- Footer: Auto-save status -->
+<div class="p-3 bg-surface-dim dark:bg-[#0d1418] border-t border-[#e6f0f4] dark:border-[#2a3b45] flex items-center justify-between text-xs text-gray-400 font-medium">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-green-500">cloud_done</span>
+<span>All changes saved</span>
+</div>
+<span>Last edit: Just now</span>
+</div>
+</aside>
+</div>
+</body></html>

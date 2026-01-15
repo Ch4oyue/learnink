@@ -1,0 +1,123 @@
+import { useNavigate } from "react-router-dom";
+import {
+    GraduationCap,
+    BookOpen,
+    Search,
+    LayoutDashboard,
+    Settings,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+// ============================================
+// TYPES
+// ============================================
+
+interface NavItem {
+    icon: React.ReactNode;
+    label: string;
+    isActive?: boolean;
+    onClick?: () => void;
+}
+
+interface HybridSidebarProps {
+    onTableOfContentsClick?: () => void;
+    onSearchClick?: () => void;
+    onBackClick?: () => void;
+    activeTab?: "toc" | "content" | "dashboard";
+}
+
+// ============================================
+// HYBRID SIDEBAR (72px Rail - Layout from variant_2, Colors from dark_mode)
+// ============================================
+
+export function HybridSidebar({
+    onTableOfContentsClick,
+    onSearchClick,
+    onBackClick,
+    activeTab = "content",
+}: HybridSidebarProps) {
+    const navigate = useNavigate();
+
+    const navItems: NavItem[] = [
+        {
+            icon: <BookOpen className="h-5 w-5" />,
+            label: "Table of Contents",
+            isActive: activeTab === "toc",
+            onClick: onTableOfContentsClick,
+        },
+        {
+            icon: <Search className="h-5 w-5" />,
+            label: "Search",
+            onClick: onSearchClick,
+        },
+        {
+            icon: <LayoutDashboard className="h-5 w-5" />,
+            label: "Dashboard",
+            isActive: activeTab === "dashboard",
+            onClick: () => navigate("/dashboard"),
+        },
+    ];
+
+    return (
+        <aside className="w-[72px] border-r border-zinc-800 bg-[#111316] flex flex-col items-center py-6 gap-8 shrink-0 z-20">
+            {/* Brand Mark - Clean Dark Style */}
+            <div className="size-8 rounded-lg bg-white flex items-center justify-center text-zinc-900 shadow-lg mb-2">
+                <GraduationCap className="h-5 w-5" />
+            </div>
+
+            {/* Nav Icons with Tooltips */}
+            <div className="flex flex-col gap-4 w-full px-3">
+                {navItems.map((item, index) => (
+                    <Tooltip key={index}>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={item.onClick}
+                                className={cn(
+                                    "w-full aspect-square flex items-center justify-center rounded-xl transition-all",
+                                    item.isActive
+                                        ? "text-purple-400 bg-purple-500/10 shadow-inner"
+                                        : "text-zinc-500 hover:text-purple-400 hover:bg-white/5"
+                                )}
+                            >
+                                {item.icon}
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent
+                            side="right"
+                            sideOffset={10}
+                            className="bg-zinc-800 text-white border-zinc-700"
+                        >
+                            <p className="text-xs font-bold">{item.label}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                ))}
+            </div>
+
+            {/* Bottom Settings */}
+            <div className="mt-auto px-3 w-full">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            onClick={() => navigate("/dashboard/settings")}
+                            className="w-full aspect-square flex items-center justify-center rounded-xl text-zinc-500 hover:text-purple-400 hover:bg-white/5 transition-all"
+                        >
+                            <Settings className="h-5 w-5" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent
+                        side="right"
+                        sideOffset={10}
+                        className="bg-zinc-800 text-white border-zinc-700"
+                    >
+                        <p className="text-xs font-bold">Settings</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </aside>
+    );
+}

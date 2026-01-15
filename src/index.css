@@ -1,151 +1,117 @@
-/* Google Fonts - Inter + JetBrains Mono for new design */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/**
+ * LearnInk Design System - Total System Repair
+ * =============================================
+ * FASE 1: Global Style Reset
+ * 
+ * Primary: Indigo 500 (#6366f1)
+ * Background: Zinc 950 (#09090b) - DARK FIRST
+ * Text: Zinc 200 (#e4e4e7)
+ * Border: Zinc 800 (#27272a)
+ */
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* =========================================
-   Design System - LearnInk
-   Apple-Inspired Minimal Interface
-   All colors MUST be HSL.
-========================================= */
-
 @layer base {
+  /* =========================================
+     DARK MODE DEFAULT - LearnInk V2
+     All colors in HSL format
+  ========================================= */
+
   :root {
-    /* =========================================
-       LearnInk V2 Design System
-       Dark-first design with Sky/Zinc palette
-       Primary: #0ea5e9 (Sky 500)
-       Background: #fafafa light / #09090b dark
-    ========================================= */
+    /* Dark Mode as Default */
+    --background: 240 10% 4%;
+    /* #09090b - Zinc 950 */
+    --foreground: 240 5% 90%;
+    /* #e4e4e7 - Zinc 200 */
 
-    /* Light Mode (default) */
-    --background: 0 0% 98%; /* #fafafa - Zinc 50 */
-    --foreground: 240 10% 4%; /* #09090b - Zinc 950 */
-
-    --card: 0 0% 100%; /* white */
-    --card-foreground: 240 10% 4%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 240 10% 4%;
-
-    /* Primary - Sky 500 #0ea5e9 */
-    --primary: 199 89% 48%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 240 5% 96%;
-    --secondary-foreground: 240 6% 10%;
-
-    --muted: 240 5% 96%;
-    --muted-foreground: 240 4% 46%; /* #71717a */
-
-    --accent: 240 5% 96%;
-    --accent-foreground: 240 6% 10%;
-
-    --success: 142 76% 36%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 240 6% 90%;
-    --input: 240 6% 90%;
-    --ring: 199 89% 48%;
-
-    --radius: 0.5rem;
-
-    /* Sidebar */
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 4% 46%;
-    --sidebar-primary: 199 89% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 5% 96%;
-    --sidebar-accent-foreground: 240 6% 10%;
-    --sidebar-border: 240 6% 90%;
-    --sidebar-ring: 199 89% 48%;
-
-    /* LearnInk Specific */
-    --notes-bg: 210 40% 98%;
-    --accent-green: 142 76% 93%;
-    --accent-green-text: 142 76% 36%;
-
-    /* Layout */
-    --nav-height: 4rem;
-
-    /* Shadows */
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.03);
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.05);
-    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.08);
-    --shadow-glow: 0 0 20px -5px rgba(14, 165, 233, 0.3);
-  }
-
-  .dark {
-    /* LearnInk V2 Dark Mode - Zinc palette */
-    --background: 240 10% 4%; /* #09090b - Zinc 950 */
-    --foreground: 240 5% 90%; /* #e4e4e7 - Zinc 200 */
-
-    --card: 240 6% 10%; /* #18181b - Zinc 900 */
+    --card: 240 6% 10%;
+    /* #18181b - Zinc 900 */
     --card-foreground: 240 5% 90%;
 
     --popover: 240 6% 10%;
     --popover-foreground: 240 5% 90%;
 
-    /* Primary - Sky 500 */
-    --primary: 199 89% 48%;
+    /* Primary - Indigo 500 */
+    --primary: 239 84% 67%;
+    /* #6366f1 */
     --primary-foreground: 0 0% 100%;
 
     --secondary: 240 4% 16%;
+    /* Zinc 800 */
     --secondary-foreground: 240 5% 90%;
 
     --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 65%; /* #a1a1aa */
+    --muted-foreground: 240 5% 65%;
+    /* Zinc 400 */
 
     --accent: 240 4% 16%;
     --accent-foreground: 240 5% 90%;
 
-    --success: 142 76% 42%;
-    --success-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --warning: 38 92% 55%;
-    --warning-foreground: 0 0% 100%;
-
-    --destructive: 0 63% 55%;
-    --destructive-foreground: 0 0% 98%;
-
-    /* Border - Zinc 800 */
+    /* Borders - Zinc 800 */
     --border: 240 4% 16%;
+    /* #27272a */
     --input: 240 4% 16%;
-    --ring: 199 89% 48%;
+    --ring: 239 84% 67%;
 
-    --sidebar-background: 240 10% 4%;
+    --radius: 0.5rem;
+
+    /* Sidebar - Slightly different for depth */
+    --sidebar-background: 240 10% 6%;
+    /* #0f0f14 */
     --sidebar-foreground: 240 5% 65%;
-    --sidebar-primary: 199 89% 48%;
+    --sidebar-primary: 239 84% 67%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 240 4% 16%;
     --sidebar-accent-foreground: 240 5% 90%;
-    --sidebar-border: 240 4% 16%;
-    --sidebar-ring: 199 89% 48%;
+    --sidebar-border: 240 4% 14%;
 
-    /* LearnInk Specific */
-    --notes-bg: 240 10% 6%;
-    --accent-green: 142 50% 15%;
-    --accent-green-text: 142 76% 50%;
+    /* Notes Panel */
+    --notes-bg: 240 10% 8%;
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.5);
-    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.5);
-    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.6);
-    --shadow-glow: 0 0 20px -5px rgba(14, 165, 233, 0.3);
+    /* Shadows */
+    --shadow-glow: 0 0 20px -5px rgba(99, 102, 241, 0.4);
   }
-}
 
-@layer base {
+  /* Light Mode (Optional Override) */
+  .light {
+    --background: 0 0% 98%;
+    --foreground: 240 10% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 4%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 240 6% 10%;
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 240 6% 10%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 239 84% 67%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 4% 46%;
+    --sidebar-primary: 239 84% 67%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 5% 96%;
+    --sidebar-accent-foreground: 240 6% 10%;
+    --sidebar-border: 240 6% 90%;
+    --notes-bg: 210 40% 98%;
+  }
+
   * {
     @apply border-border;
   }
@@ -154,6 +120,8 @@
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* Force dark mode by default */
+    color-scheme: dark;
   }
 
   body {
@@ -163,25 +131,31 @@
     line-height: 1.6;
     letter-spacing: -0.01em;
   }
+}
 
-  /* Reading mode - warm cream background for eye comfort */
-  .reading-mode {
-    --background: 40 30% 96%;
-    --card: 40 25% 94%;
-    --foreground: 30 10% 15%;
-    --muted-foreground: 30 8% 45%;
-    --border: 35 15% 88%;
+@layer components {
+
+  /* Skeleton shimmer animation */
+  .skeleton-shimmer {
+    background: linear-gradient(90deg,
+        hsl(var(--muted)) 0%,
+        hsl(var(--muted-foreground) / 0.1) 50%,
+        hsl(var(--muted)) 100%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s ease-in-out infinite;
   }
 
-  .dark .reading-mode {
-    --background: 35 12% 14%;
-    --card: 35 10% 17%;
-    --foreground: 40 20% 92%;
-    --muted-foreground: 35 10% 60%;
-    --border: 35 8% 22%;
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
   }
 
-  /* Reading content area - optimal typography for reading */
+  /* Reading content typography */
   .reading-content {
     font-size: 1.125rem;
     line-height: 1.9;
@@ -199,45 +173,49 @@
     margin-bottom: 1rem;
   }
 
-  /* Focus styles - Subtle ring */
-  :focus-visible {
-    @apply outline-none ring-2 ring-primary/20 ring-offset-2 ring-offset-background;
+  /* Hide scrollbar utility */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Custom scrollbar for dark mode */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--border));
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.5);
   }
 }
 
 @layer utilities {
 
-  /* Smooth transition - Apple standard */
-  .transition-apple {
-    transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-  }
-
-  /* Press effect - Subtle feedback */
+  /* Press effect for buttons */
   .press-effect {
     @apply transition-transform duration-100 active:scale-[0.98];
   }
 
-  /* Skeleton shimmer */
-  .skeleton-shimmer {
-    background: linear-gradient(90deg,
-        hsl(var(--muted)) 0%,
-        hsl(var(--muted-foreground) / 0.08) 50%,
-        hsl(var(--muted)) 100%);
-    background-size: 200% 100%;
-    animation: shimmer 1.5s ease-in-out infinite;
+  /* Focus ring */
+  :focus-visible {
+    @apply outline-none ring-2 ring-primary/30 ring-offset-2 ring-offset-background;
   }
 
-  @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-
-    100% {
-      background-position: -200% 0;
-    }
-  }
-
-  /* Fade in animation - Subtle */
+  /* Fade in animation */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-out forwards;
   }
@@ -252,145 +230,5 @@
       opacity: 1;
       transform: translateY(0);
     }
-  }
-
-  /* Scale in - Minimal */
-  .animate-scale-in {
-    animation: scaleIn 0.2s ease-out forwards;
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.98);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  /* Slide up - Gentle */
-  .animate-slide-up {
-    animation: slideUp 0.25s ease-out forwards;
-  }
-
-  @keyframes slideUp {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  /* Badge pulse - Subtle */
-  .badge-pulse {
-    animation: badgePulse 2s ease-in-out infinite;
-  }
-
-  @keyframes badgePulse {
-
-    0%,
-    100% {
-      box-shadow: 0 0 0 0 hsl(var(--destructive) / 0.3);
-    }
-
-    50% {
-      box-shadow: 0 0 0 3px hsl(var(--destructive) / 0);
-    }
-  }
-
-  /* Nav link - Clean hover */
-  .nav-link {
-    @apply relative text-muted-foreground transition-colors duration-150 hover:text-foreground;
-  }
-}
-
-@layer components {
-
-  /* Apple-style input */
-  .input-apple {
-    @apply h-11 rounded-xl border border-border bg-background px-4 text-sm;
-    @apply transition-all duration-150;
-    @apply focus:border-primary/50 focus:ring-2 focus:ring-primary/10;
-    @apply placeholder:text-muted-foreground/50;
-  }
-
-  /* Apple-style button */
-  .btn-apple {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5;
-    @apply text-sm font-medium;
-    @apply transition-all duration-150;
-    @apply press-effect;
-    @apply disabled:opacity-50 disabled:pointer-events-none;
-  }
-
-  .btn-apple-primary {
-    @apply btn-apple bg-primary text-primary-foreground;
-    @apply hover:bg-primary/90;
-  }
-
-  .btn-apple-secondary {
-    @apply btn-apple bg-secondary text-secondary-foreground;
-    @apply hover:bg-secondary/80;
-  }
-
-  .btn-apple-ghost {
-    @apply btn-apple bg-transparent text-foreground;
-    @apply hover:bg-secondary;
-  }
-
-  /* Apple-style card */
-  .card-apple {
-    @apply bg-card rounded-2xl border border-border/60;
-    @apply shadow-soft;
-  }
-
-  /* Badge styles */
-  .badge-success {
-    @apply bg-success/10 text-success border-success/20;
-  }
-
-  .badge-warning {
-    @apply bg-warning/10 text-warning border-warning/20;
-  }
-
-  .badge-destructive {
-    @apply bg-destructive/10 text-destructive border-destructive/20;
-  }
-
-  .badge-primary {
-    @apply bg-primary/10 text-primary border-primary/20;
-  }
-
-  /* Hero 3D Tilt Animation */
-  .hero-tilt {
-    transform: perspective(1200px) rotateX(15deg) rotateY(0deg) rotateZ(0deg) translateY(0);
-    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .group\/hero:hover .hero-tilt {
-    transform: perspective(1200px) rotateX(5deg) rotateY(0deg) rotateZ(0deg) translateY(-20px);
-  }
-
-  /* Grid Background Pattern */
-  .bg-grid-pattern {
-    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-
-  /* Hide scrollbar for clean UI */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
   }
 }

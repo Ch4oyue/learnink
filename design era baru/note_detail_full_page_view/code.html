@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Note Detail - Python Dictionary Methods</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#007ea8",
+              "background-light": "#fcfcfc",
+              "background-dark": "#19212e",
+              "surface-light": "#ffffff",
+              "surface-dark": "#232d3f",
+            },
+            fontFamily: {
+              "display": ["Manrope", "sans-serif"],
+              "mono": ["Fira Code", "Menlo", "Monaco", "Consolas", "monospace"], // Adding mono stack for code
+            },
+            borderRadius: {
+              "DEFAULT": "0.5rem", 
+              "lg": "1rem", 
+              "xl": "1.5rem", 
+              "2xl": "2rem",
+              "full": "9999px"
+            },
+            boxShadow: {
+                'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                'float': '0 10px 40px -10px rgba(0, 126, 168, 0.2)',
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display min-h-screen flex flex-col antialiased selection:bg-primary/20 selection:text-primary relative">
+<!-- Minimal Header / Nav -->
+<header class="w-full px-6 py-4 sticky top-0 z-40 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md border-b border-slate-100 dark:border-slate-800 transition-all">
+<div class="max-w-[960px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center size-10 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-slate-400 group">
+<span class="material-symbols-outlined group-hover:-translate-x-0.5 transition-transform" style="font-size: 20px;">arrow_back</span>
+</button>
+<!-- Breadcrumbs Component Adapted -->
+<nav class="hidden sm:flex items-center text-sm font-medium">
+<a class="text-slate-400 hover:text-primary transition-colors" href="#">Courses</a>
+<span class="text-slate-300 mx-2">/</span>
+<a class="text-slate-400 hover:text-primary transition-colors" href="#">Python Fundamentals</a>
+<span class="text-slate-300 mx-2">/</span>
+<span class="text-slate-800 dark:text-slate-100 font-semibold">Notes</span>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:block text-xs font-semibold text-primary bg-primary/10 px-3 py-1.5 rounded-full">
+                    Auto-saved
+                </div>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-8 ring-2 ring-white dark:ring-slate-700 shadow-sm" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD9bRi2U_47PkiUwXGlAUsMwqYaisKgaDkwBPDhpLKdSjFJxhy_SfuAOodsJzWzYaU_x8nq8dPIbRvCq5PO8sq8DTKWlV_ZdbX0TRnZY4E8RIIHjUeX0HgSaXnx4edozRp1aJnQ7j4frt1X5yquq7vNojb9BOoMHD5KU0fdl0vNx1ijP5thdQvvqEge1J3c6_1kYzRQtpSsiGgx50Vysabs55Ofv3c430wm4aofexEHolZSxVsCKHuMaNidk_NCO-fTderuB7muPsB_");'></div>
+</div>
+</div>
+</header>
+<!-- Main Reading Content -->
+<main class="flex-1 w-full max-w-[680px] mx-auto px-6 py-12 pb-40">
+<!-- Page Heading Component -->
+<div class="flex flex-col gap-6 mb-10">
+<!-- Chips -->
+<div class="flex gap-2 flex-wrap">
+<div class="flex h-7 shrink-0 items-center justify-center gap-x-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 px-3 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-primary text-[16px]">bolt</span>
+<p class="text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-wider">Intermediate</p>
+</div>
+<div class="flex h-7 shrink-0 items-center justify-center gap-x-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 px-3 border border-slate-200 dark:border-slate-700">
+<p class="text-slate-600 dark:text-slate-300 text-xs font-bold uppercase tracking-wider">Python 3.11</p>
+</div>
+</div>
+<h1 class="text-slate-900 dark:text-white text-4xl sm:text-5xl font-extrabold leading-[1.1] tracking-tight">
+                Python Dictionary Methods
+            </h1>
+<div class="flex items-center gap-3 text-slate-500 dark:text-slate-400 text-sm border-b border-slate-100 dark:border-slate-800 pb-8 w-full">
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                    Oct 24, 2023
+                </span>
+<span class="w-1 h-1 rounded-full bg-slate-300"></span>
+<span class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[18px]">schedule</span>
+                    5 min read
+                </span>
+</div>
+</div>
+<!-- Body Text Content -->
+<article class="flex flex-col gap-6">
+<p class="text-slate-700 dark:text-slate-300 text-lg leading-relaxed font-normal">
+                Dictionaries are Python's implementation of a data structure that is more generally known as an associative array. A dictionary consists of a collection of <span class="font-semibold text-primary bg-primary/5 px-1 rounded">key-value pairs</span>. Each key-value pair maps the key to its associated value.
+            </p>
+<p class="text-slate-700 dark:text-slate-300 text-lg leading-relaxed font-normal">
+                Unlike sequences, which are indexed by a range of numbers, dictionaries are indexed by keys, which can be any immutable type; strings and numbers can always be keys.
+            </p>
+<!-- Callout Box -->
+<div class="my-4 p-5 rounded-xl bg-[#e6f1f4] dark:bg-primary/10 border-l-4 border-primary flex gap-4 items-start">
+<div class="bg-primary/20 rounded-full p-1 shrink-0 text-primary">
+<span class="material-symbols-outlined">lightbulb</span>
+</div>
+<div class="space-y-1">
+<h4 class="font-bold text-slate-900 dark:text-slate-100 text-base">Key Mutability</h4>
+<p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+                        Tuples can be used as keys if they contain only strings, numbers, or tuples; if a tuple contains any mutable object either directly or indirectly, it cannot be used as a key.
+                    </p>
+</div>
+</div>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-4 tracking-tight">The .get() Method</h2>
+<p class="text-slate-700 dark:text-slate-300 text-lg leading-relaxed font-normal">
+                One of the most useful methods is <code class="text-[0.9em] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-primary font-mono font-medium">.get()</code>. It returns the value for the specified key if the key is in the dictionary.
+            </p>
+<!-- Code Snippet Component -->
+<div class="group relative my-4 rounded-xl overflow-hidden bg-[#1e293b] shadow-xl border border-slate-800">
+<div class="flex items-center justify-between px-4 py-2 bg-[#0f172a] border-b border-slate-700/50">
+<div class="flex items-center gap-2">
+<div class="flex gap-1.5">
+<div class="w-3 h-3 rounded-full bg-red-500/80"></div>
+<div class="w-3 h-3 rounded-full bg-yellow-500/80"></div>
+<div class="w-3 h-3 rounded-full bg-green-500/80"></div>
+</div>
+<span class="text-xs text-slate-400 font-mono ml-2">example.py</span>
+</div>
+<button class="text-xs text-slate-400 hover:text-white flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+                        Copy
+                    </button>
+</div>
+<div class="p-5 overflow-x-auto">
+<pre class="font-mono text-sm leading-relaxed text-slate-300"><span class="text-purple-400">my_dict</span> = {
+    <span class="text-green-400">"brand"</span>: <span class="text-green-400">"Ford"</span>,
+    <span class="text-green-400">"model"</span>: <span class="text-green-400">"Mustang"</span>,
+    <span class="text-green-400">"year"</span>: <span class="text-orange-400">1964</span>
+}
+
+<span class="text-slate-500"># Safe retrieval</span>
+<span class="text-blue-400">x</span> = <span class="text-purple-400">my_dict</span>.get(<span class="text-green-400">"model"</span>)
+
+<span class="text-slate-500"># With default value if key missing</span>
+<span class="text-blue-400">y</span> = <span class="text-purple-400">my_dict</span>.get(<span class="text-green-400">"price"</span>, <span class="text-orange-400">15000</span>)
+</pre>
+</div>
+</div>
+<p class="text-slate-700 dark:text-slate-300 text-lg leading-relaxed font-normal">
+                Using <code class="text-[0.9em] bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-primary font-mono font-medium">.get()</code> is safer than square bracket notation because it returns <code>None</code> (or a default value) instead of raising a <span class="text-red-500 font-medium">KeyError</span> when the key doesn't exist.
+            </p>
+<h2 class="text-2xl font-bold text-slate-900 dark:text-white mt-6 tracking-tight">Iterating Through Dictionaries</h2>
+<p class="text-slate-700 dark:text-slate-300 text-lg leading-relaxed font-normal">
+                When looping through a dictionary, the return value are the keys of the dictionary, but there are methods to return the values as well.
+            </p>
+<!-- Toggle List Component -->
+<div class="space-y-2 mt-2">
+<details class="group bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<summary class="flex items-center justify-between p-4 cursor-pointer list-none select-none">
+<span class="font-semibold text-slate-800 dark:text-slate-200">Iterating Keys</span>
+<span class="material-symbols-outlined text-slate-400 transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pt-0 text-slate-600 dark:text-slate-400">
+                        Use <code class="font-mono text-sm bg-slate-100 dark:bg-slate-800 px-1 rounded">.keys()</code> explicitly, or just iterate the dictionary object directly.
+                    </div>
+</details>
+<details class="group bg-white dark:bg-surface-dark rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<summary class="flex items-center justify-between p-4 cursor-pointer list-none select-none">
+<span class="font-semibold text-slate-800 dark:text-slate-200">Iterating Values</span>
+<span class="material-symbols-outlined text-slate-400 transition-transform group-open:rotate-180">expand_more</span>
+</summary>
+<div class="px-4 pb-4 pt-0 text-slate-600 dark:text-slate-400">
+                        Use <code class="font-mono text-sm bg-slate-100 dark:bg-slate-800 px-1 rounded">.values()</code> to loop through the values directly.
+                    </div>
+</details>
+</div>
+</article>
+<!-- Reading Progress Indicator (Simple text end of article) -->
+<div class="mt-16 pt-8 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center text-sm text-slate-400">
+<span>You've reached the end</span>
+<div class="flex gap-2">
+<button class="hover:text-primary transition-colors">Previous Note</button>
+<span>•</span>
+<button class="hover:text-primary transition-colors">Next Note</button>
+</div>
+</div>
+</main>
+<!-- Floating Action Pill (Sticky Bottom) -->
+<div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50">
+<div class="flex items-center p-1.5 pr-2 gap-1 bg-surface-light dark:bg-[#1e2636] rounded-full shadow-float border border-slate-200/60 dark:border-slate-700/60 backdrop-blur-xl supports-[backdrop-filter]:bg-surface-light/80">
+<button class="flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900 dark:bg-primary text-white hover:bg-slate-800 dark:hover:bg-primary/90 transition-all shadow-md group">
+<span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">edit_note</span>
+<span class="font-bold text-sm">Edit Note</span>
+</button>
+<div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+<button aria-label="Export PDF" class="p-2.5 rounded-full text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all tooltip-trigger relative group">
+<span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+<!-- Tooltip -->
+<span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">Export PDF</span>
+</button>
+<button aria-label="Copy Link" class="p-2.5 rounded-full text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all group relative">
+<span class="material-symbols-outlined text-[20px]">link</span>
+<!-- Tooltip -->
+<span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-slate-800 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">Copy Link</span>
+</button>
+<button aria-label="More Options" class="p-2.5 rounded-full text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 transition-all group relative">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</div>
+</body></html>

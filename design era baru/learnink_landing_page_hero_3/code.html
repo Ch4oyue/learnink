@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>LearnInk - Dashboard</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#0079a8", // LearnInk Primary Blue
+                        "primary-dark": "#005f85",
+                        "background-light": "#ffffff",
+                        "background-dark": "#121212",
+                        "surface-light": "#f3f4f6", // gray-100
+                        "surface-dark": "#1e1e1e",
+                        "border-light": "#e5e7eb", // gray-200
+                        "border-dark": "#2d2d2d",
+                        "text-light": "#111827", // gray-900
+                        "text-dark": "#f9fafb", // gray-50
+                        "muted-light": "#6b7280", // gray-500
+                        "muted-dark": "#9ca3af", // gray-400
+                    },
+                    fontFamily: {
+                        display: ["Manrope", "sans-serif"],
+                        body: ["Manrope", "sans-serif"],
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.75rem", // rounded-xl
+                        'xl': "0.75rem",
+                        '2xl': "1rem",
+                        '3xl': "1.5rem",
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'tilt': '0 20px 40px -10px rgba(0, 0, 0, 0.1)',
+                    }
+                },
+            },
+        };
+    </script>
+<style>
+        body {
+            font-family: 'Manrope', sans-serif;
+        }::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #e5e7eb;
+            border-radius: 20px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #374151;
+        }
+        .chart-tooltip {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .chart-point:hover .chart-tooltip {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-surface-light dark:bg-background-dark text-text-light dark:text-text-dark font-display antialiased selection:bg-primary selection:text-white transition-colors duration-300 overflow-hidden h-screen flex">
+<aside class="w-64 bg-background-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-col hidden md:flex h-full z-20">
+<div class="h-20 flex items-center px-6 border-b border-border-light dark:border-border-dark">
+<div class="flex items-center gap-2 cursor-pointer">
+<div class="bg-primary text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg">L</div>
+<span class="font-bold text-xl tracking-tight text-text-light dark:text-text-dark">LearnInk</span>
+</div>
+</div>
+<nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 bg-primary/10 text-primary rounded-xl transition-colors group" href="#">
+<span class="material-symbols-outlined filled">dashboard</span>
+<span class="font-semibold text-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-muted-light dark:text-muted-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark rounded-xl transition-colors group" href="#">
+<span class="material-symbols-outlined">school</span>
+<span class="font-medium text-sm">My Courses</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-muted-light dark:text-muted-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark rounded-xl transition-colors group" href="#">
+<span class="material-symbols-outlined">edit_note</span>
+<span class="font-medium text-sm">Guided Notes</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-muted-light dark:text-muted-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark rounded-xl transition-colors group" href="#">
+<span class="material-symbols-outlined">forum</span>
+<span class="font-medium text-sm">Community</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-muted-light dark:text-muted-dark hover:bg-gray-50 dark:hover:bg-white/5 hover:text-text-light dark:hover:text-text-dark rounded-xl transition-colors group" href="#">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="font-medium text-sm">Progress</span>
+</a>
+</nav>
+<div class="p-4 border-t border-border-light dark:border-border-dark">
+<div class="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 dark:hover:bg-white/5 cursor-pointer transition-colors">
+<img alt="User" class="h-10 w-10 rounded-full object-cover ring-2 ring-white dark:ring-border-dark" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3dpkmufYzfVF7aaNckqOHSybJnKlAHG3izYlUUI3Te_lHr21_xAzYdGvGCO5-wardbZgu8_6f5dihyAOg_FDZf5RMc9MWNREuziToAqAwAbwkYvzWjLPsv6DcmEXTi9NyOykb2mVI-qRzniAxyy4w3rScQaLhB0yyypAc2QyC8P0-vcGN3hjTTiHRzWQFaLrBlzF-Rl1cE8rJdDfVCWBXAE-S25fgbyClTCp9_9x4azIJT8mJ5z_kN6tI1SdvPXk2PuokIntMeSvb"/>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-bold text-text-light dark:text-text-dark truncate">Abelion</p>
+<p class="text-xs text-muted-light dark:text-muted-dark truncate">Pro Member</p>
+</div>
+<span class="material-symbols-outlined text-muted-light text-[20px]">settings</span>
+</div>
+</div>
+</aside>
+<main class="flex-1 h-full overflow-y-auto bg-surface-light dark:bg-background-dark relative">
+<header class="md:hidden sticky top-0 z-30 bg-background-light/80 dark:bg-surface-dark/80 backdrop-blur-md border-b border-border-light dark:border-border-dark px-4 h-16 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="bg-primary text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg">L</div>
+<span class="font-bold text-xl tracking-tight text-text-light dark:text-text-dark">LearnInk</span>
+</div>
+<button class="text-text-light dark:text-text-dark">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</header>
+<div class="max-w-7xl mx-auto px-6 py-8 md:py-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+<div>
+<h1 class="text-3xl md:text-4xl font-extrabold text-text-light dark:text-text-dark tracking-tight mb-2">
+                        Good Morning, Abelion <span class="inline-block animate-wave origin-[70%_70%]">👋</span>
+</h1>
+<p class="text-muted-light dark:text-muted-dark font-medium">Ready to continue your React journey?</p>
+</div>
+<div class="flex items-center gap-3">
+<div class="relative hidden sm:block">
+<span class="absolute left-3 top-1/2 -translate-y-1/2 material-symbols-outlined text-muted-light text-[20px]">search</span>
+<input class="pl-10 pr-4 py-2 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-shadow w-64" placeholder="Search notes, lessons..." type="text"/>
+</div>
+<button class="bg-white dark:bg-surface-dark p-2 rounded-xl border border-border-light dark:border-border-dark text-muted-light hover:text-primary transition-colors relative">
+<span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-surface-dark"></span>
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+<div class="lg:col-span-2 bg-white dark:bg-surface-dark rounded-2xl p-6 border border-border-light dark:border-border-dark shadow-sm hover:shadow-soft transition-all duration-300 group cursor-pointer relative overflow-hidden">
+<div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[120px] text-primary rotate-12">code</span>
+</div>
+<div class="relative z-10 flex flex-col h-full justify-between">
+<div>
+<div class="flex items-center gap-2 mb-4">
+<span class="bg-blue-50 dark:bg-blue-900/20 text-primary text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">In Progress</span>
+<span class="text-muted-light dark:text-muted-dark text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 2h 15m remaining
+                                </span>
+</div>
+<h2 class="text-2xl font-bold text-text-light dark:text-text-dark mb-1">React Mastery: Advanced Patterns</h2>
+<p class="text-muted-light dark:text-muted-dark mb-6">Module 3: Understanding the Virtual DOM &amp; Reconciliation</p>
+</div>
+<div>
+<div class="flex justify-between text-xs font-semibold mb-2">
+<span class="text-text-light dark:text-text-dark">45% Complete</span>
+<span class="text-primary">12/26 Lessons</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-black h-3 rounded-full overflow-hidden mb-6">
+<div class="bg-gradient-to-r from-primary to-indigo-500 h-full rounded-full transition-all duration-1000 ease-out" style="width: 45%"></div>
+</div>
+<button class="bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg shadow-primary/20 flex items-center gap-2 w-fit">
+                                Continue Learning <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="lg:col-span-1 bg-white dark:bg-surface-dark rounded-2xl p-6 border border-border-light dark:border-border-dark shadow-sm flex flex-col items-center justify-center text-center relative overflow-hidden">
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-orange-500/10 rounded-full blur-3xl"></div>
+<div class="relative z-10">
+<div class="w-16 h-16 mx-auto bg-orange-50 dark:bg-orange-900/20 rounded-2xl flex items-center justify-center mb-4 text-orange-500">
+<span class="material-symbols-outlined text-4xl animate-pulse">local_fire_department</span>
+</div>
+<h3 class="text-3xl font-extrabold text-text-light dark:text-text-dark mb-1">12 Day Streak</h3>
+<p class="text-muted-light dark:text-muted-dark text-sm mb-6">You're on fire! Keep it up to earn the "Consistent Coder" badge.</p>
+<div class="flex items-center justify-center gap-2">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-sm">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<span class="text-[10px] text-muted-light font-medium">M</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-sm">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<span class="text-[10px] text-muted-light font-medium">T</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-sm">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<span class="text-[10px] text-muted-light font-medium">W</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs shadow-sm">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<span class="text-[10px] text-muted-light font-medium">T</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-white dark:bg-background-dark border-2 border-primary text-primary flex items-center justify-center text-xs shadow-sm">
+<span class="material-symbols-outlined text-[16px]">local_fire_department</span>
+</div>
+<span class="text-[10px] font-bold text-primary">F</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-40">
+<div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs">
+</div>
+<span class="text-[10px] text-muted-light font-medium">S</span>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-40">
+<div class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs">
+</div>
+<span class="text-[10px] text-muted-light font-medium">S</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+<div class="lg:col-span-2 bg-white dark:bg-surface-dark rounded-2xl p-6 border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex items-center justify-between mb-6">
+<div>
+<h3 class="text-lg font-bold text-text-light dark:text-text-dark">Learning Activity</h3>
+<p class="text-xs text-muted-light dark:text-muted-dark">Time spent learning (minutes)</p>
+</div>
+<select class="text-sm bg-gray-50 dark:bg-background-dark border-none rounded-lg text-muted-light focus:ring-0 cursor-pointer outline-none">
+<option>Last 7 Days</option>
+<option>Last 30 Days</option>
+</select>
+</div>
+<div class="h-48 w-full flex items-end justify-between gap-2 sm:gap-4 px-2">
+<div class="flex flex-col items-center gap-2 group w-full chart-point cursor-pointer">
+<div class="relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg h-32 flex items-end overflow-visible">
+<div class="w-full bg-primary/30 group-hover:bg-primary/50 transition-all rounded-t-lg relative" style="height: 40%;">
+<div class="chart-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded shadow-lg whitespace-nowrap z-10">
+                                        45 mins
+                                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-muted-light font-medium">Mon</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full chart-point cursor-pointer">
+<div class="relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg h-32 flex items-end">
+<div class="w-full bg-primary/30 group-hover:bg-primary/50 transition-all rounded-t-lg relative" style="height: 65%;">
+<div class="chart-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded shadow-lg whitespace-nowrap z-10">
+                                        72 mins
+                                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-muted-light font-medium">Tue</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full chart-point cursor-pointer">
+<div class="relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg h-32 flex items-end">
+<div class="w-full bg-primary/30 group-hover:bg-primary/50 transition-all rounded-t-lg relative" style="height: 30%;">
+<div class="chart-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded shadow-lg whitespace-nowrap z-10">
+                                        30 mins
+                                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-muted-light font-medium">Wed</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full chart-point cursor-pointer">
+<div class="relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg h-32 flex items-end">
+<div class="w-full bg-primary/30 group-hover:bg-primary/50 transition-all rounded-t-lg relative" style="height: 85%;">
+<div class="chart-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded shadow-lg whitespace-nowrap z-10">
+                                        95 mins
+                                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-muted-light font-medium">Thu</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full chart-point cursor-pointer">
+<div class="relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg h-32 flex items-end">
+<div class="w-full bg-primary group-hover:bg-primary-dark transition-all rounded-t-lg relative shadow-[0_0_15px_rgba(0,121,168,0.3)]" style="height: 55%;">
+<div class="chart-tooltip absolute -top-10 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] py-1 px-2 rounded shadow-lg whitespace-nowrap z-10">
+                                        60 mins
+                                        <div class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45"></div>
+</div>
+</div>
+</div>
+<span class="text-[10px] text-primary font-bold">Fri</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full chart-point cursor-pointer">
+<div class="relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg h-32 flex items-end">
+<div class="w-full bg-primary/10 group-hover:bg-primary/30 transition-all rounded-t-lg relative border-t border-dashed border-gray-300 dark:border-gray-700" style="height: 0%;">
+</div>
+</div>
+<span class="text-[10px] text-muted-light font-medium">Sat</span>
+</div>
+<div class="flex flex-col items-center gap-2 group w-full chart-point cursor-pointer">
+<div class="relative w-full bg-gray-100 dark:bg-gray-800 rounded-t-lg h-32 flex items-end">
+<div class="w-full bg-primary/10 group-hover:bg-primary/30 transition-all rounded-t-lg relative" style="height: 0%;">
+</div>
+</div>
+<span class="text-[10px] text-muted-light font-medium">Sun</span>
+</div>
+</div>
+</div>
+<div class="lg:col-span-1 flex flex-col gap-6">
+<div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 shadow-md text-white relative overflow-hidden">
+<div class="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-10 -mt-10 blur-xl"></div>
+<div class="relative z-10">
+<div class="w-10 h-10 bg-white/20 backdrop-blur rounded-lg flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-white">tips_and_updates</span>
+</div>
+<h3 class="font-bold text-lg mb-1">Daily Tip</h3>
+<p class="text-white/80 text-xs leading-relaxed mb-4">
+                                Use <code class="bg-white/20 px-1 rounded font-mono text-white">useMemo</code> only for expensive calculations. Overusing it adds unnecessary overhead.
+                            </p>
+<button class="text-xs font-semibold bg-white text-indigo-600 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors">Save to Notes</button>
+</div>
+</div>
+<div class="flex-1 bg-white dark:bg-surface-dark rounded-2xl p-6 border border-border-light dark:border-border-dark shadow-sm">
+<h3 class="text-sm font-bold text-text-light dark:text-text-dark mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-lg">emoji_events</span> Achievements
+                        </h3>
+<div class="space-y-4">
+<div class="flex items-center gap-3 opacity-100">
+<div class="w-10 h-10 rounded-full bg-yellow-100 dark:bg-yellow-900/20 flex items-center justify-center text-yellow-600">
+<span class="material-symbols-outlined text-[18px]">bolt</span>
+</div>
+<div class="flex-1">
+<p class="text-xs font-bold text-text-light dark:text-text-dark">Quick Learner</p>
+<p class="text-[10px] text-muted-light">Completed 5 lessons in 1 hour</p>
+</div>
+</div>
+<div class="flex items-center gap-3 opacity-50 grayscale">
+<div class="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/20 flex items-center justify-center text-green-600">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<div class="flex-1">
+<p class="text-xs font-bold text-text-light dark:text-text-dark">React Master</p>
+<p class="text-[10px] text-muted-light">Finish the React Course</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="mb-12">
+<div class="flex items-center justify-between mb-6">
+<h2 class="text-xl font-bold text-text-light dark:text-text-dark">My Courses</h2>
+<a class="text-sm font-medium text-primary hover:text-primary-dark flex items-center gap-1" href="#">View All <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-white dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+<div class="h-32 bg-gray-100 dark:bg-gray-800 relative">
+<div class="absolute inset-0 bg-gradient-to-br from-blue-500/10 to-purple-500/10 group-hover:opacity-75 transition-opacity"></div>
+<div class="absolute top-4 right-4 bg-white dark:bg-surface-dark px-2 py-1 rounded-md text-[10px] font-bold text-text-light dark:text-text-dark shadow-sm">
+                                TS
+                            </div>
+<div class="absolute bottom-0 left-0 p-4">
+<div class="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-lg">TS</div>
+</div>
+</div>
+<div class="p-5">
+<h3 class="font-bold text-text-light dark:text-text-dark mb-1">Advanced Typescript</h3>
+<p class="text-xs text-muted-light dark:text-muted-dark mb-4">Master generics, decorators, and utility types.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-20 bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-blue-500 h-full rounded-full" style="width: 15%"></div>
+</div>
+<span class="text-[10px] text-muted-light">15%</span>
+</div>
+<span class="material-symbols-outlined text-muted-light hover:text-primary text-[20px]">play_circle</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden hover:shadow-md transition-shadow cursor-pointer group">
+<div class="h-32 bg-gray-100 dark:bg-gray-800 relative">
+<div class="absolute inset-0 bg-gradient-to-br from-green-500/10 to-emerald-500/10 group-hover:opacity-75 transition-opacity"></div>
+<div class="absolute top-4 right-4 bg-white dark:bg-surface-dark px-2 py-1 rounded-md text-[10px] font-bold text-text-light dark:text-text-dark shadow-sm">
+                                Node
+                            </div>
+<div class="absolute bottom-0 left-0 p-4">
+<div class="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center text-white font-bold shadow-lg">Node</div>
+</div>
+</div>
+<div class="p-5">
+<h3 class="font-bold text-text-light dark:text-text-dark mb-1">Node.js Microservices</h3>
+<p class="text-xs text-muted-light dark:text-muted-dark mb-4">Scalable backend architecture patterns.</p>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-20 bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden">
+<div class="bg-green-500 h-full rounded-full" style="width: 0%"></div>
+</div>
+<span class="text-[10px] text-muted-light">Start</span>
+</div>
+<span class="material-symbols-outlined text-muted-light hover:text-primary text-[20px]">play_circle</span>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-surface-dark rounded-2xl border-2 border-dashed border-border-light dark:border-border-dark shadow-none flex flex-col items-center justify-center p-6 text-center hover:bg-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer min-h-[220px]">
+<div class="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3 text-muted-light">
+<span class="material-symbols-outlined">add</span>
+</div>
+<h3 class="font-bold text-text-light dark:text-text-dark mb-1">Explore Courses</h3>
+<p class="text-xs text-muted-light dark:text-muted-dark">Find your next challenge</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+</body></html>

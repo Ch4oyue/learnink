@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Note Detail Focused Modal</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0079a8",
+                        "primary-hover": "#005f85",
+                        "background-light": "#ffffff",
+                        "surface-light": "#ffffff",
+                        "surface-subtle": "#f3f4f6",
+                        "text-main": "#111827",
+                        "text-muted": "#4b5563",
+                        "code-bg": "#1e293b", 
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "mono": ["monospace"] 
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "0.75rem", "xl": "1rem", "2xl": "1.5rem", "full": "9999px"},
+                    boxShadow: {
+                        'soft': '0 4px 30px rgba(0, 0, 0, 0.05)',
+                        'modal': '0 20px 50px -12px rgba(0, 0, 0, 0.15)',
+                    },
+                    lineHeight: {
+                        'loose-2': '2.0',
+                    },
+                    letterSpacing: {
+                        'wider': '0.025em', 
+                    }
+                },
+            },
+        }
+    </script>
+<style>.custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: rgba(0, 0, 0, 0.2);
+        }.token-keyword { color: #ff7b72; }
+        .token-function { color: #d2a8ff; }
+        .token-string { color: #a5d6ff; }
+        .token-number { color: #79c0ff; }
+        .token-comment { color: #8b949e; font-style: italic; }
+        .token-variable { color: #ffa657; }
+        .token-tag { color: #7ee787; }.modal-backdrop {
+            backdrop-filter: blur(8px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-display text-text-main overflow-hidden h-screen selection:bg-primary selection:text-white tracking-wider">
+<div aria-hidden="true" class="absolute inset-0 z-0 p-8 opacity-60 pointer-events-none select-none overflow-hidden bg-gray-50">
+<div class="flex justify-between items-center mb-10">
+<div class="h-8 w-32 bg-gray-200 rounded-lg"></div>
+<div class="flex gap-4">
+<div class="size-8 bg-gray-200 rounded-full"></div>
+<div class="size-8 bg-gray-200 rounded-full"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="h-64 rounded-xl bg-white border border-gray-200 shadow-sm p-6 flex flex-col gap-4">
+<div class="h-6 w-3/4 bg-gray-100 rounded"></div>
+<div class="flex gap-2">
+<div class="h-4 w-12 bg-primary/20 rounded-full"></div>
+<div class="h-4 w-12 bg-gray-100 rounded-full"></div>
+</div>
+<div class="flex-1 space-y-2 mt-2">
+<div class="h-3 w-full bg-gray-100 rounded"></div>
+<div class="h-3 w-5/6 bg-gray-100 rounded"></div>
+<div class="h-3 w-4/6 bg-gray-100 rounded"></div>
+</div>
+</div>
+<div class="h-64 rounded-xl bg-white border border-gray-200 shadow-sm p-6 flex flex-col gap-4">
+<div class="h-6 w-1/2 bg-gray-100 rounded"></div>
+<div class="flex gap-2">
+<div class="h-4 w-16 bg-gray-100 rounded-full"></div>
+</div>
+<div class="flex-1 space-y-2 mt-2">
+<div class="h-3 w-full bg-gray-100 rounded"></div>
+<div class="h-3 w-full bg-gray-100 rounded"></div>
+</div>
+</div>
+<div class="h-64 rounded-xl bg-white border border-gray-200 shadow-sm p-6 flex flex-col gap-4">
+<div class="h-6 w-2/3 bg-gray-100 rounded"></div>
+<div class="flex-1 space-y-2 mt-2">
+<div class="h-3 w-full bg-gray-100 rounded"></div>
+<div class="h-3 w-5/6 bg-gray-100 rounded"></div>
+</div>
+</div>
+<div class="h-64 rounded-xl bg-white border border-gray-200 shadow-sm p-6 flex flex-col gap-4">
+<div class="h-6 w-3/4 bg-gray-100 rounded"></div>
+<div class="flex-1 space-y-2 mt-2">
+<div class="h-3 w-full bg-gray-100 rounded"></div>
+<div class="h-3 w-4/6 bg-gray-100 rounded"></div>
+</div>
+</div>
+</div>
+</div>
+<div class="fixed inset-0 z-10 bg-gray-900/10 modal-backdrop flex items-center justify-center p-4 md:p-8 transition-all duration-300">
+<div class="relative w-full max-w-5xl h-[85vh] md:h-[90vh] bg-white/90 backdrop-blur-xl rounded-xl shadow-modal border border-white/40 overflow-hidden flex flex-col animate-fade-in-up">
+<header class="h-16 shrink-0 border-b border-gray-100 bg-white/50 backdrop-blur-md z-20 px-6 flex items-center justify-between">
+<div class="flex items-center gap-3 text-text-muted text-sm font-medium">
+<div class="flex items-center gap-2 hover:text-primary transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-[20px] text-gray-400 group-hover:text-primary group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<span class="tracking-wide text-xs uppercase text-gray-400 font-bold">Course Source</span>
+</div>
+<span class="text-gray-300">/</span>
+<span class="text-text-main font-semibold">React Mastery</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center mr-2 pl-4 border-l border-gray-200/60">
+<label class="inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="relative w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary"></div>
+<span class="ms-2 text-xs font-semibold uppercase tracking-wider text-gray-500">Quick Edit</span>
+</label>
+</div>
+<div class="flex items-center gap-1">
+<button class="flex items-center justify-center size-9 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-primary transition-colors" title="Edit Note">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-800 transition-colors" title="Share Note">
+<span class="material-symbols-outlined text-[20px]">ios_share</span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-red-500 transition-colors" title="Delete">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+<div class="w-px h-5 bg-gray-200 mx-2"></div>
+<button class="flex items-center justify-center size-9 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-800 transition-colors" title="Close">
+<span class="material-symbols-outlined text-[22px]">close</span>
+</button>
+</div>
+</div>
+</header>
+<div class="flex-1 overflow-y-auto custom-scrollbar relative bg-transparent">
+<div class="max-w-[720px] mx-auto py-12 px-8 md:px-0">
+<div class="flex items-center justify-between mb-6">
+<span class="text-primary text-xs font-bold tracking-widest uppercase bg-primary/5 px-2 py-1 rounded">Draft</span>
+<span class="text-gray-400 text-xs font-medium tracking-wide">Last edited 2 hours ago by You</span>
+</div>
+<h1 class="text-4xl md:text-5xl font-extrabold text-text-main tracking-tight leading-[1.15] mb-8">
+                    Understanding State Management in React
+                </h1>
+<div class="flex flex-wrap gap-3 mb-12">
+<div class="flex items-center px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 text-xs font-bold tracking-wide shadow-sm">
+<span class="material-symbols-outlined text-[14px] mr-1.5 font-bold">tag</span>
+                        React
+                    </div>
+<div class="flex items-center px-3 py-1.5 rounded-full bg-white border border-gray-200 hover:border-gray-300 text-gray-600 text-xs font-bold tracking-wide transition-colors cursor-pointer shadow-sm">
+                        JavaScript
+                    </div>
+<div class="flex items-center px-3 py-1.5 rounded-full bg-white border border-gray-200 hover:border-gray-300 text-gray-600 text-xs font-bold tracking-wide transition-colors cursor-pointer shadow-sm">
+                        Hooks
+                    </div>
+</div>
+<hr class="border-gray-100 mb-12"/>
+<article class="space-y-10 text-lg leading-loose-2 text-text-muted font-normal tracking-wide">
+<p>
+                        State is a built-in React object that is used to contain data or information about the component. A component's state can change over time; whenever it changes, the component re-renders. This is the core mechanism that makes React apps interactive.
+                    </p>
+<h2 class="text-2xl font-bold text-text-main mt-14 mb-6 flex items-center gap-2 tracking-tight">
+<span class="text-primary opacity-60">#</span> Using the useState Hook
+                    </h2>
+<p>
+                        The most common way to handle state in functional components is via the <code class="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono border border-gray-200 font-medium">useState</code> hook. It returns a stateful value, and a function to update it.
+                    </p>
+<div class="my-10 rounded-xl overflow-hidden border border-gray-200 shadow-xl shadow-gray-200/50 bg-code-bg relative group">
+<div class="flex items-center justify-between px-4 py-3 bg-white/5 border-b border-white/5">
+<div class="flex gap-2">
+<div class="size-3 rounded-full bg-[#ff5f56]"></div>
+<div class="size-3 rounded-full bg-[#ffbd2e]"></div>
+<div class="size-3 rounded-full bg-[#27c93f]"></div>
+</div>
+<div class="text-xs text-gray-400 font-mono">CounterComponent.jsx</div>
+<div class="opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-gray-400 hover:text-white text-xs flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">content_copy</span> Copy
+                                </button>
+</div>
+</div>
+<div class="p-6 overflow-x-auto">
+<pre class="font-mono text-sm leading-7"><code><span class="token-keyword">import</span> React, { useState } <span class="token-keyword">from</span> <span class="token-string">'react'</span>;
+<span class="token-keyword">function</span> <span class="token-function">Counter</span>() {
+  <span class="token-comment">// Declare a new state variable, which we'll call "count"</span>
+  <span class="token-keyword">const</span> [count, setCount] = <span class="token-function">useState</span>(<span class="token-number">0</span>);
+  <span class="token-keyword">return</span> (
+    <span class="token-tag">&lt;div&gt;</span>
+      <span class="token-tag">&lt;p&gt;</span>You clicked {count} times<span class="token-tag">&lt;/p&gt;</span>
+      <span class="token-tag">&lt;button</span> <span class="token-variable">onClick</span>={() =&gt; <span class="token-function">setCount</span>(count + <span class="token-number">1</span>)}<span class="token-tag">&gt;</span>
+        Click me
+      <span class="token-tag">&lt;/button&gt;</span>
+    <span class="token-tag">&lt;/div&gt;</span>
+  );
+}</code></pre>
+</div>
+</div>
+<p>
+                        Notice how we destructure the array returned by <code class="bg-gray-100 text-pink-600 px-1.5 py-0.5 rounded text-sm font-mono border border-gray-200 font-medium">useState</code>. The first element is the current state, and the second is the setter function.
+                    </p>
+<div class="bg-blue-50 border-l-4 border-primary p-6 rounded-r-xl my-10 shadow-sm">
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-primary text-2xl">lightbulb</span>
+<div>
+<h4 class="text-primary-hover font-bold text-base mb-2 tracking-wide">Async Nature</h4>
+<p class="text-sm text-gray-600 leading-relaxed">
+                                    Remember: State updates in React may be asynchronous. React creates a queue of changes and batches them for performance. If you need the previous state value to calculate the next one, always pass a function to the setter: <code class="bg-white px-1 rounded text-primary font-mono text-xs border border-primary/20">setCount(prev =&gt; prev + 1)</code>.
+                                </p>
+</div>
+</div>
+</div>
+<h2 class="text-2xl font-bold text-text-main mt-14 mb-6 flex items-center gap-2 tracking-tight">
+<span class="text-primary opacity-60">#</span> When to use Redux or Context?
+                    </h2>
+<p>
+                        For simple component-level data, standard state is sufficient. However, when you have "prop drilling" (passing data down through many layers), you might consider the Context API.
+                    </p>
+<figure class="my-10">
+<div class="w-full h-64 rounded-xl overflow-hidden relative group shadow-lg">
+<img alt="Abstract representation of data flow and code structure on a dark monitor" class="w-full h-full object-cover transition-opacity duration-500" data-alt="Abstract representation of data flow and code structure on a dark monitor" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDVSbpwFQh1lzxqyTOi2vj8gyiMwedFMWnI_6jXWbcl0l4YA8sO6FZrcl0b1GqaY9V7iFxKciL5p_mcNaDSQGiiqTm4Xk94J9gy394prxhBjLVYKrkbm3DREymH_-JmvHUpIhyYSPtOZ-PET_ytujI-fXRfMf0ykLpuoaYnAI0QROXqpsHgzWSQK-LJuun0cUNuech1_rP_Pj3FPMkisbrllAaHl-DDf07OKSPy0jD4VeEOd4ArEz1l-wCtgQq6-9TZqZxUNS1Zniq-"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60"></div>
+<figcaption class="absolute bottom-4 left-4 text-xs text-white/90 font-mono bg-black/40 px-2 py-1 rounded backdrop-blur-md border border-white/10">
+                                Fig 1. Data Flow Visualization
+                            </figcaption>
+</div>
+</figure>
+</article>
+<div class="h-24"></div>
+</div>
+<div class="absolute bottom-10 right-10 hidden md:block z-50">
+<div class="size-10 rounded-full bg-white hover:bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-400 hover:text-primary transition-all cursor-pointer shadow-lg hover:shadow-xl">
+<span class="material-symbols-outlined text-[20px]">keyboard_arrow_up</span>
+</div>
+</div>
+</div>
+<div class="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10"></div>
+</div>
+</div>
+
+</body></html>

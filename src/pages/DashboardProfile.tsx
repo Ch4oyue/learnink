@@ -91,12 +91,12 @@ const achievements = [
 
 export default function DashboardProfile() {
   const navigate = useNavigate();
-  const { user, role, profile, signOut } = useAuth();
+  const { user, role, signOut } = useAuth();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
 
   const [displayName, setDisplayName] = useState(
-    profile?.full_name || user?.user_metadata?.display_name || ""
+    user?.user_metadata?.display_name || ""
   );
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
@@ -127,7 +127,7 @@ export default function DashboardProfile() {
       // Also update the profiles table
       await supabase
         .from("profiles")
-        .update({ full_name: displayName })
+        .update({ display_name: displayName })
         .eq("id", user.id);
 
       toast({
@@ -425,7 +425,7 @@ export default function DashboardProfile() {
                       </label>
                       <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border flex items-center justify-between">
                         {user?.email}
-                        <CheckCircle className="h-4 w-4 text-green-500" title="Verified" />
+                        <CheckCircle className="h-4 w-4 text-green-500" aria-label="Verified" />
                       </div>
                     </div>
                     <div className="space-y-2">

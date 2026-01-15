@@ -14,7 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Manrope', '-apple-system', 'BlinkMacSystemFont', 'SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Manrope', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -68,6 +69,12 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        // LearnInk Design Tokens
+        "notes-bg": "hsl(var(--notes-bg))",
+        "accent-green": {
+          DEFAULT: "hsl(var(--accent-green))",
+          text: "hsl(var(--accent-green-text))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -82,6 +89,8 @@ export default {
         medium: "var(--shadow-medium)",
         elevated: "var(--shadow-elevated)",
         glow: "var(--shadow-glow)",
+        subtle: "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        float: "0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025)",
       },
       keyframes: {
         "accordion-down": {

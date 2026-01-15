@@ -1,3 +1,6 @@
+/* Google Fonts - Manrope */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,36 +13,43 @@
 
 @layer base {
   :root {
-    /* Background - Pure clean white */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 9%;
+    /* =========================================
+       LearnInk Design System
+       Primary: #0079a8
+       Based on Master HTML Reference
+    ========================================= */
 
-    /* Card - Slightly off-white for depth */
+    /* Background - Clean off-white #f9fafa */
+    --background: 168 8% 98%;
+    --foreground: 195 45% 8%;
+    /* #0c181d */
+
+    /* Card/Surface - Pure white #ffffff */
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 9%;
+    --card-foreground: 195 45% 8%;
 
     /* Popover */
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 9%;
+    --popover-foreground: 195 45% 8%;
 
-    /* Primary - Muted, confident blue (Apple-like) */
-    --primary: 211 80% 42%;
+    /* Primary - LearnInk Cyan #0079a8 */
+    --primary: 195 100% 33%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Warm neutral grey */
-    --secondary: 220 9% 96%;
-    --secondary-foreground: 0 0% 9%;
+    /* Secondary - Soft neutral */
+    --secondary: 180 6% 96%;
+    --secondary-foreground: 195 45% 8%;
 
-    /* Muted - Soft grey tones */
-    --muted: 220 9% 96%;
+    /* Muted */
+    --muted: 180 6% 96%;
     --muted-foreground: 0 0% 45%;
 
     /* Accent */
-    --accent: 220 9% 96%;
-    --accent-foreground: 0 0% 9%;
+    --accent: 180 6% 96%;
+    --accent-foreground: 195 45% 8%;
 
-    /* Success - Muted green */
-    --success: 142 55% 38%;
+    /* Success - Green accent #1e8e3e */
+    --success: 142 65% 34%;
     --success-foreground: 0 0% 100%;
 
     /* Warning - Soft amber */
@@ -50,22 +60,30 @@
     --destructive: 0 65% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Borders & Inputs - Very subtle */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 211 80% 42%;
+    /* Border - Soft cyan tint #e6f0f4 */
+    --border: 195 40% 93%;
+    --input: 195 40% 93%;
+    --ring: 195 100% 33%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 0 0% 25%;
-    --sidebar-primary: 211 80% 42%;
+    --sidebar-primary: 195 100% 33%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 9% 96%;
-    --sidebar-accent-foreground: 0 0% 9%;
-    --sidebar-border: 0 0% 92%;
-    --sidebar-ring: 211 80% 42%;
+    --sidebar-accent: 180 6% 96%;
+    --sidebar-accent-foreground: 195 45% 8%;
+    --sidebar-border: 195 40% 93%;
+    --sidebar-ring: 195 100% 33%;
+
+    /* LearnInk Specific */
+    --notes-bg: 190 20% 97%;
+    /* #F3F7F8 */
+    --accent-green: 136 35% 93%;
+    /* #e6f4ea */
+    --accent-green-text: 142 65% 34%;
+    /* #1e8e3e */
 
     /* Layout */
     --nav-height: 4rem;
@@ -75,32 +93,35 @@
     --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
     --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.05);
     --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.08);
+    --shadow-glow: 0 0 10px rgba(0, 121, 168, 0.5);
   }
 
   .dark {
-    /* Dark mode - Warm, easy on eyes */
-    --background: 0 0% 9%;
-    --foreground: 0 0% 95%;
+    /* LearnInk Dark Mode */
+    --background: 200 27% 10%;
+    /* #121c21 */
+    --foreground: 0 0% 100%;
 
-    --card: 0 0% 11%;
-    --card-foreground: 0 0% 95%;
+    --card: 200 23% 14%;
+    /* #1a262d */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 0 0% 11%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 200 23% 14%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 211 75% 55%;
+    --primary: 195 100% 33%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 14%;
+    --secondary: 200 20% 12%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 14%;
+    --muted: 200 20% 12%;
     --muted-foreground: 0 0% 55%;
 
-    --accent: 0 0% 14%;
+    --accent: 200 20% 12%;
     --accent-foreground: 0 0% 95%;
 
-    --success: 142 55% 45%;
+    --success: 142 65% 40%;
     --success-foreground: 0 0% 100%;
 
     --warning: 38 70% 55%;
@@ -109,23 +130,32 @@
     --destructive: 0 55% 45%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 16%;
-    --input: 0 0% 16%;
-    --ring: 211 75% 55%;
+    /* Border - #2a3b45 */
+    --border: 200 22% 22%;
+    --input: 200 22% 22%;
+    --ring: 195 100% 33%;
 
-    --sidebar-background: 0 0% 7%;
+    --sidebar-background: 200 30% 8%;
+    /* #0f161a */
     --sidebar-foreground: 0 0% 85%;
-    --sidebar-primary: 211 75% 55%;
+    --sidebar-primary: 195 100% 33%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 13%;
+    --sidebar-accent: 200 20% 13%;
     --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 0 0% 16%;
-    --sidebar-ring: 211 75% 55%;
+    --sidebar-border: 200 22% 22%;
+    --sidebar-ring: 195 100% 33%;
 
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.25);
-    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.3);
-    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.4);
+    /* LearnInk Specific */
+    --notes-bg: 200 30% 8%;
+    /* #0f161a */
+    --accent-green: 142 50% 15%;
+    --accent-green-text: 142 65% 50%;
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-elevated: 0 8px 24px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 10px rgba(0, 121, 168, 0.5);
   }
 }
 
@@ -350,5 +380,31 @@
 
   .badge-primary {
     @apply bg-primary/10 text-primary border-primary/20;
+  }
+
+  /* Hero 3D Tilt Animation */
+  .hero-tilt {
+    transform: perspective(1200px) rotateX(15deg) rotateY(0deg) rotateZ(0deg) translateY(0);
+    transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .group\/hero:hover .hero-tilt {
+    transform: perspective(1200px) rotateX(5deg) rotateY(0deg) rotateZ(0deg) translateY(-20px);
+  }
+
+  /* Grid Background Pattern */
+  .bg-grid-pattern {
+    background-image: radial-gradient(hsl(var(--border)) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Hide scrollbar for clean UI */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }

@@ -28,6 +28,7 @@ const DashboardNotifications = lazy(() => import("./pages/DashboardNotifications
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon"));
+const LandingPage = lazy(() => import("./pages/LandingPage"));
 
 // Lazy load dashboard components
 const UserDashboard = lazy(() => import("@/components/dashboard/UserDashboard").then(m => ({ default: m.UserDashboard })));
@@ -62,7 +63,8 @@ const App = () => (
           <BrowserRouter>
             <Suspense fallback={<PageLoader />}>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/home" element={<Index />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/modules" element={<Modules />} />
                 <Route path="/module/:id" element={<ModuleDetail />} />

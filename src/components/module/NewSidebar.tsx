@@ -1,0 +1,125 @@
+import { Link, useNavigate } from "react-router-dom";
+import {
+    GraduationCap,
+    BookOpen,
+    Search,
+    LayoutDashboard,
+    Settings,
+    ChevronLeft,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+
+interface NavItem {
+    icon: React.ReactNode;
+    label: string;
+    isActive?: boolean;
+    onClick?: () => void;
+}
+
+interface NewSidebarProps {
+    onTableOfContentsClick?: () => void;
+    onSearchClick?: () => void;
+    onBackClick?: () => void;
+    activeTab?: "toc" | "content" | "dashboard";
+}
+
+export function NewSidebar({
+    onTableOfContentsClick,
+    onSearchClick,
+    onBackClick,
+    activeTab = "content",
+}: NewSidebarProps) {
+    const navigate = useNavigate();
+
+    const navItems: NavItem[] = [
+        {
+            icon: <BookOpen className="h-5 w-5" />,
+            label: "Table of Contents",
+            isActive: activeTab === "toc",
+            onClick: onTableOfContentsClick,
+        },
+        {
+            icon: <Search className="h-5 w-5" />,
+            label: "Search",
+            onClick: onSearchClick,
+        },
+        {
+            icon: <LayoutDashboard className="h-5 w-5" />,
+            label: "Dashboard",
+            isActive: activeTab === "dashboard",
+            onClick: () => navigate("/dashboard"),
+        },
+    ];
+
+    return (
+        <aside className="w-[72px] border-r border-border bg-card flex flex-col items-center py-6 gap-8 shrink-0 z-20">
+            {/* Brand Mark */}
+            <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/30 mb-2">
+                <GraduationCap className="h-5 w-5" />
+            </div>
+
+            {/* Back Button */}
+            {onBackClick && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            onClick={onBackClick}
+                            className="w-full aspect-square flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all mx-3"
+                        >
+                            <ChevronLeft className="h-5 w-5" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" sideOffset={10}>
+                        <p className="text-xs font-bold">Back to Modules</p>
+                    </TooltipContent>
+                </Tooltip>
+            )}
+
+            {/* Nav Icons */}
+            <div className="flex flex-col gap-4 w-full px-3">
+                {navItems.map((item, index) => (
+                    <Tooltip key={index}>
+                        <TooltipTrigger asChild>
+                            <button
+                                onClick={item.onClick}
+                                className={cn(
+                                    "w-full aspect-square flex items-center justify-center rounded-xl transition-all",
+                                    item.isActive
+                                        ? "text-primary bg-primary/10 shadow-inner"
+                                        : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                                )}
+                            >
+                                {item.icon}
+                            </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" sideOffset={10}>
+                            <p className="text-xs font-bold">{item.label}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                ))}
+            </div>
+
+            {/* Bottom Settings */}
+            <div className="mt-auto px-3 w-full">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <button
+                            onClick={() => navigate("/dashboard/settings")}
+                            className="w-full aspect-square flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-primary/5 transition-all"
+                        >
+                            <Settings className="h-5 w-5" />
+                        </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" sideOffset={10}>
+                        <p className="text-xs font-bold">Settings</p>
+                    </TooltipContent>
+                </Tooltip>
+            </div>
+        </aside>
+    );
+}

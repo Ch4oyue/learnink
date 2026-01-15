@@ -7,15 +7,19 @@ import { useQuizzes, useQuizQuestionsSafe, Quiz, useUserQuizAttempts } from "@/h
 import { useScrollProgress } from "@/hooks/useScrollProgress";
 import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "@/hooks/useLearningNotes";
 import { QuizPlayer } from "@/components/quiz/QuizPlayer";
-import { StickyProgressBar } from "@/components/module/StickyProgressBar";
-import { ContentSection } from "@/components/module/ContentSection";
 import { QuizSection } from "@/components/module/QuizSection";
 import { ModuleTOC, extractTOC } from "@/components/module/ModuleTOC";
-import { LearningNotesSidebar } from "@/components/module/LearningNotesSidebar";
 import { TextSelectionMenu } from "@/components/module/TextSelectionMenu";
+import { NewSidebar } from "@/components/module/NewSidebar";
+import { NewContentRenderer } from "@/components/module/NewContentRenderer";
+import { NewGuidedNotes } from "@/components/module/NewGuidedNotes";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@/components/ui/resizable";
 import {
   Sheet,
   SheetContent,
@@ -30,14 +34,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { BookOpen, ArrowLeft, CheckCircle2, List, StickyNote, Loader2, Menu, Plus, X } from "lucide-react";
+import { BookOpen, ChevronRight, Loader2, Menu, StickyNote } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export default function ModuleLearn() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, role } = useAuth();
+  const { user, role, profile } = useAuth();
   const { toast } = useToast();
 
   const { data: modules, isLoading: modulesLoading } = useModules(true);
@@ -61,15 +65,9 @@ export default function ModuleLearn() {
   const [selectedText, setSelectedText] = useState("");
   const [selectionPosition, setSelectionPosition] = useState<{ x: number; y: number } | null>(null);
 
-  // Sticky progress bar state
-  const [showStickyProgress, setShowStickyProgress] = useState(false);
-
-  // Mobile TOC sheet state
-  const [mobileTocOpen, setMobileTocOpen] = useState(false);
-
-  // Custom note creation state
-  const [showCustomNoteInput, setShowCustomNoteInput] = useState(false);
-  const [customNoteText, setCustomNoteText] = useState("");
+  // Mobile sheet state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
 
   // Content ref for scroll tracking
   const contentRef = useRef<HTMLElement>(null);
@@ -158,40 +156,6 @@ export default function ModuleLearn() {
       setInitialProgress(currentProgress);
     }
   }, [currentProgress, setInitialProgress]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowStickyProgress(window.scrollY > 300);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleMarkComplete = () => {
-    if (!user || !id || !hasPassedQuiz) {
-      toast({
-        title: "Selesaikan Quiz Terlebih Dahulu",
-        description: "Anda harus lulus quiz sebelum dapat menandai modul sebagai selesai.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    updateProgress.mutate({
-      userId: user.id,
-      moduleId: id,
-      progressPercent: 100,
-      isCompleted: true,
-    }, {
-      onSuccess: () => {
-        toast({
-          title: "Selamat! 🎉",
-          description: "Modul berhasil ditandai sebagai selesai.",
-        });
-        refetchProgress();
-      }
-    });
-  };
 
   const handleGenerateQuiz = async () => {
     if (!id) return;
@@ -286,17 +250,12 @@ export default function ModuleLearn() {
     }
   };
 
-  const handleDeleteNote = (noteId: string) => {
-    deleteNote.mutate(noteId);
-  };
-
-  // Handle custom note creation (user types their own note)
-  const handleCreateCustomNote = () => {
-    if (customNoteText.trim() && user && id) {
+  const handleCreateCustomNote = (content: string) => {
+    if (content && user && id) {
       createNote.mutate({
         user_id: user.id,
         module_id: id,
-        content: customNoteText.trim(),
+        content: content,
         highlighted_text: null,
       }, {
         onSuccess: () => {
@@ -304,11 +263,13 @@ export default function ModuleLearn() {
             title: "Catatan Dibuat!",
             description: "Catatan Anda berhasil disimpan.",
           });
-          setCustomNoteText("");
-          setShowCustomNoteInput(false);
         }
       });
     }
+  };
+
+  const handleDeleteNote = (noteId: string) => {
+    deleteNote.mutate(noteId);
   };
 
   // Redirect if not authenticated or hasn't started learning (no progress record)
@@ -349,7 +310,6 @@ export default function ModuleLearn() {
             Modul yang Anda cari tidak ada atau belum dipublikasikan.
           </p>
           <Button onClick={() => navigate('/modules')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
             Kembali ke Daftar Modul
           </Button>
         </div>
@@ -357,101 +317,93 @@ export default function ModuleLearn() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-background reading-mode">
-      {/* Floating Header - Back button + Mobile TOC */}
-      <header className="fixed top-0 left-0 right-0 z-40 bg-background/80 backdrop-blur-lg border-b border-border/50">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/modules')}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Kembali</span>
-          </Button>
+  const userName = profile?.full_name || user?.email?.split('@')[0] || 'User';
+  const userInitials = userName.slice(0, 2).toUpperCase();
 
-          <div className="flex items-center gap-2">
-            {/* Mobile TOC Button */}
-            <Sheet open={mobileTocOpen} onOpenChange={setMobileTocOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="sm" className="lg:hidden gap-2">
-                  <List className="h-4 w-4" />
-                  <span className="hidden sm:inline">Daftar Isi</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-80">
-                <SheetHeader>
-                  <SheetTitle>Navigasi</SheetTitle>
-                </SheetHeader>
-                <Tabs defaultValue="toc" className="mt-4">
-                  <TabsList className="w-full grid grid-cols-2">
-                    <TabsTrigger value="toc" className="gap-1">
-                      <List className="h-3 w-3" />
-                      <span className="text-xs">Daftar Isi</span>
-                    </TabsTrigger>
-                    <TabsTrigger value="notes" className="gap-1">
-                      <StickyNote className="h-3 w-3" />
-                      <span className="text-xs">Catatan</span>
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="toc" className="mt-4">
-                    {tocItems.length > 0 ? (
-                      <div onClick={() => setMobileTocOpen(false)}>
-                        <ModuleTOC items={tocItems} className="w-full" />
-                      </div>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">Tidak ada daftar isi</p>
-                    )}
-                  </TabsContent>
-                  <TabsContent value="notes" className="mt-4">
-                    {/* Custom note creation */}
-                    <div className="mb-4">
-                      {showCustomNoteInput ? (
-                        <div className="space-y-2">
-                          <Input
-                            placeholder="Tulis catatan Anda..."
-                            value={customNoteText}
-                            onChange={(e) => setCustomNoteText(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && handleCreateCustomNote()}
-                          />
-                          <div className="flex gap-2">
-                            <Button size="sm" onClick={handleCreateCustomNote} disabled={createNote.isPending}>
-                              {createNote.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Simpan'}
-                            </Button>
-                            <Button size="sm" variant="ghost" onClick={() => setShowCustomNoteInput(false)}>
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => setShowCustomNoteInput(true)}>
-                          <Plus className="h-3 w-3" />
-                          Buat Catatan
-                        </Button>
-                      )}
-                    </div>
-                    <LearningNotesSidebar
-                      notes={notes || []}
-                      isLoading={notesLoading}
-                      onDelete={handleDeleteNote}
-                      isDeleting={deleteNote.isPending}
-                    />
-                  </TabsContent>
-                </Tabs>
-              </SheetContent>
-            </Sheet>
+  return (
+    <div className="h-screen overflow-hidden flex flex-col bg-background antialiased selection:bg-primary/20 selection:text-primary">
+      {/* Top Header */}
+      <header className="h-[60px] flex items-center justify-between px-6 border-b border-border bg-card/80 backdrop-blur-sm relative shrink-0 z-30">
+        {/* Slim Progress Bar at Top Edge */}
+        <div className="absolute top-0 left-0 w-full h-[3px] bg-muted">
+          <div
+            className="h-full bg-primary transition-all duration-1000 ease-out shadow-glow"
+            style={{ width: `${currentProgress}%` }}
+          />
+        </div>
+
+        {/* Left: Context */}
+        <div className="flex items-center gap-4">
+          {/* Mobile Menu Button */}
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="lg:hidden">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-80 p-0">
+              <SheetHeader className="p-4 border-b">
+                <SheetTitle>Table of Contents</SheetTitle>
+              </SheetHeader>
+              <div className="p-4">
+                {tocItems.length > 0 ? (
+                  <div onClick={() => setMobileMenuOpen(false)}>
+                    <ModuleTOC items={tocItems} className="w-full" />
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">Tidak ada daftar isi</p>
+                )}
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground font-medium">Course</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+            <span className="text-foreground font-bold tracking-tight line-clamp-1">
+              {module.title}
+            </span>
+          </div>
+        </div>
+
+        {/* Right: Profile & Status */}
+        <div className="flex items-center gap-6">
+          {/* Mobile Notes Button */}
+          <Sheet open={mobileNotesOpen} onOpenChange={setMobileNotesOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="lg:hidden">
+                <StickyNote className="h-5 w-5" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-80 p-0">
+              <NewGuidedNotes
+                notes={notes || []}
+                isLoading={notesLoading}
+                onCreateNote={handleCreateCustomNote}
+                onDeleteNote={handleDeleteNote}
+                isCreating={createNote.isPending}
+                isDeleting={deleteNote.isPending}
+              />
+            </SheetContent>
+          </Sheet>
+
+          <div className="hidden sm:flex flex-col items-end">
+            <span className="text-xs font-bold text-primary tracking-wide">
+              {currentProgress}% COMPLETE
+            </span>
+          </div>
+          <div className="hidden sm:block h-8 w-[1px] bg-border" />
+          <div className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity">
+            <span className="text-sm font-semibold hidden sm:block">{userName}</span>
+            <Avatar className="h-9 w-9 ring-2 ring-background shadow-sm">
+              <AvatarImage src={profile?.avatar_url || undefined} alt={userName} />
+              <AvatarFallback className="bg-muted text-muted-foreground text-xs font-bold">
+                {userInitials}
+              </AvatarFallback>
+            </Avatar>
           </div>
         </div>
       </header>
-
-      {/* Sticky Progress Bar */}
-      <StickyProgressBar
-        title={module.title}
-        progress={currentProgress}
-        isVisible={showStickyProgress}
-      />
 
       {/* Text Selection Menu */}
       {selectionPosition && selectedText && (
@@ -463,124 +415,63 @@ export default function ModuleLearn() {
         />
       )}
 
-      <main className="container mx-auto px-4 py-8 pt-20">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{module.title}</h1>
-              <p className="text-muted-foreground mt-1">
-                Progress: {currentProgress}% {isCompleted && <span className="text-success">(Selesai)</span>}
-              </p>
-            </div>
-
-            {/* Mark Complete Button - Only show if quiz passed */}
-            {!isCompleted && hasPassedQuiz && (
-              <Button
-                onClick={handleMarkComplete}
-                disabled={updateProgress.isPending}
-                className="gap-2"
-              >
-                {updateProgress.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2 className="h-4 w-4" />
-                )}
-                Tandai Selesai
-              </Button>
-            )}
-
-            {!isCompleted && !hasPassedQuiz && quizzes && quizzes.length > 0 && (
-              <p className="text-sm text-muted-foreground italic">
-                Selesaikan quiz untuk dapat menandai modul sebagai selesai
-              </p>
-            )}
-          </div>
+      {/* Main Workspace Layout */}
+      <div className="flex flex-1 overflow-hidden relative">
+        {/* Left Navigation Rail (Desktop) */}
+        <div className="hidden lg:block">
+          <NewSidebar
+            onBackClick={() => navigate('/modules')}
+            onTableOfContentsClick={() => setMobileMenuOpen(true)}
+          />
         </div>
 
-        {/* Main Content Layout */}
-        <div className="flex gap-8">
-          {/* Sidebar - TOC + Notes (Desktop) */}
-          <div className="hidden lg:block w-64 flex-shrink-0">
-            <div className="sticky top-24">
-              <Tabs defaultValue="toc" className="w-full">
-                <TabsList className="w-full grid grid-cols-2">
-                  <TabsTrigger value="toc" className="gap-1">
-                    <List className="h-3 w-3" />
-                    <span className="text-xs">Daftar Isi</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="notes" className="gap-1">
-                    <StickyNote className="h-3 w-3" />
-                    <span className="text-xs">Catatan</span>
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="toc" className="mt-4">
-                  {tocItems.length > 0 ? (
-                    <ModuleTOC items={tocItems} className="w-full" />
-                  ) : (
-                    <p className="text-sm text-muted-foreground">Tidak ada daftar isi</p>
-                  )}
-                </TabsContent>
-                <TabsContent value="notes" className="mt-4">
-                  {/* Custom note creation */}
-                  <div className="mb-4">
-                    {showCustomNoteInput ? (
-                      <div className="space-y-2">
-                        <Input
-                          placeholder="Tulis catatan Anda..."
-                          value={customNoteText}
-                          onChange={(e) => setCustomNoteText(e.target.value)}
-                          onKeyDown={(e) => e.key === 'Enter' && handleCreateCustomNote()}
-                        />
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={handleCreateCustomNote} disabled={createNote.isPending}>
-                            {createNote.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : 'Simpan'}
-                          </Button>
-                          <Button size="sm" variant="ghost" onClick={() => setShowCustomNoteInput(false)}>
-                            <X className="h-3 w-3" />
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <Button variant="outline" size="sm" className="w-full gap-2" onClick={() => setShowCustomNoteInput(true)}>
-                        <Plus className="h-3 w-3" />
-                        Buat Catatan
-                      </Button>
-                    )}
-                  </div>
-                  <LearningNotesSidebar
-                    notes={notes || []}
-                    isLoading={notesLoading}
-                    onDelete={handleDeleteNote}
-                    isDeleting={deleteNote.isPending}
-                  />
-                </TabsContent>
-              </Tabs>
+        {/* Resizable Panels for Content and Notes */}
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
+          {/* Center Content Panel */}
+          <ResizablePanel defaultSize={65} minSize={40}>
+            <div className="h-full overflow-y-auto scroll-smooth no-scrollbar">
+              <NewContentRenderer
+                ref={contentRef}
+                content={module.content}
+                metadata={{
+                  title: module.title,
+                  description: module.description || undefined,
+                  category: module.category || undefined,
+                  readingTime: module.content ? Math.ceil(module.content.split(' ').length / 200) : undefined,
+                }}
+                isLoading={modulesLoading}
+              />
+
+              {/* Quiz Section */}
+              <div className="max-w-[800px] mx-auto px-10 pb-16">
+                <QuizSection
+                  quizzes={quizzes}
+                  isLoading={quizzesLoading}
+                  canManageQuiz={canManageQuiz}
+                  isGenerating={isGeneratingQuiz}
+                  onGenerateQuiz={handleGenerateQuiz}
+                  onStartQuiz={handleStartQuiz}
+                />
+              </div>
             </div>
-          </div>
+          </ResizablePanel>
 
-          {/* Main Content Area */}
-          <div className="flex-1 min-w-0 space-y-8">
-            {/* Learning Content */}
-            <ContentSection
-              ref={contentRef}
-              content={module.content}
-              isLocked={false}
-              isAuthenticated={true}
-            />
+          {/* Resize Handle */}
+          <ResizableHandle withHandle className="hidden lg:flex" />
 
-            {/* Quiz Section */}
-            <QuizSection
-              quizzes={quizzes}
-              isLoading={quizzesLoading}
-              canManageQuiz={canManageQuiz}
-              isGenerating={isGeneratingQuiz}
-              onGenerateQuiz={handleGenerateQuiz}
-              onStartQuiz={handleStartQuiz}
+          {/* Right Notes Panel (Desktop) */}
+          <ResizablePanel defaultSize={35} minSize={25} maxSize={50} className="hidden lg:block">
+            <NewGuidedNotes
+              notes={notes || []}
+              isLoading={notesLoading}
+              onCreateNote={handleCreateCustomNote}
+              onDeleteNote={handleDeleteNote}
+              isCreating={createNote.isPending}
+              isDeleting={deleteNote.isPending}
             />
-          </div>
-        </div>
-      </main>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
 
       {/* Quiz Player Dialog */}
       <Dialog open={showQuizPlayer} onOpenChange={(open) => !open && handleQuizComplete()}>

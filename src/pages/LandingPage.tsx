@@ -39,7 +39,10 @@ export default function LandingPage() {
 
                         {/* Nav Links */}
                         <div className="flex items-center gap-4">
-                            <button className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden sm:block">
+                            <button
+                                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden sm:block"
+                            >
                                 Features
                             </button>
                             <div className="h-4 w-[1px] bg-border mx-2 hidden sm:block" />

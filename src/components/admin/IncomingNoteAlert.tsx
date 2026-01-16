@@ -44,7 +44,7 @@ interface IncomingNoteAlertProps {
 }
 
 export function IncomingNoteAlert({
-    notes = MOCK_INCOMING_NOTES,
+    notes = [],
     onApprove,
     onDiscard
 }: IncomingNoteAlertProps) {

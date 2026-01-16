@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import { ArrowRight, PlayCircle, GraduationCap, Folder, Search } from "lucide-react";
 
 export function Hero() {
     return (
@@ -79,20 +79,13 @@ export function Hero() {
                             {/* Sidebar */}
                             <div className="w-16 bg-zinc-900 border-r border-zinc-800 flex-col items-center py-6 gap-6 hidden md:flex">
                                 <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path d="M12 14l9-5-9-5-9 5 9 5z" />
-                                        <path d="M12 14l6.16-3.422a12 12 0 010 6.844L12 14z" />
-                                    </svg>
+                                    <GraduationCap className="h-5 w-5" />
                                 </div>
                                 <div className="p-2 text-zinc-500 hover:text-zinc-300 cursor-pointer">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                                    </svg>
+                                    <Folder className="h-5 w-5" />
                                 </div>
                                 <div className="p-2 text-zinc-500 hover:text-zinc-300 cursor-pointer">
-                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
+                                    <Search className="h-5 w-5" />
                                 </div>
                             </div>
 

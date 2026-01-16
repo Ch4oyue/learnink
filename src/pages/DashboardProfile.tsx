@@ -91,7 +91,7 @@ const achievements = [
 
 export default function DashboardProfile() {
   const navigate = useNavigate();
-  const { user, role, signOut } = useAuth();
+  const { user, role, profile, signOut } = useAuth();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
 

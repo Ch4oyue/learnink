@@ -81,15 +81,11 @@ export default function Auth() {
     return "Terjadi kesalahan. Silakan coba lagi.";
   };
 
-  // Redirect to role-based dashboard if already logged in
+  // Redirect to dashboard if already logged in
   useEffect(() => {
     if (user && role) {
-      const dashboardPath = role === 'admin'
-        ? '/dashboard/admin'
-        : role === 'tutor'
-          ? '/dashboard/tutor'
-          : '/dashboard/user';
-      navigate(dashboardPath);
+      // All users go to same dashboard, role-based features handled inside
+      navigate('/dashboard');
     }
   }, [user, role, navigate]);
 

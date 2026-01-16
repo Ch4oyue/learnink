@@ -23,21 +23,21 @@ const features = [
 
 export function Features() {
     return (
-        <section id="features" className="py-16 bg-card border-t border-border">
+        <section id="features" className="py-24 sm:py-32 bg-zinc-950 dark:bg-zinc-950 border-t border-zinc-800/40">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {features.map((feature) => (
                         <div
                             key={feature.title}
-                            className="group p-6 rounded-2xl bg-muted/50 hover:bg-card border border-transparent hover:border-border transition-all duration-300 shadow-sm hover:shadow-md"
+                            className="group p-8 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800/40 hover:border-zinc-700/60 transition-all duration-300 shadow-sm hover:shadow-lg hover:shadow-black/10"
                         >
                             <div className={`w-12 h-12 rounded-xl ${feature.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                                 <feature.icon className="h-6 w-6" />
                             </div>
-                            <h3 className="text-xl font-bold text-foreground mb-2">
+                            <h3 className="text-xl font-bold text-zinc-100 mb-3">
                                 {feature.title}
                             </h3>
-                            <p className="text-muted-foreground leading-relaxed">
+                            <p className="text-zinc-400 leading-relaxed">
                                 {feature.description}
                             </p>
                         </div>

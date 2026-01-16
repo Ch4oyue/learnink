@@ -5,6 +5,7 @@ import { Terminal, Moon, Sun, Heart, Github, BookOpen } from "lucide-react";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { Footer } from "@/components/landing/Footer";
+import { LearningSourcesMarquee } from "@/components/landing/LearningSourcesMarquee";
 
 export default function LandingPage() {
     const [isDark, setIsDark] = useState(() => {
@@ -75,15 +76,15 @@ export default function LandingPage() {
                 <Features />
 
                 {/* Open Source & Free Section */}
-                <section className="py-20 bg-gradient-to-b from-background to-primary/5 border-t border-border">
+                <section className="py-28 sm:py-32 bg-gradient-to-b from-zinc-950 via-zinc-950 to-zinc-900 border-t border-zinc-800/40">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-6">
+                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-8">
                             <Heart className="h-8 w-8 text-primary" />
                         </div>
-                        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-zinc-100 mb-6 leading-tight">
                             Open Source & Forever Free
                         </h2>
-                        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+                        <p className="text-lg sm:text-xl text-zinc-400 mb-10 max-w-2xl mx-auto leading-relaxed">
                             We believe education should be accessible to everyone. LearnInk is completely free—no premium tiers, no hidden costs.
                             Just pure, transparent learning materials built for the community, by the community.
                         </p>
@@ -106,35 +107,8 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* Trust Section */}
-                <section className="py-12 bg-background border-t border-border">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-8">
-                            Trusted by developers from
-                        </p>
-                        <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 dark:opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
-                            {/* Company Logos (Abstract) */}
-                            <svg className="h-8 w-auto text-foreground" fill="currentColor" viewBox="0 0 100 30">
-                                <path d="M10,15 L20,5 L30,15 L20,25 Z M40,5 H50 V25 H40 Z M60,5 H70 V25 H60 Z M80,5 H90 V25 H80 Z" />
-                            </svg>
-                            <svg className="h-8 w-auto text-foreground" fill="currentColor" viewBox="0 0 100 30">
-                                <circle cx="15" cy="15" r="10" />
-                                <rect height="20" width="20" x="35" y="5" />
-                                <polygon points="70,25 80,5 90,25" />
-                            </svg>
-                            <svg className="h-8 w-auto text-foreground" fill="currentColor" viewBox="0 0 100 30">
-                                <rect height="10" width="30" x="5" y="10" />
-                                <rect height="20" width="10" x="45" y="5" />
-                                <rect height="20" width="10" x="65" y="5" />
-                                <rect height="10" width="10" x="85" y="10" />
-                            </svg>
-                            <svg className="h-8 w-auto text-foreground" fill="currentColor" viewBox="0 0 100 30">
-                                <path d="M10,5 Q20,25 30,5 T50,5 T70,5" fill="none" stroke="currentColor" strokeWidth="4" />
-                                <circle cx="85" cy="15" r="8" />
-                            </svg>
-                        </div>
-                    </div>
-                </section>
+                {/* Learning Sources Marquee */}
+                <LearningSourcesMarquee />
             </main>
 
             <Footer />

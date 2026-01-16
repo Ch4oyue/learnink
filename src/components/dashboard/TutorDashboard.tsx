@@ -50,7 +50,7 @@ const statusColors: Record<RequestStatus, string> = {
   rejected: 'bg-destructive/10 text-destructive',
 };
 
-export function TutorDashboard() {
+export function TutorDashboardContent() {
   const { user } = useAuth();
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all');
   const [generateDialog, setGenerateDialog] = useState<{
@@ -58,7 +58,7 @@ export function TutorDashboard() {
     requestId: string;
     topic: string;
   }>({ open: false, requestId: '', topic: '' });
-  
+
   const { data: myModules, isLoading: modulesLoading } = useMyModules(user?.id);
   const { data: requests, isLoading: requestsLoading } = useAllRequests(
     statusFilter === 'all' ? undefined : statusFilter
@@ -86,7 +86,7 @@ export function TutorDashboard() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-foreground mb-1">
@@ -203,7 +203,7 @@ export function TutorDashboard() {
                       </TableCell>
                       <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
                       <TableCell>
-                        {request.created_at 
+                        {request.created_at
                           ? new Date(request.created_at).toLocaleDateString('id-ID')
                           : '-'}
                       </TableCell>
@@ -314,8 +314,8 @@ export function TutorDashboard() {
       </Tabs>
 
       {/* Generate Confirmation Dialog */}
-      <AlertDialog 
-        open={generateDialog.open} 
+      <AlertDialog
+        open={generateDialog.open}
         onOpenChange={(open) => setGenerateDialog(prev => ({ ...prev, open }))}
       >
         <AlertDialogContent>
@@ -325,7 +325,7 @@ export function TutorDashboard() {
               Generate Modul dengan AI
             </AlertDialogTitle>
             <AlertDialogDescription>
-              AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}". 
+              AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}".
               Proses ini mungkin membutuhkan waktu beberapa detik.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -338,6 +338,18 @@ export function TutorDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>
+  );
+}
+
+// ============================================
+// MAIN COMPONENT (Backward Compatible)
+// ============================================
+
+export function TutorDashboard() {
+  return (
+    <DashboardLayout>
+      <TutorDashboardContent />
     </DashboardLayout>
   );
 }

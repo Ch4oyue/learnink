@@ -1,43 +1,155 @@
-import { ReactNode, forwardRef } from "react";
+import { ReactNode, forwardRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { LogOut, LayoutDashboard, User, Layers, ChevronRight } from "lucide-react";
+import {
+  LogOut,
+  LayoutDashboard,
+  User,
+  Layers,
+  ChevronRight,
+  ChevronLeft,
+  BookOpen,
+  Trophy,
+  Palette,
+  BarChart3,
+  FileQuestion,
+  Users,
+  CheckCircle,
+  Globe,
+  Settings,
+  Menu,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 /**
- * DashboardLayout - Cleaned Version
- * ==================================
- * Simplified sidebar with only essential navigation:
- * - Home (/dashboard)
- * - Profile (/dashboard/profile)
+ * DashboardLayout - Scalable Dashboard Shell
+ * ==========================================
+ * Dynamic sidebar that adapts to user role:
+ * - Student: Home, My Courses, Achievements
+ * - Tutor: Studio, Analytics, Material Requests
+ * - Admin: Overview, Users, Content Approval, Learning Sources
  */
+
+// ============================================
+// TYPES
+// ============================================
+
+interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  badge?: string | number;
+}
 
 interface DashboardLayoutProps {
   children: ReactNode;
 }
 
-const SIDEBAR_WIDTH = 250;
+// ============================================
+// CONSTANTS
+// ============================================
 
-const roleLabels = {
+const SIDEBAR_WIDTH = 250;
+const SIDEBAR_COLLAPSED_WIDTH = 72;
+
+const roleLabels: Record<AppRole, string> = {
   user: "Pelajar",
   tutor: "Tutor",
   admin: "Admin",
 };
 
-const roleBadgeColors = {
+const roleBadgeColors: Record<AppRole, string> = {
   user: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   tutor: "bg-green-500/10 text-green-400 border-green-500/20",
   admin: "bg-red-500/10 text-red-400 border-red-500/20",
 };
 
+// ============================================
+// MENU CONFIGURATION PER ROLE
+// ============================================
+
+const MENU_CONFIG: Record<AppRole, NavItem[]> = {
+  user: [
+    { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+    { href: "/dashboard/courses", label: "My Courses", icon: BookOpen },
+    { href: "/dashboard/achievements", label: "Achievements", icon: Trophy },
+  ],
+  tutor: [
+    { href: "/dashboard", label: "Studio", icon: Palette },
+    { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+    { href: "/dashboard/requests", label: "Material Requests", icon: FileQuestion },
+  ],
+  admin: [
+    { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+    { href: "/dashboard/users", label: "Users", icon: Users },
+    { href: "/dashboard/approval", label: "Content Approval", icon: CheckCircle },
+    { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
+    { href: "/dashboard/settings", label: "System Settings", icon: Settings },
+  ],
+};
+
+// Common items shown for all roles at the bottom
+const COMMON_NAV_ITEMS: NavItem[] = [
+  { href: "/dashboard/profile", label: "Profile", icon: User },
+];
+
+// ============================================
+// LOADING SKELETON COMPONENT
+// ============================================
+
+function SidebarSkeleton() {
+  return (
+    <aside
+      className="fixed left-0 top-0 z-40 h-screen border-r border-border bg-sidebar hidden md:flex md:flex-col"
+      style={{ width: `${SIDEBAR_WIDTH}px` }}
+    >
+      {/* Logo Header Skeleton */}
+      <div className="h-16 flex items-center px-6 border-b border-sidebar-border shrink-0">
+        <Skeleton className="h-8 w-8 rounded-lg" />
+        <Skeleton className="h-5 w-24 ml-3" />
+      </div>
+
+      {/* Navigation Skeleton */}
+      <nav className="flex-1 overflow-y-auto p-4 space-y-2">
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton key={i} className="h-10 w-full rounded-lg" />
+        ))}
+      </nav>
+
+      {/* User Info Skeleton */}
+      <div className="border-t border-sidebar-border p-4 shrink-0">
+        <div className="flex items-center gap-3 mb-4">
+          <Skeleton className="h-10 w-10 rounded-full" />
+          <div className="flex-1">
+            <Skeleton className="h-4 w-24 mb-2" />
+            <Skeleton className="h-5 w-16" />
+          </div>
+        </div>
+        <Skeleton className="h-8 w-full" />
+      </div>
+    </aside>
+  );
+}
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+
 export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
   function DashboardLayout({ children }, ref) {
-    const { user, role, profile, signOut } = useAuth();
+    const { user, role, profile, loading, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
+    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Get role-specific nav items with type safety
+    const currentRole: AppRole = role ?? "user";
+    const navItems: NavItem[] = MENU_CONFIG[currentRole];
 
     const displayName =
       profile?.full_name ||
@@ -51,19 +163,41 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
       navigate("/");
     };
 
-    // SIMPLIFIED NAV ITEMS - Only Home and Profile
-    const navItems = [
-      {
-        href: "/dashboard",
-        label: "Home",
-        icon: LayoutDashboard,
-      },
-      {
-        href: "/dashboard/profile",
-        label: "Profile",
-        icon: User,
-      },
-    ];
+    const sidebarWidth = isCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH;
+
+    // Show loading skeleton while checking auth state
+    if (loading) {
+      return (
+        <div
+          ref={ref}
+          className="min-h-screen bg-background text-foreground font-sans"
+        >
+          <SidebarSkeleton />
+          <main
+            className="min-h-screen pb-20 md:pb-0 transition-all duration-300"
+            style={{ marginLeft: `${SIDEBAR_WIDTH}px` }}
+          >
+            <div className="p-4 md:p-8">
+              <div className="space-y-6">
+                <Skeleton className="h-10 w-64" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {[1, 2, 3].map((i) => (
+                    <Skeleton key={i} className="h-32 rounded-xl" />
+                  ))}
+                </div>
+                <Skeleton className="h-64 w-full rounded-xl" />
+              </div>
+            </div>
+          </main>
+          {/* Mobile margin fix */}
+          <style>{`
+            @media (max-width: 768px) {
+              main { margin-left: 0 !important; }
+            }
+          `}</style>
+        </div>
+      );
+    }
 
     return (
       <div
@@ -74,41 +208,131 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
             SIDEBAR - Fixed Position, Left Side
         ============================================ */}
         <aside
-          className="fixed left-0 top-0 z-40 h-screen border-r border-border bg-sidebar hidden md:flex md:flex-col"
-          style={{ width: `${SIDEBAR_WIDTH}px` }}
+          className={cn(
+            "fixed left-0 top-0 z-40 h-screen border-r border-border bg-sidebar hidden md:flex md:flex-col transition-all duration-300"
+          )}
+          style={{ width: `${sidebarWidth}px` }}
         >
           {/* Logo Header */}
-          <div className="h-16 flex items-center px-6 border-b border-sidebar-border shrink-0">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground">
+          <div className="h-16 flex items-center justify-between px-4 border-b border-sidebar-border shrink-0">
+            <Link to="/" className={cn("flex items-center gap-3", isCollapsed && "justify-center")}>
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground shrink-0">
                 <Layers className="h-4 w-4" />
               </div>
-              <span className="font-bold text-lg text-foreground">
-                Learn<span className="text-primary">Ink</span>
-              </span>
+              {!isCollapsed && (
+                <span className="font-bold text-lg text-foreground">
+                  Learn<span className="text-primary">Ink</span>
+                </span>
+              )}
             </Link>
+            {!isCollapsed && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-muted-foreground hover:text-foreground"
+                onClick={() => setIsCollapsed(true)}
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+            )}
           </div>
 
-          {/* Navigation - Simplified */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
+          {/* Expand button when collapsed */}
+          {isCollapsed && (
+            <div className="px-2 py-3 border-b border-sidebar-border">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-full h-8 text-muted-foreground hover:text-foreground"
+                onClick={() => setIsCollapsed(false)}
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+
+          {/* Role-Based Navigation */}
+          <nav className="flex-1 overflow-y-auto p-2 space-y-1">
+            {/* Role Badge */}
+            {!isCollapsed && (
+              <div className="px-2 py-3">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "text-[10px] font-bold uppercase tracking-wider w-full justify-center",
+                    roleBadgeColors[currentRole]
+                  )}
+                >
+                  {roleLabels[currentRole]} Dashboard
+                </Badge>
+              </div>
+            )}
+
+            {/* Main Navigation Items */}
             {navItems.map((item) => {
               const isActive = location.pathname === item.href;
+              const IconComponent = item.icon;
 
               return (
                 <Link
                   key={item.href}
                   to={item.href}
+                  title={isCollapsed ? item.label : undefined}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all relative",
                     isActive
                       ? "bg-primary/10 text-primary"
-                      : "text-sidebar-foreground hover:bg-muted hover:text-foreground"
+                      : "text-sidebar-foreground hover:bg-muted hover:text-foreground",
+                    isCollapsed && "justify-center px-0"
                   )}
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
-                  <span className="flex-1">{item.label}</span>
-                  {isActive && (
-                    <ChevronRight className="h-4 w-4 text-primary/50" />
+                  <IconComponent className="h-4 w-4 shrink-0" />
+                  {!isCollapsed && (
+                    <>
+                      <span className="flex-1">{item.label}</span>
+                      {item.badge && (
+                        <Badge variant="secondary" className="text-[10px] px-1.5">
+                          {item.badge}
+                        </Badge>
+                      )}
+                      {isActive && (
+                        <ChevronRight className="h-4 w-4 text-primary/50" />
+                      )}
+                    </>
+                  )}
+                </Link>
+              );
+            })}
+
+            {/* Separator */}
+            <div className="my-4 border-t border-sidebar-border" />
+
+            {/* Common Navigation Items */}
+            {COMMON_NAV_ITEMS.map((item) => {
+              const isActive = location.pathname === item.href;
+              const IconComponent = item.icon;
+
+              return (
+                <Link
+                  key={item.href}
+                  to={item.href}
+                  title={isCollapsed ? item.label : undefined}
+                  className={cn(
+                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all relative",
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-sidebar-foreground hover:bg-muted hover:text-foreground",
+                    isCollapsed && "justify-center px-0"
+                  )}
+                >
+                  <IconComponent className="h-4 w-4 shrink-0" />
+                  {!isCollapsed && (
+                    <>
+                      <span className="flex-1">{item.label}</span>
+                      {isActive && (
+                        <ChevronRight className="h-4 w-4 text-primary/50" />
+                      )}
+                    </>
                   )}
                 </Link>
               );
@@ -117,40 +341,65 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
 
           {/* User Info Footer */}
           <div className="border-t border-sidebar-border p-4 shrink-0">
-            <div className="flex items-center gap-3 mb-4">
-              <Avatar className="h-10 w-10">
-                <AvatarImage
-                  src={profile?.avatar_url || undefined}
-                  alt={displayName}
-                />
-                <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
-                  {userInitials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">
-                  {displayName}
-                </p>
-                <Badge
-                  variant="outline"
-                  className={cn(
-                    "text-[10px] font-bold",
-                    role ? roleBadgeColors[role] : ""
-                  )}
+            {!isCollapsed ? (
+              <>
+                <div className="flex items-center gap-3 mb-4">
+                  <Avatar className="h-10 w-10">
+                    <AvatarImage
+                      src={profile?.avatar_url || undefined}
+                      alt={displayName}
+                    />
+                    <AvatarFallback className="bg-primary/10 text-primary text-sm font-bold">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-foreground truncate">
+                      {displayName}
+                    </p>
+                    <Badge
+                      variant="outline"
+                      className={cn(
+                        "text-[10px] font-bold",
+                        roleBadgeColors[currentRole]
+                      )}
+                    >
+                      {roleLabels[currentRole]}
+                    </Badge>
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                 >
-                  {role ? roleLabels[role] : "Loading..."}
-                </Badge>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Keluar
+                </Button>
+              </>
+            ) : (
+              <div className="flex flex-col items-center gap-3">
+                <Avatar className="h-9 w-9">
+                  <AvatarImage
+                    src={profile?.avatar_url || undefined}
+                    alt={displayName}
+                  />
+                  <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                    {userInitials}
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleSignOut}
+                  title="Keluar"
+                  className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
               </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleSignOut}
-              className="w-full justify-start text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Keluar
-            </Button>
+            )}
           </div>
         </aside>
 
@@ -158,8 +407,8 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
             MAIN CONTENT AREA
         ============================================ */}
         <main
-          className="min-h-screen pb-20 md:pb-0"
-          style={{ marginLeft: `${SIDEBAR_WIDTH}px` }}
+          className="min-h-screen pb-20 md:pb-0 transition-all duration-300"
+          style={{ marginLeft: `${sidebarWidth}px` }}
         >
           {/* Mobile Header */}
           <div className="md:hidden sticky top-0 z-30 flex items-center justify-between h-14 px-4 border-b border-border bg-card/95 backdrop-blur-sm">
@@ -169,6 +418,12 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
               </span>
             </Link>
             <div className="flex items-center gap-2">
+              <Badge
+                variant="outline"
+                className={cn("text-[10px]", roleBadgeColors[currentRole])}
+              >
+                {roleLabels[currentRole]}
+              </Badge>
               <Link to="/dashboard/profile" className="p-2">
                 <Avatar className="h-7 w-7">
                   <AvatarImage
@@ -187,7 +442,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
           <div className="p-4 md:p-8">{children}</div>
         </main>
 
-        {/* Mobile Reset - No sidebar on small screens */}
+        {/* Mobile Reset */}
         <style>{`
           @media (max-width: 768px) {
             main {
@@ -196,11 +451,14 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
           }
         `}</style>
 
-        {/* Mobile Bottom Nav - Simplified */}
+        {/* Mobile Bottom Nav - Role-Specific (max 5 items) */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm">
           <div className="flex items-center justify-around h-16">
-            {navItems.map((item) => {
+            {/* Show first 4 role-specific items + Profile */}
+            {[...navItems.slice(0, 4), COMMON_NAV_ITEMS[0]].map((item) => {
               const isActive = location.pathname === item.href;
+              const IconComponent = item.icon;
+
               return (
                 <Link
                   key={item.href}
@@ -212,8 +470,8 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
                       : "text-muted-foreground"
                   )}
                 >
-                  <item.icon className="h-5 w-5 mb-1" />
-                  <span>{item.label}</span>
+                  <IconComponent className="h-5 w-5 mb-1" />
+                  <span className="truncate max-w-[60px]">{item.label}</span>
                 </Link>
               );
             })}

@@ -8,12 +8,12 @@ import { useAllRequests, useUpdateRequest, RequestStatus } from "@/hooks/useMate
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useGenerateModule } from "@/hooks/useGenerateModule";
 import { AppRole } from "@/contexts/AuthContext";
-import { 
-  Users, 
-  BookOpen, 
-  FileQuestion, 
-  Shield, 
-  GraduationCap, 
+import {
+  Users,
+  BookOpen,
+  FileQuestion,
+  Shield,
+  GraduationCap,
   UserCircle,
   Search,
   Sparkles,
@@ -83,7 +83,7 @@ const statusColors: Record<RequestStatus, string> = {
   rejected: 'bg-destructive/10 text-destructive',
 };
 
-export function AdminDashboard() {
+export function AdminDashboardContent() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all');
@@ -109,7 +109,7 @@ export function AdminDashboard() {
   const updateRequest = useUpdateRequest();
   const generateModule = useGenerateModule();
 
-  const filteredUsers = users?.filter(u => 
+  const filteredUsers = users?.filter(u =>
     u.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -122,9 +122,9 @@ export function AdminDashboard() {
   };
 
   const confirmRoleChange = () => {
-    updateUserRole.mutate({ 
-      userId: roleChangeDialog.userId, 
-      newRole: roleChangeDialog.newRole 
+    updateUserRole.mutate({
+      userId: roleChangeDialog.userId,
+      newRole: roleChangeDialog.newRole
     });
     setRoleChangeDialog({ open: false, userId: '', newRole: 'user', userName: '' });
   };
@@ -143,7 +143,7 @@ export function AdminDashboard() {
   };
 
   return (
-    <DashboardLayout>
+    <>
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-foreground mb-1">
@@ -250,7 +250,7 @@ export function AdminDashboard() {
                   filteredUsers.map((userItem) => {
                     const RoleIcon = roleIcons[userItem.role];
                     const isSelf = userItem.id === user?.id;
-                    
+
                     return (
                       <TableRow key={userItem.id}>
                         <TableCell>
@@ -278,7 +278,7 @@ export function AdminDashboard() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-muted-foreground">
-                          {userItem.created_at 
+                          {userItem.created_at
                             ? new Date(userItem.created_at).toLocaleDateString('id-ID')
                             : '-'}
                         </TableCell>
@@ -286,7 +286,7 @@ export function AdminDashboard() {
                           {!isSelf && (
                             <Select
                               value={userItem.role}
-                              onValueChange={(value) => 
+                              onValueChange={(value) =>
                                 handleRoleChange(userItem.id, value as AppRole, userItem.display_name || 'Pengguna')
                               }
                             >
@@ -370,7 +370,7 @@ export function AdminDashboard() {
                       </TableCell>
                       <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
                       <TableCell>
-                        {request.created_at 
+                        {request.created_at
                           ? new Date(request.created_at).toLocaleDateString('id-ID')
                           : '-'}
                       </TableCell>
@@ -463,8 +463,8 @@ export function AdminDashboard() {
       </Tabs>
 
       {/* Role Change Confirmation Dialog */}
-      <AlertDialog 
-        open={roleChangeDialog.open} 
+      <AlertDialog
+        open={roleChangeDialog.open}
         onOpenChange={(open) => setRoleChangeDialog(prev => ({ ...prev, open }))}
       >
         <AlertDialogContent>
@@ -490,8 +490,8 @@ export function AdminDashboard() {
       </AlertDialog>
 
       {/* Generate Confirmation Dialog */}
-      <AlertDialog 
-        open={generateDialog.open} 
+      <AlertDialog
+        open={generateDialog.open}
         onOpenChange={(open) => setGenerateDialog(prev => ({ ...prev, open }))}
       >
         <AlertDialogContent>
@@ -501,7 +501,7 @@ export function AdminDashboard() {
               Generate Modul dengan AI
             </AlertDialogTitle>
             <AlertDialogDescription>
-              AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}". 
+              AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}".
               Proses ini mungkin membutuhkan waktu beberapa detik.
             </AlertDialogDescription>
           </AlertDialogHeader>
@@ -514,6 +514,18 @@ export function AdminDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </>
+  );
+}
+
+// ============================================
+// MAIN COMPONENT (Backward Compatible)
+// ============================================
+
+export function AdminDashboard() {
+  return (
+    <DashboardLayout>
+      <AdminDashboardContent />
     </DashboardLayout>
   );
 }

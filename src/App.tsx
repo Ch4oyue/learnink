@@ -8,19 +8,28 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-// Lazy load page components - ESSENTIAL ONLY
+// ============================================
+// LAZY LOADED PAGES
+// ============================================
+
+// Public Pages
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-const ModuleLearn = lazy(() => import("./pages/ModuleLearn"));
+
+// Dashboard Pages
+const DashboardHome = lazy(() => import("./pages/DashboardHome"));
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 
-// Dashboard with layout
-const UserDashboard = lazy(() =>
-  import("@/components/dashboard/UserDashboard").then((m) => ({
-    default: m.UserDashboard,
-  }))
-);
+// Learning Pages
+const ModuleLearn = lazy(() => import("./pages/ModuleLearn"));
+
+// Admin Pages
+const ManageSources = lazy(() => import("./pages/admin/ManageSources"));
+
+// ============================================
+// QUERY CLIENT CONFIG
+// ============================================
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -33,14 +42,23 @@ const queryClient = new QueryClient({
   },
 });
 
-// Minimal loading fallback
+// ============================================
+// LOADING FALLBACK
+// ============================================
+
 const PageLoader = () => (
-  <div className="min-h-screen flex items-center justify-center">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  <div className="min-h-screen flex items-center justify-center bg-background">
+    <div className="flex flex-col items-center gap-3">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <span className="text-sm text-muted-foreground">Loading...</span>
+    </div>
   </div>
 );
 
-// Smart landing that redirects to dashboard if user is logged in
+// ============================================
+// SMART LANDING (Redirect logged-in users)
+// ============================================
+
 const SmartLanding = () => {
   const { session, loading } = useAuth();
 
@@ -56,6 +74,10 @@ const SmartLanding = () => {
   return <LandingPage />;
 };
 
+// ============================================
+// APP COMPONENT
+// ============================================
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
@@ -67,26 +89,22 @@ const App = () => (
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* ============================
-                    ESSENTIAL ROUTES ONLY
+                    PUBLIC ROUTES
                     ============================ */}
-
-                {/* Landing Page - Smart redirect if logged in */}
                 <Route path="/" element={<SmartLanding />} />
-
-                {/* Auth (Login/Register) */}
                 <Route path="/auth" element={<Auth />} />
 
-                {/* Dashboard - User Home */}
+                {/* ============================
+                    DASHBOARD ROUTES
+                    ============================ */}
                 <Route
                   path="/dashboard"
                   element={
                     <ProtectedRoute>
-                      <UserDashboard />
+                      <DashboardHome />
                     </ProtectedRoute>
                   }
                 />
-
-                {/* Dashboard Profile */}
                 <Route
                   path="/dashboard/profile"
                   element={
@@ -96,7 +114,21 @@ const App = () => (
                   }
                 />
 
-                {/* Learning Interface */}
+                {/* ============================
+                    ADMIN ROUTES
+                    ============================ */}
+                <Route
+                  path="/dashboard/admin/sources"
+                  element={
+                    <ProtectedRoute>
+                      <ManageSources />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* ============================
+                    LEARNING ROUTES
+                    ============================ */}
                 <Route
                   path="/learn/:moduleId"
                   element={
@@ -106,7 +138,9 @@ const App = () => (
                   }
                 />
 
-                {/* 404 Fallback */}
+                {/* ============================
+                    404 FALLBACK
+                    ============================ */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>

@@ -152,10 +152,10 @@ function DailyGoalCard({ progress = 0 }: { progress?: number }) {
 }
 
 // ============================================
-// MAIN COMPONENT
+// DASHBOARD CONTENT (for use in DashboardHome)
 // ============================================
 
-export function UserDashboard() {
+export function UserDashboardContent() {
   const navigate = useNavigate();
   const { user, profile } = useAuth();
   const { averageProgress } = useProgressStats(user?.id);
@@ -190,7 +190,7 @@ export function UserDashboard() {
   const isLoading = modulesLoading || progressLoading;
 
   return (
-    <DashboardLayout>
+    <>
       {/* Header Section */}
       <header className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
@@ -297,6 +297,18 @@ export function UserDashboard() {
           <DailyGoalCard progress={averageProgress || 0} />
         </div>
       </div>
+    </>
+  );
+}
+
+// ============================================
+// MAIN COMPONENT (Backward Compatible)
+// ============================================
+
+export function UserDashboard() {
+  return (
+    <DashboardLayout>
+      <UserDashboardContent />
     </DashboardLayout>
   );
 }

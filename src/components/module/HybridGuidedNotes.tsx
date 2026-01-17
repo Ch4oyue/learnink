@@ -62,14 +62,14 @@ export function HybridGuidedNotes({
     };
 
     return (
-        <aside className="w-[360px] bg-[#111316] border-l border-zinc-800 flex flex-col shrink-0 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.1)]">
+        <aside className="w-[360px] bg-sidebar border-l border-border flex flex-col shrink-0 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.1)]">
             {/* Notes Header - Sticky with backdrop blur */}
-            <div className="px-6 py-5 border-b border-zinc-800 flex justify-between items-center bg-[#111316]/90 backdrop-blur sticky top-0 z-10">
+            <div className="px-6 py-5 border-b border-border flex justify-between items-center bg-sidebar/90 backdrop-blur sticky top-0 z-10">
                 <div className="flex items-center gap-3">
-                    <div className="p-1.5 bg-white/10 rounded-md shadow-sm">
-                        <FileText className="h-5 w-5 text-purple-400" />
+                    <div className="p-1.5 bg-primary/10 rounded-md shadow-sm">
+                        <FileText className="h-5 w-5 text-primary" />
                     </div>
-                    <h2 className="font-bold text-white text-lg tracking-tight">
+                    <h2 className="font-bold text-foreground text-lg tracking-tight">
                         Guided Notes
                     </h2>
                 </div>
@@ -77,7 +77,7 @@ export function HybridGuidedNotes({
                     variant="outline"
                     size="sm"
                     onClick={onExportPdf}
-                    className="text-[11px] font-bold text-purple-400 bg-transparent px-3 py-1.5 rounded-full border-purple-500/30 hover:bg-purple-500 hover:text-white hover:border-purple-500 transition-all"
+                    className="text-[11px] font-bold text-primary px-3 py-1.5 rounded-full border-primary/30 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
                 >
                     Export PDF
                 </Button>
@@ -88,12 +88,12 @@ export function HybridGuidedNotes({
                 <div className="flex flex-col gap-5">
                     {isLoading ? (
                         <div className="flex items-center justify-center py-8">
-                            <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
+                            <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
                         </div>
                     ) : notes.length === 0 ? (
                         <div className="text-center py-8">
-                            <p className="text-sm text-zinc-500">Belum ada catatan</p>
-                            <p className="text-xs text-zinc-600 mt-1">
+                            <p className="text-sm text-muted-foreground">Belum ada catatan</p>
+                            <p className="text-xs text-muted-foreground/60 mt-1">
                                 Pilih teks atau tulis catatan di bawah
                             </p>
                         </div>
@@ -111,9 +111,9 @@ export function HybridGuidedNotes({
             </ScrollArea>
 
             {/* Notion-like Input Area - Sticky at bottom */}
-            <div className="p-6 bg-[#111316] border-t border-zinc-800 sticky bottom-0">
+            <div className="p-6 bg-sidebar border-t border-border sticky bottom-0">
                 <div className="relative group">
-                    <div className="absolute left-4 top-3.5 text-zinc-500 group-focus-within:text-purple-400 transition-colors">
+                    <div className="absolute left-4 top-3.5 text-muted-foreground group-focus-within:text-primary transition-colors">
                         <Plus className="h-5 w-5" />
                     </div>
                     <Textarea
@@ -121,7 +121,7 @@ export function HybridGuidedNotes({
                         onChange={(e) => setNewNoteText(e.target.value)}
                         onKeyDown={handleKeyDown}
                         placeholder="Type '/' for commands"
-                        className="w-full bg-zinc-900 border-none shadow-subtle rounded-xl py-3.5 pl-12 pr-12 text-sm text-white placeholder:text-zinc-500 focus-visible:ring-2 focus-visible:ring-purple-500/20 resize-none min-h-[56px]"
+                        className="w-full bg-muted border-none shadow-subtle rounded-xl py-3.5 pl-12 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/20 resize-none min-h-[56px]"
                     />
                     {/* Submit Button */}
                     <Button
@@ -129,7 +129,7 @@ export function HybridGuidedNotes({
                         onClick={handleSubmit}
                         disabled={!newNoteText.trim() || isCreating}
                         className={cn(
-                            "absolute right-2 top-2 h-8 w-8 rounded-lg shadow-md transition-all bg-purple-600 hover:bg-purple-500",
+                            "absolute right-2 top-2 h-8 w-8 rounded-lg shadow-md transition-all",
                             newNoteText.trim()
                                 ? "opacity-100 scale-100"
                                 : "opacity-0 scale-90"
@@ -144,10 +144,10 @@ export function HybridGuidedNotes({
                 </div>
                 <div className="flex justify-between items-center mt-3 px-1">
                     <div className="flex gap-3">
-                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider hover:text-zinc-300 cursor-pointer">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
                             Markdown
                         </span>
-                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider hover:text-zinc-300 cursor-pointer">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
                             Shortcuts
                         </span>
                     </div>
@@ -175,10 +175,10 @@ function NoteCard({ note, onDelete, isDeleting }: NoteCardProps) {
     return (
         <div
             className={cn(
-                "bg-zinc-900 p-5 rounded-2xl border group transition-all duration-300 hover:shadow-md",
+                "bg-card p-5 rounded-2xl border group transition-all duration-300 hover:shadow-md",
                 isHighlightedNote
-                    ? "border-transparent hover:border-purple-500/20"
-                    : "border-dashed border-zinc-700 hover:border-purple-500/50"
+                    ? "border-transparent hover:border-primary/20"
+                    : "border-dashed border-border hover:border-primary/50"
             )}
         >
             {/* Header with badge and delete button */}
@@ -188,14 +188,14 @@ function NoteCard({ note, onDelete, isDeleting }: NoteCardProps) {
                         SAVED <Check className="h-3 w-3" />
                     </span>
                 ) : (
-                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                         NOTE
                     </span>
                 )}
                 <button
                     onClick={() => onDelete?.(note.id)}
                     disabled={isDeleting}
-                    className="opacity-0 group-hover:opacity-100 text-zinc-500 hover:text-red-400 transition-colors"
+                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-colors"
                 >
                     {isDeleting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -207,16 +207,16 @@ function NoteCard({ note, onDelete, isDeleting }: NoteCardProps) {
 
             {/* Highlighted text (if from selection) */}
             {note.highlighted_text && (
-                <div className="bg-black/30 rounded-lg p-3 font-mono text-[11px] text-zinc-300 border border-zinc-700/50 leading-relaxed mb-3">
+                <div className="bg-muted/50 rounded-lg p-3 font-mono text-[11px] text-muted-foreground border border-border leading-relaxed mb-3">
                     "{note.highlighted_text}"
                 </div>
             )}
 
             {/* Note content */}
-            <p className="text-sm text-zinc-300 leading-relaxed">{note.content}</p>
+            <p className="text-sm text-foreground leading-relaxed">{note.content}</p>
 
             {/* Timestamp */}
-            <div className="mt-3 text-[10px] text-zinc-600">
+            <div className="mt-3 text-[10px] text-muted-foreground/60">
                 {format(new Date(note.created_at), "dd MMM yyyy, HH:mm", {
                     locale: localeId,
                 })}
@@ -225,7 +225,7 @@ function NoteCard({ note, onDelete, isDeleting }: NoteCardProps) {
             {/* Edit indicator for user notes */}
             {!isHighlightedNote && (
                 <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Edit3 className="h-4 w-4 text-zinc-500" />
+                    <Edit3 className="h-4 w-4 text-muted-foreground" />
                 </div>
             )}
         </div>

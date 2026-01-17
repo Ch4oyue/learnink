@@ -33,28 +33,13 @@ export default function ComingSoon({
                     </p>
                 </div>
 
-                {/* CTA */}
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <Button asChild variant="default">
-                        <Link to="/">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Kembali ke Beranda
-                        </Link>
-                    </Button>
-                    <Button asChild variant="outline">
-                        <Link to="/modules">
-                            Lihat Modul
-                        </Link>
-                    </Button>
-                </div>
-
-                {/* Progress indicator */}
-                <div className="pt-4">
-                    <div className="h-2 bg-muted rounded-full overflow-hidden max-w-xs mx-auto">
-                        <div className="h-full bg-primary rounded-full animate-pulse" style={{ width: '60%' }} />
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-2">Pengembangan 60% selesai</p>
-                </div>
+                {/* Single CTA Button */}
+                <Button asChild variant="default">
+                    <Link to="/dashboard">
+                        <ArrowLeft className="h-4 w-4 mr-2" />
+                        Kembali ke Dashboard
+                    </Link>
+                </Button>
             </div>
         </div>
     );

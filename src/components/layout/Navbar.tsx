@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Menu, X, LogOut, User, LayoutDashboard, ChevronDown } from "lucide-react";
+import { Menu, X, LogOut, User, LayoutDashboard, ChevronDown, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 
 const navLinks = [
   { href: "#home", label: "Home" },
@@ -24,6 +25,7 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, signOut, loading } = useAuth();
+  const { theme, setTheme, resolvedTheme } = useTheme();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,6 +60,10 @@ export function Navbar() {
     if (isRoute) {
       navigate(href);
     }
+  };
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === "dark" ? "light" : "dark");
   };
 
   return (
@@ -102,8 +108,22 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop Auth Buttons + Theme Toggle */}
           <div className="hidden lg:flex lg:items-center lg:gap-3">
+            {/* Theme Toggle */}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Toggle theme"
+            >
+              {resolvedTheme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
             {loading ? (
               <div className="h-9 w-20 bg-muted animate-pulse rounded-md" />
             ) : user ? (
@@ -213,6 +233,18 @@ export function Navbar() {
               )
             ))}
             <div className="flex flex-col gap-3 pt-4 mt-2 border-t border-border">
+              {/* Theme Toggle - Mobile */}
+              <Button
+                variant="ghost"
+                onClick={toggleTheme}
+                className="justify-start gap-2 text-muted-foreground"
+              >
+                {resolvedTheme === "dark" ? (
+                  <><Sun className="h-4 w-4" /> Light Mode</>
+                ) : (
+                  <><Moon className="h-4 w-4" /> Dark Mode</>
+                )}
+              </Button>
               {loading ? (
                 <div className="h-10 w-full bg-muted animate-pulse rounded-md" />
               ) : user ? (

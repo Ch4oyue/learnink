@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
@@ -16,10 +17,13 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const Changelog = lazy(() => import("./pages/Changelog"));
 
 // Dashboard Pages
 const DashboardHome = lazy(() => import("./pages/DashboardHome"));
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
+const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
+const ComingSoon = lazy(() => import("./pages/ComingSoon"));
 
 // Learning Pages
 const ModuleLearn = lazy(() => import("./pages/ModuleLearn"));
@@ -80,74 +84,135 @@ const SmartLanding = () => {
 
 const App = () => (
   <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Suspense fallback={<PageLoader />}>
-              <Routes>
-                {/* ============================
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <AuthProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  {/* ============================
                     PUBLIC ROUTES
                     ============================ */}
-                <Route path="/" element={<SmartLanding />} />
-                <Route path="/auth" element={<Auth />} />
+                  <Route path="/" element={<SmartLanding />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/changelog" element={<Changelog />} />
 
-                {/* ============================
+                  {/* ============================
                     DASHBOARD ROUTES
                     ============================ */}
-                <Route
-                  path="/dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <DashboardHome />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/dashboard/profile"
-                  element={
-                    <ProtectedRoute>
-                      <DashboardProfile />
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path="/dashboard"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardHome />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/profile"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardProfile />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/settings"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardSettings />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* ============================
+                  {/* Coming Soon Routes - Pages under development */}
+                  <Route
+                    path="/dashboard/analytics"
+                    element={
+                      <ProtectedRoute>
+                        <ComingSoon title="Analytics" description="Fitur analytics untuk melihat statistik pembelajaran Anda secara detail sedang dalam pengembangan." />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/achievements"
+                    element={
+                      <ProtectedRoute>
+                        <ComingSoon title="Achievements" description="Fitur achievements untuk melihat semua pencapaian belajar Anda sedang dalam pengembangan." />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/approval"
+                    element={
+                      <ProtectedRoute>
+                        <ComingSoon title="Content Approval" description="Fitur persetujuan konten untuk admin sedang dalam pengembangan." />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/courses"
+                    element={
+                      <ProtectedRoute>
+                        <ComingSoon title="My Courses" description="Fitur daftar kursus yang sedang Anda pelajari akan segera tersedia." />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/users"
+                    element={
+                      <ProtectedRoute>
+                        <ComingSoon title="Manajemen Pengguna" description="Fitur untuk mengelola pengguna, mengubah role, dan mengelola akun sedang dalam pengembangan." />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/requests"
+                    element={
+                      <ProtectedRoute>
+                        <ComingSoon title="Request Materi" description="Fitur untuk melihat dan mengelola permintaan materi dari pengguna sedang dalam pengembangan." />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* ============================
                     ADMIN ROUTES
                     ============================ */}
-                <Route
-                  path="/dashboard/admin/sources"
-                  element={
-                    <ProtectedRoute>
-                      <ManageSources />
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path="/dashboard/admin/sources"
+                    element={
+                      <ProtectedRoute>
+                        <ManageSources />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* ============================
+                  {/* ============================
                     LEARNING ROUTES
                     ============================ */}
-                <Route
-                  path="/learn/:moduleId"
-                  element={
-                    <ProtectedRoute>
-                      <ModuleLearn />
-                    </ProtectedRoute>
-                  }
-                />
+                  <Route
+                    path="/learn/:moduleId"
+                    element={
+                      <ProtectedRoute>
+                        <ModuleLearn />
+                      </ProtectedRoute>
+                    }
+                  />
 
-                {/* ============================
+                  {/* ============================
                     404 FALLBACK
                     ============================ */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </BrowserRouter>
-        </AuthProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </BrowserRouter>
+          </AuthProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   </ErrorBoundary>
 );
 

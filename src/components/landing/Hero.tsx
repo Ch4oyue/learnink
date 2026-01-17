@@ -18,19 +18,19 @@ export function Hero() {
     ];
 
     return (
-        <section className="pt-28 pb-20 sm:pt-32 sm:pb-28 overflow-hidden">
+        <section className="pt-28 pb-20 sm:pt-32 sm:pb-28 overflow-hidden bg-background">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
                 {/* Version Badge */}
                 <Badge
                     variant="outline"
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/40 border-blue-200 dark:border-blue-800/60 text-blue-600 dark:text-blue-300 text-xs font-medium mb-10 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border-primary/30 text-primary text-xs font-medium mb-10 backdrop-blur-sm"
                 >
-                    <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                     V2.0 IS LIVE
                 </Badge>
 
                 {/* Main Heading */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-zinc-100 dark:text-zinc-200 mb-8 leading-[1.1]">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.1]">
                     Master Tech Skills,
                     <br className="hidden sm:block" />
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-500 to-cyan-400">
@@ -39,9 +39,9 @@ export function Hero() {
                 </h1>
 
                 {/* Subtitle */}
-                <p className="max-w-2xl mx-auto text-lg sm:text-xl text-zinc-500 dark:text-zinc-400 mb-12 leading-relaxed">
+                <p className="max-w-2xl mx-auto text-lg sm:text-xl text-muted-foreground mb-12 leading-relaxed">
                     Stop watching endless tutorials. Build real projects with auto-generated{" "}
-                    <strong className="text-zinc-200 dark:text-zinc-200 font-semibold">Guided Notes</strong>{" "}
+                    <strong className="text-foreground font-semibold">Guided Notes</strong>{" "}
                     that track your progress for you.
                 </p>
 
@@ -77,8 +77,8 @@ export function Hero() {
                             key={option.key}
                             onClick={() => setSelectedLanguage(option.key)}
                             className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedLanguage === option.key
-                                    ? "bg-primary text-white shadow-lg shadow-primary/30"
-                                    : "bg-zinc-800/60 text-zinc-400 hover:bg-zinc-700/60 hover:text-zinc-200"
+                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
+                                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
                                 }`}
                         >
                             <span className="mr-1.5">{option.icon}</span>
@@ -97,7 +97,7 @@ export function Hero() {
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
                     {/* Glow Effect */}
-                    <div className="absolute -inset-8 bg-gradient-to-r from-blue-500/30 via-purple-500/20 to-cyan-400/30 rounded-3xl blur-3xl opacity-40 dark:opacity-20 pointer-events-none" />
+                    <div className="absolute -inset-8 bg-gradient-to-r from-primary/20 via-purple-500/15 to-cyan-400/20 rounded-3xl blur-3xl opacity-60 dark:opacity-30 pointer-events-none" />
 
                     {/* Interactive Code Block */}
                     <InteractiveCodeBlock
@@ -109,7 +109,7 @@ export function Hero() {
 
                 {/* Feature highlights below code block */}
                 <motion.div
-                    className="flex flex-wrap items-center justify-center gap-6 mt-12 text-sm text-zinc-500"
+                    className="flex flex-wrap items-center justify-center gap-6 mt-12 text-sm text-muted-foreground"
                     initial={{ opacity: 0, y: 20 }}
                     animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.6, delay: 0.4 }}

@@ -1,6 +1,5 @@
 import { useLearningSourcesMarquee, LearningSource } from "@/hooks/useLearningSourcesMarquee";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { motion } from "framer-motion";
 
 // Fallback data when Supabase data is not available
 const FALLBACK_SOURCES: LearningSource[] = [
@@ -26,29 +25,28 @@ function MarqueeItem({ source }: MarqueeItemProps) {
                     href={source.website_url || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 px-6 py-3 mx-2 rounded-xl bg-zinc-900/40 border border-zinc-800/40 
-                               hover:bg-zinc-800/60 hover:border-zinc-700/60 transition-all duration-300 group
+                    className="flex items-center gap-3 px-6 py-3 mx-2 rounded-xl bg-muted/50 border border-border 
+                               hover:bg-muted hover:border-primary/30 transition-all duration-300 group
                                shrink-0"
                 >
                     <img
                         src={source.logo_url}
                         alt={source.name}
-                        className="w-6 h-6 object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300"
+                        className="w-6 h-6 object-contain grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-300 dark:invert-0"
                         onError={(e) => {
-                            // Fallback to first letter if image fails
                             (e.target as HTMLImageElement).style.display = 'none';
                             (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
                         }}
                     />
-                    <span className="hidden w-6 h-6 rounded bg-zinc-700 items-center justify-center text-xs font-bold text-zinc-300">
+                    <span className="hidden w-6 h-6 rounded bg-muted items-center justify-center text-xs font-bold text-muted-foreground">
                         {source.name.charAt(0)}
                     </span>
-                    <span className="text-sm font-medium text-zinc-500 group-hover:text-zinc-200 transition-colors whitespace-nowrap">
+                    <span className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors whitespace-nowrap">
                         {source.name}
                     </span>
                 </a>
             </TooltipTrigger>
-            <TooltipContent side="top" className="bg-zinc-800 border-zinc-700">
+            <TooltipContent side="top" className="bg-popover border-border">
                 <p className="text-sm">{source.description || `Learn from ${source.name}`}</p>
             </TooltipContent>
         </Tooltip>
@@ -56,55 +54,61 @@ function MarqueeItem({ source }: MarqueeItemProps) {
 }
 
 export function LearningSourcesMarquee() {
-    const { data: sources, isLoading, isError } = useLearningSourcesMarquee();
+    const { data: sources, isLoading } = useLearningSourcesMarquee();
 
     // Use fallback data if no sources from Supabase
     const displaySources = (sources && sources.length > 0) ? sources : FALLBACK_SOURCES;
 
-    // Duplicate sources for seamless infinite scroll
-    const duplicatedSources = [...displaySources, ...displaySources];
-
     return (
-        <section className="py-16 sm:py-20 bg-zinc-950 border-t border-zinc-800/40 overflow-hidden">
+        <section className="py-16 sm:py-20 bg-card border-t border-border overflow-hidden">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Section Header */}
                 <div className="text-center mb-12">
-                    <p className="text-xs font-semibold text-zinc-500 uppercase tracking-[0.2em] mb-3">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-[0.2em] mb-3">
                         Curated Learning Sources
                     </p>
-                    <h3 className="text-lg sm:text-xl font-medium text-zinc-300">
+                    <h3 className="text-lg sm:text-xl font-medium text-foreground">
                         We aggregate content from the best platforms
                     </h3>
                 </div>
 
-                {/* Infinite Marquee */}
+                {/* Infinite Marquee - Twin track for seamless ribbon effect */}
                 <div className="relative">
                     {/* Gradient fade edges */}
-                    <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-zinc-950 to-transparent z-10 pointer-events-none" />
-                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-zinc-950 to-transparent z-10 pointer-events-none" />
+                    <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-card to-transparent z-10 pointer-events-none" />
+                    <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-card to-transparent z-10 pointer-events-none" />
 
-                    {/* Marquee container */}
+                    {/* Marquee container - Three identical tracks for seamless loop */}
                     <div className="overflow-hidden">
-                        <motion.div
-                            className="flex"
-                            animate={{
-                                x: [0, -50 * displaySources.length],
-                            }}
-                            transition={{
-                                x: {
-                                    duration: 30,
-                                    repeat: Infinity,
-                                    ease: "linear",
-                                },
-                            }}
-                        >
-                            {duplicatedSources.map((source, index) => (
-                                <MarqueeItem
-                                    key={`${source.id}-${index}`}
-                                    source={source}
-                                />
-                            ))}
-                        </motion.div>
+                        <div className="flex w-fit animate-marquee-seamless">
+                            {/* Track 1 */}
+                            <div className="flex shrink-0">
+                                {displaySources.map((source, index) => (
+                                    <MarqueeItem
+                                        key={`track1-${source.id}-${index}`}
+                                        source={source}
+                                    />
+                                ))}
+                            </div>
+                            {/* Track 2 - Identical copy */}
+                            <div className="flex shrink-0">
+                                {displaySources.map((source, index) => (
+                                    <MarqueeItem
+                                        key={`track2-${source.id}-${index}`}
+                                        source={source}
+                                    />
+                                ))}
+                            </div>
+                            {/* Track 3 - Third copy for perfect seamless loop */}
+                            <div className="flex shrink-0">
+                                {displaySources.map((source, index) => (
+                                    <MarqueeItem
+                                        key={`track3-${source.id}-${index}`}
+                                        source={source}
+                                    />
+                                ))}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -113,14 +117,14 @@ export function LearningSourcesMarquee() {
                     <div className="flex justify-center mt-4">
                         <div className="animate-pulse flex gap-4">
                             {[1, 2, 3, 4].map((i) => (
-                                <div key={i} className="w-32 h-10 bg-zinc-800/50 rounded-xl" />
+                                <div key={i} className="w-32 h-10 bg-muted rounded-xl" />
                             ))}
                         </div>
                     </div>
                 )}
 
                 {/* Bottom text */}
-                <p className="text-center text-xs text-zinc-600 mt-8">
+                <p className="text-center text-xs text-muted-foreground mt-8">
                     Content is curated and organized to optimize your learning journey
                 </p>
             </div>

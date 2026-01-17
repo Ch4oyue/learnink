@@ -191,3 +191,32 @@
 .animate-slide-up {
     animation: slide-up 0.6s ease-out forwards;
 }
+
+/* ======================================
+   MARQUEE ANIMATION - Seamless infinite loop
+   Uses 3 tracks, translates 33.33% for perfect loop
+   ====================================== */
+@keyframes marquee-seamless {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-33.333%);
+    }
+}
+
+.animate-marquee-seamless {
+    animation: marquee-seamless 30s linear infinite;
+}
+
+.animate-marquee-seamless:hover {
+    animation-play-state: paused;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+    .animate-marquee-seamless {
+        animation: none;
+    }
+}

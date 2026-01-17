@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useUsers, useUserStats } from "@/hooks/useUsers";
@@ -87,6 +87,15 @@ export function AdminDashboardContent() {
   const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all');
+
+  // URL-based tab persistence
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = searchParams.get("tab") || "users";
+
+  const handleTabChange = (value: string) => {
+    setSearchParams({ tab: value });
+  };
+
   const [roleChangeDialog, setRoleChangeDialog] = useState<{
     open: boolean;
     userId: string;
@@ -204,8 +213,8 @@ export function AdminDashboardContent() {
         </div>
       </div>
 
-      {/* Tabs for Users and Requests */}
-      <Tabs defaultValue="users" className="space-y-6">
+      {/* Tabs for Users and Requests - URL Persisted */}
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList>
           <TabsTrigger value="users">Manajemen Pengguna</TabsTrigger>
           <TabsTrigger value="requests">Request Materi</TabsTrigger>

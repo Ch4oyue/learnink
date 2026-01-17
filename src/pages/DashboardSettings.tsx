@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,14 +22,19 @@ import {
   Copy,
   RefreshCw,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Sun,
+  Moon,
+  Monitor,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { IncomingNoteAlert } from "@/components/admin/IncomingNoteAlert";
 
 export default function DashboardSettings() {
   const { role } = useAuth();
+  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
+  const isAdmin = role === 'admin';
 
   // Categories
   const { data: categories, isLoading: categoriesLoading } = useModuleCategories();
@@ -50,17 +56,63 @@ export default function DashboardSettings() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  if (role !== 'admin') {
+  // Theme options
+  const themeOptions = [
+    { value: "light" as const, label: "Light", icon: Sun, description: "Light background with dark text" },
+    { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background with light text" },
+    { value: "system" as const, label: "System", icon: Monitor, description: "Follows your device settings" },
+  ];
+
+  // Non-admin users only see appearance settings
+  if (!isAdmin) {
     return (
       <DashboardLayout>
-        <div className="flex items-center justify-center py-16">
-          <div className="text-center">
-            <Settings className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Akses Terbatas</h2>
+        <div className="space-y-6 max-w-3xl mx-auto">
+          <div>
+            <h1 className="text-2xl font-semibold">Settings</h1>
             <p className="text-muted-foreground">
-              Halaman ini hanya dapat diakses oleh Administrator
+              Manage your preferences
             </p>
           </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>
+                Customize how LearnAI looks on your device
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {themeOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setTheme(option.value)}
+                    className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/50 hover:bg-muted/50"
+                      }`}
+                  >
+                    <option.icon
+                      className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
+                        }`}
+                    />
+                    <div className="text-center">
+                      <span
+                        className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
+                          }`}
+                      >
+                        {option.label}
+                      </span>
+                      <span className="text-xs text-muted-foreground mt-1 block">
+                        {option.description}
+                      </span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </DashboardLayout>
     );
@@ -138,6 +190,7 @@ export default function DashboardSettings() {
               Integrasi
             </TabsTrigger>
           </TabsList>
+
 
           {/* Categories Tab */}
           <TabsContent value="categories" className="space-y-4 mt-6">

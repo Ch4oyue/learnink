@@ -64,9 +64,9 @@ export function HybridSidebar({
     ];
 
     return (
-        <aside className="w-[72px] border-r border-zinc-800 bg-[#111316] flex flex-col items-center py-6 gap-8 shrink-0 z-20">
+        <aside className="w-[72px] border-r border-border bg-sidebar flex flex-col items-center py-6 gap-8 shrink-0 z-20">
             {/* Brand Mark - Clean Dark Style */}
-            <div className="size-8 rounded-lg bg-white flex items-center justify-center text-zinc-900 shadow-lg mb-2">
+            <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg mb-2">
                 <GraduationCap className="h-5 w-5" />
             </div>
 
@@ -80,8 +80,8 @@ export function HybridSidebar({
                                 className={cn(
                                     "w-full aspect-square flex items-center justify-center rounded-xl transition-all",
                                     item.isActive
-                                        ? "text-purple-400 bg-purple-500/10 shadow-inner"
-                                        : "text-zinc-500 hover:text-purple-400 hover:bg-white/5"
+                                        ? "text-primary bg-primary/10 shadow-inner"
+                                        : "text-muted-foreground hover:text-primary hover:bg-muted"
                                 )}
                             >
                                 {item.icon}
@@ -90,7 +90,7 @@ export function HybridSidebar({
                         <TooltipContent
                             side="right"
                             sideOffset={10}
-                            className="bg-zinc-800 text-white border-zinc-700"
+                            className="bg-card text-foreground border-border"
                         >
                             <p className="text-xs font-bold">{item.label}</p>
                         </TooltipContent>
@@ -104,7 +104,7 @@ export function HybridSidebar({
                     <TooltipTrigger asChild>
                         <button
                             onClick={() => navigate("/dashboard/settings")}
-                            className="w-full aspect-square flex items-center justify-center rounded-xl text-zinc-500 hover:text-purple-400 hover:bg-white/5 transition-all"
+                            className="w-full aspect-square flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-muted transition-all"
                         >
                             <Settings className="h-5 w-5" />
                         </button>

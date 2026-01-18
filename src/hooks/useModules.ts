@@ -70,23 +70,6 @@ export function useMyModules(userId?: string) {
   });
 }
 
-export function useModule(moduleId: string) {
-  return useQuery({
-    queryKey: ["module", moduleId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("modules")
-        .select(`*, author:profiles(id, full_name, avatar_url)`)
-        .eq("id", moduleId)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!moduleId,
-  });
-}
-
 export function useCreateModule() {
   const queryClient = useQueryClient();
   const { toast } = useToast();

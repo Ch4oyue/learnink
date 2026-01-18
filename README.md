@@ -1,73 +1,89 @@
-# Welcome to your Lovable project
+# LearnInk
 
-## Project info
+LearnInk is a modern learning management system (LMS) and educational platform designed to provide an interactive and engaging learning experience. Built with performance and developer experience in mind, it utilizes the latest web technologies.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Interactive Learning Modules:** Structured learning content with support for rich media.
+- **In-Browser Coding:** Integrated Python code execution environment using Pyodide, allowing for interactive coding exercises.
+- **Student Dashboard:** Track progress, manage enrolled courses, and view notifications.
+- **Material Requests:** System for students to request additional learning materials.
+- **Admin & Instructor Tools:** Comprehensive interfaces for managing users, requests, and creating/editing course modules.
+- **Authentication:** Secure user authentication powered by Supabase.
 
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
+## Tech Stack
 
 This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- **Runtime & Package Manager:** [Bun](https://bun.sh/)
+- **Frontend Framework:** [React](https://react.dev/) with [Vite](https://vitejs.dev/)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) and [shadcn-ui](https://ui.shadcn.com/)
+- **State Management:** [TanStack Query (React Query)](https://tanstack.com/query/latest)
+- **Backend & Database:** [Supabase](https://supabase.com/)
+- **Code Execution:** [Pyodide](https://pyodide.org/) (Python in the browser)
+- **Animations:** Framer Motion, GSAP
+- **Charts:** Recharts
 
-## How can I deploy this project?
+## Getting Started
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+### Prerequisites
 
-## Can I connect a custom domain to my Lovable project?
+- [Bun](https://bun.sh/) (v1.0.0 or higher)
+- Node.js (optional, Bun is preferred)
 
-Yes, you can!
+### Installation
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+1.  **Clone the repository:**
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+    ```sh
+    git clone <YOUR_GIT_URL>
+    cd <YOUR_PROJECT_NAME>
+    ```
+
+2.  **Install dependencies:**
+
+    ```sh
+    bun install
+    ```
+
+3.  **Environment Setup:**
+
+    Create a `.env` file in the root directory and add your Supabase configuration:
+
+    ```env
+    VITE_SUPABASE_URL=your_supabase_url
+    VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+    ```
+
+4.  **Start the development server:**
+
+    ```sh
+    bun run dev
+    ```
+
+    The application will be available at `http://localhost:5173`.
+
+## Scripts
+
+- `bun run dev`: Start the development server.
+- `bun run build`: Build the application for production.
+- `bun run lint`: Run ESLint to check for code quality issues.
+- `bun run preview`: Preview the production build locally.
+
+## Project Structure
+
+- `src/components`: Reusable UI components.
+- `src/pages`: Application views and routes (Dashboard, Modules, Admin, etc.).
+- `src/hooks`: Custom React hooks (including data fetching).
+- `src/integrations`: External service integrations (Supabase).
+- `src/lib`: Utility functions and helpers.
+- `supabase`: Supabase configuration and migrations.
+
+## Contributing
+
+1.  Fork the repository.
+2.  Create a new branch (`git checkout -b feature/amazing-feature`).
+3.  Commit your changes (`git commit -m 'Add some amazing feature'`).
+4.  Push to the branch (`git push origin feature/amazing-feature`).
+5.  Open a Pull Request.

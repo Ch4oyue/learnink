@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 export interface Quiz {
   id: string;
@@ -108,7 +109,7 @@ export function useQuizQuestionsSafe(quizId?: string) {
         .rpc("get_quiz_questions_safe", { p_quiz_id: quizId });
       
       if (error) {
-        console.error("Error fetching quiz questions:", error);
+        logger.error("Error fetching quiz questions:", error);
         throw error;
       }
       
@@ -175,7 +176,7 @@ export function useCreateQuiz() {
       toast({ title: "Sukses", description: "Kuis berhasil dibuat" });
     },
     onError: (error) => {
-      console.error("Error creating quiz:", error);
+      logger.error("Error creating quiz:", error);
       toast({
         title: "Error",
         description: "Gagal membuat kuis",
@@ -202,7 +203,7 @@ export function useCreateQuizQuestions() {
       queryClient.invalidateQueries({ queryKey: ["quiz-questions"] });
     },
     onError: (error) => {
-      console.error("Error creating questions:", error);
+      logger.error("Error creating questions:", error);
       toast({
         title: "Error",
         description: "Gagal membuat soal kuis",
@@ -239,7 +240,7 @@ export function useValidateQuizAnswers() {
       });
     },
     onError: (error) => {
-      console.error("Error validating quiz:", error);
+      logger.error("Error validating quiz:", error);
       toast({
         title: "Error",
         description: "Gagal memproses hasil kuis",
@@ -278,7 +279,7 @@ export function useSubmitQuizAttempt() {
       });
     },
     onError: (error) => {
-      console.error("Error submitting attempt:", error);
+      logger.error("Error submitting attempt:", error);
       toast({
         title: "Error",
         description: "Gagal menyimpan hasil kuis",

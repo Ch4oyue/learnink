@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Quiz, QuizQuestionSafe, QuizAttempt, QuizValidationResult, useValidateQuizAnswers } from "@/hooks/useQuiz";
 import { useAuth } from "@/contexts/AuthContext";
+import { logger } from "@/lib/logger";
 import {
   Clock,
   ChevronLeft,
@@ -90,7 +91,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
       setShowResults(true);
       onComplete(result.attempt);
     } catch (error) {
-      console.error("Error submitting quiz:", error);
+      logger.error("Error submitting quiz:", error);
     }
   };
 

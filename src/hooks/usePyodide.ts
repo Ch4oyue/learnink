@@ -1,4 +1,5 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback } from "react";
+import { pyodideManager } from "@/lib/pyodide-manager";
 
 interface UsePyodideOptions {
   onOutput?: (output: string) => void;
@@ -11,13 +12,6 @@ interface PyodideState {
   error: string | null;
 }
 
-declare global {
-  interface Window {
-    loadPyodide: (config: { indexURL: string }) => Promise<any>;
-    pyodide: any;
-  }
-}
-
 export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
   const [state, setState] = useState<PyodideState>({
     isLoading: false,
@@ -28,45 +22,29 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
   const pyodideRef = useRef<any>(null);
   const outputBuffer = useRef<string[]>([]);
 
+  const setupStreams = useCallback((pyodide: any) => {
+    pyodide.setStdout({
+      batched: (text: string) => {
+        outputBuffer.current.push(text);
+      },
+    });
+
+    pyodide.setStderr({
+      batched: (text: string) => {
+        outputBuffer.current.push(`[Error] ${text}`);
+      },
+    });
+  }, []);
+
   const loadPyodide = useCallback(async () => {
     if (pyodideRef.current || state.isLoading) return;
     
     setState({ isLoading: true, isReady: false, error: null });
     
     try {
-      // Load Pyodide script if not already loaded
-      if (!window.loadPyodide) {
-        const script = document.createElement("script");
-        script.src = "https://cdn.jsdelivr.net/pyodide/v0.26.1/full/pyodide.js";
-        script.async = true;
-        
-        await new Promise<void>((resolve, reject) => {
-          script.onload = () => resolve();
-          script.onerror = () => reject(new Error("Failed to load Pyodide"));
-          document.head.appendChild(script);
-        });
-      }
-      
-      // Initialize Pyodide
-      const pyodide = await window.loadPyodide({
-        indexURL: "https://cdn.jsdelivr.net/pyodide/v0.26.1/full/",
-      });
-      
-      // Set up stdout/stderr capture
-      pyodide.setStdout({
-        batched: (text: string) => {
-          outputBuffer.current.push(text);
-        },
-      });
-      
-      pyodide.setStderr({
-        batched: (text: string) => {
-          outputBuffer.current.push(`[Error] ${text}`);
-        },
-      });
+      const pyodide = await pyodideManager.load();
       
       pyodideRef.current = pyodide;
-      window.pyodide = pyodide;
       
       setState({ isLoading: false, isReady: true, error: null });
     } catch (err: any) {
@@ -74,7 +52,7 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
       setState({ isLoading: false, isReady: false, error: errorMsg });
       onError?.(errorMsg);
     }
-  }, [state.isLoading, onError]);
+  }, [state.isLoading, onError, setupStreams]);
 
   const runCode = useCallback(async (code: string): Promise<{ output: string; error?: string }> => {
     if (!pyodideRef.current) {
@@ -85,25 +63,15 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
       return { output: "", error: "Python runtime not loaded" };
     }
     
+    // Ensure streams are directed to this hook's buffer
+    setupStreams(pyodideRef.current);
+
     outputBuffer.current = [];
     
     try {
-      // Wrap code to capture print output
-      const wrappedCode = `
-import sys
-from io import StringIO
-
-_output = StringIO()
-_old_stdout = sys.stdout
-sys.stdout = _output
-
-try:
-${code.split('\n').map(line => '    ' + line).join('\n')}
-finally:
-    sys.stdout = _old_stdout
-    
-_output.getvalue()
-`;
+      // Note: Previous implementation defined `wrappedCode` but didn't use it.
+      // We maintain the existing behavior of running `code` directly.
+      // Output is captured via setStdout (setupStreams).
       
       const result = await pyodideRef.current.runPythonAsync(code);
       const bufferedOutput = outputBuffer.current.join('\n');
@@ -121,7 +89,7 @@ _output.getvalue()
       onError?.(errorMsg);
       return { output: outputBuffer.current.join('\n'), error: errorMsg };
     }
-  }, [loadPyodide, onOutput, onError]);
+  }, [loadPyodide, onOutput, onError, setupStreams]);
 
   const reset = useCallback(() => {
     outputBuffer.current = [];

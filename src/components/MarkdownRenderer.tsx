@@ -122,7 +122,7 @@ export function MarkdownRenderer({
         if (textBefore.trim()) {
           segments.push({
             type: 'html',
-            content: parseMarkdown(textBefore),
+            content: DOMPurify.sanitize(parseMarkdown(textBefore), purifyConfig),
             key: `html-${segmentIndex++}`,
           });
         }
@@ -142,7 +142,7 @@ export function MarkdownRenderer({
       if (remaining.trim()) {
         segments.push({
           type: 'html',
-          content: parseMarkdown(remaining),
+          content: DOMPurify.sanitize(parseMarkdown(remaining), purifyConfig),
           key: `html-${segmentIndex++}`,
         });
       }
@@ -151,7 +151,7 @@ export function MarkdownRenderer({
     if (segments.length === 0) {
       segments.push({
         type: 'html',
-        content: parseMarkdown(content),
+        content: DOMPurify.sanitize(parseMarkdown(content), purifyConfig),
         key: 'html-0',
       });
     }
@@ -170,12 +170,11 @@ export function MarkdownRenderer({
           );
         }
 
-        const sanitizedHtml = DOMPurify.sanitize(segment.content, purifyConfig);
         return (
           <div
             key={segment.key}
             className="prose prose-slate dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+            dangerouslySetInnerHTML={{ __html: segment.content }}
           />
         );
       })}

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModule } from "@/hooks/useModules";
-import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
+import { useModuleProgress, useUpdateProgress } from "@/hooks/useUserProgress";
 import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "@/hooks/useLearningNotes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -112,7 +112,7 @@ export default function ModuleLearn() {
 
   // Data hooks
   const { data: module, isLoading } = useModule(moduleId ?? "");
-  const { data: userProgress, refetch: refetchProgress } = useUserProgress(user?.id);
+  const { data: progress, refetch: refetchProgress } = useModuleProgress(user?.id, moduleId);
   const updateProgress = useUpdateProgress();
 
   // Notes hooks
@@ -151,7 +151,6 @@ export default function ModuleLearn() {
   };
 
   // Derived state
-  const progress = userProgress?.find((p) => p.module_id === moduleId);
   const currentProgress = progress?.progress_percent || 0;
 
   // Extract TOC from content
@@ -203,7 +202,7 @@ export default function ModuleLearn() {
         { onSuccess: () => refetchProgress() }
       );
     }
-  }, [currentSectionIndex, tocItems.length, user, moduleId, currentProgress]);
+  }, [currentSectionIndex, tocItems.length, user, moduleId, currentProgress, updateProgress, refetchProgress]);
 
   // Navigation handlers
   const handlePrevious = () => {

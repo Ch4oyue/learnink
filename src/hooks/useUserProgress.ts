@@ -48,21 +48,12 @@ export function useUserProgress(userId?: string) {
   });
 }
 
-export function useAllProgress() {
+export function useTotalStudents() {
   return useQuery({
-    queryKey: ['all-progress'],
+    queryKey: ['total-students'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('user_progress')
-        .select(`
-          *,
-          modules (
-            id,
-            title,
-            level
-          )
-        `)
-        .order('started_at', { ascending: false });
+        .rpc('get_unique_student_count');
       
       if (error) throw error;
       return data;

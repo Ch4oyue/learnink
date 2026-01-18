@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useMyModules } from "@/hooks/useModules";
 import { useAllRequests, useUpdateRequest, RequestStatus } from "@/hooks/useMaterialRequests";
-import { useAllProgress } from "@/hooks/useUserProgress";
+import { useTotalStudents } from "@/hooks/useUserProgress";
 import { useGenerateModule } from "@/hooks/useGenerateModule";
 import { BookOpen, FileQuestion, Users, CheckCircle, Clock, Eye, Sparkles, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -63,14 +63,13 @@ export function TutorDashboardContent() {
   const { data: requests, isLoading: requestsLoading } = useAllRequests(
     statusFilter === 'all' ? undefined : statusFilter
   );
-  const { data: allProgress } = useAllProgress();
+  const { data: totalStudents = 0 } = useTotalStudents();
   const updateRequest = useUpdateRequest();
   const generateModule = useGenerateModule();
 
   const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Tutor";
 
   const pendingRequests = requests?.filter(r => r.status === 'pending').length || 0;
-  const totalStudents = new Set(allProgress?.map(p => p.user_id)).size;
 
   const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
     updateRequest.mutate({ id: requestId, status: newStatus });

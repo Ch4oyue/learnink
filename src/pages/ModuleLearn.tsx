@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useModules } from "@/hooks/useModules";
+import { useModule } from "@/hooks/useModules";
 import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
 import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "@/hooks/useLearningNotes";
 import { Button } from "@/components/ui/button";
@@ -111,7 +111,7 @@ export default function ModuleLearn() {
   const contentRef = useRef<HTMLElement>(null);
 
   // Data hooks
-  const { data: modules, isLoading: modulesLoading } = useModules(true);
+  const { data: module, isLoading: modulesLoading } = useModule(moduleId);
   const { data: userProgress, refetch: refetchProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
 
@@ -151,7 +151,6 @@ export default function ModuleLearn() {
   };
 
   // Derived state
-  const module = modules?.find((m) => m.id === moduleId);
   const progress = userProgress?.find((p) => p.module_id === moduleId);
   const currentProgress = progress?.progress_percent || 0;
 

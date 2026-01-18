@@ -13,16 +13,32 @@ export interface Module {
   created_at: string | null;
   updated_at: string | null;
   category: string | null;
-  content: string | null;
+  content?: string | null;
   generated_at: string | null;
-  source_request_id: string | null;
+  source_request_id?: string | null;
 }
 
-export function useModules(publishedOnly = false) {
+export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; minimal?: boolean } | boolean = {}) {
+  // Handle legacy boolean argument (publishedOnly)
+  const options = typeof optionsOrPublishedOnly === 'boolean'
+    ? { publishedOnly: optionsOrPublishedOnly, minimal: true }
+    : { minimal: true, ...optionsOrPublishedOnly };
+
+  const { publishedOnly = false, minimal = true } = options;
+
   return useQuery({
-    queryKey: ['modules', publishedOnly],
+    queryKey: ['modules', publishedOnly, minimal],
     queryFn: async () => {
-      let query = supabase.from('modules').select('*');
+      let query;
+
+      if (minimal) {
+        // Exclude content to reduce payload size
+        query = supabase
+          .from('modules')
+          .select('id, title, summary, level, icon_name, is_published, created_by, created_at, updated_at, category, generated_at, source_request_id');
+      } else {
+        query = supabase.from('modules').select('*');
+      }
       
       if (publishedOnly) {
         query = query.eq('is_published', true);
@@ -33,6 +49,25 @@ export function useModules(publishedOnly = false) {
       if (error) throw error;
       return data as Module[];
     },
+  });
+}
+
+export function useModule(id?: string) {
+  return useQuery({
+    queryKey: ['module', id],
+    queryFn: async () => {
+      if (!id) return null;
+
+      const { data, error } = await supabase
+        .from('modules')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return data as Module;
+    },
+    enabled: !!id,
   });
 }
 

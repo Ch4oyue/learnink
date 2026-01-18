@@ -16,6 +16,11 @@ export interface Module {
   content?: string | null;
   generated_at: string | null;
   source_request_id?: string | null;
+  author?: {
+    id: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  } | null;
 }
 
 export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; minimal?: boolean } | boolean = {}) {
@@ -46,6 +51,25 @@ export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; mi
       if (error) throw error;
       return data as Module[];
     },
+  });
+}
+
+export function useModule(id?: string) {
+  return useQuery({
+    queryKey: ['module', id],
+    queryFn: async () => {
+      if (!id) return null;
+
+      const { data, error } = await supabase
+        .from('modules')
+        .select(`*, author:profiles(id, full_name, avatar_url)`)
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+      return data as Module;
+    },
+    enabled: !!id,
   });
 }
 

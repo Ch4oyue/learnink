@@ -48,7 +48,27 @@ export function useUserProgress(userId?: string) {
   });
 }
 
-export function useTotalStudents() {
+export function useModuleProgress(userId?: string, moduleId?: string) {
+  return useQuery({
+    queryKey: ['user-progress', userId, moduleId],
+    queryFn: async () => {
+      if (!userId || !moduleId) return null;
+
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .eq('module_id', moduleId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as UserProgress | null;
+    },
+    enabled: !!userId && !!moduleId,
+  });
+}
+
+export function useAllProgress() {
   return useQuery({
     queryKey: ['total-students'],
     queryFn: async () => {

@@ -27,25 +27,22 @@ export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; mi
   const { publishedOnly = false, minimal = true } = options;
 
   return useQuery({
-    queryKey: ['modules', publishedOnly, minimal],
+    queryKey: ["modules", publishedOnly],
     queryFn: async () => {
-      let query;
+      let query = supabase
+        .from("modules")
+        .select(
+          "id, title, summary, level, category, is_published, created_at"
+        );
 
-      if (minimal) {
-        // Exclude content to reduce payload size
-        query = supabase
-          .from('modules')
-          .select('id, title, summary, level, icon_name, is_published, created_by, created_at, updated_at, category, generated_at, source_request_id');
-      } else {
-        query = supabase.from('modules').select('*');
-      }
-      
       if (publishedOnly) {
-        query = query.eq('is_published', true);
+        query = query.eq("is_published", true);
       }
-      
-      const { data, error } = await query.order('created_at', { ascending: false });
-      
+
+      const { data, error } = await query.order("created_at", {
+        ascending: false,
+      });
+
       if (error) throw error;
       return data as Module[];
     },
@@ -73,20 +70,39 @@ export function useModule(id?: string) {
 
 export function useMyModules(userId?: string) {
   return useQuery({
-    queryKey: ['my-modules', userId],
+    queryKey: ["my-modules", userId],
     queryFn: async () => {
       if (!userId) return [];
-      
+
       const { data, error } = await supabase
-        .from('modules')
-        .select('*')
-        .eq('created_by', userId)
-        .order('created_at', { ascending: false });
-      
+        .from("modules")
+        .select(
+          "id, title, summary, level, category, is_published, created_at"
+        )
+        .eq("created_by", userId)
+        .order("created_at", { ascending: false });
+
       if (error) throw error;
       return data as Module[];
     },
     enabled: !!userId,
+  });
+}
+
+export function useModule(moduleId: string) {
+  return useQuery({
+    queryKey: ["module", moduleId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("modules")
+        .select(`*, author:profiles(id, full_name, avatar_url)`)
+        .eq("id", moduleId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!moduleId,
   });
 }
 

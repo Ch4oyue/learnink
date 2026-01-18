@@ -6,7 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ModuleEdit() {
   const { id } = useParams<{ id: string }>();
-  const { data: module, isLoading } = useModule(id);
+  const { data: module, isLoading } = useModule(id ?? "");
 
   if (isLoading) {
     return (

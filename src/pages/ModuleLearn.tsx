@@ -111,7 +111,7 @@ export default function ModuleLearn() {
   const contentRef = useRef<HTMLElement>(null);
 
   // Data hooks
-  const { data: module, isLoading: modulesLoading } = useModule(moduleId);
+  const { data: module, isLoading } = useModule(moduleId ?? "");
   const { data: userProgress, refetch: refetchProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
 
@@ -268,7 +268,7 @@ export default function ModuleLearn() {
   // LOADING STATE
   // ============================================
 
-  if (modulesLoading) {
+  if (isLoading) {
     return (
       <div className="h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">

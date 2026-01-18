@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useModules } from "@/hooks/useModules";
+import { useModule } from "@/hooks/useModules";
 import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,11 +43,9 @@ export default function ModuleDetail() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const { data: modules, isLoading: modulesLoading } = useModules(true);
+  const { data: module, isLoading } = useModule(id ?? "");
   const { data: userProgress } = useUserProgress(user?.id);
   const updateProgress = useUpdateProgress();
-
-  const module = modules?.find(m => m.id === id);
   const progress = userProgress?.find(p => p.module_id === id);
   const currentProgress = progress?.progress_percent || 0;
   const isCompleted = progress?.is_completed || false;
@@ -86,7 +84,7 @@ export default function ModuleDetail() {
     navigate(`/module/${id}/learn`);
   };
 
-  if (modulesLoading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
         {/* Simple Header */}

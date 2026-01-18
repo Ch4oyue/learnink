@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from "react
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { logger } from "@/lib/logger";
 
 export type AppRole = 'user' | 'tutor' | 'admin';
 
@@ -49,14 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        logger.error('Error fetching profile:', error);
         setProfile(null);
         return;
       }
 
       setProfile(data as Profile);
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      logger.error('Error fetching profile:', error);
       setProfile(null);
     }
   };
@@ -70,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .single();
 
       if (error) {
-        console.error('Error fetching user role:', error);
+        logger.error('Error fetching user role:', error);
         // Default to 'user' if no role found
         setRole('user');
         return;
@@ -78,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setRole(data?.role as AppRole || 'user');
     } catch (error) {
-      console.error('Error fetching user role:', error);
+      logger.error('Error fetching user role:', error);
       setRole('user');
     }
   };
@@ -94,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!mounted) return;
 
         if (error) {
-          console.error('Error getting session:', error);
+          logger.error('Error getting session:', error);
           setLoading(false);
           return;
         }
@@ -113,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setLoading(false);
         }
       } catch (error) {
-        console.error('Error initializing auth:', error);
+        logger.error('Error initializing auth:', error);
         if (mounted) {
           setLoading(false);
         }

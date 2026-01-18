@@ -34,6 +34,9 @@ function isLowEndDevice(): boolean {
     return false;
 }
 
+// Cache for element cursor styles to avoid layout thrashing
+const cursorStyleCache = new WeakMap<HTMLElement, string>();
+
 export function CustomCursor() {
     const [isVisible, setIsVisible] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
@@ -96,13 +99,24 @@ export function CustomCursor() {
         setIsVisible(false);
     }, []);
 
+// Cache for element cursor styles to avoid layout thrashing
+const cursorStyleCache = new WeakMap<HTMLElement, string>();
+
+// ...
+
     // Check if hovering interactive element
     const handleElementHover = useCallback((e: MouseEvent) => {
         const target = e.target as HTMLElement;
         const isInteractive = target.closest(
             'button, a, [role="button"], input, textarea, select, .clickable, [data-cursor-hover]'
         );
-        const isPointerCursor = window.getComputedStyle(target).cursor === "pointer";
+
+    let cursor = cursorStyleCache.get(target);
+    if (cursor === undefined) {
+        cursor = window.getComputedStyle(target).cursor;
+        cursorStyleCache.set(target, cursor);
+    }
+    const isPointerCursor = cursor === "pointer";
 
         setIsHovering(!!isInteractive);
         setIsPointer(isPointerCursor);

@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.3.1] - January 18, 2026
+
+### Bug Fixes & Database Improvements
+
+Critical bug fixes and database schema improvements for production stability.
+
+#### Fixes (5)
+- Fixed `useTotalStudents` missing export in `useUserProgress.ts`
+- Fixed profile fetch 400 errors by removing non-existent columns (`full_name`, `bio`, `location`)
+- Fixed admin/tutor module access - added redirect from `/module/:id` to `/learn/:id`
+- Fixed `DashboardProfile` to use `display_name` instead of non-existent profile fields
+- Added React Router v7 future flags (`v7_startTransition`, `v7_relativeSplatPath`)
+
+#### Database (3)
+- Created `learning_sources` table with correct RLS policies
+- Created `integrations` table for API key management
+- Created `incoming_contents` table for n8n webhook integration
+
+#### Infrastructure (2)
+- Added Edge Function `generate-api-key` for integration API key generation
+- Created standalone SQL migration for missing tables
+
+---
+
 ## [1.3.0] - January 17, 2026
 
 ### Total System Repair
@@ -106,7 +130,9 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.3.1 | Jan 18, 2026 | Bug Fixes & Database Schema |
 | 1.3.0 | Jan 17, 2026 | Total System Repair - Stability & Dark Mode |
 | 1.2.0 | Jan 15, 2026 | Learning Interface Redesign |
 | 1.1.0 | Jan 10, 2026 | Dashboard & Auth Implementation |
 | 1.0.0 | Dec 23, 2025 | Initial Release |
+

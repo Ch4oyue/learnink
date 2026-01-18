@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
@@ -82,6 +82,15 @@ const SmartLanding = () => {
 };
 
 // ============================================
+// MODULE REDIRECT (Legacy /module/:id -> /learn/:id)
+// ============================================
+
+const ModuleRedirect = () => {
+  const { moduleId } = useParams();
+  return <Navigate to={`/learn/${moduleId}`} replace />;
+};
+
+// ============================================
 // APP COMPONENT
 // ============================================
 
@@ -94,7 +103,7 @@ const App = () => (
           <AuthProvider>
             <Toaster />
             <Sonner />
-            <BrowserRouter>
+            <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <Suspense fallback={<PageLoader />}>
                 <Routes>
                   {/* ============================
@@ -212,6 +221,11 @@ const App = () => (
                         <ModuleLearn />
                       </ProtectedRoute>
                     }
+                  />
+                  {/* Legacy redirect: /module/:id -> /learn/:id */}
+                  <Route
+                    path="/module/:moduleId"
+                    element={<ModuleRedirect />}
                   />
 
                   {/* ============================

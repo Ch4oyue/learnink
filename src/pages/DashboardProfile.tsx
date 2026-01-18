@@ -124,7 +124,7 @@ export default function DashboardProfile() {
   const streak = 7;
 
   // Get user initials
-  const userName = profile?.full_name || displayName || user?.email?.split("@")[0] || "User";
+  const userName = profile?.display_name || displayName || user?.email?.split("@")[0] || "User";
   const userInitials = userName.slice(0, 2).toUpperCase();
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
@@ -255,7 +255,7 @@ export default function DashboardProfile() {
                         {userName}
                       </h1>
                       <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
-                        {profile?.bio || "Lifelong learner exploring new skills."}
+                        Lifelong learner exploring new skills.
                       </p>
                       <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
                         {role && (
@@ -269,7 +269,7 @@ export default function DashboardProfile() {
                         )}
                         <Badge variant="secondary" className="text-muted-foreground">
                           <MapPin className="h-3 w-3 mr-1" />
-                          {profile?.location || "Earth"}
+                          Earth
                         </Badge>
                       </div>
                     </div>

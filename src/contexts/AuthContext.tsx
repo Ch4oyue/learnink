@@ -7,13 +7,11 @@ import { logger } from "@/lib/logger";
 export type AppRole = 'user' | 'tutor' | 'admin';
 
 // Profile interface for user profile data
+// NOTE: Only includes columns that exist in the Supabase 'profiles' table
 export interface Profile {
   id: string;
   display_name: string | null;
-  full_name: string | null;
   avatar_url: string | null;
-  bio: string | null;
-  location: string | null;
 }
 
 interface AuthContextType {
@@ -45,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, display_name, full_name, avatar_url, bio, location')
+        .select('id, display_name, avatar_url')
         .eq('id', userId)
         .single();
 

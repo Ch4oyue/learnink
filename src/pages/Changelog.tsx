@@ -17,112 +17,13 @@ import {
     Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getChangelog, type ChangelogEntry } from "@/lib/changelogParser";
 
 // ============================================
-// CHANGELOG DATA
+// CHANGELOG DATA (Dynamic from CHANGELOG.md)
 // ============================================
 
-interface ChangelogEntry {
-    version: string;
-    date: string;
-    title: string;
-    description: string;
-    improvements: string[];
-    fixes: string[];
-    patches: string[];
-}
-
-const CHANGELOG_DATA: ChangelogEntry[] = [
-    {
-        version: "1.3.0",
-        date: "Jan 17, 2026",
-        title: "Total System Repair",
-        description: "Major system-wide repair and redesign to stabilize the application after failed redesign attempt.",
-        improvements: [
-            "Implemented dark-first design system with Indigo/Zinc color palette",
-            "Added URL-based tab persistence across Profile and Admin Dashboard",
-            "Created interactive sidebar account dropdown with hover effects",
-            "Improved marquee animation with 3-track seamless infinite loop",
-            "Added responsive 3-column layout for learning interface",
-            "Implemented role-based navigation in dashboard sidebar",
-            "Added collapsible sidebar feature for more workspace",
-            "Improved mobile responsiveness with bottom navigation",
-        ],
-        fixes: [
-            "Fixed sidebar overlap issue with main content (250px fixed width)",
-            "Fixed tab content isolation in Profile page",
-            "Fixed profile header showing in all tabs (now only in Profile tab)",
-            "Fixed Coming Soon pages having redundant buttons",
-            "Fixed marquee loop jerk/gap when resetting",
-            "Fixed missing routes returning 404",
-        ],
-        patches: [
-            "Added Coming Soon routes for unimplemented features",
-            "Cleaned up unused imports in DashboardSettings",
-            "Removed progress indicator from Coming Soon pages",
-        ],
-    },
-    {
-        version: "1.2.0",
-        date: "Jan 15, 2026",
-        title: "Learning Interface Redesign",
-        description: "Comprehensive redesign of the learning interface with hybrid layout.",
-        improvements: [
-            "New 3-column learning layout (Rail + Content + Notes)",
-            "Resizable panels for content and notes sections",
-            "Text selection to notes feature",
-            "Quiz section integration at end of content",
-            "Scroll-based progress tracking",
-        ],
-        fixes: [
-            "Fixed guided notes not persisting",
-            "Fixed quiz completion not updating progress",
-            "Fixed content rendering issues with markdown",
-        ],
-        patches: [
-            "Updated quiz player styling",
-            "Improved notes panel scrolling",
-        ],
-    },
-    {
-        version: "1.1.0",
-        date: "Jan 10, 2026",
-        title: "Dashboard and Authentication",
-        description: "Core dashboard implementation with role-based access.",
-        improvements: [
-            "Role-based dashboard views (Student, Tutor, Admin)",
-            "User management for admins",
-            "Material request system",
-            "AI-powered module generation",
-            "Learning sources management",
-            "Profile page with activity tracking",
-        ],
-        fixes: [
-            "Fixed Supabase authentication flow",
-            "Fixed role detection on login",
-        ],
-        patches: [
-            "Added loading skeletons for better UX",
-        ],
-    },
-    {
-        version: "1.0.0",
-        date: "Dec 23, 2025",
-        title: "Initial Release",
-        description: "First stable release of LearnInk learning platform.",
-        improvements: [
-            "User authentication with Supabase",
-            "Module browsing and learning",
-            "Guided notes system",
-            "Quiz system with scoring",
-            "Progress tracking",
-            "Dark/Light theme support",
-            "Mobile-responsive design",
-        ],
-        fixes: [],
-        patches: [],
-    },
-];
+const CHANGELOG_DATA: ChangelogEntry[] = getChangelog();
 
 // ============================================
 // COLLAPSIBLE SECTION COMPONENT

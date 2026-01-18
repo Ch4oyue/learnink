@@ -49,25 +49,6 @@ export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; mi
   });
 }
 
-export function useModule(moduleId?: string) {
-  return useQuery({
-    queryKey: ["module", moduleId],
-    queryFn: async () => {
-      if (!moduleId) return null;
-
-      const { data, error } = await supabase
-        .from("modules")
-        .select(`*, author:profiles(id, full_name, avatar_url)`)
-        .eq("id", moduleId)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!moduleId,
-  });
-}
-
 export function useMyModules(userId?: string) {
   return useQuery({
     queryKey: ["my-modules", userId],

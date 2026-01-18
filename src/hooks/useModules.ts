@@ -20,16 +20,22 @@ export interface Module {
 
 export function useModules(publishedOnly = false) {
   return useQuery({
-    queryKey: ['modules', publishedOnly],
+    queryKey: ["modules", publishedOnly],
     queryFn: async () => {
-      let query = supabase.from('modules').select('*');
-      
+      let query = supabase
+        .from("modules")
+        .select(
+          "id, title, summary, level, category, is_published, created_at"
+        );
+
       if (publishedOnly) {
-        query = query.eq('is_published', true);
+        query = query.eq("is_published", true);
       }
-      
-      const { data, error } = await query.order('created_at', { ascending: false });
-      
+
+      const { data, error } = await query.order("created_at", {
+        ascending: false,
+      });
+
       if (error) throw error;
       return data as Module[];
     },
@@ -38,20 +44,39 @@ export function useModules(publishedOnly = false) {
 
 export function useMyModules(userId?: string) {
   return useQuery({
-    queryKey: ['my-modules', userId],
+    queryKey: ["my-modules", userId],
     queryFn: async () => {
       if (!userId) return [];
-      
+
       const { data, error } = await supabase
-        .from('modules')
-        .select('*')
-        .eq('created_by', userId)
-        .order('created_at', { ascending: false });
-      
+        .from("modules")
+        .select(
+          "id, title, summary, level, category, is_published, created_at"
+        )
+        .eq("created_by", userId)
+        .order("created_at", { ascending: false });
+
       if (error) throw error;
       return data as Module[];
     },
     enabled: !!userId,
+  });
+}
+
+export function useModule(moduleId: string) {
+  return useQuery({
+    queryKey: ["module", moduleId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("modules")
+        .select(`*, author:profiles(id, full_name, avatar_url)`)
+        .eq("id", moduleId)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!moduleId,
   });
 }
 

@@ -1,0 +1,298 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+
+// =============================================
+// ENVIRONMENT & CONFIG
+// =============================================
+
+const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+
+// Legacy secret for backward compatibility (optional)
+const INGEST_SECRET = Deno.env.get("INGEST_SECRET");
+
+const corsHeaders = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+// =============================================
+// TYPES
+// =============================================
+
+interface IngestPayload {
+    title: string;
+    content: string;
+    tags?: string[];
+}
+
+interface ValidatedIntegration {
+    id: string;
+    name: string;
+    source: string;
+}
+
+// =============================================
+// INPUT VALIDATION
+// =============================================
+
+function validatePayload(body: unknown): IngestPayload {
+    if (!body || typeof body !== "object") {
+        throw new Error("Request body must be a JSON object");
+    }
+
+    const payload = body as Record<string, unknown>;
+
+    if (!payload.title || typeof payload.title !== "string") {
+        throw new Error("'title' is required and must be a string");
+    }
+
+    if (!payload.content || typeof payload.content !== "string") {
+        throw new Error("'content' is required and must be a string");
+    }
+
+    // Sanitize title (max 200 chars)
+    const title = payload.title.trim().substring(0, 200);
+    if (!title) {
+        throw new Error("'title' cannot be empty");
+    }
+
+    // Sanitize content (max 50KB)
+    const content = payload.content.trim().substring(0, 50000);
+
+    // Validate tags if provided
+    let tags: string[] = [];
+    if (payload.tags) {
+        if (!Array.isArray(payload.tags)) {
+            throw new Error("'tags' must be an array of strings");
+        }
+        tags = payload.tags
+            .filter((t): t is string => typeof t === "string")
+            .map((t) => t.trim().substring(0, 50))
+            .slice(0, 10); // Max 10 tags
+    }
+
+    return { title, content, tags };
+}
+
+// =============================================
+// API KEY VALIDATION
+// =============================================
+
+async function validateApiKey(
+    supabase: ReturnType<typeof createClient>,
+    token: string
+): Promise<ValidatedIntegration | null> {
+    // Check if it's the service role key (backward compatibility)
+    if (token === SUPABASE_SERVICE_ROLE_KEY) {
+        return {
+            id: "service-role",
+            name: "Service Role (Legacy)",
+            source: "system",
+        };
+    }
+
+    // Check legacy INGEST_SECRET
+    if (INGEST_SECRET && token === INGEST_SECRET) {
+        return {
+            id: "ingest-secret",
+            name: "Ingest Secret (Legacy)",
+            source: "n8n",
+        };
+    }
+
+    // Check if token looks like an API key (sk_live_...)
+    if (!token.startsWith("sk_live_")) {
+        return null;
+    }
+
+    // Fetch all active integrations and check against bcrypt hashes
+    const { data: integrations, error } = await supabase
+        .from("integrations")
+        .select("id, name, source, api_key_hash")
+        .eq("is_active", true);
+
+    if (error || !integrations) {
+        console.error("Error fetching integrations:", error);
+        return null;
+    }
+
+    // Check each integration's hash
+    for (const integration of integrations) {
+        try {
+            const isMatch = await bcrypt.compare(token, integration.api_key_hash);
+            if (isMatch) {
+                return {
+                    id: integration.id,
+                    name: integration.name,
+                    source: integration.source,
+                };
+            }
+        } catch (e) {
+            console.error(`Error comparing hash for ${integration.id}:`, e);
+        }
+    }
+
+    return null;
+}
+
+// =============================================
+// UPDATE INTEGRATION STATS
+// =============================================
+
+async function updateIntegrationStats(
+    supabase: ReturnType<typeof createClient>,
+    integrationId: string
+): Promise<void> {
+    // Skip for legacy auth methods
+    if (integrationId === "service-role" || integrationId === "ingest-secret") {
+        return;
+    }
+
+    const { error } = await supabase.rpc("increment_integration_request_count", {
+        integration_id: integrationId,
+    }).catch(() => {
+        // Fallback if RPC doesn't exist - do manual update
+        return supabase
+            .from("integrations")
+            .update({
+                last_used_at: new Date().toISOString(),
+                request_count: supabase.raw("request_count + 1"),
+            })
+            .eq("id", integrationId);
+    });
+
+    if (error) {
+        console.warn("Failed to update integration stats:", error);
+    }
+}
+
+// =============================================
+// MAIN HANDLER
+// =============================================
+
+serve(async (req) => {
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+        return new Response(null, { headers: corsHeaders });
+    }
+
+    // Only accept POST requests
+    if (req.method !== "POST") {
+        return new Response(
+            JSON.stringify({ error: "Method not allowed", success: false }),
+            { status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+    }
+
+    try {
+        const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+        // -------------------------
+        // 1. Validate Authorization
+        // -------------------------
+        const authHeader = req.headers.get("Authorization");
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return new Response(
+                JSON.stringify({ error: "Missing or invalid Authorization header", success: false }),
+                { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+        }
+
+        const token = authHeader.replace("Bearer ", "");
+
+        // Validate API key against integrations table or legacy keys
+        const integration = await validateApiKey(supabase, token);
+
+        if (!integration) {
+            console.error("Invalid API key provided");
+            return new Response(
+                JSON.stringify({ error: "Unauthorized - Invalid API key", success: false }),
+                { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+        }
+
+        console.log(`Authenticated via: ${integration.name} (${integration.source})`);
+
+        // -------------------------
+        // 2. Parse and Validate Body
+        // -------------------------
+        let body: unknown;
+        try {
+            body = await req.json();
+        } catch {
+            return new Response(
+                JSON.stringify({ error: "Invalid JSON body", success: false }),
+                { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+        }
+
+        const payload = validatePayload(body);
+        console.log("Received content:", payload.title);
+
+        // -------------------------
+        // 3. Insert into Database
+        // -------------------------
+        const insertData: Record<string, unknown> = {
+            title: payload.title,
+            raw_content: {
+                content: payload.content,
+                tags: payload.tags || [],
+            },
+            source: integration.source,
+            status: "pending",
+        };
+
+        // Link to integration if it's not a legacy auth method
+        if (integration.id !== "service-role" && integration.id !== "ingest-secret") {
+            insertData.integration_id = integration.id;
+        }
+
+        const { data, error } = await supabase
+            .from("incoming_contents")
+            .insert(insertData)
+            .select("id")
+            .single();
+
+        if (error) {
+            console.error("Database error:", error);
+            throw new Error(`Failed to insert content: ${error.message}`);
+        }
+
+        console.log("Content inserted with ID:", data.id);
+
+        // -------------------------
+        // 4. Update Integration Stats
+        // -------------------------
+        await updateIntegrationStats(supabase, integration.id);
+
+        // -------------------------
+        // 5. Return Success Response
+        // -------------------------
+        return new Response(
+            JSON.stringify({
+                success: true,
+                message: "Content received and queued for review",
+                id: data.id,
+                source: integration.source,
+            }),
+            {
+                status: 201,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+        );
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : "Unknown error";
+        console.error("Error in ingest-content function:", error);
+
+        return new Response(
+            JSON.stringify({ error: errorMessage, success: false }),
+            {
+                status: 500,
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+        );
+    }
+});

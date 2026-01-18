@@ -77,3 +77,125 @@ export interface WebhookConfig {
     /** Timestamp when the config was last updated */
     updated_at: string;
 }
+
+// =============================================
+// INCOMING CONTENTS (from n8n integration)
+// =============================================
+
+/**
+ * Status of incoming content for admin review
+ */
+export type ContentStatus = 'pending' | 'approved' | 'rejected';
+
+/**
+ * Represents incoming content from n8n workflow
+ * that needs admin review before publishing to modules
+ */
+export interface IncomingContent {
+    /** Unique identifier */
+    id: string;
+
+    /** Title of the content */
+    title: string;
+
+    /** Raw JSON content from n8n */
+    raw_content: {
+        content?: string;
+        tags?: string[];
+        [key: string]: unknown;
+    };
+
+    /** Source of the content (default: 'n8n') */
+    source: string;
+
+    /** Current review status */
+    status: ContentStatus;
+
+    /** Timestamp when content was received */
+    created_at: string;
+
+    /** Timestamp when content was processed (approved/rejected) */
+    processed_at?: string;
+
+    /** UUID of admin who processed the content */
+    processed_by?: string;
+}
+
+/**
+ * Payload structure expected from n8n webhook
+ */
+export interface N8nPayload {
+    title: string;
+    content: string;
+    tags?: string[];
+}
+
+// =============================================
+// INTEGRATIONS (API Key Management)
+// =============================================
+
+/**
+ * Available integration sources
+ */
+export type IntegrationSource = 'n8n' | 'notion' | 'chatgpt' | 'zapier' | 'custom';
+
+/**
+ * Integration configuration for external sources
+ */
+export interface Integration {
+    /** Unique identifier */
+    id: string;
+
+    /** Display name for the integration */
+    name: string;
+
+    /** Optional description */
+    description?: string;
+
+    /** Source type */
+    source: IntegrationSource;
+
+    /** Masked API key preview (e.g., sk_live_••••••••x1a4) */
+    api_key_preview: string;
+
+    /** Webhook URL to send data to */
+    webhook_url: string;
+
+    /** Whether the integration is active */
+    is_active: boolean;
+
+    /** Last time this integration was used */
+    last_used_at: string | null;
+
+    /** Number of requests made through this integration */
+    request_count: number;
+
+    /** UUID of admin who created the integration */
+    created_by?: string;
+
+    /** Timestamp when integration was created */
+    created_at: string;
+
+    /** Timestamp when integration was last updated */
+    updated_at: string;
+}
+
+/**
+ * Response when generating a new API key
+ */
+export interface GenerateKeyResponse {
+    success: boolean;
+    message: string;
+    integration: Omit<Integration, 'api_key_preview' | 'request_count' | 'last_used_at' | 'updated_at'>;
+    api_key: string;  // Full key - only shown once!
+    api_key_preview: string;
+}
+
+/**
+ * Input for creating a new integration
+ */
+export interface CreateIntegrationInput {
+    name: string;
+    source: IntegrationSource;
+    description?: string;
+}

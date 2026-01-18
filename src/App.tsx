@@ -31,6 +31,8 @@ const ModuleLearn = lazy(() => import("./pages/ModuleLearn"));
 
 // Admin Pages
 const ManageSources = lazy(() => import("./pages/admin/ManageSources"));
+const ContentApproval = lazy(() => import("./pages/admin/ContentApproval"));
+const IntegrationManager = lazy(() => import("./pages/admin/IntegrationManager"));
 
 // ============================================
 // QUERY CLIENT CONFIG
@@ -148,10 +150,10 @@ const App = () => (
                     }
                   />
                   <Route
-                    path="/dashboard/approval"
+                    path="/dashboard/admin/approval"
                     element={
                       <ProtectedRoute>
-                        <ComingSoon title="Content Approval" description="Fitur persetujuan konten untuk admin sedang dalam pengembangan." />
+                        <ContentApproval />
                       </ProtectedRoute>
                     }
                   />
@@ -188,6 +190,14 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <ManageSources />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/admin/integrations"
+                    element={
+                      <ProtectedRoute>
+                        <IntegrationManager />
                       </ProtectedRoute>
                     }
                   />

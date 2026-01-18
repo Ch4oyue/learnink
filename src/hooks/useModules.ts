@@ -49,22 +49,22 @@ export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; mi
   });
 }
 
-export function useModule(id?: string) {
+export function useModule(moduleId?: string) {
   return useQuery({
-    queryKey: ['module', id],
+    queryKey: ["module", moduleId],
     queryFn: async () => {
-      if (!id) return null;
+      if (!moduleId) return null;
 
       const { data, error } = await supabase
-        .from('modules')
-        .select('*')
-        .eq('id', id)
+        .from("modules")
+        .select(`*, author:profiles(id, full_name, avatar_url)`)
+        .eq("id", moduleId)
         .single();
 
       if (error) throw error;
-      return data as Module;
+      return data;
     },
-    enabled: !!id,
+    enabled: !!moduleId,
   });
 }
 
@@ -86,23 +86,6 @@ export function useMyModules(userId?: string) {
       return data as Module[];
     },
     enabled: !!userId,
-  });
-}
-
-export function useModule(moduleId: string) {
-  return useQuery({
-    queryKey: ["module", moduleId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("modules")
-        .select(`*, author:profiles(id, full_name, avatar_url)`)
-        .eq("id", moduleId)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!moduleId,
   });
 }
 

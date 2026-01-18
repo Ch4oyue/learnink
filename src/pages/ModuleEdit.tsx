@@ -1,14 +1,12 @@
 import { useParams, Navigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { ModuleEditor } from "@/components/module/ModuleEditor";
-import { useModules } from "@/hooks/useModules";
+import { useModule } from "@/hooks/useModules";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ModuleEdit() {
   const { id } = useParams<{ id: string }>();
-  const { data: modules, isLoading } = useModules();
-
-  const module = modules?.find((m) => m.id === id);
+  const { data: module, isLoading } = useModule(id);
 
   if (isLoading) {
     return (

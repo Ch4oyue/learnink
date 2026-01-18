@@ -106,9 +106,8 @@ const MENU_CONFIG: Record<AppRole, NavItem[]> = {
 };
 
 // Common items shown for all roles at the bottom
-const COMMON_NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard/profile", label: "Profile", icon: User },
-];
+// Note: Profile is accessed via user dropdown at footer, not duplicated here
+const COMMON_NAV_ITEMS: NavItem[] = [];
 
 // ============================================
 // LOADING SKELETON COMPONENT
@@ -157,7 +156,21 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
     const { user, role, profile, loading, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
-    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Persist sidebar collapsed state in localStorage
+    const [isCollapsed, setIsCollapsed] = useState(() => {
+      if (typeof window !== "undefined") {
+        const saved = localStorage.getItem("sidebar-collapsed");
+        return saved === "true";
+      }
+      return false;
+    });
+
+    // Update localStorage when collapsed state changes
+    const handleSetCollapsed = (collapsed: boolean) => {
+      setIsCollapsed(collapsed);
+      localStorage.setItem("sidebar-collapsed", String(collapsed));
+    };
 
     // Get role-specific nav items with type safety
     const currentRole: AppRole = role ?? "user";
@@ -242,7 +255,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
                 variant="ghost"
                 size="icon"
                 className="h-8 w-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setIsCollapsed(true)}
+                onClick={() => handleSetCollapsed(true)}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -256,7 +269,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
                 variant="ghost"
                 size="icon"
                 className="w-full h-8 text-muted-foreground hover:text-foreground"
-                onClick={() => setIsCollapsed(false)}
+                onClick={() => handleSetCollapsed(false)}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -530,7 +543,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm">
           <div className="flex items-center justify-around h-16">
             {/* Show first 4 role-specific items + Profile */}
-            {[...navItems.slice(0, 4), COMMON_NAV_ITEMS[0]].map((item) => {
+            {[...navItems.slice(0, 4), { href: "/dashboard/profile", label: "Profile", icon: User }].map((item) => {
               const isActive = location.pathname === item.href;
               const IconComponent = item.icon;
 

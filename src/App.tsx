@@ -2,6 +2,7 @@ import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { CustomCursor } from "@/components/ui/CustomCursor";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -85,6 +86,7 @@ const SmartLanding = () => {
 const App = () => (
   <ErrorBoundary>
     <ThemeProvider>
+      <CustomCursor />
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <AuthProvider>

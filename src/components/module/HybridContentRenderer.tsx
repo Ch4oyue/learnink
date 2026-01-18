@@ -10,6 +10,7 @@ import {
     Copy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
 
 // ============================================
 // TYPES
@@ -38,9 +39,11 @@ interface HybridContentRendererProps {
 
 export const HybridContentRenderer = forwardRef<HTMLElement, HybridContentRendererProps>(
     ({ content, metadata, onAddToNotes, onCopyCode, isLoading }, ref) => {
+        const { resolvedTheme } = useTheme();
+
         if (isLoading) {
             return (
-                <main className="flex-1 overflow-y-auto bg-background relative">
+                <main className="flex-1 overflow-y-auto bg-background relative" aria-busy="true">
                     <div className="max-w-[800px] mx-auto py-16 px-10 flex flex-col gap-10">
                         <div className="animate-pulse space-y-4">
                             <div className="h-6 w-32 bg-muted rounded" />
@@ -110,7 +113,10 @@ export const HybridContentRenderer = forwardRef<HTMLElement, HybridContentRender
 
                     {/* Content Blocks with Hover Interactions */}
                     {content ? (
-                        <div className="reading-content prose prose-lg prose-invert max-w-none">
+                        <div className={cn(
+                            "reading-content prose prose-lg max-w-none",
+                            resolvedTheme === "dark" && "prose-invert"
+                        )}>
                             {/* Wrap content in reading blocks style */}
                             <div className="group relative rounded-xl -ml-6 pl-6 p-4 border-l-4 border-transparent hover:border-primary/20 hover:bg-muted/30 transition-all duration-300">
                                 <div className="text-[1.15rem] leading-[1.8] text-muted-foreground font-normal">
@@ -120,10 +126,10 @@ export const HybridContentRenderer = forwardRef<HTMLElement, HybridContentRender
                                 {/* Add to Notes Button (appears on hover) */}
                                 <button
                                     onClick={() => onAddToNotes?.(content)}
+                                    aria-label="Add to Notes"
                                     className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-200 p-2 text-primary bg-card shadow-subtle rounded-lg hover:scale-105 active:scale-95"
-                                    title="Add to Notes"
                                 >
-                                    <PlusCircle className="h-5 w-5" />
+                                    <PlusCircle className="h-5 w-5" aria-hidden="true" />
                                 </button>
                             </div>
                         </div>

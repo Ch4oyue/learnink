@@ -6,9 +6,13 @@ import { Features } from "@/components/landing/Features";
 import { Footer } from "@/components/landing/Footer";
 import { LearningSourcesMarquee } from "@/components/landing/LearningSourcesMarquee";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
 
 export default function LandingPage() {
     const { resolvedTheme, setTheme } = useTheme();
+
+    // Enable smooth scrolling for anchor links
+    useSimpleSmoothScroll();
 
     const toggleTheme = () => {
         setTheme(resolvedTheme === "dark" ? "light" : "dark");

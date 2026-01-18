@@ -64,10 +64,13 @@ export function HybridSidebar({
     ];
 
     return (
-        <aside className="w-[72px] border-r border-border bg-sidebar flex flex-col items-center py-6 gap-8 shrink-0 z-20">
+        <aside
+            className="w-[72px] border-r border-sidebar-border bg-sidebar flex flex-col items-center py-6 gap-8 shrink-0 z-20"
+            aria-label="Learning navigation"
+        >
             {/* Brand Mark - Clean Dark Style */}
             <div className="size-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-lg mb-2">
-                <GraduationCap className="h-5 w-5" />
+                <GraduationCap className="h-5 w-5" aria-hidden="true" />
             </div>
 
             {/* Nav Icons with Tooltips */}
@@ -77,11 +80,13 @@ export function HybridSidebar({
                         <TooltipTrigger asChild>
                             <button
                                 onClick={item.onClick}
+                                aria-label={item.label}
+                                aria-pressed={item.isActive}
                                 className={cn(
                                     "w-full aspect-square flex items-center justify-center rounded-xl transition-all",
                                     item.isActive
-                                        ? "text-primary bg-primary/10 shadow-inner"
-                                        : "text-muted-foreground hover:text-primary hover:bg-muted"
+                                        ? "text-primary bg-sidebar-accent shadow-inner"
+                                        : "text-sidebar-foreground hover:text-primary hover:bg-sidebar-accent"
                                 )}
                             >
                                 {item.icon}
@@ -104,15 +109,16 @@ export function HybridSidebar({
                     <TooltipTrigger asChild>
                         <button
                             onClick={() => navigate("/dashboard/settings")}
-                            className="w-full aspect-square flex items-center justify-center rounded-xl text-muted-foreground hover:text-primary hover:bg-muted transition-all"
+                            aria-label="Settings"
+                            className="w-full aspect-square flex items-center justify-center rounded-xl text-sidebar-foreground hover:text-primary hover:bg-sidebar-accent transition-all"
                         >
-                            <Settings className="h-5 w-5" />
+                            <Settings className="h-5 w-5" aria-hidden="true" />
                         </button>
                     </TooltipTrigger>
                     <TooltipContent
                         side="right"
                         sideOffset={10}
-                        className="bg-zinc-800 text-white border-zinc-700"
+                        className="bg-card text-foreground border-border"
                     >
                         <p className="text-xs font-bold">Settings</p>
                     </TooltipContent>

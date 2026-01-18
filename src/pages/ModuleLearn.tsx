@@ -120,12 +120,35 @@ export default function ModuleLearn() {
   const createNote = useCreateLearningNote();
   const deleteNote = useDeleteLearningNote();
 
-  // UI State
-  const [showTOC, setShowTOC] = useState(true);
-  const [showNotes, setShowNotes] = useState(true);
+  // UI State - Persist panel visibility in localStorage
+  const [showTOC, setShowTOC] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("module-show-toc");
+      return saved !== "false"; // Default true
+    }
+    return true;
+  });
+  const [showNotes, setShowNotes] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("module-show-notes");
+      return saved !== "false"; // Default true
+    }
+    return true;
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
+
+  // Persist panel visibility to localStorage
+  const handleSetShowTOC = (show: boolean) => {
+    setShowTOC(show);
+    localStorage.setItem("module-show-toc", String(show));
+  };
+
+  const handleSetShowNotes = (show: boolean) => {
+    setShowNotes(show);
+    localStorage.setItem("module-show-notes", String(show));
+  };
 
   // Derived state
   const module = modules?.find((m) => m.id === moduleId);
@@ -288,7 +311,7 @@ export default function ModuleLearn() {
       <div className="hidden md:block">
         <HybridSidebar
           activeTab={showTOC ? "toc" : "content"}
-          onTableOfContentsClick={() => setShowTOC(!showTOC)}
+          onTableOfContentsClick={() => handleSetShowTOC(!showTOC)}
           onBackClick={() => navigate("/dashboard")}
         />
       </div>
@@ -297,18 +320,18 @@ export default function ModuleLearn() {
           PANEL 2: TOC Sidebar (240px) - Collapsible
       ============================================ */}
       {showTOC && (
-        <aside className="hidden md:flex w-[240px] bg-sidebar border-r border-border flex-col shrink-0">
-          {/* TOC Header */
-            <div className="p-4 border-b border-border">
-              <h2 className="font-bold text-foreground text-sm mb-3 line-clamp-2">{module.title}</h2>
-              <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-primary transition-all duration-500"
-                  style={{ width: `${currentProgress}%` }}
-                />
-              </div>
-              <p className="text-[10px] text-muted-foreground mt-1 font-medium">{currentProgress}% complete</p>
+        <aside className="hidden md:flex w-[240px] bg-sidebar border-r border-sidebar-border flex-col shrink-0">
+          {/* TOC Header */}
+          <div className="p-4 border-b border-sidebar-border">
+            <h2 className="font-bold text-foreground text-sm mb-3 line-clamp-2">{module.title}</h2>
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary transition-all duration-500"
+                style={{ width: `${currentProgress}%` }}
+              />
             </div>
+            <p className="text-[10px] text-muted-foreground mt-1 font-medium">{currentProgress}% complete</p>
+          </div>
 
           {/* TOC List */}
           <ScrollArea className="flex-1 p-3">

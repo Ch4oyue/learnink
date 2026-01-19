@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -151,7 +152,7 @@ export default function DashboardProfile() {
       });
       setIsEditing(false);
     } catch (error: any) {
-      console.error("Update profile error:", error);
+      logger.error("Update profile error:", error);
       toast({
         title: "Error",
         description: error.message || "Gagal memperbarui profil",

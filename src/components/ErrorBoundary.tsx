@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import React, { Component, ErrorInfo, ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw } from "lucide-react";
@@ -22,7 +23,7 @@ class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
-    console.error("React Error Boundary caught an error:", error, errorInfo);
+    logger.error("React Error Boundary caught an error:", error, errorInfo);
   }
 
   handleReload = (): void => {

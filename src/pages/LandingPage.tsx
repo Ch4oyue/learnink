@@ -1,15 +1,17 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Terminal, Moon, Sun, Heart, Github, BookOpen } from "lucide-react";
+import { Terminal, Moon, Sun, Heart, Github, BookOpen, LayoutDashboard } from "lucide-react";
 import { Hero } from "@/components/landing/Hero";
 import { Features } from "@/components/landing/Features";
 import { Footer } from "@/components/landing/Footer";
 import { LearningSourcesMarquee } from "@/components/landing/LearningSourcesMarquee";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
 
 export default function LandingPage() {
     const { resolvedTheme, setTheme } = useTheme();
+    const { user } = useAuth();
 
     // Enable smooth scrolling for anchor links
     useSimpleSmoothScroll();
@@ -41,12 +43,22 @@ export default function LandingPage() {
                                 Features
                             </button>
                             <div className="h-4 w-[1px] bg-border mx-2 hidden sm:block" />
-                            <Link
-                                to="/auth"
-                                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-                            >
-                                Log in
-                            </Link>
+                            {user ? (
+                                <Link
+                                    to="/dashboard"
+                                    className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                                >
+                                    <LayoutDashboard className="h-4 w-4" />
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <Link
+                                    to="/auth"
+                                    className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                                >
+                                    Log in
+                                </Link>
+                            )}
                             <Button
                                 variant="outline"
                                 size="icon"

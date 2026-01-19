@@ -63,21 +63,10 @@ const PageLoader = () => (
 );
 
 // ============================================
-// SMART LANDING (Redirect logged-in users)
+// SMART LANDING (No redirect - show landing to everyone)
 // ============================================
 
 const SmartLanding = () => {
-  const { session, loading } = useAuth();
-
-  if (loading) {
-    return <PageLoader />;
-  }
-
-  // If user is already logged in, redirect to dashboard
-  if (session) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
   return <LandingPage />;
 };
 

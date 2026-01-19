@@ -297,212 +297,216 @@ export default function DashboardProfile() {
               </CardContent>
             </Card>
 
-            {/* Learning Activity Card */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle>Learning Activity</CardTitle>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Your daily progress over the last week
-                  </p>
-                </div>
-                <div className="hidden sm:flex bg-muted p-1 rounded-lg">
-                  <button className="px-3 py-1 text-xs font-bold text-primary bg-card shadow-sm rounded-md">
-                    Weekly
-                  </button>
-                  <button className="px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
-                    Monthly
-                  </button>
-                </div>
-              </CardHeader>
-              <CardContent>
-                {/* Activity Chart */}
-                <div className="w-full h-48 flex items-end justify-between gap-2 sm:gap-4 mt-4">
-                  {activityData.map((item) => (
-                    <div key={item.day} className="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
-                      <div className="relative w-full bg-muted rounded-t-lg h-32 flex items-end overflow-hidden">
-                        <div
-                          className={`w-full transition-all rounded-t-lg relative ${item.isToday
-                            ? "bg-primary hover:bg-primary/90 shadow-glow"
-                            : "bg-primary/40 group-hover:bg-primary/60"
-                            }`}
-                          style={{ height: `${item.height}%` }}
-                        >
+            {/* Learning Activity Card - Hidden during edit mode for focus */}
+            {!isEditing && (
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <div>
+                    <CardTitle>Learning Activity</CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Your daily progress over the last week
+                    </p>
+                  </div>
+                  <div className="hidden sm:flex bg-muted p-1 rounded-lg">
+                    <button className="px-3 py-1 text-xs font-bold text-primary bg-card shadow-sm rounded-md">
+                      Weekly
+                    </button>
+                    <button className="px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+                      Monthly
+                    </button>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {/* Activity Chart */}
+                  <div className="w-full h-48 flex items-end justify-between gap-2 sm:gap-4 mt-4">
+                    {activityData.map((item) => (
+                      <div key={item.day} className="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
+                        <div className="relative w-full bg-muted rounded-t-lg h-32 flex items-end overflow-hidden">
                           <div
-                            className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-[10px] py-1 px-2 rounded transition-opacity whitespace-nowrap z-10 ${item.isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                            className={`w-full transition-all rounded-t-lg relative ${item.isToday
+                              ? "bg-primary hover:bg-primary/90 shadow-glow"
+                              : "bg-primary/40 group-hover:bg-primary/60"
                               }`}
+                            style={{ height: `${item.height}%` }}
                           >
-                            {formatMinutes(item.minutes)}
+                            <div
+                              className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-[10px] py-1 px-2 rounded transition-opacity whitespace-nowrap z-10 ${item.isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                                }`}
+                            >
+                              {formatMinutes(item.minutes)}
+                            </div>
                           </div>
                         </div>
+                        <span
+                          className={`text-xs font-medium ${item.isToday ? "text-primary font-bold" : "text-muted-foreground"
+                            }`}
+                        >
+                          {item.day}
+                        </span>
                       </div>
-                      <span
-                        className={`text-xs font-medium ${item.isToday ? "text-primary font-bold" : "text-muted-foreground"
-                          }`}
-                      >
-                        {item.day}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Stats Footer */}
-                <div className="mt-6 pt-6 border-t border-border flex flex-wrap justify-between items-center gap-4">
-                  <div className="flex items-center gap-6">
-                    <div>
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                        Total XP
-                      </span>
-                      <div className="text-xl font-bold">12,450</div>
-                    </div>
-                    <div>
-                      <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                        Avg. Time
-                      </span>
-                      <div className="text-xl font-bold">
-                        48m <span className="text-sm font-normal text-muted-foreground">/ day</span>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                  <Link
-                    to="/dashboard/analytics"
-                    className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 group"
-                  >
-                    View Detailed Analytics
-                    <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
 
-            {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Personal Information */}
-              <div className="lg:col-span-2">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Personal Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {isEditing ? (
-                      <form onSubmit={handleUpdateProfile} className="space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Stats Footer */}
+                  <div className="mt-6 pt-6 border-t border-border flex flex-wrap justify-between items-center gap-4">
+                    <div className="flex items-center gap-6">
+                      <div>
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                          Total XP
+                        </span>
+                        <div className="text-xl font-bold">12,450</div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                          Avg. Time
+                        </span>
+                        <div className="text-xl font-bold">
+                          48m <span className="text-sm font-normal text-muted-foreground">/ day</span>
+                        </div>
+                      </div>
+                    </div>
+                    <Link
+                      to="/dashboard/analytics"
+                      className="text-sm font-semibold text-primary hover:text-primary/80 flex items-center gap-1 group"
+                    >
+                      View Detailed Analytics
+                      <ChevronRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+                    </Link>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Two Column Layout - Hidden during edit mode for focus */}
+            {!isEditing && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Personal Information */}
+                <div className="lg:col-span-2">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Personal Information</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      {isEditing ? (
+                        <form onSubmit={handleUpdateProfile} className="space-y-4">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Full Name
+                              </label>
+                              <Input
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                                placeholder="Your name"
+                                className="rounded-lg"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                Email Address
+                              </label>
+                              <Input
+                                value={user?.email || ""}
+                                disabled
+                                className="rounded-lg bg-muted"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button type="submit" disabled={isUpdating}>
+                              {isUpdating ? (
+                                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <Save className="h-4 w-4 mr-2" />
+                              )}
+                              Save Changes
+                            </Button>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              onClick={() => setIsEditing(false)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </form>
+                      ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
                           <div className="space-y-2">
                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                               Full Name
                             </label>
-                            <Input
-                              value={displayName}
-                              onChange={(e) => setDisplayName(e.target.value)}
-                              placeholder="Your name"
-                              className="rounded-lg"
-                            />
+                            <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border">
+                              {userName}
+                            </div>
                           </div>
                           <div className="space-y-2">
                             <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                               Email Address
                             </label>
-                            <Input
-                              value={user?.email || ""}
-                              disabled
-                              className="rounded-lg bg-muted"
-                            />
+                            <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border flex items-center justify-between">
+                              {user?.email}
+                              <CheckCircle className="h-4 w-4 text-green-500" aria-label="Verified" />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                              Role
+                            </label>
+                            <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border">
+                              {role ? roleLabels[role] : "Member"}
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                              Member Since
+                            </label>
+                            <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border">
+                              {user?.created_at
+                                ? format(new Date(user.created_at), "dd MMMM yyyy", { locale: localeId })
+                                : "-"}
+                            </div>
                           </div>
                         </div>
-                        <div className="flex gap-2">
-                          <Button type="submit" disabled={isUpdating}>
-                            {isUpdating ? (
-                              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                            ) : (
-                              <Save className="h-4 w-4 mr-2" />
-                            )}
-                            Save Changes
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => setIsEditing(false)}
-                          >
-                            Cancel
-                          </Button>
-                        </div>
-                      </form>
-                    ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
-                        <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Full Name
-                          </label>
-                          <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border">
-                            {userName}
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Email Address
-                          </label>
-                          <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border flex items-center justify-between">
-                            {user?.email}
-                            <CheckCircle className="h-4 w-4 text-green-500" aria-label="Verified" />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Role
-                          </label>
-                          <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border">
-                            {role ? roleLabels[role] : "Member"}
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            Member Since
-                          </label>
-                          <div className="p-3 bg-muted rounded-lg text-foreground text-sm font-medium border border-border">
-                            {user?.created_at
-                              ? format(new Date(user.created_at), "dd MMMM yyyy", { locale: localeId })
-                              : "-"}
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </div>
 
-              {/* Achievements */}
-              <div className="lg:col-span-1">
-                <Card className="h-full">
-                  <CardHeader className="flex flex-row items-center justify-between">
-                    <CardTitle className="text-lg">Recent Achievements</CardTitle>
-                    <Link to="/dashboard/achievements" className="text-xs font-bold text-primary hover:text-primary/80">
-                      View All
-                    </Link>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {achievements.map((achievement) => (
-                        <div
-                          key={achievement.id}
-                          className={`flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer ${!achievement.unlocked ? "opacity-60 grayscale" : ""
-                            }`}
-                        >
+                {/* Achievements */}
+                <div className="lg:col-span-1">
+                  <Card className="h-full">
+                    <CardHeader className="flex flex-row items-center justify-between">
+                      <CardTitle className="text-lg">Recent Achievements</CardTitle>
+                      <Link to="/dashboard/achievements" className="text-xs font-bold text-primary hover:text-primary/80">
+                        View All
+                      </Link>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {achievements.map((achievement) => (
                           <div
-                            className={`h-12 w-12 rounded-full bg-gradient-to-br ${achievement.bgColor || "bg-muted"} flex items-center justify-center shrink-0 border ${achievement.borderColor}`}
+                            key={achievement.id}
+                            className={`flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer ${!achievement.unlocked ? "opacity-60 grayscale" : ""
+                              }`}
                           >
-                            <achievement.icon className={`h-5 w-5 ${achievement.iconColor}`} />
+                            <div
+                              className={`h-12 w-12 rounded-full bg-gradient-to-br ${achievement.bgColor || "bg-muted"} flex items-center justify-center shrink-0 border ${achievement.borderColor}`}
+                            >
+                              <achievement.icon className={`h-5 w-5 ${achievement.iconColor}`} />
+                            </div>
+                            <div>
+                              <h3 className="text-sm font-bold">{achievement.title}</h3>
+                              <p className="text-xs text-muted-foreground">{achievement.description}</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="text-sm font-bold">{achievement.title}</h3>
-                            <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
-            </div>
+            )}
           </>
         )}
 

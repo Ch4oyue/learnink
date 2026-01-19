@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Construction, ArrowLeft, Sparkles } from "lucide-react";
 
@@ -11,6 +11,8 @@ export default function ComingSoon({
     title = "Segera Hadir",
     description = "Fitur ini sedang dalam pengembangan dan akan segera tersedia."
 }: ComingSoonProps) {
+    const navigate = useNavigate();
+
     return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">
             <div className="max-w-md w-full text-center space-y-6">
@@ -33,12 +35,10 @@ export default function ComingSoon({
                     </p>
                 </div>
 
-                {/* Single CTA Button */}
-                <Button asChild variant="default">
-                    <Link to="/dashboard">
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Kembali ke Dashboard
-                    </Link>
+                {/* Single CTA Button - Goes back to previous page */}
+                <Button onClick={() => navigate(-1)} variant="default">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Kembali
                 </Button>
             </div>
         </div>

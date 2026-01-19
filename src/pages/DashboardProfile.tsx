@@ -377,6 +377,60 @@ export default function DashboardProfile() {
               </Card>
             )}
 
+            {/* Edit Profile Card - Shown when editing */}
+            {isEditing && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Edit Profile</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleUpdateProfile} className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Full Name
+                        </label>
+                        <Input
+                          value={displayName}
+                          onChange={(e) => setDisplayName(e.target.value)}
+                          placeholder="Your name"
+                          className="rounded-lg"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                          Email Address
+                        </label>
+                        <Input
+                          value={user?.email || ""}
+                          type="email"
+                          disabled
+                          className="rounded-lg bg-muted"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 pt-4">
+                      <Button type="submit" disabled={isUpdating}>
+                        {isUpdating ? (
+                          <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        ) : (
+                          <Save className="h-4 w-4 mr-2" />
+                        )}
+                        Save Changes
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setIsEditing(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Two Column Layout - Hidden during edit mode for focus */}
             {!isEditing && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

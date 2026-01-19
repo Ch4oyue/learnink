@@ -113,6 +113,19 @@ export default function DashboardSettings() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Changelog Link */}
+          <Card>
+            <CardContent className="py-4">
+              <a
+                href="/changelog"
+                className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <span>View Changelog & Version History</span>
+                <span className="text-xs">v1.4.0</span>
+              </a>
+            </CardContent>
+          </Card>
         </div>
       </DashboardLayout>
     );

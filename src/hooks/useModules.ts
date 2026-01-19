@@ -60,9 +60,12 @@ export function useModule(id?: string) {
     queryFn: async () => {
       if (!id) return null;
 
+      // Note: We don't join profiles here because RLS on profiles table
+      // blocks users from viewing other users' profiles, causing query failure.
+      // Author info is optional - module content is the priority.
       const { data, error } = await supabase
         .from('modules')
-        .select(`*, author:profiles(id, full_name, avatar_url)`)
+        .select('*')
         .eq('id', id)
         .single();
 
@@ -106,7 +109,7 @@ export function useCreateModule() {
         .insert(module)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -141,7 +144,7 @@ export function useUpdateModule() {
         .eq('id', id)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -174,7 +177,7 @@ export function useDeleteModule() {
         .from('modules')
         .delete()
         .eq('id', id);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {

@@ -91,6 +91,7 @@ function extractListItems(block: string, header: string): string[] {
             // Clean up markdown formatting for display
             const cleanItem = itemMatch[1]
                 .replace(/`([^`]+)`/g, '$1') // Remove code backticks
+                .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold markers
                 .trim();
             items.push(cleanItem);
         }

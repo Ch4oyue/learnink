@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.0] - January 19, 2026
+
+### Major Frontend Upgrade & Premium UX
+
+A comprehensive upgrade to the user interface, introducing dynamic theming, premium interactions, and performance optimizations.
+
+#### New Features (4)
+- **Dynamic Theme System**: Auth page and components now fully support System/Light/Dark mode switching.
+- **Premium UX**: Integrated animated Custom Cursor and GSAP-powered Smooth Scrolling for a high-end feel.
+- **Theme Transition**: Implemented smooth visual transitions between theme changes across the platform.
+- **Security Visibility**: Added show/hide password toggles to all authentication forms.
+
+#### Bug Fixes (8)
+- **Autofill Contrast**: Fixed "white-on-white" input issue in dark mode when using browser autofill.
+- **SPA Routing**: Added `vercel.json` with SPA rewrites to fix 404 errors on production page reloads.
+- **Smart Navigation**: Fixed "Coming Soon" pages to use historical back navigation instead of hardcoded redirects.
+- **Landing Access**: Enabled landing page access for authenticated users with dynamic "Dashboard" navigation.
+- **Module Not Found**: Fixed query error in `useModule` hook (profiles.full_name -> display_name).
+- **Changelog Display**: Fixed markdown bold rendering by stripping `**` markers in changelog parser.
+- **Profile Edit Screen**: Fixed blank screen issue when clicking Edit Profile by adding dedicated edit card.
+- **Super Admin Protection**: Added protection for primary admin email from role downgrades.
+
+#### Improvements (4)
+- **Profile Edit UX**: Enhanced focus during profile editing by conditionally hiding non-essential dashboard cards.
+- **Changelog Link**: Added direct link to changelog from Profile Settings page.
+- **Sidebar Persistence**: Sidebar collapsed state now persists across sessions using `localStorage`.
+- **Accessibility**: Added comprehensive Aria labels and semantic roles to the core learning interface.
+
+#### Maintenance (1)
+- **Code Optimization**: Audited and removed 13 unused Shadcn components, reducing source code footprint.
+
+---
+
 ## [1.3.1] - January 18, 2026
 
 ### Bug Fixes & Database Improvements
@@ -130,6 +163,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.0 | Jan 19, 2026 | Major Frontend Upgrade & Premium UX |
 | 1.3.1 | Jan 18, 2026 | Bug Fixes & Database Schema |
 | 1.3.0 | Jan 17, 2026 | Total System Repair - Stability & Dark Mode |
 | 1.2.0 | Jan 15, 2026 | Learning Interface Redesign |

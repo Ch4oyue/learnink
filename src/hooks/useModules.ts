@@ -60,19 +60,22 @@ export function useModule(id?: string) {
     queryFn: async () => {
       if (!id) return null;
 
-      // Note: We don't join profiles here because RLS on profiles table
-      // blocks users from viewing other users' profiles, causing query failure.
-      // Author info is optional - module content is the priority.
+      // First try to get the module directly (without author join which can fail)
       const { data, error } = await supabase
         .from('modules')
         .select('*')
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Module fetch error:', error.message, error.details);
+        throw error;
+      }
+
       return data as Module;
     },
     enabled: !!id,
+    retry: 1, // Limit retries to avoid delays
   });
 }
 

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { useUsers, UserWithRole } from "@/hooks/useUsers";
+import { useUsers, UserWithRole, SUPER_ADMIN_EMAIL, SUPER_ADMIN_USER_ID } from "@/hooks/useUsers";
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -32,11 +32,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { 
-  Users, 
-  Search, 
-  Shield, 
-  GraduationCap, 
+import {
+  Users,
+  Search,
+  Shield,
+  GraduationCap,
   User,
   Loader2,
   AlertCircle,
@@ -54,7 +54,7 @@ export default function DashboardUsers() {
   const { user: currentUser } = useAuth();
   const { data: users, isLoading, error } = useUsers();
   const updateRole = useUpdateUserRole();
-  
+
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<AppRole | "all">("all");
   const [confirmDialog, setConfirmDialog] = useState<{
@@ -64,7 +64,7 @@ export default function DashboardUsers() {
   }>({ open: false, user: null, newRole: null });
 
   const filteredUsers = users?.filter(u => {
-    const matchesSearch = !searchQuery || 
+    const matchesSearch = !searchQuery ||
       u.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       u.id.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesRole = roleFilter === "all" || u.role === roleFilter;
@@ -74,7 +74,7 @@ export default function DashboardUsers() {
   const handleRoleChange = (user: UserWithRole, newRole: AppRole) => {
     if (user.role === newRole) return;
     if (user.id === currentUser?.id) return; // Prevent self-role change
-    
+
     setConfirmDialog({ open: true, user, newRole });
   };
 
@@ -195,7 +195,11 @@ export default function DashboardUsers() {
                 {filteredUsers?.map((user) => {
                   const config = roleConfig[user.role];
                   const isSelf = user.id === currentUser?.id;
-                  
+                  // Check if this user is the super admin (by ID or by checking if current logged-in user's email matches)
+                  const isSuperAdmin =
+                    (SUPER_ADMIN_USER_ID && user.id === SUPER_ADMIN_USER_ID) ||
+                    (currentUser?.email === SUPER_ADMIN_EMAIL && isSelf);
+
                   return (
                     <TableRow key={user.id}>
                       <TableCell>
@@ -212,6 +216,11 @@ export default function DashboardUsers() {
                               {isSelf && (
                                 <span className="ml-2 text-xs text-muted-foreground">(Anda)</span>
                               )}
+                              {isSuperAdmin && (
+                                <Badge variant="outline" className="ml-2 text-xs bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
+                                  Super Admin
+                                </Badge>
+                              )}
                             </div>
                             <div className="text-xs text-muted-foreground font-mono">
                               {user.id.slice(0, 8)}...
@@ -226,26 +235,33 @@ export default function DashboardUsers() {
                         </Badge>
                       </TableCell>
                       <TableCell className="hidden md:table-cell text-muted-foreground">
-                        {user.created_at 
+                        {user.created_at
                           ? format(new Date(user.created_at), "d MMM yyyy", { locale: id })
                           : "-"
                         }
                       </TableCell>
                       <TableCell>
-                        <Select
-                          value={user.role}
-                          onValueChange={(v) => handleRoleChange(user, v as AppRole)}
-                          disabled={isSelf || updateRole.isPending}
-                        >
-                          <SelectTrigger className="w-[120px]" disabled={isSelf}>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="user">User</SelectItem>
-                            <SelectItem value="tutor">Tutor</SelectItem>
-                            <SelectItem value="admin">Admin</SelectItem>
-                          </SelectContent>
-                        </Select>
+                        {isSuperAdmin ? (
+                          <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
+                            <Shield className="h-3 w-3 mr-1" />
+                            Protected
+                          </Badge>
+                        ) : (
+                          <Select
+                            value={user.role}
+                            onValueChange={(v) => handleRoleChange(user, v as AppRole)}
+                            disabled={isSelf || updateRole.isPending}
+                          >
+                            <SelectTrigger className="w-[120px]" disabled={isSelf}>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="user">User</SelectItem>
+                              <SelectItem value="tutor">Tutor</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        )}
                       </TableCell>
                     </TableRow>
                   );

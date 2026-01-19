@@ -2,27 +2,66 @@
 -- FIX: Learning Sources RLS Policy
 -- The original policy referenced profiles.role which doesn't exist
 -- Roles are stored in user_roles table
+-- FIXED: Split into public read + admin write policies
 -- =============================================
 
--- Drop the incorrect admin policy
+-- Drop any existing policies
 DROP POLICY IF EXISTS "Allow admin full access" ON public.learning_sources;
+DROP POLICY IF EXISTS "Admin can manage learning_sources" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable read access for all users" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable insert for admins only" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable update for admins only" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable delete for admins only" ON public.learning_sources;
 
--- Create correct admin policy using user_roles table
-CREATE POLICY "Admin can manage learning_sources"
+-- Policy 1: Public can read active learning sources (for landing page marquee)
+CREATE POLICY "Enable read access for all users"
 ON public.learning_sources
-FOR ALL
+FOR SELECT
+TO public
+USING (is_active = true);
+
+-- Policy 2: Admin can insert new learning sources
+CREATE POLICY "Enable insert for admins only"
+ON public.learning_sources
+FOR INSERT
+TO authenticated
+WITH CHECK (
+    EXISTS (
+        SELECT 1 FROM public.user_roles
+        WHERE user_roles.user_id = (select auth.uid())
+        AND user_roles.role = 'admin'
+    )
+);
+
+-- Policy 3: Admin can update learning sources
+CREATE POLICY "Enable update for admins only"
+ON public.learning_sources
+FOR UPDATE
 TO authenticated
 USING (
     EXISTS (
         SELECT 1 FROM public.user_roles
-        WHERE user_roles.user_id = auth.uid()
+        WHERE user_roles.user_id = (select auth.uid())
         AND user_roles.role = 'admin'
     )
 )
 WITH CHECK (
     EXISTS (
         SELECT 1 FROM public.user_roles
-        WHERE user_roles.user_id = auth.uid()
+        WHERE user_roles.user_id = (select auth.uid())
+        AND user_roles.role = 'admin'
+    )
+);
+
+-- Policy 4: Admin can delete learning sources
+CREATE POLICY "Enable delete for admins only"
+ON public.learning_sources
+FOR DELETE
+TO authenticated
+USING (
+    EXISTS (
+        SELECT 1 FROM public.user_roles
+        WHERE user_roles.user_id = (select auth.uid())
         AND user_roles.role = 'admin'
     )
 );

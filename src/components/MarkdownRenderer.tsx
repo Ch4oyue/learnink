@@ -87,8 +87,18 @@ function parseMarkdown(text: string): string {
     `<ol class="my-4 space-y-2">${match}</ol>`);
 
   html = html.replace(/^---$/gim, '<hr class="my-6 border-border" />');
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim,
-    '<a href="$2" class="text-primary hover:underline" target="_blank" rel="noopener noreferrer">$1</a>');
+
+  // Handle links with external detection
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, (_, text, url) => {
+    const isExternal = url.startsWith('http://') || url.startsWith('https://');
+    if (isExternal) {
+      // External link: add icon, nofollow, and visual indicator
+      return `<a href="${url}" class="text-primary hover:underline inline-flex items-center gap-1" target="_blank" rel="noopener nofollow noreferrer">${text}<svg class="inline-block w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>`;
+    } else {
+      // Internal link: no icon, standard behavior
+      return `<a href="${url}" class="text-primary hover:underline">${text}</a>`;
+    }
+  });
 
   html = html.split('\n\n').map(paragraph => {
     const trimmed = paragraph.trim();

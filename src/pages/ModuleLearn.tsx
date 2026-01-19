@@ -37,66 +37,60 @@ import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
 // TYPES
 // ============================================
 
-interface TOCItem {
+interface SectionData {
   id: string;
   title: string;
   level: number;
+  content: string;
 }
 
 // ============================================
-// HELPER: Extract TOC from Markdown
+// HELPER: Parse all sections from Markdown (ONE-TIME)
 // ============================================
 
-function extractTOCFromContent(content: string): TOCItem[] {
-  const headingRegex = /^(#{1,3})\s+(.+)$/gm;
-  const items: TOCItem[] = [];
-  let match;
+function parseModuleSections(markdown: string): SectionData[] {
+  if (!markdown) return [];
 
-  while ((match = headingRegex.exec(content)) !== null) {
-    const level = match[1].length;
-    const title = match[2].trim();
-    const id = title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-");
-    items.push({ id, title, level });
-  }
+  const lines = markdown.split("\n");
+  const sections: SectionData[] = [];
+  const headingRegex = /^(#{1,3})\s+(.+)$/;
 
-  return items;
-}
+  let currentSection: SectionData | null = null;
+  let contentLines: string[] = [];
 
-function extractSectionContent(content: string, sectionId: string, allSections: TOCItem[]): string {
-  const lines = content.split("\n");
-  const sectionIndex = allSections.findIndex((s) => s.id === sectionId);
+  for (const line of lines) {
+    const match = line.match(headingRegex);
 
-  if (sectionIndex === -1) return content;
-
-  const currentSection = allSections[sectionIndex];
-  const nextSection = allSections[sectionIndex + 1];
-
-  // Find start line
-  const startPattern = new RegExp(`^#{${currentSection.level}}\\s+${currentSection.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "i");
-  let startLine = 0;
-  for (let i = 0; i < lines.length; i++) {
-    if (startPattern.test(lines[i])) {
-      startLine = i;
-      break;
-    }
-  }
-
-  // Find end line
-  let endLine = lines.length;
-  if (nextSection) {
-    const endPattern = new RegExp(`^#{${nextSection.level}}\\s+${nextSection.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, "i");
-    for (let i = startLine + 1; i < lines.length; i++) {
-      if (endPattern.test(lines[i])) {
-        endLine = i;
-        break;
+    if (match) {
+      // Save previous section if exists
+      if (currentSection) {
+        currentSection.content = contentLines.join("\n").trim();
+        sections.push(currentSection);
       }
+
+      // Start new section
+      const level = match[1].length;
+      const title = match[2].trim();
+      const id = title
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-");
+
+      currentSection = { id, title, level, content: "" };
+      contentLines = [line]; // Include heading in content
+    } else {
+      // Accumulate content lines
+      contentLines.push(line);
     }
   }
 
-  return lines.slice(startLine, endLine).join("\n");
+  // Don't forget the last section
+  if (currentSection) {
+    currentSection.content = contentLines.join("\n").trim();
+    sections.push(currentSection);
+  }
+
+  return sections;
 }
 
 // ============================================
@@ -153,30 +147,29 @@ export default function ModuleLearn() {
   // Derived state
   const currentProgress = progress?.progress_percent || 0;
 
-  // Extract TOC from content
-  const tocItems = useMemo(() => {
+  // ============================================
+  // OPTIMIZED: Parse sections ONCE when content changes
+  // ============================================
+  const sections = useMemo(() => {
     if (!module?.content) return [];
-    return extractTOCFromContent(module.content);
+    return parseModuleSections(module.content);
   }, [module?.content]);
 
-  // Get current section content
-  const currentContent = useMemo(() => {
-    if (!module?.content) return "";
-    if (!currentSectionId || tocItems.length === 0) return module.content;
-    return extractSectionContent(module.content, currentSectionId, tocItems);
-  }, [module?.content, currentSectionId, tocItems]);
+  // Get current section content via simple lookup (O(n) but no string splitting)
+  const currentSectionIndex = sections.findIndex((s) => s.id === currentSectionId);
+  const currentSection = currentSectionIndex >= 0 ? sections[currentSectionIndex] : sections[0];
+  const currentContent = currentSection?.content || module?.content || "";
 
   // Navigation helpers
-  const currentSectionIndex = tocItems.findIndex((item) => item.id === currentSectionId);
   const hasPrevious = currentSectionIndex > 0;
-  const hasNext = currentSectionIndex < tocItems.length - 1 && currentSectionIndex >= 0;
+  const hasNext = currentSectionIndex < sections.length - 1 && currentSectionIndex >= 0;
 
   // Set initial section
   useEffect(() => {
-    if (tocItems.length > 0 && !currentSectionId) {
-      setCurrentSectionId(tocItems[0].id);
+    if (sections.length > 0 && !currentSectionId) {
+      setCurrentSectionId(sections[0].id);
     }
-  }, [tocItems, currentSectionId]);
+  }, [sections, currentSectionId]);
 
   // Scroll to top when section changes
   useEffect(() => {
@@ -187,9 +180,9 @@ export default function ModuleLearn() {
 
   // Update progress when changing sections
   useEffect(() => {
-    if (!user || !moduleId || tocItems.length === 0 || currentSectionIndex < 0) return;
+    if (!user || !moduleId || sections.length === 0 || currentSectionIndex < 0) return;
 
-    const newProgress = Math.round(((currentSectionIndex + 1) / tocItems.length) * 100);
+    const newProgress = Math.round(((currentSectionIndex + 1) / sections.length) * 100);
     if (newProgress > currentProgress) {
       // Silently save progress without notification
       updateProgress.mutate(
@@ -202,18 +195,18 @@ export default function ModuleLearn() {
         { onSuccess: () => refetchProgress() }
       );
     }
-  }, [currentSectionIndex, tocItems.length, user, moduleId, currentProgress, updateProgress, refetchProgress]);
+  }, [currentSectionIndex, sections.length, user, moduleId, currentProgress, updateProgress, refetchProgress]);
 
   // Navigation handlers
   const handlePrevious = () => {
     if (hasPrevious) {
-      setCurrentSectionId(tocItems[currentSectionIndex - 1].id);
+      setCurrentSectionId(sections[currentSectionIndex - 1].id);
     }
   };
 
   const handleNext = () => {
     if (hasNext) {
-      setCurrentSectionId(tocItems[currentSectionIndex + 1].id);
+      setCurrentSectionId(sections[currentSectionIndex + 1].id);
     }
   };
 
@@ -334,13 +327,13 @@ export default function ModuleLearn() {
           {/* TOC List */}
           <ScrollArea className="flex-1 p-3">
             <nav className="space-y-1">
-              {tocItems.length === 0 ? (
+              {sections.length === 0 ? (
                 <p className="text-sm text-muted-foreground p-2">No sections</p>
               ) : (
-                tocItems.map((item, index) => {
+                sections.map((item, index) => {
                   const isActive = item.id === currentSectionId;
                   const isCompleted = currentSectionId
-                    ? tocItems.findIndex((i) => i.id === currentSectionId) > index
+                    ? sections.findIndex((i) => i.id === currentSectionId) > index
                     : false;
 
                   return (
@@ -408,7 +401,7 @@ export default function ModuleLearn() {
                 </div>
                 <ScrollArea className="h-[calc(100vh-60px)] p-3">
                   <nav className="space-y-1">
-                    {tocItems.map((item, index) => {
+                    {sections.map((item, index) => {
                       const isActive = item.id === currentSectionId;
                       return (
                         <button
@@ -439,7 +432,7 @@ export default function ModuleLearn() {
             <div>
               <h1 className="font-semibold text-sm text-foreground line-clamp-1">{module.title}</h1>
               <p className="text-[10px] text-muted-foreground">
-                {currentSectionIndex + 1} of {tocItems.length || 1}
+                {currentSectionIndex + 1} of {sections.length || 1}
               </p>
             </div>
           </div>
@@ -469,7 +462,7 @@ export default function ModuleLearn() {
           ref={contentRef}
           content={currentContent}
           metadata={{
-            title: tocItems[currentSectionIndex]?.title || module.title,
+            title: currentSection?.title || module.title,
             description: module.summary || undefined,
             category: module.category || undefined,
             readingTime: Math.ceil((currentContent?.length || 0) / 1000),
@@ -490,7 +483,7 @@ export default function ModuleLearn() {
           </Button>
 
           <Badge variant="secondary">
-            {currentSectionIndex + 1} / {tocItems.length || 1}
+            {currentSectionIndex + 1} / {sections.length || 1}
           </Badge>
 
           {hasNext ? (

@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { getChangelog, type ChangelogEntry } from "@/lib/changelogParser";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { cn } from "@/lib/utils";
 
 // ============================================
 // CHANGELOG DATA (Dynamic from CHANGELOG.md)
@@ -68,6 +69,7 @@ function CollapsibleSection({ title, count, items, icon, type }: CollapsibleSect
     }
 
     return (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-3 hover:bg-muted/50 rounded-lg transition-colors group">
                 <span className={cn("flex items-center gap-2 text-sm font-medium", styles.text)}>
                     {icon}
@@ -88,13 +90,13 @@ function CollapsibleSection({ title, count, items, icon, type }: CollapsibleSect
                                     content={item} 
                                     variant="compact" 
                                     enableCodeEditor={false} 
-                                / >
+                                />
                             </div>
                         </li>
                     ))}
                 </ul>
             </CollapsibleContent>
-        </Collapsible >
+        </Collapsible>
     );
 }
 

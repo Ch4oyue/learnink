@@ -88,11 +88,7 @@ function extractListItems(block: string, header: string): string[] {
         // Match markdown list items: - Item text or - `code` text
         const itemMatch = line.match(/^-\s+(.+)/);
         if (itemMatch) {
-            // Clean up markdown formatting for display
-            const cleanItem = itemMatch[1]
-                .replace(/`([^`]+)`/g, '$1') // Remove code backticks
-                .replace(/\*\*([^*]+)\*\*/g, '$1') // Remove bold markers
-                .trim();
+            const cleanItem = itemMatch[1].trim();
             items.push(cleanItem);
         }
     }

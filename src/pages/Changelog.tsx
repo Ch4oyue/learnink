@@ -16,8 +16,8 @@ import {
     Calendar,
     Tag,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { getChangelog, type ChangelogEntry } from "@/lib/changelogParser";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 
 // ============================================
 // CHANGELOG DATA (Dynamic from CHANGELOG.md)
@@ -34,11 +34,27 @@ interface CollapsibleSectionProps {
     count: number;
     items: string[];
     icon: React.ReactNode;
-    colorClass: string;
+    type: 'improvements' | 'fixes' | 'patches';
 }
 
-function CollapsibleSection({ title, count, items, icon, colorClass }: CollapsibleSectionProps) {
+const SECTION_STYLES = {
+    improvements: {
+        text: "text-green-500",
+        bullet: "bg-green-500"
+    },
+    fixes: {
+        text: "text-amber-500",
+        bullet: "bg-amber-500"
+    },
+    patches: {
+        text: "text-blue-500",
+        bullet: "bg-blue-500"
+    }
+};
+
+function CollapsibleSection({ title, count, items, icon, type }: CollapsibleSectionProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const styles = SECTION_STYLES[type];
 
     if (count === 0) {
         return (
@@ -52,9 +68,8 @@ function CollapsibleSection({ title, count, items, icon, colorClass }: Collapsib
     }
 
     return (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-3 hover:bg-muted/50 rounded-lg transition-colors group">
-                <span className={cn("flex items-center gap-2 text-sm font-medium", colorClass)}>
+                <span className={cn("flex items-center gap-2 text-sm font-medium", styles.text)}>
                     {icon}
                     {title} ({count})
                 </span>
@@ -67,13 +82,19 @@ function CollapsibleSection({ title, count, items, icon, colorClass }: Collapsib
                 <ul className="space-y-1.5 mt-2 ml-6">
                     {items.map((item, index) => (
                         <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                            <span className={cn("mt-1.5 h-1.5 w-1.5 rounded-full shrink-0", colorClass.replace("text-", "bg-"))} />
-                            {item}
+                            <span className={cn("mt-1.5 h-1.5 w-1.5 rounded-full shrink-0", styles.bullet)} />
+                            <div className="flex-1">
+                                <MarkdownRenderer 
+                                    content={item} 
+                                    variant="compact" 
+                                    enableCodeEditor={false} 
+                                / >
+                            </div>
                         </li>
                     ))}
                 </ul>
             </CollapsibleContent>
-        </Collapsible>
+        </Collapsible >
     );
 }
 
@@ -155,21 +176,21 @@ export default function Changelog() {
                                         count={entry.improvements.length}
                                         items={entry.improvements}
                                         icon={<Sparkles className="h-4 w-4" />}
-                                        colorClass="text-green-500"
+                                        type="improvements"
                                     />
                                     <CollapsibleSection
                                         title="Fixes"
                                         count={entry.fixes.length}
                                         items={entry.fixes}
                                         icon={<Wrench className="h-4 w-4" />}
-                                        colorClass="text-amber-500"
+                                        type="fixes"
                                     />
                                     <CollapsibleSection
                                         title="Patches"
                                         count={entry.patches.length}
                                         items={entry.patches}
                                         icon={<Package className="h-4 w-4" />}
-                                        colorClass="text-blue-500"
+                                        type="patches"
                                     />
                                 </div>
                             </div>

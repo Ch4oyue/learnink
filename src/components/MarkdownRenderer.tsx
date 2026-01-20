@@ -7,6 +7,7 @@ interface MarkdownRendererProps {
   content: string;
   className?: string;
   enableCodeEditor?: boolean;
+  variant?: 'default' | 'compact';
 }
 
 const purifyConfig = {
@@ -124,6 +125,7 @@ export function MarkdownRenderer({
   content,
   className,
   enableCodeEditor = true,
+  variant = 'default',
 }: MarkdownRendererProps) {
 
   const parsedContent = useMemo(() => {
@@ -178,7 +180,7 @@ export function MarkdownRenderer({
   }, [content]);
 
   return (
-    <div className={cn("space-y-6", className)}>
+    <div className={cn(variant === 'default' ? "space-y-6" : "space-y-0", className)}>
       {parsedContent.map((segment) => {
         if (segment.type === 'python-code' && enableCodeEditor) {
           return (
@@ -191,7 +193,10 @@ export function MarkdownRenderer({
         return (
           <div
             key={segment.key}
-            className="prose prose-slate dark:prose-invert max-w-none"
+            className={cn(
+              "prose prose-slate dark:prose-invert max-w-none",
+              variant === 'compact' && "prose-p:my-0 prose-li:my-0 prose-ul:my-0 prose-ol:my-0"
+            )}
             dangerouslySetInnerHTML={{ __html: segment.content }}
           />
         );

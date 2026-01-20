@@ -150,11 +150,11 @@ export default function DashboardProfile() {
         description: "Profil berhasil diperbarui",
       });
       setIsEditing(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Update profile error:", error);
       toast({
         title: "Error",
-        description: error.message || "Gagal memperbarui profil",
+        description: error instanceof Error ? error.message : "Gagal memperbarui profil",
         variant: "destructive",
       });
     } finally {

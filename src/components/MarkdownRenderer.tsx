@@ -24,6 +24,14 @@ const purifyConfig = {
   ALLOW_DATA_ATTR: false,
 };
 
+// Add hook to ensure all links have security attributes
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+  if (node instanceof HTMLAnchorElement && 'target' in node) {
+    node.setAttribute('target', '_blank');
+    node.setAttribute('rel', 'noopener nofollow noreferrer');
+  }
+});
+
 interface ParsedContent {
   type: 'html' | 'python-code';
   content: string;
@@ -81,9 +89,9 @@ function parseMarkdown(text: string): string {
   html = html.replace(/^- (.*$)/gim, '<li class="ml-6 list-disc text-foreground/90 leading-relaxed">$1</li>');
   html = html.replace(/^\d+\. (.*$)/gim, '<li class="ml-6 list-decimal text-foreground/90 leading-relaxed">$1</li>');
 
-  html = html.replace(/(<li class="ml-4 list-disc.*?<\/li>\n?)+/gim, (match) =>
+  html = html.replace(/(<li class="ml-6 list-disc.*?<\/li>\n?)+/gim, (match) =>
     `<ul class="my-4 space-y-2">${match}</ul>`);
-  html = html.replace(/(<li class="ml-4 list-decimal.*?<\/li>\n?)+/gim, (match) =>
+  html = html.replace(/(<li class="ml-6 list-decimal.*?<\/li>\n?)+/gim, (match) =>
     `<ol class="my-4 space-y-2">${match}</ol>`);
 
   html = html.replace(/^---$/gim, '<hr class="my-6 border-border" />');
@@ -92,10 +100,10 @@ function parseMarkdown(text: string): string {
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, (_, text, url) => {
     const isExternal = url.startsWith('http://') || url.startsWith('https://');
     if (isExternal) {
-      // External link: add icon, nofollow, and visual indicator
-      return `<a href="${url}" class="text-primary hover:underline inline-flex items-center gap-1" target="_blank" rel="noopener nofollow noreferrer">${text}<svg class="inline-block w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>`;
+      // External link: add icon (security attributes handled by DOMPurify hook)
+      return `<a href="${url}" class="text-primary hover:underline inline-flex items-center gap-1">${text}<svg class="inline-block w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>`;
     } else {
-      // Internal link: no icon, standard behavior
+      // Internal link
       return `<a href="${url}" class="text-primary hover:underline">${text}</a>`;
     }
   });

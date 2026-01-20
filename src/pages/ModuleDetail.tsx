@@ -147,9 +147,10 @@ export default function ModuleDetail() {
 
   // Determine creator type for watermark
   const getCreatorBadge = () => {
-    // Check if module was AI generated (using optional chaining for type safety)
-    const isAiGenerated = (module as any).is_ai_generated;
-    if (isAiGenerated) {
+    // Check if module was AI generated
+    // Note: is_ai_generated may be added as a future field
+    const moduleWithAI = module as { is_ai_generated?: boolean };
+    if (moduleWithAI.is_ai_generated) {
       return (
         <Badge variant="outline" className="bg-purple-500/10 text-purple-500 border-purple-500/20 gap-1">
           <Wand2 className="h-3 w-3" />

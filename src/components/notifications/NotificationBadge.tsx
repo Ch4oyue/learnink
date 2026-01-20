@@ -6,7 +6,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotifications, useUnreadNotificationCount, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from "@/hooks/useNotifications";
+import { useNotifications, useUnreadNotificationCount, useMarkNotificationAsRead, useMarkAllNotificationsAsRead, Notification } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 import { BookOpen, CheckCircle, MessageSquare, Info, Sparkles } from "lucide-react";
@@ -35,7 +35,7 @@ export function NotificationBadge() {
   const markAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
 
-  const handleNotificationClick = (notification: any) => {
+  const handleNotificationClick = (notification: Notification) => {
     if (!notification.is_read) {
       markAsRead.mutate(notification.id);
     }

@@ -195,10 +195,10 @@ export default function DashboardUsers() {
                 {filteredUsers?.map((user) => {
                   const config = roleConfig[user.role];
                   const isSelf = user.id === currentUser?.id;
-                  // Check if this user is the super admin (by ID or by checking if current logged-in user's email matches)
-                  const isSuperAdmin =
+                  // Check if this user is the super admin (by ID or email)
+                  const isThisSuperAdmin =
                     (SUPER_ADMIN_USER_ID && user.id === SUPER_ADMIN_USER_ID) ||
-                    (currentUser?.email === SUPER_ADMIN_EMAIL && isSelf);
+                    (user.email === SUPER_ADMIN_EMAIL);
 
                   return (
                     <TableRow key={user.id}>
@@ -216,9 +216,9 @@ export default function DashboardUsers() {
                               {isSelf && (
                                 <span className="ml-2 text-xs text-muted-foreground">(Anda)</span>
                               )}
-                              {isSuperAdmin && (
-                                <Badge variant="outline" className="ml-2 text-xs bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-200 dark:border-red-800">
-                                  Super Admin
+                              {isThisSuperAdmin && (
+                                <Badge variant="outline" className="ml-2 text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800">
+                                  👑 Super Admin
                                 </Badge>
                               )}
                             </div>
@@ -241,7 +241,7 @@ export default function DashboardUsers() {
                         }
                       </TableCell>
                       <TableCell>
-                        {isSuperAdmin ? (
+                        {isThisSuperAdmin ? (
                           <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
                             <Shield className="h-3 w-3 mr-1" />
                             Protected

@@ -100,6 +100,7 @@ const App = () => (
                     ============================ */}
                   <Route path="/" element={<SmartLanding />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/login" element={<Navigate to="/auth" replace />} />
                   <Route path="/changelog" element={<Changelog />} />
 
                   {/* ============================

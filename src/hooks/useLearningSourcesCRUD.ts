@@ -11,7 +11,7 @@ type LearningSourceRow = Database["public"]["Tables"]["learning_sources"]["Row"]
 type LearningSourceInsert = Database["public"]["Tables"]["learning_sources"]["Insert"];
 type LearningSourceUpdate = Database["public"]["Tables"]["learning_sources"]["Update"];
 
-export interface LearningSource extends LearningSourceRow { }
+export type LearningSource = LearningSourceRow;
 
 export interface CreateLearningSourceInput {
     name: string;

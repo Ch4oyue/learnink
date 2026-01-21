@@ -178,12 +178,22 @@ export default function ModuleLearn() {
     }
   }, [currentSectionId]);
 
-  // Update progress when changing sections
+  // Track last saved progress to prevent duplicate API calls
+  const lastSavedProgressRef = useRef<number>(0);
+  const updatePendingRef = useRef<boolean>(false);
+
+  // Update progress when changing sections (debounced to prevent API spam)
   useEffect(() => {
     if (!user || !moduleId || sections.length === 0 || currentSectionIndex < 0) return;
+    if (updatePendingRef.current) return; // Skip if update is in flight
 
     const newProgress = Math.round(((currentSectionIndex + 1) / sections.length) * 100);
-    if (newProgress > currentProgress) {
+
+    // Only update if progress actually increased AND hasn't been saved yet
+    if (newProgress > currentProgress && newProgress > lastSavedProgressRef.current) {
+      updatePendingRef.current = true;
+      lastSavedProgressRef.current = newProgress;
+
       // Silently save progress without notification
       updateProgress.mutate(
         {
@@ -192,10 +202,15 @@ export default function ModuleLearn() {
           progressPercent: Math.min(newProgress, 100),
           isCompleted: newProgress >= 100,
         },
-        { onSuccess: () => refetchProgress() }
+        {
+          onSettled: () => {
+            updatePendingRef.current = false;
+          },
+        }
       );
     }
-  }, [currentSectionIndex, sections.length, user, moduleId, currentProgress, updateProgress, refetchProgress]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSectionIndex, sections.length, user?.id, moduleId, currentProgress]);
 
   // Navigation handlers
   const handlePrevious = () => {

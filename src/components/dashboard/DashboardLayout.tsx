@@ -90,6 +90,7 @@ const MENU_CONFIG: Record<AppRole, NavItem[]> = {
   user: [
     { href: "/dashboard", label: "Home", icon: LayoutDashboard },
     { href: "/dashboard/courses", label: "My Courses", icon: BookOpen },
+    { href: "/dashboard/second-brain", label: "Second Brain", icon: StickyNote },
     { href: "/dashboard/achievements", label: "Achievements", icon: Trophy },
   ],
   tutor: [

@@ -68,33 +68,31 @@ function CollapsibleSection({ title, count, items, icon, type }: CollapsibleSect
     }
 
     return (
+        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
             <CollapsibleTrigger className="flex items-center justify-between w-full py-2 px-3 hover:bg-muted/50 rounded-lg transition-colors group">
-                <span className={cn("flex items-center gap-2 text-sm font-medium", styles.text)}>
+                <span className={`flex items-center gap-2 text-sm font-medium ${styles.text}`}>
                     {icon}
                     {title} ({count})
                 </span>
-                <ChevronDown className={cn(
-                    "h-4 w-4 text-muted-foreground transition-transform",
-                    isOpen && "rotate-180"
-                )} />
+                <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </CollapsibleTrigger>
             <CollapsibleContent className="px-3 pb-2">
                 <ul className="space-y-1.5 mt-2 ml-6">
                     {items.map((item, index) => (
                         <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
-                            <span className={cn("mt-1.5 h-1.5 w-1.5 rounded-full shrink-0", styles.bullet)} />
+                            <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${styles.bullet}`} />
                             <div className="flex-1">
-                                <MarkdownRenderer 
-                                    content={item} 
-                                    variant="compact" 
-                                    enableCodeEditor={false} 
-                                / >
+                                <MarkdownRenderer
+                                    content={item}
+                                    variant="compact"
+                                    enableCodeEditor={false}
+                                />
                             </div>
                         </li>
                     ))}
                 </ul>
             </CollapsibleContent>
-        </Collapsible >
+        </Collapsible>
     );
 }
 

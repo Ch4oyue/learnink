@@ -124,11 +124,8 @@ export function useUpdateProgress() {
       return data;
     },
     onSuccess: (_, variables) => {
+      // Silently invalidate cache - no toast for automatic progress saves
       queryClient.invalidateQueries({ queryKey: ['user-progress', variables.userId] });
-      toast({
-        title: "Progress disimpan",
-        description: "Kemajuan belajar Anda telah disimpan",
-      });
     },
     onError: (error) => {
       toast({

@@ -54,55 +54,27 @@ export function useUsers() {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      // Try to fetch profiles with email column first
-      let profiles: Array<{
-        id: string;
-        display_name: string | null;
-        avatar_url: string | null;
-        created_at: string | null;
-        email?: string | null;
-      }>;
+      // Use the secure RPC function to fetch users with email (Admin only)
+      const { data, error } = await supabase.rpc('get_users_for_admin');
 
-      const { data: profilesWithEmail, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url, created_at, email')
-        .order('created_at', { ascending: false });
-
-      if (profilesError) {
-        // If error is about email column not existing, try without it
-        if (profilesError.code === 'PGRST204' || profilesError.message?.includes('email')) {
-          console.warn('Email column not found in profiles, fetching without it');
-          const { data: profilesNoEmail, error: fallbackError } = await supabase
-            .from('profiles')
-            .select('id, display_name, avatar_url, created_at')
-            .order('created_at', { ascending: false });
-
-          if (fallbackError) throw fallbackError;
-          profiles = (profilesNoEmail || []).map(p => ({ ...p, email: null }));
-        } else {
-          throw profilesError;
-        }
-      } else {
-        profiles = profilesWithEmail || [];
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
       }
 
-      // Then get all roles
-      const { data: roles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      if (rolesError) throw rolesError;
-
-      // Create a map of user_id -> role
-      const roleMap = new Map(roles?.map(r => [r.user_id, r.role as AppRole]) || []);
-
-      // Combine the data with email for Super Admin detection
-      return profiles.map(profile => ({
-        ...profile,
-        email: profile.email || null,
-        role: roleMap.get(profile.id) || 'user',
+      // Map the response to match UserWithRole interface
+      // The RPC returns email as text, and role as app_role type
+      return (data || []).map(user => ({
+        id: user.id,
+        email: user.email || null,
+        display_name: user.display_name,
+        avatar_url: user.avatar_url,
+        created_at: user.created_at,
+        role: user.role as AppRole,
       })) as UserWithRole[];
     },
+    // Only retry once to avoid spamming if not admin
+    retry: 1,
   });
 }
 

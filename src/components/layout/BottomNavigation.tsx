@@ -1,6 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadNotificationCount } from "@/hooks/useNotifications";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
@@ -10,12 +12,28 @@ import {
   User,
   Users,
   Settings,
+  CheckCircle,
 } from "lucide-react";
 
 export function BottomNavigation() {
   const { user, role } = useAuth();
   const location = useLocation();
   const { data: unreadCount } = useUnreadNotificationCount(user?.id);
+
+  // Fetch pending approval count for admin
+  const { data: pendingApprovalCount } = useQuery({
+    queryKey: ["pending-approval-count-mobile"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("incoming_contents")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending");
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: role === "admin",
+    refetchInterval: 30000,
+  });
 
   const getDashboardPath = () => {
     if (role === "admin") return "/dashboard/admin";
@@ -55,6 +73,13 @@ export function BottomNavigation() {
       roles: ["admin"],
     },
     {
+      href: "/dashboard/admin/approval",
+      label: "Inbox",
+      icon: CheckCircle,
+      badge: pendingApprovalCount,
+      roles: ["admin"],
+    },
+    {
       href: "/dashboard/notifications",
       label: "Notifikasi",
       icon: Bell,
@@ -69,6 +94,7 @@ export function BottomNavigation() {
       roles: ["user", "tutor", "admin"],
     },
   ];
+
 
   const filteredItems = navItems.filter(
     (item) => role && item.roles.includes(role) &&

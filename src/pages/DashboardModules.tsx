@@ -47,7 +47,28 @@ import {
   Sparkles,
   CheckCircle2,
   Clock,
+  Loader2,
 } from "lucide-react";
+
+// Status badge configuration
+const STATUS_CONFIG = {
+  mastered: {
+    label: "Mastered",
+    className: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
+    icon: CheckCircle2,
+  },
+  exploring: {
+    label: "Exploring",
+    className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
+    icon: Loader2,
+  },
+  queue: {
+    label: "Queue",
+    className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400",
+    icon: Clock,
+  },
+} as const;
+
 
 export default function DashboardModules() {
   const { user, role } = useAuth();
@@ -295,13 +316,24 @@ export default function DashboardModules() {
                           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                             {module.summary}
                           </p>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             <Badge variant="secondary" className="text-xs">
                               {module.category}
                             </Badge>
                             <Badge variant="outline" className="text-xs">
                               {module.level}
                             </Badge>
+                            {/* Module Status Badge (Creator Confidence) */}
+                            {module.status && STATUS_CONFIG[module.status as keyof typeof STATUS_CONFIG] && (() => {
+                              const config = STATUS_CONFIG[module.status as keyof typeof STATUS_CONFIG];
+                              const StatusIcon = config.icon;
+                              return (
+                                <Badge className={`text-xs gap-1 ${config.className}`}>
+                                  <StatusIcon className={`h-3 w-3 ${module.status === 'exploring' ? 'animate-spin' : ''}`} />
+                                  {config.label}
+                                </Badge>
+                              );
+                            })()}
                           </div>
                         </CardContent>
                       </Card>

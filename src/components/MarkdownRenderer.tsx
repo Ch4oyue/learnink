@@ -208,11 +208,19 @@ export function MarkdownRenderer({
   return (
     <div className={cn(variant === 'default' ? "space-y-6" : "space-y-0", className)}>
       {parsedContent.map((segment) => {
-        if (segment.type === 'python-code' && enableCodeEditor) {
+        if (segment.type === 'python-code') {
+          if (enableCodeEditor) {
+            return (
+              <div key={segment.key} className="my-6">
+                <PythonCodeEditor initialCode={segment.content} />
+              </div>
+            );
+          }
+          // Fallback: render as static code block (safe from XSS)
           return (
-            <div key={segment.key} className="my-6">
-              <PythonCodeEditor initialCode={segment.content} />
-            </div>
+            <pre key={segment.key} className="bg-muted rounded-lg p-4 my-4 overflow-x-auto">
+              <code className="text-sm font-mono text-foreground">{segment.content}</code>
+            </pre>
           );
         }
 

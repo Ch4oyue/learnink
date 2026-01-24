@@ -49,6 +49,34 @@ export function useUserProgress(userId?: string) {
   });
 }
 
+export function useAllProgress(page = 0, limit = 10) {
+  return useQuery({
+    queryKey: ['all-progress', page, limit],
+    queryFn: async () => {
+      const from = page * limit;
+      const to = from + limit - 1;
+
+      const { data, count, error } = await supabase
+        .from('user_progress')
+        .select(`
+          *,
+          modules (
+            id,
+            title,
+            level,
+            icon_name
+          )
+        `, { count: 'exact' })
+        .range(from, to)
+        .order('started_at', { ascending: false });
+
+      if (error) throw error;
+      return { data: data as UserProgressWithModule[], count };
+    },
+    placeholderData: (previousData) => previousData,
+  });
+}
+
 export function useModuleProgress(userId?: string, moduleId?: string) {
   return useQuery({
     queryKey: ['user-progress', userId, moduleId],

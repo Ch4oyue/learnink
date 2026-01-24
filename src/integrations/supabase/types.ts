@@ -14,6 +14,101 @@ export type Database = {
   }
   public: {
     Tables: {
+      incoming_contents: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          integration_id: string | null
+          processed_at: string | null
+          processed_by: string | null
+          raw_content: Json | null
+          source: string | null
+          status: Database["public"]["Enums"]["content_status"] | null
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          integration_id?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          raw_content?: Json | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          title: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          integration_id?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          raw_content?: Json | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incoming_contents_integration_id_fkey"
+            columns: ["integration_id"]
+            isOneToOne: false
+            referencedRelation: "integrations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      integrations: {
+        Row: {
+          api_key_hash: string
+          api_key_preview: string
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          last_used_at: string | null
+          name: string
+          request_count: number | null
+          source: Database["public"]["Enums"]["integration_source"]
+          updated_at: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          api_key_hash: string
+          api_key_preview: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          name: string
+          request_count?: number | null
+          source?: Database["public"]["Enums"]["integration_source"]
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          api_key_hash?: string
+          api_key_preview?: string
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_used_at?: string | null
+          name?: string
+          request_count?: number | null
+          source?: Database["public"]["Enums"]["integration_source"]
+          updated_at?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
       learning_notes: {
         Row: {
           content: string
@@ -658,6 +753,8 @@ export type Database = {
     }
     Enums: {
       app_role: "user" | "moderator" | "admin" | "tutor"
+      content_status: "pending" | "approved" | "rejected"
+      integration_source: "n8n" | "notion" | "chatgpt" | "zapier" | "custom"
       request_status: "pending" | "reviewing" | "completed" | "rejected"
     }
     CompositeTypes: {
@@ -787,6 +884,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin", "tutor"],
+      content_status: ["pending", "approved", "rejected"],
+      integration_source: ["n8n", "notion", "chatgpt", "zapier", "custom"],
       request_status: ["pending", "reviewing", "completed", "rejected"],
     },
   },

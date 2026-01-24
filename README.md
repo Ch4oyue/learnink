@@ -10,6 +10,7 @@ LearnInk is a modern learning management system (LMS) and educational platform d
 - **In-Browser Coding:** Integrated Python code execution environment using Pyodide.
 - **Student Dashboard:** Track progress, manage enrolled courses, and view notifications.
 - **Authentication:** Secure user authentication with Supabase, featuring show/hide password states.
+- **Code Quality:** Comprehensive ESLint configuration and strict TypeScript usage for reliable development.
 
 ## Tech Stack
 

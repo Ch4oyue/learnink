@@ -99,11 +99,6 @@ export function CustomCursor() {
         setIsVisible(false);
     }, []);
 
-// Cache for element cursor styles to avoid layout thrashing
-const cursorStyleCache = new WeakMap<HTMLElement, string>();
-
-// ...
-
     // Check if hovering interactive element
     const handleElementHover = useCallback((e: MouseEvent) => {
         const target = e.target as HTMLElement;

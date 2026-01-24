@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -39,6 +39,28 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
+  const handleSubmit = useCallback(async () => {
+    if (validateQuiz.isPending || !user) return;
+
+    try {
+      const result = await validateQuiz.mutateAsync({
+        quiz_id: quiz.id,
+        answers,
+      });
+
+      setResults(result.results);
+      setShowResults(true);
+      onComplete(result.attempt);
+    } catch (error) {
+      logger.error("Error submitting quiz:", error);
+    }
+  }, [validateQuiz, user, quiz.id, answers, onComplete]);
+
+  const handleSubmitRef = useRef(handleSubmit);
+  useEffect(() => {
+    handleSubmitRef.current = handleSubmit;
+  }, [handleSubmit]);
+
   // Timer
   useEffect(() => {
     if (showResults) return;
@@ -46,7 +68,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 1) {
-          handleSubmit();
+          handleSubmitRef.current();
           return 0;
         }
         return prev - 1;
@@ -78,22 +100,6 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
     }
   };
 
-  const handleSubmit = async () => {
-    if (validateQuiz.isPending || !user) return;
-
-    try {
-      const result = await validateQuiz.mutateAsync({
-        quiz_id: quiz.id,
-        answers,
-      });
-      
-      setResults(result.results);
-      setShowResults(true);
-      onComplete(result.attempt);
-    } catch (error) {
-      logger.error("Error submitting quiz:", error);
-    }
-  };
 
   if (showResults && results) {
     return (

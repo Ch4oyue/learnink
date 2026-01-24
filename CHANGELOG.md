@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.2] - January 21, 2026
+
+### Bug Fixes & Code Quality
+
+Resolved multiple ESLint errors and warnings across the project to improve code stability and maintainability.
+
+#### Fixes (5)
+- Replaced `any` types with proper TypeScript types in `DashboardProfile.tsx` and `generate-quiz` Supabase function.
+- Fixed regex-related ESLint errors (`no-control-regex`, `no-useless-escape`) in Supabase Edge Functions.
+- Converted `require()` statements to ES module imports in `tailwind.config.ts`.
+- Resolved missing dependency warnings in `QuizPlayer.tsx` and `CustomCursor.tsx`.
+- Removed duplicate variable definitions in `CustomCursor.tsx`.
+
+#### Improvements (1)
+- Refactored `ModuleTOC.tsx` and other components to reduce Fast Refresh warnings and improve HMR.
+
 ## [1.4.1] - January 20, 2026
 
 ### Code Quality & Security Audit

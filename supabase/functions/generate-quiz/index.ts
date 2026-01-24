@@ -218,8 +218,17 @@ PENTING:
 
     console.log(`Quiz created with ID: ${quiz.id}`);
 
+    interface QuizQuestion {
+      question_text: string;
+      question_type: string;
+      options: string[] | null;
+      correct_answer: string;
+      explanation: string | null;
+      points: number;
+    }
+
     // Create questions
-    const questions = quizData.questions.map((q: any, index: number) => ({
+    const questions = quizData.questions.map((q: QuizQuestion, index: number) => ({
       quiz_id: quiz.id,
       question_text: q.question_text,
       question_type: q.question_type,
@@ -256,7 +265,7 @@ PENTING:
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("Generate quiz error:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(

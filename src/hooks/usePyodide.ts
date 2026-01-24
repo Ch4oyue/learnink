@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { pyodideManager, PyodideInstance } from "@/lib/pyodide-manager";
 
 interface UsePyodideOptions {
@@ -21,6 +21,18 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
 
   const pyodideRef = useRef<PyodideInstance | null>(null);
   const outputBuffer = useRef<string[]>([]);
+
+  // Use refs for callbacks to avoid re-creating functions when callbacks change
+  const onOutputRef = useRef(onOutput);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onOutputRef.current = onOutput;
+  }, [onOutput]);
+
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
 
   const setupStreams = useCallback((pyodide: PyodideInstance) => {
     pyodide.setStdout({
@@ -50,9 +62,9 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : "Failed to load Python runtime";
       setState({ isLoading: false, isReady: false, error: errorMsg });
-      onError?.(errorMsg);
+      onErrorRef.current?.(errorMsg);
     }
-  }, [state.isLoading, onError]);
+  }, [state.isLoading]);
 
   const runCode = useCallback(async (code: string): Promise<{ output: string; error?: string }> => {
     if (!pyodideRef.current) {
@@ -82,14 +94,14 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
         output += (output ? '\n' : '') + String(result);
       }
 
-      onOutput?.(output);
+      onOutputRef.current?.(output);
       return { output };
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
-      onError?.(errorMsg);
+      onErrorRef.current?.(errorMsg);
       return { output: outputBuffer.current.join('\n'), error: errorMsg };
     }
-  }, [loadPyodide, onOutput, onError, setupStreams]);
+  }, [loadPyodide, setupStreams]);
 
   const reset = useCallback(() => {
     outputBuffer.current = [];

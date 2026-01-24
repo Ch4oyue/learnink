@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
@@ -152,7 +153,7 @@ export default function IntegrationManager() {
             });
 
             if (error) {
-                console.error("Edge Function error:", error);
+                logger.error("Edge Function error:", error);
                 throw new Error(error.message || "Failed to call Edge Function");
             }
 
@@ -238,7 +239,7 @@ export default function IntegrationManager() {
             });
 
             if (error) {
-                console.error("Edge Function error:", error);
+                logger.error("Edge Function error:", error);
                 throw new Error(error.message || "Failed to regenerate API key");
             }
 

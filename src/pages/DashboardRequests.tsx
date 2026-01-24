@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -101,7 +102,7 @@ export default function DashboardRequests() {
 
       setGenerateId(null);
     } catch (error) {
-      console.error("Generate error:", error);
+      logger.error("Generate error:", error);
     }
   };
 

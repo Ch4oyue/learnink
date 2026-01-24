@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -129,7 +130,7 @@ export function useCreateRequest() {
         description: "Gagal mengirim request materi",
         variant: "destructive",
       });
-      console.error('Error creating request:', error);
+      logger.error('Error creating request:', error);
     },
   });
 }
@@ -179,7 +180,7 @@ export function useUpdateRequest() {
         description: "Gagal memperbarui request",
         variant: "destructive",
       });
-      console.error('Error updating request:', error);
+      logger.error('Error updating request:', error);
     },
   });
 }

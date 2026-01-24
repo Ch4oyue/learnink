@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -22,7 +23,7 @@ export function useLearningSourcesMarquee() {
                 .order("display_order", { ascending: true });
 
             if (error) {
-                console.error("Error fetching learning sources:", error);
+                logger.error("Error fetching learning sources:", error);
                 return [];
             }
 

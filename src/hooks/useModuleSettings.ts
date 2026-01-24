@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -70,7 +71,7 @@ export function useCreateCategory() {
       queryClient.invalidateQueries({ queryKey: ["module-categories"] });
     },
     onError: (error) => {
-      console.error("Error creating category:", error);
+      logger.error("Error creating category:", error);
       toast({
         title: "Error",
         description: "Gagal membuat kategori",
@@ -99,7 +100,7 @@ export function useCreateLevel() {
       queryClient.invalidateQueries({ queryKey: ["module-levels"] });
     },
     onError: (error) => {
-      console.error("Error creating level:", error);
+      logger.error("Error creating level:", error);
       toast({
         title: "Error",
         description: "Gagal membuat level",
@@ -130,7 +131,7 @@ export function useDeleteCategory() {
       });
     },
     onError: (error) => {
-      console.error("Error deleting category:", error);
+      logger.error("Error deleting category:", error);
       toast({
         title: "Error",
         description: "Gagal menghapus kategori",
@@ -161,7 +162,7 @@ export function useDeleteLevel() {
       });
     },
     onError: (error) => {
-      console.error("Error deleting level:", error);
+      logger.error("Error deleting level:", error);
       toast({
         title: "Error",
         description: "Gagal menghapus level",

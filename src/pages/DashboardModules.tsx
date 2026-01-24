@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -99,8 +99,14 @@ export default function DashboardModules() {
     }
   };
 
+  // Optimize progress lookup from O(N^2) to O(N) using a Map
+  const progressMap = useMemo(() => {
+    if (!progress) return new Map();
+    return new Map(progress.map((p) => [p.module_id, p]));
+  }, [progress]);
+
   const getProgressForModule = (moduleId: string) => {
-    return progress?.find((p) => p.module_id === moduleId);
+    return progressMap.get(moduleId);
   };
 
   const publishedModules = filterModules(allModules?.filter((m) => m.is_published));

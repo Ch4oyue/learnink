@@ -54,37 +54,18 @@ export function useUsers() {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      // Try to fetch profiles with email column first
-      let profiles: Array<{
-        id: string;
-        display_name: string | null;
-        avatar_url: string | null;
-        created_at: string | null;
-        email?: string | null;
-      }>;
-
-      const { data: profilesWithEmail, error: profilesError } = await supabase
+      // Fetch profiles without email (removed for privacy)
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, display_name, avatar_url, created_at, email')
+        .select('id, display_name, avatar_url, created_at')
         .order('created_at', { ascending: false });
 
-      if (profilesError) {
-        // If error is about email column not existing, try without it
-        if (profilesError.code === 'PGRST204' || profilesError.message?.includes('email')) {
-          console.warn('Email column not found in profiles, fetching without it');
-          const { data: profilesNoEmail, error: fallbackError } = await supabase
-            .from('profiles')
-            .select('id, display_name, avatar_url, created_at')
-            .order('created_at', { ascending: false });
+      if (profilesError) throw profilesError;
 
-          if (fallbackError) throw fallbackError;
-          profiles = (profilesNoEmail || []).map(p => ({ ...p, email: null }));
-        } else {
-          throw profilesError;
-        }
-      } else {
-        profiles = profilesWithEmail || [];
-      }
+      const profiles = (profilesData || []).map(p => ({
+        ...p,
+        email: null // Email is no longer accessible via public profiles
+      }));
 
       // Then get all roles
       const { data: roles, error: rolesError } = await supabase
@@ -99,7 +80,7 @@ export function useUsers() {
       // Combine the data with email for Super Admin detection
       return profiles.map(profile => ({
         ...profile,
-        email: profile.email || null,
+        email: null,
         role: roleMap.get(profile.id) || 'user',
       })) as UserWithRole[];
     },
@@ -108,7 +89,8 @@ export function useUsers() {
 
 export function isSuperAdmin(user: { id: string; email?: string | null }): boolean {
   // Check by email (primary) or by ID (fallback)
-  const emailMatch = user.email === SUPER_ADMIN_EMAIL;
+  // Note: user.email might be null if fetched from public profiles
+  const emailMatch = !!user.email && user.email === SUPER_ADMIN_EMAIL;
   const idMatch = SUPER_ADMIN_USER_ID !== null && user.id === SUPER_ADMIN_USER_ID;
 
   return emailMatch || idMatch;

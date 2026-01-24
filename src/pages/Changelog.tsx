@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { getChangelog, type ChangelogEntry } from "@/lib/changelogParser";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { cn } from "@/lib/utils";
 
 // ============================================
 // CHANGELOG DATA (Dynamic from CHANGELOG.md)
@@ -82,10 +83,10 @@ function CollapsibleSection({ title, count, items, icon, type }: CollapsibleSect
                         <li key={index} className="text-sm text-muted-foreground flex items-start gap-2">
                             <span className={`mt-1.5 h-1.5 w-1.5 rounded-full shrink-0 ${styles.bullet}`} />
                             <div className="flex-1">
-                                <MarkdownRenderer
-                                    content={item}
-                                    variant="compact"
-                                    enableCodeEditor={false}
+                                <MarkdownRenderer 
+                                    content={item} 
+                                    variant="compact" 
+                                    enableCodeEditor={false} 
                                 />
                             </div>
                         </li>

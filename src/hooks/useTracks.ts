@@ -14,6 +14,12 @@ export interface Track {
   updated_at: string | null;
 }
 
+export interface UserTrackResponse {
+  id: string;
+  created_at: string;
+  track: Track;
+}
+
 export function useTracks() {
   return useQuery({
     queryKey: ["tracks"],
@@ -65,10 +71,10 @@ export function useUserTracks(userId?: string) {
 
       if (error) throw error;
 
-      // Flatten the structure for easier usage
-      // We cast to any first because TS might not infer the join structure perfectly
-      // without deeper type definitions, but Supabase returns it correctly.
-      return (data as any[]).map(item => ({
+      // We use unknown first to safely cast the Supabase response
+      const rawData = data as unknown as UserTrackResponse[];
+
+      return rawData.map(item => ({
         ...item.track,
         enrollment_id: item.id,
         enrolled_at: item.created_at

@@ -280,7 +280,7 @@ serve(async (req) => {
         // -------------------------
         // 2. Parse Body (Early) & Extract Token
         // -------------------------
-        let body: any;
+        let body: unknown;
         try {
             body = await req.json();
         } catch {
@@ -292,10 +292,20 @@ serve(async (req) => {
         let token = "";
         const authHeader = req.headers.get("Authorization");
 
+        // Helper to safely access api_key from unknown body
+        const getApiKeyFromBody = (b: unknown): string | null => {
+            if (b && typeof b === 'object' && 'api_key' in b) {
+                const key = (b as Record<string, unknown>).api_key;
+                return typeof key === 'string' ? key : null;
+            }
+            return null;
+        };
+
         if (authHeader && authHeader.startsWith("Bearer ")) {
             token = authHeader.replace("Bearer ", "");
-        } else if (body && typeof body.api_key === "string") {
-            token = body.api_key;
+        } else {
+            const bodyKey = getApiKeyFromBody(body);
+            if (bodyKey) token = bodyKey;
         }
 
         if (!token) {

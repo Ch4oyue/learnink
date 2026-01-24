@@ -61,16 +61,22 @@ export function useModule(id?: string) {
     queryFn: async () => {
       if (!id) return null;
 
+      // First try to get the module directly (without author join which can fail)
       const { data, error } = await supabase
         .from('modules')
-        .select(`*, author:profiles(id, full_name, avatar_url)`)
+        .select('*')
         .eq('id', id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Module fetch error:', error.message, error.details);
+        throw error;
+      }
+
       return data as Module;
     },
     enabled: !!id,
+    retry: 1, // Limit retries to avoid delays
   });
 }
 
@@ -107,7 +113,7 @@ export function useCreateModule() {
         .insert(module)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -142,7 +148,7 @@ export function useUpdateModule() {
         .eq('id', id)
         .select()
         .single();
-      
+
       if (error) throw error;
       return data;
     },
@@ -175,7 +181,7 @@ export function useDeleteModule() {
         .from('modules')
         .delete()
         .eq('id', id);
-      
+
       if (error) throw error;
     },
     onSuccess: () => {

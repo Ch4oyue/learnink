@@ -98,8 +98,23 @@ export interface IncomingContent {
     /** Title of the content */
     title: string;
 
-    /** Raw JSON content from n8n */
-    raw_content: {
+    /** Markdown content from Notion page body */
+    content?: string;
+
+    /** Summary/description of the content */
+    summary?: string;
+
+    /** Difficulty level (Pemula, Menengah, Lanjutan) */
+    level?: string;
+
+    /** Track/cluster (The Specialist, Life OS) */
+    track?: string;
+
+    /** Category of the module */
+    category?: string;
+
+    /** Raw JSON content from n8n (deprecated, kept for backward compatibility) */
+    raw_content?: {
         content?: string;
         tags?: string[];
         [key: string]: unknown;
@@ -110,6 +125,9 @@ export interface IncomingContent {
 
     /** Current review status */
     status: ContentStatus;
+
+    /** AI-generated summary (optional) */
+    ai_summary?: string;
 
     /** Timestamp when content was received */
     created_at: string;

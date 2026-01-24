@@ -25,6 +25,7 @@ const DashboardHome = lazy(() => import("./pages/DashboardHome"));
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon"));
+const SecondBrain = lazy(() => import("./pages/SecondBrain"));
 
 // Learning Pages
 const ModuleLearn = lazy(() => import("./pages/ModuleLearn"));
@@ -100,6 +101,7 @@ const App = () => (
                     ============================ */}
                   <Route path="/" element={<SmartLanding />} />
                   <Route path="/auth" element={<Auth />} />
+                  <Route path="/login" element={<Navigate to="/auth" replace />} />
                   <Route path="/changelog" element={<Changelog />} />
 
                   {/* ============================
@@ -126,6 +128,14 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <DashboardSettings />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/second-brain"
+                    element={
+                      <ProtectedRoute>
+                        <SecondBrain />
                       </ProtectedRoute>
                     }
                   />

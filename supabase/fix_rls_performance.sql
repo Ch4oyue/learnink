@@ -464,12 +464,31 @@ WITH CHECK (
 
 DROP POLICY IF EXISTS "Allow public read access for active sources" ON public.learning_sources;
 DROP POLICY IF EXISTS "Admin can manage learning_sources" ON public.learning_sources;
+DROP POLICY IF EXISTS "learning_sources_select_policy" ON public.learning_sources;
+DROP POLICY IF EXISTS "learning_sources_admin_policy" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable read access for all users" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable insert for admins only" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable update for admins only" ON public.learning_sources;
+DROP POLICY IF EXISTS "Enable delete for admins only" ON public.learning_sources;
 
+-- Public can read active sources (for landing page marquee)
 CREATE POLICY "learning_sources_select_policy" ON public.learning_sources
 FOR SELECT USING (is_active = true);
 
-CREATE POLICY "learning_sources_admin_policy" ON public.learning_sources
-FOR ALL TO authenticated
+-- Admin can insert new sources
+CREATE POLICY "learning_sources_insert_policy" ON public.learning_sources
+FOR INSERT TO authenticated
+WITH CHECK (
+    EXISTS (
+        SELECT 1 FROM public.user_roles
+        WHERE user_roles.user_id = (select auth.uid())
+        AND user_roles.role = 'admin'
+    )
+);
+
+-- Admin can update sources
+CREATE POLICY "learning_sources_update_policy" ON public.learning_sources
+FOR UPDATE TO authenticated
 USING (
     EXISTS (
         SELECT 1 FROM public.user_roles
@@ -478,6 +497,17 @@ USING (
     )
 )
 WITH CHECK (
+    EXISTS (
+        SELECT 1 FROM public.user_roles
+        WHERE user_roles.user_id = (select auth.uid())
+        AND user_roles.role = 'admin'
+    )
+);
+
+-- Admin can delete sources
+CREATE POLICY "learning_sources_delete_policy" ON public.learning_sources
+FOR DELETE TO authenticated
+USING (
     EXISTS (
         SELECT 1 FROM public.user_roles
         WHERE user_roles.user_id = (select auth.uid())

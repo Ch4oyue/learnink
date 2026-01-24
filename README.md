@@ -5,11 +5,11 @@ LearnInk is a modern learning management system (LMS) and educational platform d
 ## Features
 
 - **Interactive Learning Modules:** Structured learning content with support for rich media.
-- **In-Browser Coding:** Integrated Python code execution environment using Pyodide, allowing for interactive coding exercises.
+- **Dynamic Theme System:** Native support for Light, Dark, and System themes across all pages (including Auth).
+- **Premium UX & Motion:** GSAP-powered smooth scrolling and animated custom cursor for a high-end feel.
+- **In-Browser Coding:** Integrated Python code execution environment using Pyodide.
 - **Student Dashboard:** Track progress, manage enrolled courses, and view notifications.
-- **Material Requests:** System for students to request additional learning materials.
-- **Admin & Instructor Tools:** Comprehensive interfaces for managing users, requests, and creating/editing course modules.
-- **Authentication:** Secure user authentication powered by Supabase.
+- **Authentication:** Secure user authentication with Supabase, featuring show/hide password states.
 
 ## Tech Stack
 
@@ -62,7 +62,7 @@ This project is built with:
     bun run dev
     ```
 
-    The application will be available at `http://localhost:5173`.
+    The application will be available at `http://localhost:8080`.
 
 ## Scripts
 

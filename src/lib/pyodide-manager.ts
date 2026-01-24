@@ -3,10 +3,17 @@ interface PyodideConfig {
   indexURL: string;
 }
 
+// Pyodide instance type definition
+export interface PyodideInstance {
+  runPythonAsync: (code: string) => Promise<unknown>;
+  setStdout: (options: { batched: (text: string) => void }) => void;
+  setStderr: (options: { batched: (text: string) => void }) => void;
+}
+
 declare global {
   interface Window {
-    loadPyodide: (config: PyodideConfig) => Promise<any>;
-    pyodide: any;
+    loadPyodide: (config: PyodideConfig) => Promise<PyodideInstance>;
+    pyodide: PyodideInstance | undefined;
   }
 }
 
@@ -16,9 +23,9 @@ const SCRIPT_URL = `https://cdn.jsdelivr.net/pyodide/${PYODIDE_VERSION}/full/pyo
 
 class PyodideManager {
   private static instance: PyodideManager;
-  private pyodidePromise: Promise<any> | null = null;
+  private pyodidePromise: Promise<PyodideInstance> | null = null;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): PyodideManager {
     if (!PyodideManager.instance) {
@@ -27,7 +34,7 @@ class PyodideManager {
     return PyodideManager.instance;
   }
 
-  public async load(): Promise<any> {
+  public async load(): Promise<PyodideInstance> {
     if (this.pyodidePromise) {
       return this.pyodidePromise;
     }
@@ -36,7 +43,7 @@ class PyodideManager {
     return this.pyodidePromise;
   }
 
-  private async initializePyodide(): Promise<any> {
+  private async initializePyodide(): Promise<PyodideInstance> {
     // 1. Load the script if necessary
     if (!window.loadPyodide) {
       await this.loadScript();
@@ -44,7 +51,7 @@ class PyodideManager {
 
     // 2. Initialize Pyodide
     if (!window.loadPyodide) {
-        throw new Error("Pyodide script loaded but window.loadPyodide is missing");
+      throw new Error("Pyodide script loaded but window.loadPyodide is missing");
     }
 
     const pyodide = await window.loadPyodide({

@@ -11,6 +11,7 @@ import {
   useNotifications,
   useMarkNotificationAsRead,
   useMarkAllNotificationsAsRead,
+  Notification,
 } from "@/hooks/useNotifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
@@ -76,7 +77,7 @@ export default function DashboardNotifications() {
     };
   }, [user?.id, queryClient]);
 
-  const handleNotificationClick = async (notification: any) => {
+  const handleNotificationClick = async (notification: Notification) => {
     if (!notification.is_read) {
       await markAsRead.mutateAsync(notification.id);
     }
@@ -162,11 +163,10 @@ export default function DashboardNotifications() {
                     <button
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
-                      className={`w-full text-left p-4 rounded-lg border transition-all hover:shadow-soft ${
-                        notification.is_read
+                      className={`w-full text-left p-4 rounded-lg border transition-all hover:shadow-soft ${notification.is_read
                           ? "bg-background"
                           : "bg-primary/5 border-primary/20"
-                      }`}
+                        }`}
                     >
                       <div className="flex gap-4">
                         <div
@@ -178,9 +178,8 @@ export default function DashboardNotifications() {
                           <div className="flex items-start justify-between gap-2">
                             <div>
                               <p
-                                className={`font-medium ${
-                                  notification.is_read ? "" : "text-primary"
-                                }`}
+                                className={`font-medium ${notification.is_read ? "" : "text-primary"
+                                  }`}
                               >
                                 {notification.title}
                               </p>

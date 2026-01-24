@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, PlayCircle } from "lucide-react";
 import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
-import { InteractiveCodeBlock } from "./InteractiveCodeBlock";
+import { useRef, useState, lazy, Suspense } from "react";
+
+// Lazy load the heavy code block component
+const InteractiveCodeBlock = lazy(() => import("./InteractiveCodeBlock"));
 
 export function Hero() {
     const mockupRef = useRef(null);
@@ -100,11 +102,17 @@ export function Hero() {
                     <div className="absolute -inset-8 bg-gradient-to-r from-primary/20 via-purple-500/15 to-cyan-400/20 rounded-3xl blur-3xl opacity-60 dark:opacity-30 pointer-events-none" />
 
                     {/* Interactive Code Block */}
-                    <InteractiveCodeBlock
-                        language={selectedLanguage}
-                        showTypingAnimation={true}
-                        typingSpeed={12}
-                    />
+                    <Suspense fallback={
+                        <div className="w-full h-[400px] bg-[#1e1e1e] rounded-xl border border-zinc-800/60 shadow-2xl animate-pulse flex items-center justify-center">
+                            <span className="text-zinc-500 font-mono">Loading Editor...</span>
+                        </div>
+                    }>
+                        <InteractiveCodeBlock
+                            language={selectedLanguage}
+                            showTypingAnimation={true}
+                            typingSpeed={12}
+                        />
+                    </Suspense>
                 </motion.div>
 
                 {/* Feature highlights below code block */}

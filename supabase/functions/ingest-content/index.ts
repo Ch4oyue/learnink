@@ -13,6 +13,10 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 // Legacy secret for backward compatibility (optional)
 const INGEST_SECRET = Deno.env.get("INGEST_SECRET");
 
+// Rate limiting configuration
+const RATE_LIMIT_MAX_REQUESTS = 100; // Max requests per window
+const RATE_LIMIT_WINDOW_MINUTES = 15; // Time window in minutes
+
 const corsHeaders = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -32,6 +36,71 @@ interface ValidatedIntegration {
     id: string;
     name: string;
     source: string;
+}
+
+// =============================================
+// SECURITY LOGGING
+// =============================================
+
+async function logSecurityEvent(
+    supabase: ReturnType<typeof createClient>,
+    eventType: string,
+    req: Request,
+    errorCode: number,
+    errorMessage: string,
+    metadata: Record<string, unknown> = {}
+): Promise<void> {
+    try {
+        const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+            || req.headers.get("x-real-ip")
+            || "unknown";
+        const userAgent = req.headers.get("user-agent") || "unknown";
+
+        await supabase.rpc("log_security_event", {
+            p_event_type: eventType,
+            p_ip_address: ipAddress,
+            p_user_agent: userAgent.substring(0, 500),
+            p_endpoint: "/ingest-content",
+            p_request_method: req.method,
+            p_error_code: errorCode,
+            p_error_message: errorMessage.substring(0, 500),
+            p_metadata: metadata,
+        });
+    } catch (e) {
+        console.warn("Failed to log security event:", e);
+    }
+}
+
+// =============================================
+// RATE LIMITING
+// =============================================
+
+async function checkRateLimit(
+    supabase: ReturnType<typeof createClient>,
+    req: Request
+): Promise<boolean> {
+    try {
+        const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+            || req.headers.get("x-real-ip")
+            || "unknown";
+
+        const { data, error } = await supabase.rpc("check_rate_limit", {
+            p_identifier: ipAddress,
+            p_endpoint: "/ingest-content",
+            p_max_requests: RATE_LIMIT_MAX_REQUESTS,
+            p_window_minutes: RATE_LIMIT_WINDOW_MINUTES,
+        });
+
+        if (error) {
+            console.warn("Rate limit check failed:", error);
+            return true; // Allow request if check fails
+        }
+
+        return data === true;
+    } catch (e) {
+        console.warn("Rate limit error:", e);
+        return true; // Allow request if check fails
+    }
 }
 
 // =============================================
@@ -191,10 +260,23 @@ serve(async (req) => {
         const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
         // -------------------------
-        // 1. Validate Authorization
+        // 1. Rate Limit Check
+        // -------------------------
+        const withinLimit = await checkRateLimit(supabase, req);
+        if (!withinLimit) {
+            await logSecurityEvent(supabase, "rate_limit_exceeded", req, 429, "Too many requests");
+            return new Response(
+                JSON.stringify({ error: "Too many requests. Please try again later.", success: false }),
+                { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+        }
+
+        // -------------------------
+        // 2. Validate Authorization
         // -------------------------
         const authHeader = req.headers.get("Authorization");
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            await logSecurityEvent(supabase, "auth_failure", req, 401, "Missing Authorization header");
             return new Response(
                 JSON.stringify({ error: "Missing or invalid Authorization header", success: false }),
                 { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -208,6 +290,9 @@ serve(async (req) => {
 
         if (!integration) {
             console.error("Invalid API key provided");
+            await logSecurityEvent(supabase, "invalid_api_key", req, 403, "Invalid API key", {
+                token_preview: token.substring(0, 10) + "...",
+            });
             return new Response(
                 JSON.stringify({ error: "Unauthorized - Invalid API key", success: false }),
                 { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -217,7 +302,7 @@ serve(async (req) => {
         console.log(`Authenticated via: ${integration.name} (${integration.source})`);
 
         // -------------------------
-        // 2. Parse and Validate Body
+        // 3. Parse and Validate Body
         // -------------------------
         let body: unknown;
         try {

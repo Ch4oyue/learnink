@@ -205,8 +205,11 @@ export type Database = {
           is_published: boolean | null
           level: string | null
           source_request_id: string | null
+          source_url: string | null
+          status: string | null
           summary: string | null
           title: string
+          track_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -220,8 +223,11 @@ export type Database = {
           is_published?: boolean | null
           level?: string | null
           source_request_id?: string | null
+          source_url?: string | null
+          status?: string | null
           summary?: string | null
           title: string
+          track_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -235,8 +241,11 @@ export type Database = {
           is_published?: boolean | null
           level?: string | null
           source_request_id?: string | null
+          source_url?: string | null
+          status?: string | null
           summary?: string | null
           title?: string
+          track_id?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -547,6 +556,80 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      tracks: {
+        Row: {
+          id: string
+          name: string
+          slug: string
+          description: string | null
+          icon: string | null
+          display_order: number | null
+          is_active: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          slug: string
+          description?: string | null
+          icon?: string | null
+          display_order?: number | null
+          is_active?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          slug?: string
+          description?: string | null
+          icon?: string | null
+          display_order?: number | null
+          is_active?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      user_notes: {
+        Row: {
+          id: string
+          user_id: string
+          module_id: string
+          content: string
+          is_public: boolean | null
+          created_at: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          module_id: string
+          content?: string
+          is_public?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          module_id?: string
+          content?: string
+          is_public?: boolean | null
+          created_at?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_notes_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

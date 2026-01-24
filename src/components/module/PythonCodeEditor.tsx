@@ -61,8 +61,9 @@ export function PythonCodeEditor({
       if (result.error) {
         setError(result.error);
       }
-    } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan saat menjalankan kode");
+    } catch (err: unknown) {
+      const errorMsg = err instanceof Error ? err.message : "Terjadi kesalahan saat menjalankan kode";
+      setError(errorMsg);
     } finally {
       setIsRunning(false);
     }

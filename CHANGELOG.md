@@ -7,6 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.1] - January 20, 2026
+
+### Code Quality & Security Audit
+
+Comprehensive codebase audit to resolve all ESLint errors and improve type safety.
+
+#### Fixes (3)
+- Replaced all `any` types with proper TypeScript interfaces in Pyodide, Notification, and Profile modules.
+- Converted empty interfaces to type aliases (`TextareaProps`, `LearningSource`).
+- Used `unknown` type with proper type guards in all catch blocks.
+
+#### Patches (4)
+- Removed Super Admin debug console.log from `DashboardUsers.tsx` and `useUsers.ts` per security checklist.
+- Added `PyodideInstance` interface export for proper type sharing between modules.
+- Added `PyodideInstance` interface in `pyodide-manager.ts`.
+- Added proper `Notification` type import in badge and notifications pages.
+
+---
+
+
+
+## [1.4.0] - January 19, 2026
+
+### Major Frontend Upgrade & Premium UX
+
+A comprehensive upgrade to the user interface, introducing dynamic theming, premium interactions, and performance optimizations.
+
+#### Improvements (4)
+- Dynamic Theme System: Auth page and components now fully support System/Light/Dark mode switching.
+- Premium UX: Integrated animated Custom Cursor and GSAP-powered Smooth Scrolling for a high-end feel.
+- Theme Transition: Implemented smooth visual transitions between theme changes across the platform.
+- Security Visibility: Added show/hide password toggles to all authentication forms.
+
+#### Fixes (8)
+- Fixed Autofill Contrast: Fixed "white-on-white" input issue in dark mode when using browser autofill.
+- Fixed SPA Routing: Added `vercel.json` with SPA rewrites to fix 404 errors on production page reloads.
+- Fixed Smart Navigation: Fixed "Coming Soon" pages to use historical back navigation instead of hardcoded redirects.
+- Fixed Landing Access: Enabled landing page access for authenticated users with dynamic "Dashboard" navigation.
+- Fixed Module Not Found: Fixed query error in `useModule` hook (profiles.full_name -> display_name).
+- Fixed Changelog Display: Fixed markdown bold rendering by stripping markers in changelog parser.
+- Fixed Profile Edit Screen: Fixed blank screen issue when clicking Edit Profile by adding dedicated edit card.
+- Fixed Super Admin Protection: Added protection for primary admin email from role downgrades.
+
+#### Patches (5)
+- Enhanced Profile Edit UX by conditionally hiding non-essential dashboard cards.
+- Added direct link to changelog from Profile Settings page.
+- Sidebar collapsed state now persists across sessions using localStorage.
+- Added comprehensive Aria labels and semantic roles to the core learning interface.
+- Audited and removed 13 unused Shadcn components, reducing source code footprint.
+
+---
+
 ## [1.3.1] - January 18, 2026
 
 ### Bug Fixes & Database Improvements
@@ -130,6 +182,8 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.1 | Jan 20, 2026 | Code Quality & Security Audit |
+| 1.4.0 | Jan 19, 2026 | Major Frontend Upgrade & Premium UX |
 | 1.3.1 | Jan 18, 2026 | Bug Fixes & Database Schema |
 | 1.3.0 | Jan 17, 2026 | Total System Repair - Stability & Dark Mode |
 | 1.2.0 | Jan 15, 2026 | Learning Interface Redesign |

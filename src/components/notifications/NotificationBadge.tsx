@@ -1,4 +1,5 @@
 import { Bell } from "lucide-react";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -6,43 +7,79 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNotifications, useUnreadNotificationCount, useMarkNotificationAsRead, useMarkAllNotificationsAsRead } from "@/hooks/useNotifications";
+import { useNotifications, useUnreadNotificationCount, useMarkNotificationAsRead, useMarkAllNotificationsAsRead, Notification } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
-import { BookOpen, CheckCircle, MessageSquare, Info, Sparkles } from "lucide-react";
+import { BookOpen, CheckCircle, MessageSquare, Info, Sparkles, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 
 const typeIcons: Record<string, React.ElementType> = {
   module: BookOpen,
+  module_created: Rocket,
   success: CheckCircle,
   request: MessageSquare,
+  request_completed: CheckCircle,
   info: Info,
 };
 
 const typeColors: Record<string, string> = {
   module: "bg-primary/10 text-primary",
+  module_created: "bg-emerald-500/10 text-emerald-500",
   success: "bg-success/10 text-success",
   request: "bg-warning/10 text-warning",
+  request_completed: "bg-emerald-500/10 text-emerald-500",
   info: "bg-muted text-muted-foreground",
 };
 
 export function NotificationBadge() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { data: notifications, isLoading } = useNotifications(user?.id);
   const { data: unreadCount } = useUnreadNotificationCount(user?.id);
   const markAsRead = useMarkNotificationAsRead();
   const markAllAsRead = useMarkAllNotificationsAsRead();
 
-  const handleNotificationClick = (notification: any) => {
+  // ============================================
+  // REALTIME SUBSCRIPTION
+  // ============================================
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel("notification-badge-realtime")
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${user.id}`,
+        },
+        () => {
+          // Invalidate queries to refetch notifications
+          queryClient.invalidateQueries({ queryKey: ["notifications"] });
+          queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
+
+  const handleNotificationClick = (notification: Notification) => {
     if (!notification.is_read) {
       markAsRead.mutate(notification.id);
     }
 
     // Navigate based on notification type
     if (notification.related_module_id) {
-      navigate(`/dashboard?tab=modules&module=${notification.related_module_id}`);
+      navigate(`/learn/${notification.related_module_id}`);
     } else if (notification.related_request_id) {
       navigate(`/dashboard?tab=requests`);
     }

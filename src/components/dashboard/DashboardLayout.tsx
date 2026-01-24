@@ -273,8 +273,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
         >
           <SidebarSkeleton />
           <main
-            className="min-h-screen pb-20 md:pb-0 transition-all duration-300"
-            style={{ marginLeft: `${SIDEBAR_WIDTH}px` }}
+            className="min-h-screen pb-20 md:pb-0 transition-all duration-300 ml-0 md:ml-[250px]"
           >
             <div className="p-4 md:p-8">
               <div className="space-y-6">
@@ -288,12 +287,6 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
               </div>
             </div>
           </main>
-          {/* Mobile margin fix */}
-          <style>{`
-            @media (max-width: 768px) {
-              main { margin-left: 0 !important; }
-            }
-          `}</style>
         </div>
       );
     }
@@ -596,8 +589,8 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
             MAIN CONTENT AREA
         ============================================ */}
         <main
-          className="min-h-screen pb-20 md:pb-0 transition-all duration-300"
-          style={{ marginLeft: `${sidebarWidth}px` }}
+          className="min-h-screen pb-20 md:pb-0 transition-all duration-300 ml-0 md:ml-[var(--sidebar-width)]"
+          style={{ "--sidebar-width": `${sidebarWidth}px` } as React.CSSProperties}
         >
           {/* Mobile Header */}
           <div className="md:hidden sticky top-0 z-30 flex items-center justify-between h-14 px-4 border-b border-border bg-card/95 backdrop-blur-sm">
@@ -630,15 +623,6 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
           {/* Content Container */}
           <div className="p-4 md:p-8">{children}</div>
         </main>
-
-        {/* Mobile Reset */}
-        <style>{`
-          @media (max-width: 768px) {
-            main {
-              margin-left: 0 !important;
-            }
-          }
-        `}</style>
 
         {/* Mobile Bottom Nav - Role-Specific (max 5 items) */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm">

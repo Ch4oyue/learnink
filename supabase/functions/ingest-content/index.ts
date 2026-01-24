@@ -278,47 +278,52 @@ serve(async (req) => {
         }
 
         // -------------------------
-        // 2. Validate Authorization
+        // 2. Parse Body (Early) & Extract Token
         // -------------------------
+        let body: any;
+        try {
+            body = await req.json();
+        } catch {
+            // Body might be empty or invalid, but we'll check token first
+            body = {};
+        }
+
+        // Try to get token from Header OR Body
+        let token = "";
         const authHeader = req.headers.get("Authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            await logSecurityEvent(supabase, "auth_failure", req, 401, "Missing Authorization header");
+
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            token = authHeader.replace("Bearer ", "");
+        } else if (body && typeof body.api_key === "string") {
+            token = body.api_key;
+        }
+
+        if (!token) {
+            await logSecurityEvent(supabase, "auth_failure", req, 401, "Missing API Key (Header or Body)");
             return new Response(
-                JSON.stringify({ error: "Missing or invalid Authorization header", success: false }),
+                JSON.stringify({ error: "Unauthorized: Missing API Key", success: false }),
                 { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
-        const token = authHeader.replace("Bearer ", "");
-
-        // Validate API key against integrations table or legacy keys
+        // -------------------------
+        // 3. Validate API Key
+        // -------------------------
         const integration = await validateApiKey(supabase, token);
 
         if (!integration) {
             console.error("Invalid API key provided");
-            await logSecurityEvent(supabase, "invalid_api_key", req, 403, "Invalid API key", {
+            await logSecurityEvent(supabase, "invalid_api_key", req, 401, "Invalid API key", {
                 token_preview: token.substring(0, 10) + "...",
             });
+            // STRICT 401 as requested
             return new Response(
-                JSON.stringify({ error: "Unauthorized - Invalid API key", success: false }),
-                { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                JSON.stringify({ error: "Unauthorized", success: false }),
+                { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
             );
         }
 
         console.log(`Authenticated via: ${integration.name} (${integration.source})`);
-
-        // -------------------------
-        // 3. Parse and Validate Body
-        // -------------------------
-        let body: unknown;
-        try {
-            body = await req.json();
-        } catch {
-            return new Response(
-                JSON.stringify({ error: "Invalid JSON body", success: false }),
-                { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
 
         const payload = validatePayload(body);
         console.log("Received content:", payload.title);

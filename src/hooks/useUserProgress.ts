@@ -97,6 +97,24 @@ export function useModuleProgress(userId?: string, moduleId?: string) {
   });
 }
 
+export function useModuleStudentCount(moduleId?: string) {
+  return useQuery({
+    queryKey: ['module-student-count', moduleId],
+    queryFn: async () => {
+      if (!moduleId) return 0;
+
+      const { count, error } = await supabase
+        .from('user_progress')
+        .select('*', { count: 'exact', head: true })
+        .eq('module_id', moduleId);
+
+      if (error) throw error;
+      return count || 0;
+    },
+    enabled: !!moduleId,
+  });
+}
+
 export function useTotalStudents() {
   return useQuery({
     queryKey: ['total-students'],

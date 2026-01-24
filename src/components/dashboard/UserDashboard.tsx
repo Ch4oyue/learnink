@@ -2,16 +2,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useProgressStats, useUserProgress } from "@/hooks/useUserProgress";
-import { useModules } from "@/hooks/useModules";
+import { useUserTracks } from "@/hooks/useTracks";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   BookOpen,
   Target,
   Flame,
-  Trophy,
   Clock,
   ArrowRight,
   Play,
@@ -59,7 +57,7 @@ function CourseCard({
 
   return (
     <div
-      onClick={() => navigate(`/learn/${id}`)}
+      onClick={() => navigate(`/dashboard/course/${id}`)}
       className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all cursor-pointer"
     >
       {/* Card Header with Gradient */}
@@ -81,16 +79,16 @@ function CourseCard({
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
           <span className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
-            {level || "Beginner"}
+            {level || "All Levels"}
           </span>
-          <span className="font-medium text-foreground">{progress}%</span>
+          {/* <span className="font-medium text-foreground">{progress}%</span> */}
         </div>
-        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+        {/* <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
           <div
             className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-500`}
             style={{ width: `${progress}%` }}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
@@ -160,7 +158,7 @@ export function UserDashboardContent() {
   const { user, profile } = useAuth();
   const { averageProgress } = useProgressStats(user?.id);
   const { data: progress, isLoading: progressLoading } = useUserProgress(user?.id);
-  const { data: modules, isLoading: modulesLoading } = useModules(true);
+  const { data: enrolledTracks, isLoading: tracksLoading } = useUserTracks(user?.id);
 
   const displayName =
     profile?.full_name || user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
@@ -171,23 +169,11 @@ export function UserDashboardContent() {
   const greeting = today.getHours() < 12 ? "Good morning" : today.getHours() < 18 ? "Good afternoon" : "Good evening";
 
   // Find the current/last active module
-  const currentModule =
-    progress && progress.length > 0
-      ? modules?.find((m) => m.id === progress[0]?.module_id)
-      : modules?.[0];
+  // progress returns sorted by date desc
+  const currentProgress = progress?.[0];
+  const currentModule = currentProgress?.modules;
 
-  const currentProgress = progress?.find((p) => p.module_id === currentModule?.id);
-
-  // Combine modules with progress data
-  const modulesWithProgress = modules?.map((mod) => {
-    const moduleProgress = progress?.find((p) => p.module_id === mod.id);
-    return {
-      ...mod,
-      progress: moduleProgress?.progress_percent || 0,
-    };
-  });
-
-  const isLoading = modulesLoading || progressLoading;
+  const isLoading = tracksLoading || progressLoading;
 
   return (
     <>
@@ -211,7 +197,7 @@ export function UserDashboardContent() {
       </header>
 
       {/* Continue Learning Hero Card */}
-      {!isLoading && currentModule && (
+      {!isLoading && currentModule && currentProgress && (
         <section className="mb-8">
           <div className="relative overflow-hidden rounded-xl bg-card border border-border">
             <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 opacity-50" />
@@ -219,22 +205,19 @@ export function UserDashboardContent() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                    Continue Learning
+                    Lanjut Belajar
                   </span>
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold mb-2">{currentModule.title}</h2>
-                <p className="text-muted-foreground text-sm mb-4 max-w-xl line-clamp-2">
-                  {currentModule.summary || currentModule.content?.slice(0, 100) + "..." || "Start your learning journey!"}
-                </p>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden max-w-xs">
                     <div
                       className="h-full bg-primary rounded-full"
-                      style={{ width: `${currentProgress?.progress_percent || 0}%` }}
+                      style={{ width: `${currentProgress.progress_percent || 0}%` }}
                     />
                   </div>
                   <span className="text-sm font-medium">
-                    {currentProgress?.progress_percent || 0}%
+                    {currentProgress.progress_percent || 0}%
                   </span>
                 </div>
                 <Button
@@ -242,7 +225,7 @@ export function UserDashboardContent() {
                   size="sm"
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  Continue
+                  Lanjutkan
                 </Button>
               </div>
             </div>
@@ -257,8 +240,11 @@ export function UserDashboardContent() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              Available Modules
+              Kursus Saya
             </h3>
+            <Button variant="ghost" asChild className="text-sm">
+                 <Link to="/dashboard/courses">Katalog Kursus <ArrowRight className="ml-1 h-3 w-3" /></Link>
+            </Button>
           </div>
 
           {isLoading ? (
@@ -267,27 +253,30 @@ export function UserDashboardContent() {
                 <CourseCardSkeleton key={i} />
               ))}
             </div>
-          ) : modules && modules.length > 0 ? (
+          ) : enrolledTracks && enrolledTracks.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {modulesWithProgress?.map((mod) => (
+              {enrolledTracks.map((track) => (
                 <CourseCard
-                  key={mod.id}
-                  id={mod.id}
-                  title={mod.title}
-                  description={mod.summary || ""}
-                  category={mod.category || "General"}
-                  level={mod.level || "Beginner"}
-                  progress={mod.progress}
+                  key={track.id}
+                  id={track.id}
+                  title={track.name}
+                  description={track.description || ""}
+                  category="Track"
+                  level="Semua Level"
+                  progress={0}
                 />
               ))}
             </div>
           ) : (
             <div className="bg-card border border-border rounded-xl p-8 text-center">
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h4 className="font-semibold mb-2">No Modules Available</h4>
-              <p className="text-sm text-muted-foreground">
-                Check back later for new learning modules!
+              <h4 className="font-semibold mb-2">Belum ada kursus yang diambil</h4>
+              <p className="text-sm text-muted-foreground mb-4">
+                Mulai perjalanan belajar Anda dengan mengambil kursus pertama.
               </p>
+              <Button asChild>
+                 <Link to="/dashboard/courses">Lihat Katalog</Link>
+              </Button>
             </div>
           )}
         </div>

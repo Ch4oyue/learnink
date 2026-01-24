@@ -17,6 +17,7 @@ export interface Module {
   content?: string | null;
   generated_at: string | null;
   source_request_id?: string | null;
+  track_id?: string | null;
   author?: {
     id: string;
     full_name: string | null;
@@ -25,16 +26,16 @@ export interface Module {
   status?: string | null;
 }
 
-export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; minimal?: boolean } | boolean = {}) {
+export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; minimal?: boolean; trackId?: string } | boolean = {}) {
   // Handle legacy boolean argument (publishedOnly)
   const options = typeof optionsOrPublishedOnly === 'boolean'
     ? { publishedOnly: optionsOrPublishedOnly, minimal: true }
     : { minimal: true, ...optionsOrPublishedOnly };
 
-  const { publishedOnly = false, minimal = true } = options;
+  const { publishedOnly = false, minimal = true, trackId } = options;
 
   return useQuery({
-    queryKey: ["modules", publishedOnly, minimal],
+    queryKey: ["modules", publishedOnly, minimal, trackId],
     queryFn: async () => {
       let query = supabase.from("modules");
 
@@ -50,12 +51,29 @@ export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; mi
         query = query.eq("is_published", true);
       }
 
+      if (trackId) {
+        query = query.eq("track_id", trackId);
+      }
+
       const { data, error } = await query.order("created_at", {
         ascending: false,
       });
 
       if (error) throw error;
       return data as Module[];
+    },
+  });
+}
+
+export function usePopularModules(limit = 6) {
+  return useQuery({
+    queryKey: ["popular-modules", limit],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .rpc('get_popular_modules', { limit_count: limit });
+
+      if (error) throw error;
+      return data;
     },
   });
 }

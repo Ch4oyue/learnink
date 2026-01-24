@@ -26,6 +26,8 @@ interface AuthContextType {
   isAdmin: boolean;
   isTutor: boolean;
   refreshProfile: () => Promise<void>;
+  enrolledTrackIds: string[];
+  canAccessTrack: (trackId: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -35,8 +37,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [enrolledTrackIds, setEnrolledTrackIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+
+  const fetchEnrolledTracks = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_tracks')
+        .select('track_id')
+        .eq('user_id', userId);
+
+      if (error) {
+        logger.error('Error fetching enrollments:', error);
+        setEnrolledTrackIds([]);
+        return;
+      }
+
+      setEnrolledTrackIds(data.map(d => d.track_id));
+    } catch (error) {
+      logger.error('Error fetching enrollments:', error);
+      setEnrolledTrackIds([]);
+    }
+  };
 
   // Fetch user profile from profiles table
   const fetchUserProfile = async (userId: string) => {
@@ -104,7 +127,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           await Promise.all([
             fetchUserRole(session.user.id),
-            fetchUserProfile(session.user.id)
+            fetchUserProfile(session.user.id),
+            fetchEnrolledTracks(session.user.id)
           ]);
         }
 
@@ -135,11 +159,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (mounted) {
               fetchUserRole(session.user.id);
               fetchUserProfile(session.user.id);
+              fetchEnrolledTracks(session.user.id);
             }
           }, 0);
         } else {
           setRole(null);
           setProfile(null);
+          setEnrolledTrackIds([]);
         }
 
         setLoading(false);
@@ -208,12 +234,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Utility to manually refresh profile
   const refreshProfile = async () => {
     if (user) {
-      await fetchUserProfile(user.id);
+      await Promise.all([
+        fetchUserProfile(user.id),
+        fetchEnrolledTracks(user.id)
+      ]);
     }
   };
 
   const isAdmin = role === 'admin';
   const isTutor = role === 'tutor' || role === 'admin';
+
+  const canAccessTrack = (trackId: string) => {
+    if (isAdmin || isTutor) return true;
+    return enrolledTrackIds.includes(trackId);
+  };
 
   return (
     <AuthContext.Provider value={{
@@ -227,7 +261,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       isAdmin,
       isTutor,
-      refreshProfile
+      refreshProfile,
+      enrolledTrackIds,
+      canAccessTrack
     }}>
       {children}
     </AuthContext.Provider>

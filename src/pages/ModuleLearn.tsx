@@ -100,7 +100,7 @@ function parseModuleSections(markdown: string): SectionData[] {
 export default function ModuleLearn() {
   const { moduleId } = useParams<{ moduleId: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, canAccessTrack } = useAuth();
   const { toast } = useToast();
   const contentRef = useRef<HTMLElement>(null);
 
@@ -109,6 +109,20 @@ export default function ModuleLearn() {
   const { data: module, isLoading } = useModule(moduleId ?? "");
   const { data: progress, refetch: refetchProgress } = useModuleProgress(user?.id, moduleId);
   const updateProgress = useUpdateProgress();
+
+  // Access Control Check
+  useEffect(() => {
+    if (!isLoading && module) {
+      if (module.track_id && !canAccessTrack(module.track_id)) {
+        toast({
+          title: "Akses Ditolak",
+          description: "Anda harus mendaftar di kursus ini untuk mengakses materi.",
+          variant: "destructive",
+        });
+        navigate(`/dashboard/course/${module.track_id}`);
+      }
+    }
+  }, [module, isLoading, canAccessTrack, navigate, toast]);
 
   // Notes hooks
   const { data: notes, isLoading: notesLoading } = useLearningNotes(user?.id, moduleId);

@@ -153,7 +153,7 @@ export default function DashboardProfile() {
         description: "Profil berhasil diperbarui",
       });
       setIsEditing(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
       logger.error("Update profile error:", error);
       toast({
         title: "Error",

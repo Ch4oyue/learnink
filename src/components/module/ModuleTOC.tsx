@@ -23,7 +23,7 @@ function slugify(text: string): string {
     .trim();
 }
 
-export function extractTOC(content: string): TOCItem[] {
+function extractTOC(content: string): TOCItem[] {
   const lines = content.split("\n");
   const headers: TOCItem[] = [];
   const usedIds = new Map<string, number>();

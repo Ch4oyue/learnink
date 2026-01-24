@@ -17,6 +17,7 @@ function validateAndSanitizeInput(text: string | null | undefined, maxLength: nu
     return '';
   }
   // Remove control characters and trim
+  // eslint-disable-next-line no-control-regex
   const cleaned = text.replace(/[\x00-\x1F\x7F]/g, '').trim();
   // Truncate if too long
   if (cleaned.length > maxLength) {
@@ -57,9 +58,9 @@ function sanitizeGeneratedContent(content: string): string {
   sanitized = sanitized.replace(/<base[^>]*>/gi, '');
   
   // Sanitize markdown links with javascript: URIs
-  sanitized = sanitized.replace(/\[([^\]]+)\]\(javascript:[^\)]*\)/gi, '[$1](#)');
-  sanitized = sanitized.replace(/\[([^\]]+)\]\(vbscript:[^\)]*\)/gi, '[$1](#)');
-  sanitized = sanitized.replace(/\[([^\]]+)\]\(data:[^\)]*\)/gi, '[$1](#)');
+  sanitized = sanitized.replace(/\[([^\]]+)\]\(javascript:[^)]*\)/gi, '[$1](#)');
+  sanitized = sanitized.replace(/\[([^\]]+)\]\(vbscript:[^)]*\)/gi, '[$1](#)');
+  sanitized = sanitized.replace(/\[([^\]]+)\]\(data:[^)]*\)/gi, '[$1](#)');
   
   return sanitized;
 }

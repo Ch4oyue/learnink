@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -48,7 +49,7 @@ export function useLearningSourcesCRUD() {
                 .order("display_order", { ascending: true });
 
             if (error) {
-                console.error("Error fetching learning sources:", error);
+                logger.error("Error fetching learning sources:", error);
                 throw error;
             }
 
@@ -99,7 +100,7 @@ export function useCreateLearningSource() {
             });
         },
         onError: (error) => {
-            console.error("Error creating learning source:", error);
+            logger.error("Error creating learning source:", error);
             toast({
                 title: "Error",
                 description: "Gagal menambahkan sumber belajar",
@@ -153,7 +154,7 @@ export function useUpdateLearningSource() {
             });
         },
         onError: (error) => {
-            console.error("Error updating learning source:", error);
+            logger.error("Error updating learning source:", error);
             toast({
                 title: "Error",
                 description: "Gagal memperbarui sumber belajar",
@@ -191,7 +192,7 @@ export function useDeleteLearningSource() {
             });
         },
         onError: (error) => {
-            console.error("Error deleting learning source:", error);
+            logger.error("Error deleting learning source:", error);
             toast({
                 title: "Error",
                 description: "Gagal menghapus sumber belajar",
@@ -233,7 +234,7 @@ export function useToggleLearningSourceActive() {
             });
         },
         onError: (error) => {
-            console.error("Error toggling learning source status:", error);
+            logger.error("Error toggling learning source status:", error);
             toast({
                 title: "Error",
                 description: "Gagal mengubah status sumber belajar",

@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -26,7 +27,7 @@ export function useGenerateModule() {
       });
     },
     onError: (error: Error) => {
-      console.error('Error generating module:', error);
+      logger.error('Error generating module:', error);
       toast({
         title: "Gagal Generate Modul",
         description: error.message || "Terjadi kesalahan saat generate modul.",

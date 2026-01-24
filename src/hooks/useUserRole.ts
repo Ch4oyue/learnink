@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -70,7 +71,7 @@ export function useUpdateUserRole() {
         description: error.message || "Gagal mengubah role pengguna",
         variant: "destructive",
       });
-      console.error('Error updating role:', error);
+      logger.error('Error updating role:', error);
     },
   });
 }

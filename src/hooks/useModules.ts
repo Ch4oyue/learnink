@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -130,7 +131,7 @@ export function useCreateModule() {
         description: "Gagal membuat modul",
         variant: "destructive",
       });
-      console.error('Error creating module:', error);
+      logger.error('Error creating module:', error);
     },
   });
 }
@@ -165,7 +166,7 @@ export function useUpdateModule() {
         description: "Gagal memperbarui modul",
         variant: "destructive",
       });
-      console.error('Error updating module:', error);
+      logger.error('Error updating module:', error);
     },
   });
 }
@@ -197,7 +198,7 @@ export function useDeleteModule() {
         description: "Gagal menghapus modul",
         variant: "destructive",
       });
-      console.error('Error deleting module:', error);
+      logger.error('Error deleting module:', error);
     },
   });
 }

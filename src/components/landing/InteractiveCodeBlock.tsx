@@ -1,7 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
+import jsx from 'react-syntax-highlighter/dist/esm/languages/prism/jsx';
+import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
+import typescript from 'react-syntax-highlighter/dist/esm/languages/prism/typescript';
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { motion } from "framer-motion";
+
+SyntaxHighlighter.registerLanguage('jsx', jsx);
+SyntaxHighlighter.registerLanguage('javascript', jsx);
+SyntaxHighlighter.registerLanguage('python', python);
+SyntaxHighlighter.registerLanguage('typescript', typescript);
 
 interface InteractiveCodeBlockProps {
     language?: "javascript" | "python" | "typescript";

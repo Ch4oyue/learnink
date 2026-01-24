@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -124,7 +125,7 @@ export function useCreateNotification() {
       queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
     },
     onError: (error) => {
-      console.error("Error creating notification:", error);
+      logger.error("Error creating notification:", error);
       toast({
         title: "Error",
         description: "Gagal membuat notifikasi. Pastikan Anda memiliki izin yang tepat.",

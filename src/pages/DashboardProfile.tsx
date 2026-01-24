@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -10,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { useLearningStats } from "@/hooks/useLearningStats";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -102,6 +104,7 @@ export default function DashboardProfile() {
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
+  const { data: stats, isLoading: statsLoading } = useLearningStats(user?.id);
 
   const [displayName, setDisplayName] = useState(
     user?.user_metadata?.display_name || ""
@@ -120,8 +123,8 @@ export default function DashboardProfile() {
   const completedModules = progress?.filter((p) => p.is_completed).length || 0;
   const totalModules = progress?.length || 0;
 
-  // Calculate streak (dummy for now)
-  const streak = 7;
+  // Calculate streak from stats
+  const streak = stats?.currentStreak || 0;
 
   // Get user initials
   const userName = profile?.display_name || displayName || user?.email?.split("@")[0] || "User";
@@ -150,8 +153,8 @@ export default function DashboardProfile() {
         description: "Profil berhasil diperbarui",
       });
       setIsEditing(false);
-    } catch (error: unknown) {
-      console.error("Update profile error:", error);
+    } catch (error: any) {
+      logger.error("Update profile error:", error);
       toast({
         title: "Error",
         description: error instanceof Error ? error.message : "Gagal memperbarui profil",
@@ -352,16 +355,27 @@ export default function DashboardProfile() {
                     <div className="flex items-center gap-6">
                       <div>
                         <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                          Total XP
+                          Modules Completed
                         </span>
-                        <div className="text-xl font-bold">12,450</div>
+                        <div className="text-xl font-bold">
+                          {statsLoading ? "..." : stats?.completedModules || 0}
+                          <span className="text-sm font-normal text-muted-foreground"> / {stats?.totalModulesStarted || 0}</span>
+                        </div>
                       </div>
                       <div>
                         <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
-                          Avg. Time
+                          Avg. Quiz Score
                         </span>
                         <div className="text-xl font-bold">
-                          48m <span className="text-sm font-normal text-muted-foreground">/ day</span>
+                          {statsLoading ? "..." : `${stats?.averageQuizScore || 0}%`}
+                        </div>
+                      </div>
+                      <div>
+                        <span className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+                          Notes
+                        </span>
+                        <div className="text-xl font-bold">
+                          {statsLoading ? "..." : stats?.totalNotes || 0}
                         </div>
                       </div>
                     </div>
@@ -564,14 +578,14 @@ export default function DashboardProfile() {
           </>
         )}
 
-        {/* My Notes Tab - Coming Soon */}
+        {/* My Notes Tab - Redirect to Second Brain */}
         {activeTab === "notes" && (
           <Card className="py-16">
             <CardContent>
               <div className="text-center space-y-6">
-                {/* Animated Icon */}
+                {/* Icon */}
                 <div className="relative mx-auto w-24 h-24">
-                  <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping" />
+                  <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse" />
                   <div className="relative flex items-center justify-center h-full">
                     <StickyNote className="h-12 w-12 text-primary" />
                   </div>
@@ -581,12 +595,21 @@ export default function DashboardProfile() {
                 <div className="space-y-3">
                   <h2 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    My Notes - Coming Soon
+                    Second Brain
                   </h2>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    Fitur catatan personal sedang dalam pengembangan. Segera Anda bisa melihat semua catatan dari semua modul yang pernah Anda pelajari di sini.
+                    Anda memiliki <span className="font-bold text-foreground">{stats?.totalNotes || 0}</span> catatan dari pembelajaran Anda.
                   </p>
                 </div>
+
+                {/* CTA Button */}
+                <Link to="/dashboard/second-brain">
+                  <Button size="lg" className="mt-4 gap-2">
+                    <Brain className="h-5 w-5" />
+                    Buka Second Brain
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>

@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -124,11 +125,8 @@ export function useUpdateProgress() {
       return data;
     },
     onSuccess: (_, variables) => {
+      // Silently invalidate cache - no toast for automatic progress saves
       queryClient.invalidateQueries({ queryKey: ['user-progress', variables.userId] });
-      toast({
-        title: "Progress disimpan",
-        description: "Kemajuan belajar Anda telah disimpan",
-      });
     },
     onError: (error) => {
       toast({
@@ -136,7 +134,7 @@ export function useUpdateProgress() {
         description: "Gagal menyimpan progress",
         variant: "destructive",
       });
-      console.error('Error updating progress:', error);
+      logger.error('Error updating progress:', error);
     },
   });
 }

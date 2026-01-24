@@ -85,6 +85,29 @@ export function useModule(id?: string) {
   });
 }
 
+export function useModuleByRequestId(requestId?: string) {
+  return useQuery({
+    queryKey: ['module-by-request', requestId],
+    queryFn: async () => {
+      if (!requestId) return null;
+
+      const { data, error } = await supabase
+        .from('modules')
+        .select('*')
+        .eq('source_request_id', requestId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Module fetch by request error:', error.message);
+        throw error;
+      }
+
+      return data as Module | null;
+    },
+    enabled: !!requestId,
+  });
+}
+
 export function useMyModules(userId?: string) {
   return useQuery({
     queryKey: ["my-modules", userId],

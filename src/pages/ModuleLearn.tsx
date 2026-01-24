@@ -105,6 +105,7 @@ export default function ModuleLearn() {
   const contentRef = useRef<HTMLElement>(null);
 
   // Data hooks
+  // Optimized: Fetching single module by ID instead of all modules
   const { data: module, isLoading } = useModule(moduleId ?? "");
   const { data: progress, refetch: refetchProgress } = useModuleProgress(user?.id, moduleId);
   const updateProgress = useUpdateProgress();

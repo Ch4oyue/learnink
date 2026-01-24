@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMyRequests } from "@/hooks/useMaterialRequests";
-import { useModules } from "@/hooks/useModules";
+import { useModuleByRequestId } from "@/hooks/useModules";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -65,10 +65,9 @@ export default function RequestDetail() {
   const { user } = useAuth();
   
   const { data: requests, isLoading: requestsLoading } = useMyRequests(user?.id);
-  const { data: modules } = useModules();
+  const { data: relatedModule } = useModuleByRequestId(id);
 
   const request = requests?.find(r => r.id === id);
-  const relatedModule = modules?.find(m => m.source_request_id === id);
 
   if (requestsLoading) {
     return (

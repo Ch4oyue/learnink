@@ -39,12 +39,37 @@ interface ParsedContent {
   key: string;
 }
 
+// Regex Constants
+const RE_SLUG_CHARS = /[^a-z0-9\s-]/g;
+const RE_SLUG_SPACES = /\s+/g;
+const RE_SLUG_DASHES = /-+/g;
+
+const RE_H3 = /^### (.*$)/gim;
+const RE_H2 = /^## (.*$)/gim;
+const RE_H1 = /^# (.*$)/gim;
+const RE_BOLD_ITALIC = /\*\*\*(.*?)\*\*\*/gim;
+const RE_BOLD = /\*\*(.*?)\*\*/gim;
+const RE_ITALIC = /\*(.*?)\*/gim;
+const RE_CODE_BLOCK = /```(\w+)?\n([\s\S]*?)```/gim;
+const RE_INLINE_CODE = /`([^`]+)`/gim;
+const RE_BLOCKQUOTE = /^> (.*$)/gim;
+const RE_UL_ITEM = /^\* (.*$)/gim;
+const RE_UL_ITEM_DASH = /^- (.*$)/gim;
+const RE_OL_ITEM = /^\d+\. (.*$)/gim;
+const RE_UL_GROUP = /(<li class="ml-6 list-disc.*?<\/li>\n?)+/gim;
+const RE_OL_GROUP = /(<li class="ml-6 list-decimal.*?<\/li>\n?)+/gim;
+const RE_HR = /^---$/gim;
+const RE_LINK = /\[([^\]]+)\]\(([^)]+)\)/gim;
+const RE_BR = /(?<!>)\n(?!<)/gim;
+
+const RE_PYTHON_CODE = /```python\n([\s\S]*?)```/gim;
+
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
+    .replace(RE_SLUG_CHARS, '')
+    .replace(RE_SLUG_SPACES, '-')
+    .replace(RE_SLUG_DASHES, '-')
     .trim();
 }
 
@@ -60,45 +85,45 @@ function parseMarkdown(text: string): string {
     return id;
   };
 
-  html = html.replace(/^### (.*$)/gim, (_, p1) => {
+  html = html.replace(RE_H3, (_, p1) => {
     const id = generateId(p1);
     return `<h3 id="${id}" class="text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24">${p1}</h3>`;
   });
-  html = html.replace(/^## (.*$)/gim, (_, p1) => {
+  html = html.replace(RE_H2, (_, p1) => {
     const id = generateId(p1);
     return `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-5 text-foreground scroll-mt-24">${p1}</h2>`;
   });
-  html = html.replace(/^# (.*$)/gim, (_, p1) => {
+  html = html.replace(RE_H1, (_, p1) => {
     const id = generateId(p1);
     return `<h1 id="${id}" class="text-3xl font-bold mt-12 mb-6 text-foreground scroll-mt-24">${p1}</h1>`;
   });
 
-  html = html.replace(/\*\*\*(.*?)\*\*\*/gim, '<strong class="font-bold"><em>$1</em></strong>');
-  html = html.replace(/\*\*(.*?)\*\*/gim, '<strong class="font-semibold text-foreground">$1</strong>');
-  html = html.replace(/\*(.*?)\*/gim, '<em class="italic">$1</em>');
+  html = html.replace(RE_BOLD_ITALIC, '<strong class="font-bold"><em>$1</em></strong>');
+  html = html.replace(RE_BOLD, '<strong class="font-semibold text-foreground">$1</strong>');
+  html = html.replace(RE_ITALIC, '<em class="italic">$1</em>');
 
-  html = html.replace(/```(\w+)?\n([\s\S]*?)```/gim,
+  html = html.replace(RE_CODE_BLOCK,
     '<pre class="bg-muted rounded-lg p-4 my-4 overflow-x-auto"><code class="text-sm font-mono text-foreground">$2</code></pre>');
 
-  html = html.replace(/`([^`]+)`/gim,
+  html = html.replace(RE_INLINE_CODE,
     '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground">$1</code>');
 
-  html = html.replace(/^> (.*$)/gim,
+  html = html.replace(RE_BLOCKQUOTE,
     '<blockquote class="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">$1</blockquote>');
 
-  html = html.replace(/^\* (.*$)/gim, '<li class="ml-6 list-disc text-foreground/90 leading-relaxed">$1</li>');
-  html = html.replace(/^- (.*$)/gim, '<li class="ml-6 list-disc text-foreground/90 leading-relaxed">$1</li>');
-  html = html.replace(/^\d+\. (.*$)/gim, '<li class="ml-6 list-decimal text-foreground/90 leading-relaxed">$1</li>');
+  html = html.replace(RE_UL_ITEM, '<li class="ml-6 list-disc text-foreground/90 leading-relaxed">$1</li>');
+  html = html.replace(RE_UL_ITEM_DASH, '<li class="ml-6 list-disc text-foreground/90 leading-relaxed">$1</li>');
+  html = html.replace(RE_OL_ITEM, '<li class="ml-6 list-decimal text-foreground/90 leading-relaxed">$1</li>');
 
-  html = html.replace(/(<li class="ml-6 list-disc.*?<\/li>\n?)+/gim, (match) =>
+  html = html.replace(RE_UL_GROUP, (match) =>
     `<ul class="my-4 space-y-2">${match}</ul>`);
-  html = html.replace(/(<li class="ml-6 list-decimal.*?<\/li>\n?)+/gim, (match) =>
+  html = html.replace(RE_OL_GROUP, (match) =>
     `<ol class="my-4 space-y-2">${match}</ol>`);
 
-  html = html.replace(/^---$/gim, '<hr class="my-6 border-border" />');
+  html = html.replace(RE_HR, '<hr class="my-6 border-border" />');
 
   // Handle links with external detection
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/gim, (_, text, url) => {
+  html = html.replace(RE_LINK, (_, text, url) => {
     const isExternal = url.startsWith('http://') || url.startsWith('https://');
     if (isExternal) {
       // External link: add icon (security attributes handled by DOMPurify hook)
@@ -116,7 +141,7 @@ function parseMarkdown(text: string): string {
     return `<p class="my-5 text-foreground/90 leading-loose">${trimmed}</p>`;
   }).join('\n');
 
-  html = html.replace(/(?<!>)\n(?!<)/gim, '<br />');
+  html = html.replace(RE_BR, '<br />');
 
   return html;
 }
@@ -132,7 +157,8 @@ export function MarkdownRenderer({
     const segments: ParsedContent[] = [];
     let segmentIndex = 0;
 
-    const pythonCodeRegex = /```python\n([\s\S]*?)```/gim;
+    // Create a new regex instance to ensure state (lastIndex) is reset for each execution
+    const pythonCodeRegex = new RegExp(RE_PYTHON_CODE);
     let lastIndex = 0;
     let match;
 

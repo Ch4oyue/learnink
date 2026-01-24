@@ -63,7 +63,7 @@ export const HybridContentRenderer = forwardRef<HTMLElement, HybridContentRender
                 style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted)) transparent" }}
             >
                 {/* Focus Container - 800px max like variant_2 */}
-                <div className="max-w-[800px] mx-auto py-16 px-10 flex flex-col gap-10">
+                <div className="max-w-[800px] mx-auto py-12 md:py-16 px-5 md:px-10 flex flex-col gap-8 md:gap-10">
                     {/* Page Title Block - Hover interaction from variant_2, colors from dark_mode */}
                     {metadata && (
                         <div className="group relative -ml-6 pl-6 border-l-4 border-transparent hover:border-primary/20 transition-all duration-500">
@@ -118,8 +118,8 @@ export const HybridContentRenderer = forwardRef<HTMLElement, HybridContentRender
                             resolvedTheme === "dark" && "prose-invert"
                         )}>
                             {/* Wrap content in reading blocks style */}
-                            <div className="group relative rounded-xl -ml-6 pl-6 p-4 border-l-4 border-transparent hover:border-primary/20 hover:bg-muted/30 transition-all duration-300">
-                                <div className="text-[1.15rem] leading-[1.8] text-muted-foreground font-normal">
+                            <div className="group relative rounded-xl -ml-4 pl-4 md:-ml-6 md:pl-6 p-4 border-l-4 border-transparent hover:border-primary/20 hover:bg-muted/30 transition-all duration-300">
+                                <div className="text-[1.15rem] leading-loose md:leading-[2.0] text-muted-foreground font-normal tracking-wide">
                                     <MarkdownRenderer content={content} />
                                 </div>
 

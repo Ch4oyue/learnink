@@ -301,7 +301,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
         ============================================ */}
         <aside
           className={cn(
-            "fixed left-0 top-0 z-40 h-screen border-r border-border bg-sidebar hidden md:flex md:flex-col transition-all duration-300"
+            "fixed left-0 top-0 z-40 h-screen border-r border-white/10 bg-background/80 backdrop-blur-lg hidden md:flex md:flex-col transition-all duration-300"
           )}
           style={{ width: `${sidebarWidth}px` }}
         >
@@ -593,7 +593,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
           style={{ "--sidebar-width": `${sidebarWidth}px` } as React.CSSProperties}
         >
           {/* Mobile Header */}
-          <div className="md:hidden sticky top-0 z-30 flex items-center justify-between h-14 px-4 border-b border-border bg-card/95 backdrop-blur-sm">
+          <div className="md:hidden sticky top-0 z-30 flex items-center justify-between h-14 px-4 border-b border-white/10 bg-background/80 backdrop-blur-lg">
             <Link to="/" className="flex items-center gap-2 font-semibold">
               <span>
                 Learn<span className="text-primary">Ink</span>

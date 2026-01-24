@@ -7,19 +7,20 @@ import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
-  Menu,
-  StickyNote,
   Check,
   Loader2,
-  X,
+  List,
+  StickyNote,
+  FileText
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/module/HybridSidebar";
@@ -27,10 +28,11 @@ import { HybridContentRenderer } from "@/components/module/HybridContentRenderer
 import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
 
 /**
- * ModuleLearn - Hybrid View with 4-Panel Layout
+ * ModuleLearn - Hybrid View with 4-Panel Layout (Desktop) & Tab View (Mobile)
  * ==============================================
- * Layout: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
- * Premium Dark Mode: #0b0c0e background, purple accents
+ * Desktop: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
+ * Mobile: Tabs (Materi | Catatan | Menu)
+ * Premium Dark Mode Optimized
  */
 
 // ============================================
@@ -103,11 +105,11 @@ export default function ModuleLearn() {
   const { user, canAccessTrack } = useAuth();
   const { toast } = useToast();
   const contentRef = useRef<HTMLElement>(null);
+  const isMobile = useIsMobile();
 
   // Data hooks
-  // Optimized: Fetching single module by ID instead of all modules
   const { data: module, isLoading } = useModule(moduleId ?? "");
-  const { data: progress, refetch: refetchProgress } = useModuleProgress(user?.id, moduleId);
+  const { data: progress } = useModuleProgress(user?.id, moduleId);
   const updateProgress = useUpdateProgress();
 
   // Access Control Check
@@ -144,8 +146,7 @@ export default function ModuleLearn() {
     }
     return true;
   });
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
+
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
 
   // Persist panel visibility to localStorage
@@ -154,7 +155,7 @@ export default function ModuleLearn() {
     localStorage.setItem("module-show-toc", String(show));
   };
 
-  const handleSetShowNotes = (show: boolean) => {
+  const handleSetShowNotes = (show: boolean) => { // Kept for logic consistency if needed later
     setShowNotes(show);
     localStorage.setItem("module-show-notes", String(show));
   };
@@ -170,7 +171,7 @@ export default function ModuleLearn() {
     return parseModuleSections(module.content);
   }, [module?.content]);
 
-  // Get current section content via simple lookup (O(n) but no string splitting)
+  // Get current section content via simple lookup
   const currentSectionIndex = sections.findIndex((s) => s.id === currentSectionId);
   const currentSection = currentSectionIndex >= 0 ? sections[currentSectionIndex] : sections[0];
   const currentContent = currentSection?.content || module?.content || "";
@@ -242,7 +243,8 @@ export default function ModuleLearn() {
 
   const handleSectionClick = (sectionId: string) => {
     setCurrentSectionId(sectionId);
-    setMobileMenuOpen(false);
+    // On mobile, if in Menu tab, we might want to switch back to Content tab?
+    // User can manually switch.
   };
 
   // Note handlers
@@ -321,14 +323,171 @@ export default function ModuleLearn() {
   }
 
   // ============================================
-  // MAIN RENDER - 4 PANEL HYBRID LAYOUT
+  // MOBILE RENDER (Tabs)
+  // ============================================
+  if (isMobile) {
+    return (
+      <div className="flex flex-col h-screen bg-background text-foreground">
+        {/* Mobile Header with Progress */}
+        <div className="shrink-0 border-b border-white/10 bg-background/80 backdrop-blur-lg z-10">
+          <div className="h-1 bg-muted w-full">
+            <div
+              className="h-full bg-primary transition-all duration-500"
+              style={{ width: `${currentProgress}%` }}
+            />
+          </div>
+          <div className="flex items-center justify-between p-4">
+             <div className="flex items-center gap-3 overflow-hidden">
+                <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => navigate("/dashboard")}>
+                   <ChevronLeft className="h-5 w-5" />
+                </Button>
+                <div className="flex-1 min-w-0">
+                  <h1 className="font-semibold text-sm truncate">{module.title}</h1>
+                  <p className="text-[10px] text-muted-foreground">
+                     {currentSectionIndex + 1} / {sections.length || 1} • {currentProgress}%
+                  </p>
+                </div>
+             </div>
+          </div>
+        </div>
+
+        <Tabs defaultValue="content" className="flex-1 flex flex-col overflow-hidden">
+          <TabsList className="w-full justify-evenly rounded-none border-b border-white/10 bg-muted/20 p-0 h-12">
+            <TabsTrigger
+              value="content"
+              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              Materi
+            </TabsTrigger>
+            <TabsTrigger
+              value="notes"
+              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full"
+            >
+              <StickyNote className="h-4 w-4 mr-2" />
+              Catatan
+            </TabsTrigger>
+            <TabsTrigger
+              value="menu"
+              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full"
+            >
+              <List className="h-4 w-4 mr-2" />
+              Menu
+            </TabsTrigger>
+          </TabsList>
+
+          {/* TAB 1: CONTENT */}
+          <TabsContent value="content" className="flex-1 flex flex-col overflow-hidden mt-0 data-[state=active]:flex">
+            <HybridContentRenderer
+              ref={contentRef}
+              content={currentContent}
+              metadata={{
+                title: currentSection?.title || module.title,
+                description: module.summary || undefined,
+                category: module.category || undefined,
+                readingTime: Math.ceil((currentContent?.length || 0) / 1000),
+              }}
+              onAddToNotes={handleAddToNotes}
+              isLoading={false}
+            />
+            {/* Bottom Nav for Content */}
+            <div className="shrink-0 h-16 border-t border-border bg-card/50 backdrop-blur flex items-center justify-between px-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevious}
+                disabled={!hasPrevious}
+              >
+                <ChevronLeft className="h-4 w-4 mr-1" />
+                Prev
+              </Button>
+              <Badge variant="secondary" className="text-xs">
+                {currentSectionIndex + 1}/{sections.length || 1}
+              </Badge>
+              {hasNext ? (
+                <Button size="sm" onClick={handleNext}>
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={() => navigate("/dashboard")}
+                  className="bg-green-600 hover:bg-green-500 text-white"
+                >
+                  Done
+                  <Check className="h-4 w-4 ml-1" />
+                </Button>
+              )}
+            </div>
+          </TabsContent>
+
+          {/* TAB 2: NOTES */}
+          <TabsContent value="notes" className="flex-1 overflow-hidden mt-0 data-[state=active]:flex flex-col">
+            <HybridGuidedNotes
+              notes={notes || []}
+              isLoading={notesLoading}
+              onCreateNote={handleCreateNote}
+              onDeleteNote={handleDeleteNote}
+              isCreating={createNote.isPending}
+              isDeleting={deleteNote.isPending}
+            />
+          </TabsContent>
+
+          {/* TAB 3: MENU / TOC */}
+          <TabsContent value="menu" className="flex-1 overflow-hidden mt-0 data-[state=active]:flex flex-col bg-sidebar/50">
+             <ScrollArea className="flex-1 p-4">
+                <nav className="space-y-1">
+                  {sections.map((item, index) => {
+                    const isActive = item.id === currentSectionId;
+                    const isCompleted = currentSectionId
+                      ? sections.findIndex((i) => i.id === currentSectionId) > index
+                      : false;
+
+                    return (
+                      <button
+                        key={item.id}
+                        onClick={() => handleSectionClick(item.id)}
+                        className={cn(
+                          "w-full text-left p-3 rounded-lg transition-all flex items-start gap-3 text-sm border border-transparent",
+                          isActive
+                            ? "bg-primary/10 text-primary border-primary/20 shadow-sm"
+                            : isCompleted
+                              ? "text-muted-foreground hover:bg-muted"
+                              : "text-foreground hover:bg-muted"
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : isCompleted
+                                ? "bg-green-500/20 text-green-400"
+                                : "bg-muted text-muted-foreground"
+                          )}
+                        >
+                          {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
+                        </span>
+                        <span className="line-clamp-2 font-medium">{item.title}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
+             </ScrollArea>
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  }
+
+  // ============================================
+  // DESKTOP RENDER - 4 PANEL HYBRID LAYOUT
   // ============================================
 
   return (
     <div className="h-screen overflow-hidden flex bg-background">
-      {/* ============================================
-          PANEL 1: Icon Rail (72px) - Desktop Only
-      ============================================ */}
+      {/* PANEL 1: Icon Rail (72px) */}
       <div className="hidden md:block">
         <HybridSidebar
           activeTab={showTOC ? "toc" : "content"}
@@ -337,12 +496,9 @@ export default function ModuleLearn() {
         />
       </div>
 
-      {/* ============================================
-          PANEL 2: TOC Sidebar (240px) - Collapsible
-      ============================================ */}
+      {/* PANEL 2: TOC Sidebar (240px) - Collapsible */}
       {showTOC && (
         <aside className="hidden md:flex w-[240px] bg-sidebar border-r border-sidebar-border flex-col shrink-0">
-          {/* TOC Header */}
           <div className="p-4 border-b border-sidebar-border">
             <h2 className="font-bold text-foreground text-sm mb-3 line-clamp-2">{module.title}</h2>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -354,7 +510,6 @@ export default function ModuleLearn() {
             <p className="text-[10px] text-muted-foreground mt-1 font-medium">{currentProgress}% complete</p>
           </div>
 
-          {/* TOC List */}
           <ScrollArea className="flex-1 p-3">
             <nav className="space-y-1">
               {sections.length === 0 ? (
@@ -403,89 +558,9 @@ export default function ModuleLearn() {
         </aside>
       )}
 
-      {/* ============================================
-          PANEL 3: Main Content (Flex 1)
-      ============================================ */}
+      {/* PANEL 3: Main Content (Flex 1) */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile Header */}
-        <header className="md:hidden h-14 flex items-center justify-between px-4 border-b border-border bg-card shrink-0">
-          {/* Progress Bar */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-muted">
-            <div
-              className="h-full bg-primary transition-all duration-500"
-              style={{ width: `${currentProgress}%` }}
-            />
-          </div>
-
-          {/* Left: Menu + Title */}
-          <div className="flex items-center gap-3">
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-80 p-0 bg-sidebar border-border">
-                <div className="p-4 border-b border-border">
-                  <h2 className="font-bold text-foreground">Table of Contents</h2>
-                </div>
-                <ScrollArea className="h-[calc(100vh-60px)] p-3">
-                  <nav className="space-y-1">
-                    {sections.map((item, index) => {
-                      const isActive = item.id === currentSectionId;
-                      return (
-                        <button
-                          key={item.id}
-                          onClick={() => handleSectionClick(item.id)}
-                          className={cn(
-                            "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
-                            isActive
-                              ? "bg-primary/10 text-primary"
-                              : "text-foreground hover:bg-muted"
-                          )}
-                        >
-                          <span className={cn(
-                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                            isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-                          )}>
-                            {index + 1}
-                          </span>
-                          {item.title}
-                        </button>
-                      );
-                    })}
-                  </nav>
-                </ScrollArea>
-              </SheetContent>
-            </Sheet>
-
-            <div>
-              <h1 className="font-semibold text-sm text-foreground line-clamp-1">{module.title}</h1>
-              <p className="text-[10px] text-muted-foreground">
-                {currentSectionIndex + 1} of {sections.length || 1}
-              </p>
-            </div>
-          </div>
-
-          {/* Right: Notes Toggle */}
-          <Sheet open={mobileNotesOpen} onOpenChange={setMobileNotesOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
-                <StickyNote className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-80 p-0 bg-sidebar border-border">
-              <HybridGuidedNotes
-                notes={notes || []}
-                isLoading={notesLoading}
-                onCreateNote={handleCreateNote}
-                onDeleteNote={handleDeleteNote}
-                isCreating={createNote.isPending}
-                isDeleting={deleteNote.isPending}
-              />
-            </SheetContent>
-          </Sheet>
-        </header>
+        {/* Header - Desktop Hidden because Sidebar has info? No, Desktop usually relies on sidebar. */}
 
         {/* Content Renderer */}
         <HybridContentRenderer
@@ -533,9 +608,7 @@ export default function ModuleLearn() {
         </div>
       </div>
 
-      {/* ============================================
-          PANEL 4: Notes Panel (360px) - Desktop Only, Collapsible
-      ============================================ */}
+      {/* PANEL 4: Notes Panel (360px) - Desktop Only, Collapsible */}
       {showNotes && (
         <div className="hidden lg:block">
           <HybridGuidedNotes

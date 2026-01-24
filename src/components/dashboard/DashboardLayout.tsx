@@ -243,7 +243,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
     }));
 
     const displayName =
-      profile?.full_name ||
+      profile?.display_name ||
       user?.user_metadata?.display_name ||
       user?.email?.split("@")[0] ||
       "User";

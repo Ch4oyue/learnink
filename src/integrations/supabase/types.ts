@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      incoming_contents: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: string
+          processed_at: string | null
+          processed_by: string | null
+          raw_content: Json | null
+          source: string | null
+          status: Database["public"]["Enums"]["content_status"] | null
+          title: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          raw_content?: Json | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          title: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: string
+          processed_at?: string | null
+          processed_by?: string | null
+          raw_content?: Json | null
+          source?: string | null
+          status?: Database["public"]["Enums"]["content_status"] | null
+          title?: string
+        }
+        Relationships: []
+      }
       learning_notes: {
         Row: {
           content: string
@@ -658,6 +694,7 @@ export type Database = {
     }
     Enums: {
       app_role: "user" | "moderator" | "admin" | "tutor"
+      content_status: "pending" | "approved" | "rejected"
       request_status: "pending" | "reviewing" | "completed" | "rejected"
     }
     CompositeTypes: {
@@ -787,6 +824,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["user", "moderator", "admin", "tutor"],
+      content_status: ["pending", "approved", "rejected"],
       request_status: ["pending", "reviewing", "completed", "rejected"],
     },
   },

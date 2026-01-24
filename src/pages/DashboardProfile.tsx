@@ -38,6 +38,7 @@ import {
   Construction,
   Sparkles,
   StickyNote,
+  Crown,
 } from "lucide-react";
 
 // ============================================
@@ -48,6 +49,7 @@ const roleLabels: Record<string, string> = {
   user: "Student",
   tutor: "Tutor",
   admin: "Administrator",
+  superadmin: "Super Admin",
 };
 
 // Dummy activity data for the chart
@@ -261,7 +263,15 @@ export default function DashboardProfile() {
                         Lifelong learner exploring new skills.
                       </p>
                       <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
-                        {role && (
+                        {role === 'superadmin' ? (
+                          <Badge
+                            variant="outline"
+                            className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
+                          >
+                            <Crown className="h-3 w-3 mr-1" />
+                            Super Admin
+                          </Badge>
+                        ) : role ? (
                           <Badge
                             variant="outline"
                             className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800"
@@ -269,7 +279,7 @@ export default function DashboardProfile() {
                             <CheckCircle className="h-3 w-3 mr-1" />
                             {roleLabels[role] || "Member"}
                           </Badge>
-                        )}
+                        ) : null}
                         <Badge variant="secondary" className="text-muted-foreground">
                           <MapPin className="h-3 w-3 mr-1" />
                           Earth

@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { logger } from "@/lib/logger";
 
-export type AppRole = 'user' | 'tutor' | 'admin';
+export type AppRole = 'user' | 'tutor' | 'admin' | 'superadmin';
 
 // Profile interface for user profile data
 // NOTE: Only includes columns that exist in the Supabase 'profiles' table
@@ -241,8 +241,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const isAdmin = role === 'admin';
-  const isTutor = role === 'tutor' || role === 'admin';
+  const isAdmin = role === 'admin' || role === 'superadmin';
+  const isTutor = role === 'tutor' || role === 'admin' || role === 'superadmin';
 
   const canAccessTrack = (trackId: string) => {
     if (isAdmin || isTutor) return true;

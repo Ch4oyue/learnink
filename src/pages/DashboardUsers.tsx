@@ -40,11 +40,13 @@ import {
   User,
   Loader2,
   AlertCircle,
+  Crown,
 } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
 
-const roleConfig: Record<AppRole, { label: string; icon: React.ReactNode; variant: "default" | "secondary" | "outline" }> = {
+const roleConfig: Record<AppRole, { label: string; icon: React.ReactNode; variant: "default" | "secondary" | "outline" | "destructive" }> = {
+  superadmin: { label: "Super Admin", icon: <Crown className="h-3 w-3" />, variant: "destructive" },
   admin: { label: "Admin", icon: <Shield className="h-3 w-3" />, variant: "default" },
   tutor: { label: "Tutor", icon: <GraduationCap className="h-3 w-3" />, variant: "secondary" },
   user: { label: "User", icon: <User className="h-3 w-3" />, variant: "outline" },
@@ -178,6 +180,7 @@ export default function DashboardUsers() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Semua Role</SelectItem>
+              <SelectItem value="superadmin">Super Admin</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="tutor">Tutor</SelectItem>
               <SelectItem value="user">User</SelectItem>
@@ -210,10 +213,13 @@ export default function DashboardUsers() {
                 {filteredUsers?.map((user) => {
                   const config = roleConfig[user.role];
                   const isSelf = user.id === currentUser?.id;
-                  // Check if this user is the super admin (by ID or email)
-                  const isThisSuperAdmin =
-                    (SUPER_ADMIN_USER_ID && user.id === SUPER_ADMIN_USER_ID) ||
+                  // Check if this user is a super admin
+                  const isUserSuperAdmin = user.role === 'superadmin';
+                  // Legacy check for backward compatibility during migration
+                  const isLegacySuperAdmin = (SUPER_ADMIN_USER_ID && user.id === SUPER_ADMIN_USER_ID) ||
                     (user.email === SUPER_ADMIN_EMAIL);
+
+                  const isProtected = isUserSuperAdmin || isLegacySuperAdmin;
 
                   return (
                     <TableRow key={user.id}>
@@ -231,8 +237,8 @@ export default function DashboardUsers() {
                               {isSelf && (
                                 <span className="ml-2 text-xs text-muted-foreground">(Anda)</span>
                               )}
-                              {isThisSuperAdmin && (
-                                <Badge variant="outline" className="ml-2 text-xs bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-200 dark:border-purple-800">
+                              {(isProtected) && (
+                                <Badge variant="outline" className="ml-2 text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
                                   👑 Super Admin
                                 </Badge>
                               )}
@@ -256,10 +262,10 @@ export default function DashboardUsers() {
                         }
                       </TableCell>
                       <TableCell>
-                        {isThisSuperAdmin ? (
+                        {isProtected ? (
                           <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
                             <Shield className="h-3 w-3 mr-1" />
-                            Protected
+                            Immutable
                           </Badge>
                         ) : (
                           <Select

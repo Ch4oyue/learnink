@@ -733,7 +733,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "user" | "moderator" | "admin" | "tutor"
+      app_role: "user" | "moderator" | "admin" | "tutor" | "superadmin"
       content_status: "pending" | "approved" | "rejected"
       request_status: "pending" | "reviewing" | "completed" | "rejected"
     }
@@ -863,7 +863,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["user", "moderator", "admin", "tutor"],
+      app_role: ["user", "moderator", "admin", "tutor", "superadmin"],
       content_status: ["pending", "approved", "rejected"],
       request_status: ["pending", "reviewing", "completed", "rejected"],
     },

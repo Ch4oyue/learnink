@@ -46,6 +46,17 @@ export function useUpdateUserRole() {
         throw new Error('Super Admin tidak dapat diubah role-nya');
       }
 
+      // Also check if current role is superadmin (double check against DB)
+      const { data: currentRoleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (currentRoleData?.role === 'superadmin') {
+        throw new Error('Super Admin role bersifat permanen dan tidak dapat diubah');
+      }
+
       const { data, error } = await supabase
         .from('user_roles')
         .update({ role: newRole })
@@ -143,6 +154,6 @@ export function useBanUser() {
 }
 
 // Helper to check if user is super admin (for UI disabling)
-export function isSuperAdmin(email?: string | null): boolean {
-  return email === SUPER_ADMIN_EMAIL;
+export function isSuperAdmin(email?: string | null, role?: AppRole | null): boolean {
+  return email === SUPER_ADMIN_EMAIL || role === 'superadmin';
 }

@@ -24,6 +24,7 @@ const Changelog = lazy(() => import("./pages/Changelog"));
 const DashboardHome = lazy(() => import("./pages/DashboardHome"));
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
+const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
 const DashboardCourses = lazy(() => import("./pages/DashboardCourses"));
 const DashboardModules = lazy(() => import("./pages/DashboardModules"));
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
@@ -196,7 +197,7 @@ const App = () => (
                     path="/dashboard/users"
                     element={
                       <ProtectedRoute>
-                        <ComingSoon title="Manajemen Pengguna" description="Fitur untuk mengelola pengguna, mengubah role, dan mengelola akun sedang dalam pengembangan." />
+                        <DashboardUsers />
                       </ProtectedRoute>
                     }
                   />

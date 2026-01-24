@@ -101,12 +101,27 @@ export default function DashboardUsers() {
   };
 
   if (error) {
+    // Determine the error type for user-friendly messages
+    const errorMessage = error.message || '';
+    const isAccessDenied = errorMessage.includes('Access denied') || errorMessage.includes('Admin role');
+    const isFunctionMissing = errorMessage.includes('function') || errorMessage.includes('does not exist');
+
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <AlertCircle className="h-12 w-12 text-destructive mb-4" />
           <h2 className="text-xl font-semibold text-foreground mb-2">Gagal Memuat Data</h2>
-          <p className="text-muted-foreground">Terjadi kesalahan saat mengambil data pengguna.</p>
+          <p className="text-muted-foreground max-w-md">
+            {isAccessDenied
+              ? 'Anda tidak memiliki akses admin. Hanya admin yang dapat melihat daftar pengguna.'
+              : isFunctionMissing
+                ? 'Database function belum tersedia. Pastikan migration sudah dijalankan di Supabase.'
+                : `Terjadi kesalahan: ${errorMessage}`
+            }
+          </p>
+          <p className="text-xs text-muted-foreground mt-4 font-mono bg-muted p-2 rounded max-w-lg break-all">
+            Debug: {errorMessage}
+          </p>
         </div>
       </DashboardLayout>
     );

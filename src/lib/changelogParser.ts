@@ -1,6 +1,9 @@
 /**
  * Changelog Parser Utility
  * Parses CHANGELOG.md and returns structured data for the UI
+ * 
+ * SECURITY: This file is read-only from a static file at build time.
+ * Content is further sanitized by MarkdownRenderer's DOMPurify.
  */
 
 export interface ChangelogEntry {
@@ -15,6 +18,19 @@ export interface ChangelogEntry {
 
 // Import the raw changelog content at build time
 import changelogContent from '/CHANGELOG.md?raw';
+
+/**
+ * Sanitize text to prevent XSS attacks
+ * Removes script tags, javascript: URLs, and event handlers
+ */
+function sanitizeText(text: string): string {
+    return text
+        .replace(/<script[^>]*>.*?<\/script>/gi, '')
+        .replace(/<[^>]+>/g, '') // Remove all HTML tags
+        .replace(/javascript:/gi, '')
+        .replace(/on\w+\s*=/gi, '')
+        .trim();
+}
 
 /**
  * Parse the CHANGELOG.md content into structured entries
@@ -34,15 +50,15 @@ export function parseChangelog(): ChangelogEntry[] {
         if (!headerMatch) continue;
 
         const version = headerMatch[1];
-        const date = formatDate(headerMatch[2].trim());
+        const date = formatDate(sanitizeText(headerMatch[2]));
 
         // Extract title (### line after version header)
         const titleMatch = block.match(/### (.+)/);
-        const title = titleMatch ? titleMatch[1].trim() : 'Update';
+        const title = titleMatch ? sanitizeText(titleMatch[1]) : 'Update';
 
         // Extract description (first paragraph after title)
         const descMatch = block.match(/### .+\n\n(.+?)(?=\n\n####|\n\n---|\n\n##|$)/s);
-        const description = descMatch ? descMatch[1].trim() : '';
+        const description = descMatch ? sanitizeText(descMatch[1]) : '';
 
         // Extract improvements
         const improvements = extractListItems(block, 'Improvements');
@@ -88,8 +104,15 @@ function extractListItems(block: string, header: string): string[] {
         // Match markdown list items: - Item text or - `code` text
         const itemMatch = line.match(/^-\s+(.+)/);
         if (itemMatch) {
-            const cleanItem = itemMatch[1].trim();
-            items.push(cleanItem);
+            // Sanitize: remove any script tags or dangerous patterns
+            const cleanItem = itemMatch[1]
+                .trim()
+                .replace(/<script[^>]*>.*?<\/script>/gi, '')
+                .replace(/javascript:/gi, '')
+                .replace(/on\w+=/gi, '');
+            if (cleanItem) {
+                items.push(cleanItem);
+            }
         }
     }
 

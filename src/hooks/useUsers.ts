@@ -3,9 +3,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppRole } from "@/contexts/AuthContext";
 
-// Super admin identification - IMPORTANT: Update SUPER_ADMIN_USER_ID after first login
-// To find the user ID, run this SQL in Supabase: 
-// SELECT id FROM auth.users WHERE email = 'agen.salva@gmail.com';
+// Super admin identification
 export const SUPER_ADMIN_EMAIL = 'agen.salva@gmail.com';
 export const SUPER_ADMIN_USER_ID: string | null = '676c1aca-b52c-4825-8f7c-1dfef33b107c';
 
@@ -53,37 +51,53 @@ export function useUsers() {
 
   return useQuery({
     queryKey: ['users'],
-    queryFn: async () => {
-      // Use the secure RPC function to fetch users with email (Admin only)
-      const { data, error } = await supabase.rpc('get_users_for_admin');
+    queryFn: async (): Promise<UserWithRole[]> => {
+      // Direct query from profiles + user_roles
+      // Simple and works without custom RPC functions
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('id, display_name, avatar_url, created_at')
+        .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching users:', error);
-        throw error;
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        throw profilesError;
       }
 
-      // Map the response to match UserWithRole interface
-      // The RPC returns email as text, and role as app_role type
-      return (data || []).map(user => ({
-        id: user.id,
-        email: user.email || null,
-        display_name: user.display_name,
-        avatar_url: user.avatar_url,
-        created_at: user.created_at,
-        role: user.role as AppRole,
-      })) as UserWithRole[];
+      // Get roles for all users
+      const { data: roles, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) {
+        console.error('Error fetching roles:', rolesError);
+      }
+
+      // Create a map of user_id -> role
+      const roleMap = new Map<string, AppRole>();
+      if (roles) {
+        for (const r of roles) {
+          roleMap.set(r.user_id, r.role as AppRole);
+        }
+      }
+
+      // Combine profiles with roles
+      return (profiles || []).map(profile => ({
+        id: profile.id,
+        email: null, // Email not exposed from public profiles
+        display_name: profile.display_name,
+        avatar_url: profile.avatar_url,
+        created_at: profile.created_at,
+        role: roleMap.get(profile.id) || 'user',
+      }));
     },
-    // Only retry once to avoid spamming if not admin
     retry: 1,
   });
 }
 
 export function isSuperAdmin(user: { id: string; email?: string | null }): boolean {
-  // Check by email (primary) or by ID (fallback)
-  // Note: user.email might be null if fetched from public profiles
   const emailMatch = !!user.email && user.email === SUPER_ADMIN_EMAIL;
   const idMatch = SUPER_ADMIN_USER_ID !== null && user.id === SUPER_ADMIN_USER_ID;
-
   return emailMatch || idMatch;
 }
 

@@ -17,7 +17,6 @@ const navLinks = [
   { href: "#home", label: "Home" },
   { href: "#fitur", label: "Fitur" },
   { href: "/syllabus", label: "Silabus", isRoute: true },
-  { href: "/modules", label: "Modul", isRoute: true },
   { href: "#request", label: "Request Materi" },
 ];
 

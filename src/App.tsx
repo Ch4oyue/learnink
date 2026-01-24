@@ -24,6 +24,9 @@ const Changelog = lazy(() => import("./pages/Changelog"));
 const DashboardHome = lazy(() => import("./pages/DashboardHome"));
 const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
 const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
+const DashboardCourses = lazy(() => import("./pages/DashboardCourses"));
+const DashboardModules = lazy(() => import("./pages/DashboardModules"));
+const CourseDetail = lazy(() => import("./pages/CourseDetail"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon"));
 const SecondBrain = lazy(() => import("./pages/SecondBrain"));
 
@@ -169,7 +172,23 @@ const App = () => (
                     path="/dashboard/courses"
                     element={
                       <ProtectedRoute>
-                        <ComingSoon title="My Courses" description="Fitur daftar kursus yang sedang Anda pelajari akan segera tersedia." />
+                        <DashboardCourses />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/course/:trackId"
+                    element={
+                      <ProtectedRoute>
+                        <CourseDetail />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/modules"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardModules />
                       </ProtectedRoute>
                     }
                   />
@@ -225,6 +244,10 @@ const App = () => (
                   <Route
                     path="/module/:moduleId"
                     element={<ModuleRedirect />}
+                  />
+                  <Route
+                    path="/modules"
+                    element={<Navigate to="/dashboard/courses" replace />}
                   />
 
                   {/* ============================

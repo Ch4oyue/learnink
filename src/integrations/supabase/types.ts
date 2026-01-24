@@ -593,6 +593,35 @@ export type Database = {
         }
         Relationships: []
       }
+      user_tracks: {
+        Row: {
+          created_at: string
+          id: string
+          track_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          track_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          track_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_tracks_track_id_fkey"
+            columns: ["track_id"]
+            isOneToOne: false
+            referencedRelation: "tracks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tracks: {
         Row: {
           id: string
@@ -672,6 +701,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_popular_modules: {
+        Args: { limit_count?: number }
+        Returns: {
+          id: string
+          title: string
+          summary: string | null
+          level: string | null
+          category: string | null
+          student_count: number
+        }[]
+      }
       get_quiz_questions_safe: {
         Args: { p_quiz_id: string }
         Returns: {

@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useUsers, useUserStats } from "@/hooks/useUsers";
-import { useModules } from "@/hooks/useModules";
+import { useModules, usePopularModules } from "@/hooks/useModules";
 import { useAllRequests, useUpdateRequest, RequestStatus } from "@/hooks/useMaterialRequests";
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useGenerateModule } from "@/hooks/useGenerateModule";
@@ -110,6 +110,7 @@ export function AdminDashboardContent() {
 
   const { data: users, isLoading: usersLoading } = useUsers();
   const { data: modules } = useModules();
+  const { data: popularModules } = usePopularModules();
   const { data: requests, isLoading: requestsLoading } = useAllRequests(
     statusFilter === 'all' ? undefined : statusFilter
   );
@@ -439,22 +440,23 @@ export function AdminDashboardContent() {
         {/* Modules Tab */}
         <TabsContent value="modules" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Semua Modul</h2>
+            <h2 className="text-lg font-semibold text-foreground">Modul Populer</h2>
             <Button size="sm" asChild>
-              <Link to="/modules">Lihat Semua</Link>
+              <Link to="/dashboard/modules">Lihat Semua</Link>
             </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {modules?.slice(0, 6).map((module) => (
+            {popularModules?.map((module) => (
               <div key={module.id} className="bg-card border border-border rounded-xl p-5 shadow-soft">
                 <div className="flex items-start justify-between mb-3">
                   <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
                     <BookOpen className="h-5 w-5 text-primary" />
                   </div>
-                  <Badge variant={module.is_published ? 'default' : 'secondary'}>
-                    {module.is_published ? 'Published' : 'Draft'}
-                  </Badge>
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                    <Users className="h-3 w-3" />
+                    {module.student_count || 0} Siswa
+                  </div>
                 </div>
                 <h3 className="font-medium text-foreground mb-1">{module.title}</h3>
                 <p className="text-sm text-muted-foreground line-clamp-2">{module.summary}</p>

@@ -74,6 +74,14 @@ interface DashboardLayoutProps {
 // CONSTANTS
 // ============================================
 
+const formatBadgeCount = (count: string | number | undefined) => {
+  if (count === undefined) return null;
+  if (typeof count === "number") {
+    return count > 999 ? "999+" : count;
+  }
+  return count;
+};
+
 const SIDEBAR_WIDTH = 250;
 const SIDEBAR_COLLAPSED_WIDTH = 72;
 
@@ -396,7 +404,9 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
                         <IconComponent className="h-4 w-4 shrink-0" />
                         {/* Badge indicator when collapsed */}
                         {isCollapsed && item.badge && (
-                          <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full animate-pulse" />
+                          <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
+                            {formatBadgeCount(item.badge)}
+                          </span>
                         )}
                       </div>
                       {!isCollapsed && (
@@ -404,7 +414,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
                           <span className="flex-1">{item.label}</span>
                           {item.badge && (
                             <Badge className="text-[10px] px-1.5 bg-destructive text-destructive-foreground">
-                              {item.badge}
+                              {formatBadgeCount(item.badge)}
                             </Badge>
                           )}
                           {isActive && (
@@ -649,7 +659,14 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
                       : "text-muted-foreground"
                   )}
                 >
-                  <IconComponent className="h-5 w-5 mb-1" />
+                  <div className="relative">
+                    <IconComponent className="h-5 w-5 mb-1" />
+                    {item.badge && (
+                      <span className="absolute -top-1.5 -right-2 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-destructive px-1 text-[10px] text-destructive-foreground">
+                        {formatBadgeCount(item.badge)}
+                      </span>
+                    )}
+                  </div>
                   <span className="truncate max-w-[60px]">{item.label}</span>
                 </Link>
               );

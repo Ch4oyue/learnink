@@ -54,36 +54,27 @@ export function useUsers() {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      // Fetch profiles without email (removed for privacy)
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url, created_at')
-        .order('created_at', { ascending: false });
+      // Use the secure RPC function to fetch users with email (Admin only)
+      const { data, error } = await supabase.rpc('get_users_for_admin');
 
-      if (profilesError) throw profilesError;
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
 
-      const profiles = (profilesData || []).map(p => ({
-        ...p,
-        email: null // Email is no longer accessible via public profiles
-      }));
-
-      // Then get all roles
-      const { data: roles, error: rolesError } = await supabase
-        .from('user_roles')
-        .select('user_id, role');
-
-      if (rolesError) throw rolesError;
-
-      // Create a map of user_id -> role
-      const roleMap = new Map(roles?.map(r => [r.user_id, r.role as AppRole]) || []);
-
-      // Combine the data with email for Super Admin detection
-      return profiles.map(profile => ({
-        ...profile,
-        email: null,
-        role: roleMap.get(profile.id) || 'user',
+      // Map the response to match UserWithRole interface
+      // The RPC returns email as text, and role as app_role type
+      return (data || []).map(user => ({
+        id: user.id,
+        email: user.email || null,
+        display_name: user.display_name,
+        avatar_url: user.avatar_url,
+        created_at: user.created_at,
+        role: user.role as AppRole,
       })) as UserWithRole[];
     },
+    // Only retry once to avoid spamming if not admin
+    retry: 1,
   });
 }
 

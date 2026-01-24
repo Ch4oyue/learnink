@@ -14,6 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
+      incoming_contents: {
+        Row: {
+          ai_summary: string | null
+          category: string | null
+          content: string | null
+          created_at: string
+          id: string
+          level: string | null
+          processed_at: string | null
+          processed_by: string | null
+          raw_content: Json | null
+          source: string
+          status: string
+          summary: string | null
+          title: string
+          track: string | null
+        }
+        Insert: {
+          ai_summary?: string | null
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          level?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          raw_content?: Json | null
+          source?: string
+          status?: string
+          summary?: string | null
+          title: string
+          track?: string | null
+        }
+        Update: {
+          ai_summary?: string | null
+          category?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          level?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          raw_content?: Json | null
+          source?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          track?: string | null
+        }
+        Relationships: []
+      }
       learning_notes: {
         Row: {
           content: string

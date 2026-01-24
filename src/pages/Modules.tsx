@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
@@ -60,6 +60,11 @@ export default function Modules() {
   const { data: modules, isLoading } = useModules(true);
   const { data: userProgress } = useUserProgress(user?.id);
 
+  const progressMap = useMemo(() => {
+    if (!userProgress) return new Map<string, number>();
+    return new Map(userProgress.map(p => [p.module_id, p.progress_percent || 0]));
+  }, [userProgress]);
+
   const filteredModules = modules?.filter(module => {
     const matchesSearch = module.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       module.summary?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -69,8 +74,7 @@ export default function Modules() {
   });
 
   const getModuleProgress = (moduleId: string) => {
-    const progress = userProgress?.find(p => p.module_id === moduleId);
-    return progress?.progress_percent || 0;
+    return progressMap.get(moduleId) || 0;
   };
 
   return (

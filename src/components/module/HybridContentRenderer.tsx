@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -37,7 +37,7 @@ interface HybridContentRendererProps {
 // Colors from dark_mode (#0b0c0e bg, zinc text, purple accents)
 // ============================================
 
-export const HybridContentRenderer = forwardRef<HTMLElement, HybridContentRendererProps>(
+export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentRendererProps>(
     ({ content, metadata, onAddToNotes, onCopyCode, isLoading }, ref) => {
         const { resolvedTheme } = useTheme();
 
@@ -151,6 +151,6 @@ export const HybridContentRenderer = forwardRef<HTMLElement, HybridContentRender
             </main>
         );
     }
-);
+));
 
 HybridContentRenderer.displayName = "HybridContentRenderer";

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModule } from "@/hooks/useModules";
@@ -44,29 +44,39 @@ interface SectionData {
   content: string;
 }
 
+interface ParsedModuleData {
+  sections: Record<string, SectionData>;
+  order: string[];
+}
+
 // ============================================
 // HELPER: Parse all sections from Markdown (ONE-TIME)
 // ============================================
 
-function parseModuleSections(markdown: string): SectionData[] {
-  if (!markdown) return [];
+function parseModuleSections(markdown: string): ParsedModuleData {
+  if (!markdown) return { sections: {}, order: [] };
 
   const lines = markdown.split("\n");
-  const sections: SectionData[] = [];
+  const sections: Record<string, SectionData> = {};
+  const order: string[] = [];
   const headingRegex = /^(#{1,3})\s+(.+)$/;
 
   let currentSection: SectionData | null = null;
   let contentLines: string[] = [];
 
+  const saveCurrentSection = () => {
+    if (currentSection) {
+      currentSection.content = contentLines.join("\n").trim();
+      sections[currentSection.id] = currentSection;
+      order.push(currentSection.id);
+    }
+  };
+
   for (const line of lines) {
     const match = line.match(headingRegex);
 
     if (match) {
-      // Save previous section if exists
-      if (currentSection) {
-        currentSection.content = contentLines.join("\n").trim();
-        sections.push(currentSection);
-      }
+      saveCurrentSection();
 
       // Start new section
       const level = match[1].length;
@@ -76,7 +86,10 @@ function parseModuleSections(markdown: string): SectionData[] {
         .replace(/[^\w\s-]/g, "")
         .replace(/\s+/g, "-");
 
-      currentSection = { id, title, level, content: "" };
+      // Handle duplicate IDs by appending random string if needed (though unlikely with title slug)
+      const uniqueId = sections[id] ? `${id}-${Math.random().toString(36).substr(2, 5)}` : id;
+
+      currentSection = { id: uniqueId, title, level, content: "" };
       contentLines = [line]; // Include heading in content
     } else {
       // Accumulate content lines
@@ -85,12 +98,9 @@ function parseModuleSections(markdown: string): SectionData[] {
   }
 
   // Don't forget the last section
-  if (currentSection) {
-    currentSection.content = contentLines.join("\n").trim();
-    sections.push(currentSection);
-  }
+  saveCurrentSection();
 
-  return sections;
+  return { sections, order };
 }
 
 // ============================================
@@ -148,43 +158,53 @@ export default function ModuleLearn() {
   const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
 
-  // Persist panel visibility to localStorage
-  const handleSetShowTOC = (show: boolean) => {
+  // Persist panel visibility to localStorage (memoized handlers)
+  const handleSetShowTOC = useCallback((show: boolean) => {
     setShowTOC(show);
     localStorage.setItem("module-show-toc", String(show));
-  };
+  }, []);
 
-  const handleSetShowNotes = (show: boolean) => {
+  const handleSetShowNotes = useCallback((show: boolean) => {
     setShowNotes(show);
     localStorage.setItem("module-show-notes", String(show));
-  };
+  }, []);
+
+  const handleToggleTOC = useCallback(() => handleSetShowTOC(!showTOC), [handleSetShowTOC, showTOC]);
+  const handleBack = useCallback(() => navigate("/dashboard"), [navigate]);
 
   // Derived state
   const currentProgress = progress?.progress_percent || 0;
 
   // ============================================
   // OPTIMIZED: Parse sections ONCE when content changes
+  // Returns { sections: Map, order: Array }
   // ============================================
-  const sections = useMemo(() => {
-    if (!module?.content) return [];
+  const { sections, order } = useMemo(() => {
+    if (!module?.content) return { sections: {}, order: [] };
     return parseModuleSections(module.content);
   }, [module?.content]);
 
-  // Get current section content via simple lookup (O(n) but no string splitting)
-  const currentSectionIndex = sections.findIndex((s) => s.id === currentSectionId);
-  const currentSection = currentSectionIndex >= 0 ? sections[currentSectionIndex] : sections[0];
+  // Get current section content via simple lookup (O(1))
+  const currentSection = currentSectionId && sections[currentSectionId]
+    ? sections[currentSectionId]
+    : (order.length > 0 ? sections[order[0]] : null);
+
   const currentContent = currentSection?.content || module?.content || "";
+
+  // Calculate index efficiently for progress bar (O(N) but negligible for N < 100)
+  // We prioritize O(1) content lookup over index lookup
+  const currentSectionIndex = currentSectionId ? order.indexOf(currentSectionId) : 0;
 
   // Navigation helpers
   const hasPrevious = currentSectionIndex > 0;
-  const hasNext = currentSectionIndex < sections.length - 1 && currentSectionIndex >= 0;
+  const hasNext = currentSectionIndex < order.length - 1 && currentSectionIndex >= 0;
 
   // Set initial section
   useEffect(() => {
-    if (sections.length > 0 && !currentSectionId) {
-      setCurrentSectionId(sections[0].id);
+    if (order.length > 0 && !currentSectionId) {
+      setCurrentSectionId(order[0]);
     }
-  }, [sections, currentSectionId]);
+  }, [order, currentSectionId]);
 
   // Scroll to top when section changes
   useEffect(() => {
@@ -199,10 +219,10 @@ export default function ModuleLearn() {
 
   // Update progress when changing sections (debounced to prevent API spam)
   useEffect(() => {
-    if (!user || !moduleId || sections.length === 0 || currentSectionIndex < 0) return;
+    if (!user || !moduleId || order.length === 0 || currentSectionIndex < 0) return;
     if (updatePendingRef.current) return; // Skip if update is in flight
 
-    const newProgress = Math.round(((currentSectionIndex + 1) / sections.length) * 100);
+    const newProgress = Math.round(((currentSectionIndex + 1) / order.length) * 100);
 
     // Only update if progress actually increased AND hasn't been saved yet
     if (newProgress > currentProgress && newProgress > lastSavedProgressRef.current) {
@@ -225,28 +245,28 @@ export default function ModuleLearn() {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSectionIndex, sections.length, user?.id, moduleId, currentProgress]);
+  }, [currentSectionIndex, order.length, user?.id, moduleId, currentProgress]);
 
-  // Navigation handlers
-  const handlePrevious = () => {
-    if (hasPrevious) {
-      setCurrentSectionId(sections[currentSectionIndex - 1].id);
+  // Navigation handlers (Wrapped in useCallback)
+  const handlePrevious = useCallback(() => {
+    if (currentSectionIndex > 0) {
+      setCurrentSectionId(order[currentSectionIndex - 1]);
     }
-  };
+  }, [currentSectionIndex, order]);
 
-  const handleNext = () => {
-    if (hasNext) {
-      setCurrentSectionId(sections[currentSectionIndex + 1].id);
+  const handleNext = useCallback(() => {
+    if (currentSectionIndex < order.length - 1) {
+      setCurrentSectionId(order[currentSectionIndex + 1]);
     }
-  };
+  }, [currentSectionIndex, order]);
 
-  const handleSectionClick = (sectionId: string) => {
+  const handleSectionClick = useCallback((sectionId: string) => {
     setCurrentSectionId(sectionId);
     setMobileMenuOpen(false);
-  };
+  }, []);
 
-  // Note handlers
-  const handleCreateNote = (content: string) => {
+  // Note handlers (Wrapped in useCallback)
+  const handleCreateNote = useCallback((content: string) => {
     if (content.trim() && user && moduleId) {
       createNote.mutate(
         {
@@ -262,13 +282,13 @@ export default function ModuleLearn() {
         }
       );
     }
-  };
+  }, [createNote, user, moduleId, toast]);
 
-  const handleDeleteNote = (noteId: string) => {
+  const handleDeleteNote = useCallback((noteId: string) => {
     deleteNote.mutate(noteId);
-  };
+  }, [deleteNote]);
 
-  const handleAddToNotes = (text: string) => {
+  const handleAddToNotes = useCallback((text: string) => {
     if (text && user && moduleId) {
       createNote.mutate(
         {
@@ -284,7 +304,15 @@ export default function ModuleLearn() {
         }
       );
     }
-  };
+  }, [createNote, user, moduleId, toast]);
+
+  // Stable props objects
+  const metadata = useMemo(() => ({
+    title: currentSection?.title || module?.title || "",
+    description: module?.summary || undefined,
+    category: module?.category || undefined,
+    readingTime: Math.ceil((currentContent?.length || 0) / 1000),
+  }), [currentSection, module, currentContent]);
 
   // ============================================
   // LOADING STATE
@@ -332,8 +360,8 @@ export default function ModuleLearn() {
       <div className="hidden md:block">
         <HybridSidebar
           activeTab={showTOC ? "toc" : "content"}
-          onTableOfContentsClick={() => handleSetShowTOC(!showTOC)}
-          onBackClick={() => navigate("/dashboard")}
+          onTableOfContentsClick={handleToggleTOC}
+          onBackClick={handleBack}
         />
       </div>
 
@@ -357,13 +385,14 @@ export default function ModuleLearn() {
           {/* TOC List */}
           <ScrollArea className="flex-1 p-3">
             <nav className="space-y-1">
-              {sections.length === 0 ? (
+              {order.length === 0 ? (
                 <p className="text-sm text-muted-foreground p-2">No sections</p>
               ) : (
-                sections.map((item, index) => {
+                order.map((sectionId, index) => {
+                  const item = sections[sectionId];
                   const isActive = item.id === currentSectionId;
                   const isCompleted = currentSectionId
-                    ? sections.findIndex((i) => i.id === currentSectionId) > index
+                    ? order.indexOf(currentSectionId) > index
                     : false;
 
                   return (
@@ -431,7 +460,8 @@ export default function ModuleLearn() {
                 </div>
                 <ScrollArea className="h-[calc(100vh-60px)] p-3">
                   <nav className="space-y-1">
-                    {sections.map((item, index) => {
+                    {order.map((sectionId, index) => {
+                      const item = sections[sectionId];
                       const isActive = item.id === currentSectionId;
                       return (
                         <button
@@ -462,7 +492,7 @@ export default function ModuleLearn() {
             <div>
               <h1 className="font-semibold text-sm text-foreground line-clamp-1">{module.title}</h1>
               <p className="text-[10px] text-muted-foreground">
-                {currentSectionIndex + 1} of {sections.length || 1}
+                {currentSectionIndex + 1} of {order.length || 1}
               </p>
             </div>
           </div>
@@ -491,12 +521,7 @@ export default function ModuleLearn() {
         <HybridContentRenderer
           ref={contentRef}
           content={currentContent}
-          metadata={{
-            title: currentSection?.title || module.title,
-            description: module.summary || undefined,
-            category: module.category || undefined,
-            readingTime: Math.ceil((currentContent?.length || 0) / 1000),
-          }}
+          metadata={metadata}
           onAddToNotes={handleAddToNotes}
           isLoading={false}
         />
@@ -513,7 +538,7 @@ export default function ModuleLearn() {
           </Button>
 
           <Badge variant="secondary">
-            {currentSectionIndex + 1} / {sections.length || 1}
+            {currentSectionIndex + 1} / {order.length || 1}
           </Badge>
 
           {hasNext ? (

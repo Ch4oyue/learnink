@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -36,7 +36,7 @@ interface HybridGuidedNotesProps {
 // Colors from dark_mode (#111316 bg, zinc borders, purple accents)
 // ============================================
 
-export function HybridGuidedNotes({
+export const HybridGuidedNotes = memo(function HybridGuidedNotes({
     notes,
     isLoading,
     onCreateNote,
@@ -155,7 +155,7 @@ export function HybridGuidedNotes({
             </div>
         </aside>
     );
-}
+});
 
 // ============================================
 // NOTE CARD COMPONENT

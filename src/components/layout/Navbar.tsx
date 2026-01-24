@@ -70,8 +70,8 @@ export function Navbar() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         isScrolled
-          ? "bg-background/80 backdrop-blur-lg shadow-soft"
-          : "bg-transparent"
+          ? "bg-background/80 backdrop-blur-lg shadow-soft border-b border-white/10"
+          : "bg-transparent border-b border-transparent"
       )}
     >
       <nav className="container mx-auto px-6 lg:px-8">

@@ -7,20 +7,19 @@ import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import {
   BookOpen,
   ChevronLeft,
   ChevronRight,
+  Menu,
+  StickyNote,
   Check,
   Loader2,
-  List,
-  StickyNote,
-  FileText
+  X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/module/HybridSidebar";
@@ -28,11 +27,10 @@ import { HybridContentRenderer } from "@/components/module/HybridContentRenderer
 import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
 
 /**
- * ModuleLearn - Hybrid View with 4-Panel Layout (Desktop) & Tab View (Mobile)
+ * ModuleLearn - Hybrid View with 4-Panel Layout
  * ==============================================
- * Desktop: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
- * Mobile: Tabs (Materi | Catatan | Menu)
- * Premium Dark Mode Optimized
+ * Layout: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
+ * Premium Dark Mode: #0b0c0e background, purple accents
  */
 
 // ============================================
@@ -115,11 +113,11 @@ export default function ModuleLearn() {
   const { user, canAccessTrack } = useAuth();
   const { toast } = useToast();
   const contentRef = useRef<HTMLElement>(null);
-  const isMobile = useIsMobile();
 
   // Data hooks
+  // Optimized: Fetching single module by ID instead of all modules
   const { data: module, isLoading } = useModule(moduleId ?? "");
-  const { data: progress } = useModuleProgress(user?.id, moduleId);
+  const { data: progress, refetch: refetchProgress } = useModuleProgress(user?.id, moduleId);
   const updateProgress = useUpdateProgress();
 
   // Access Control Check
@@ -156,7 +154,8 @@ export default function ModuleLearn() {
     }
     return true;
   });
-
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
 
   // Persist panel visibility to localStorage (memoized handlers)
@@ -350,171 +349,14 @@ export default function ModuleLearn() {
   }
 
   // ============================================
-  // MOBILE RENDER (Tabs)
-  // ============================================
-  if (isMobile) {
-    return (
-      <div className="flex flex-col h-screen bg-background text-foreground">
-        {/* Mobile Header with Progress */}
-        <div className="shrink-0 border-b border-white/10 bg-background/80 backdrop-blur-lg z-10">
-          <div className="h-1 bg-muted w-full">
-            <div
-              className="h-full bg-primary transition-all duration-500"
-              style={{ width: `${currentProgress}%` }}
-            />
-          </div>
-          <div className="flex items-center justify-between p-4">
-             <div className="flex items-center gap-3 overflow-hidden">
-                <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={() => navigate("/dashboard")}>
-                   <ChevronLeft className="h-5 w-5" />
-                </Button>
-                <div className="flex-1 min-w-0">
-                  <h1 className="font-semibold text-sm truncate">{module.title}</h1>
-                  <p className="text-[10px] text-muted-foreground">
-                     {currentSectionIndex + 1} / {sections.length || 1} • {currentProgress}%
-                  </p>
-                </div>
-             </div>
-          </div>
-        </div>
-
-        <Tabs defaultValue="content" className="flex-1 flex flex-col overflow-hidden">
-          <TabsList className="w-full justify-evenly rounded-none border-b border-white/10 bg-muted/20 p-0 h-12">
-            <TabsTrigger
-              value="content"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full"
-            >
-              <FileText className="h-4 w-4 mr-2" />
-              Materi
-            </TabsTrigger>
-            <TabsTrigger
-              value="notes"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full"
-            >
-              <StickyNote className="h-4 w-4 mr-2" />
-              Catatan
-            </TabsTrigger>
-            <TabsTrigger
-              value="menu"
-              className="flex-1 rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent h-full"
-            >
-              <List className="h-4 w-4 mr-2" />
-              Menu
-            </TabsTrigger>
-          </TabsList>
-
-          {/* TAB 1: CONTENT */}
-          <TabsContent value="content" className="flex-1 flex flex-col overflow-hidden mt-0 data-[state=active]:flex">
-            <HybridContentRenderer
-              ref={contentRef}
-              content={currentContent}
-              metadata={{
-                title: currentSection?.title || module.title,
-                description: module.summary || undefined,
-                category: module.category || undefined,
-                readingTime: Math.ceil((currentContent?.length || 0) / 1000),
-              }}
-              onAddToNotes={handleAddToNotes}
-              isLoading={false}
-            />
-            {/* Bottom Nav for Content */}
-            <div className="shrink-0 h-16 border-t border-border bg-card/50 backdrop-blur flex items-center justify-between px-4">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handlePrevious}
-                disabled={!hasPrevious}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" />
-                Prev
-              </Button>
-              <Badge variant="secondary" className="text-xs">
-                {currentSectionIndex + 1}/{sections.length || 1}
-              </Badge>
-              {hasNext ? (
-                <Button size="sm" onClick={handleNext}>
-                  Next
-                  <ChevronRight className="h-4 w-4 ml-1" />
-                </Button>
-              ) : (
-                <Button
-                  size="sm"
-                  onClick={() => navigate("/dashboard")}
-                  className="bg-green-600 hover:bg-green-500 text-white"
-                >
-                  Done
-                  <Check className="h-4 w-4 ml-1" />
-                </Button>
-              )}
-            </div>
-          </TabsContent>
-
-          {/* TAB 2: NOTES */}
-          <TabsContent value="notes" className="flex-1 overflow-hidden mt-0 data-[state=active]:flex flex-col">
-            <HybridGuidedNotes
-              notes={notes || []}
-              isLoading={notesLoading}
-              onCreateNote={handleCreateNote}
-              onDeleteNote={handleDeleteNote}
-              isCreating={createNote.isPending}
-              isDeleting={deleteNote.isPending}
-            />
-          </TabsContent>
-
-          {/* TAB 3: MENU / TOC */}
-          <TabsContent value="menu" className="flex-1 overflow-hidden mt-0 data-[state=active]:flex flex-col bg-sidebar/50">
-             <ScrollArea className="flex-1 p-4">
-                <nav className="space-y-1">
-                  {sections.map((item, index) => {
-                    const isActive = item.id === currentSectionId;
-                    const isCompleted = currentSectionId
-                      ? sections.findIndex((i) => i.id === currentSectionId) > index
-                      : false;
-
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => handleSectionClick(item.id)}
-                        className={cn(
-                          "w-full text-left p-3 rounded-lg transition-all flex items-start gap-3 text-sm border border-transparent",
-                          isActive
-                            ? "bg-primary/10 text-primary border-primary/20 shadow-sm"
-                            : isCompleted
-                              ? "text-muted-foreground hover:bg-muted"
-                              : "text-foreground hover:bg-muted"
-                        )}
-                      >
-                        <span
-                          className={cn(
-                            "shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
-                            isActive
-                              ? "bg-primary text-primary-foreground"
-                              : isCompleted
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-muted text-muted-foreground"
-                          )}
-                        >
-                          {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
-                        </span>
-                        <span className="line-clamp-2 font-medium">{item.title}</span>
-                      </button>
-                    );
-                  })}
-                </nav>
-             </ScrollArea>
-          </TabsContent>
-        </Tabs>
-      </div>
-    );
-  }
-
-  // ============================================
-  // DESKTOP RENDER - 4 PANEL HYBRID LAYOUT
+  // MAIN RENDER - 4 PANEL HYBRID LAYOUT
   // ============================================
 
   return (
     <div className="h-screen overflow-hidden flex bg-background">
-      {/* PANEL 1: Icon Rail (72px) */}
+      {/* ============================================
+          PANEL 1: Icon Rail (72px) - Desktop Only
+      ============================================ */}
       <div className="hidden md:block">
         <HybridSidebar
           activeTab={showTOC ? "toc" : "content"}
@@ -523,9 +365,12 @@ export default function ModuleLearn() {
         />
       </div>
 
-      {/* PANEL 2: TOC Sidebar (240px) - Collapsible */}
+      {/* ============================================
+          PANEL 2: TOC Sidebar (240px) - Collapsible
+      ============================================ */}
       {showTOC && (
         <aside className="hidden md:flex w-[240px] bg-sidebar border-r border-sidebar-border flex-col shrink-0">
+          {/* TOC Header */}
           <div className="p-4 border-b border-sidebar-border">
             <h2 className="font-bold text-foreground text-sm mb-3 line-clamp-2">{module.title}</h2>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
@@ -537,13 +382,16 @@ export default function ModuleLearn() {
             <p className="text-[10px] text-muted-foreground mt-1 font-medium">{currentProgress}% complete</p>
           </div>
 
+          {/* TOC List */}
           <ScrollArea className="flex-1 p-3">
             <nav className="space-y-1">
-              {order.length === 0 ? (
+              {!Array.isArray(order) || order.length === 0 ? (
                 <p className="text-sm text-muted-foreground p-2">No sections</p>
               ) : (
                 order.map((sectionId, index) => {
                   const item = sections[sectionId];
+                  if (!item) return null; // Defensive check
+
                   const isActive = item.id === currentSectionId;
                   const isCompleted = currentSectionId
                     ? order.indexOf(currentSectionId) > index
@@ -586,7 +434,9 @@ export default function ModuleLearn() {
         </aside>
       )}
 
-      {/* PANEL 3: Main Content (Flex 1) */}
+      {/* ============================================
+          PANEL 3: Main Content (Flex 1)
+      ============================================ */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile Header */}
         <header className="md:hidden h-14 flex items-center justify-between px-4 border-b border-border bg-card shrink-0">
@@ -612,8 +462,10 @@ export default function ModuleLearn() {
                 </div>
                 <ScrollArea className="h-[calc(100vh-60px)] p-3">
                   <nav className="space-y-1">
-                    {order.map((sectionId, index) => {
+                    {Array.isArray(order) && order.map((sectionId, index) => {
                       const item = sections[sectionId];
+                      if (!item) return null; // Defensive check
+
                       const isActive = item.id === currentSectionId;
                       return (
                         <button
@@ -710,7 +562,9 @@ export default function ModuleLearn() {
         </div>
       </div>
 
-      {/* PANEL 4: Notes Panel (360px) - Desktop Only, Collapsible */}
+      {/* ============================================
+          PANEL 4: Notes Panel (360px) - Desktop Only, Collapsible
+      ============================================ */}
       {showNotes && (
         <div className="hidden lg:block">
           <HybridGuidedNotes

@@ -177,18 +177,24 @@ async function validateApiKey(
         return null;
     }
 
-    // Fetch all active integrations and check against bcrypt hashes
+    // Reconstruct the API key preview to filter integrations
+    // Format: sk_live_••••••••xxxx
+    const lastChars = token.slice(-4);
+    const apiKeyPreview = `sk_live_${"•".repeat(8)}${lastChars}`;
+
+    // Fetch ONLY integrations with matching preview and check against bcrypt hashes
     const { data: integrations, error } = await supabase
         .from("integrations")
         .select("id, name, source, api_key_hash")
-        .eq("is_active", true);
+        .eq("is_active", true)
+        .eq("api_key_preview", apiKeyPreview);
 
     if (error || !integrations) {
         console.error("Error fetching integrations:", error);
         return null;
     }
 
-    // Check each integration's hash
+    // Check the hash (should be 0 or 1 result, but loop is safe)
     for (const integration of integrations) {
         try {
             const isMatch = await bcrypt.compare(token, integration.api_key_hash);

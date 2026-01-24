@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
@@ -149,7 +150,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
         navigate("/dashboard/modules");
       }
     } catch (error) {
-      console.error("Error saving module:", error);
+      logger.error("Error saving module:", error);
       toast({
         title: "Error",
         description: "Gagal menyimpan modul",

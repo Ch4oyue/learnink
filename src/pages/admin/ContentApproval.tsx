@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { IncomingContent, ContentStatus } from "@/types/staging";
+import { useModuleCategories, useModuleLevels } from "@/hooks/useModuleSettings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -66,24 +67,12 @@ const INITIAL_FORM_DATA: PublishFormData = {
     title: "",
     summary: "",
     content: "",
-    category: "Umum",
-    level: "Pemula",
+    category: "",
+    level: "",
 };
 
-const CATEGORY_OPTIONS = [
-    { value: "Umum", label: "Umum" },
-    { value: "Produktivitas", label: "Produktivitas" },
-    { value: "Teknologi", label: "Teknologi" },
-    { value: "Bisnis", label: "Bisnis" },
-    { value: "Pengembangan Diri", label: "Pengembangan Diri" },
-    { value: "Lainnya", label: "Lainnya" },
-];
-
-const LEVEL_OPTIONS = [
-    { value: "Pemula", label: "Pemula" },
-    { value: "Menengah", label: "Menengah" },
-    { value: "Lanjutan", label: "Lanjutan" },
-];
+// Removed hardcoded CATEGORY_OPTIONS and LEVEL_OPTIONS
+// Now using dynamic data from useModuleCategories() and useModuleLevels() hooks
 
 // ============================================
 // LOADING SKELETON
@@ -126,6 +115,10 @@ export default function ContentApproval() {
     const [formData, setFormData] = useState<PublishFormData>(INITIAL_FORM_DATA);
     const [isPublishOpen, setIsPublishOpen] = useState(false);
 
+    // Fetch dynamic categories and levels from Settings
+    const { data: categories = [] } = useModuleCategories();
+    const { data: levels = [] } = useModuleLevels();
+
     // Fetch pending content
     const { data: pendingContents, isLoading, refetch } = useQuery({
         queryKey: ["incoming-contents", "pending"],
@@ -141,6 +134,27 @@ export default function ContentApproval() {
         },
         enabled: role === "admin",
     });
+
+    // Realtime subscription for incoming_contents
+    useEffect(() => {
+        if (role !== "admin") return;
+
+        const channel = supabase
+            .channel("incoming-contents-realtime")
+            .on(
+                "postgres_changes",
+                { event: "*", schema: "public", table: "incoming_contents" },
+                () => {
+                    // Invalidate query to refetch on any change
+                    queryClient.invalidateQueries({ queryKey: ["incoming-contents"] });
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [role, queryClient]);
 
     // Approve and publish mutation
     const publishMutation = useMutation({
@@ -229,12 +243,16 @@ export default function ContentApproval() {
     // Handlers
     const openPublishDialog = (content: IncomingContent) => {
         setSelectedContent(content);
+
+        // Read from direct columns first, fallback to raw_content for backward compatibility
+        const raw = content.raw_content || {};
+
         setFormData({
             title: content.title,
-            summary: `Materi pembelajaran tentang ${content.title}.`,
-            content: content.raw_content?.content || "",
-            category: "Umum",
-            level: "Pemula",
+            summary: content.summary || (raw.summary as string) || `Materi pembelajaran tentang ${content.title}.`,
+            content: content.content || (raw.content as string) || "",
+            category: content.category || (raw.category as string) || categories[0]?.name || "Umum",
+            level: content.level || (raw.level as string) || levels[0]?.name || "Pemula",
         });
         setIsPublishOpen(true);
     };
@@ -436,12 +454,12 @@ export default function ContentApproval() {
                                     onValueChange={(value) => setFormData({ ...formData, category: value })}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue />
+                                        <SelectValue placeholder="Pilih kategori" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {CATEGORY_OPTIONS.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                {option.label}
+                                        {categories.map((cat) => (
+                                            <SelectItem key={cat.id} value={cat.name}>
+                                                {cat.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>
@@ -455,12 +473,12 @@ export default function ContentApproval() {
                                     onValueChange={(value) => setFormData({ ...formData, level: value })}
                                 >
                                     <SelectTrigger>
-                                        <SelectValue />
+                                        <SelectValue placeholder="Pilih level" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {LEVEL_OPTIONS.map((option) => (
-                                            <SelectItem key={option.value} value={option.value}>
-                                                {option.label}
+                                        {levels.map((lvl) => (
+                                            <SelectItem key={lvl.id} value={lvl.name}>
+                                                {lvl.name}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

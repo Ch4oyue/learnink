@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { usePyodide } from "@/hooks/usePyodide";
@@ -81,7 +82,7 @@ export function PythonCodeEditor({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error("Failed to copy:", err);
+      logger.error("Failed to copy:", err);
     }
   }, [code]);
 

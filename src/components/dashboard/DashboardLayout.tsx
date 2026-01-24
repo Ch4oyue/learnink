@@ -1,6 +1,8 @@
 import { ReactNode, forwardRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -59,6 +61,11 @@ interface NavItem {
   badge?: string | number;
 }
 
+interface NavGroup {
+  title?: string; // Optional section header
+  items: NavItem[];
+}
+
 interface DashboardLayoutProps {
   children: ReactNode;
 }
@@ -83,34 +90,64 @@ const roleBadgeColors: Record<AppRole, string> = {
 };
 
 // ============================================
-// MENU CONFIGURATION PER ROLE
+// MENU CONFIGURATION PER ROLE (Grouped)
 // ============================================
 
-const MENU_CONFIG: Record<AppRole, NavItem[]> = {
+const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
   user: [
-    { href: "/dashboard", label: "Home", icon: LayoutDashboard },
-    { href: "/dashboard/courses", label: "My Courses", icon: BookOpen },
-    { href: "/dashboard/second-brain", label: "Second Brain", icon: StickyNote },
-    { href: "/dashboard/achievements", label: "Achievements", icon: Trophy },
+    {
+      title: undefined, // Main menu, no header
+      items: [
+        { href: "/dashboard", label: "Home", icon: LayoutDashboard },
+        { href: "/dashboard/second-brain", label: "Second Brain", icon: StickyNote },
+      ],
+    },
+    {
+      title: "THE SPECIALIST",
+      items: [
+        { href: "/dashboard/courses?track=specialist", label: "AI & Automation", icon: BookOpen },
+      ],
+    },
+    {
+      title: "LIFE OS",
+      items: [
+        { href: "/dashboard/courses?track=life-os", label: "Life Skills", icon: BookOpen },
+      ],
+    },
+    {
+      title: undefined,
+      items: [
+        { href: "/dashboard/achievements", label: "Achievements", icon: Trophy },
+      ],
+    },
   ],
   tutor: [
-    { href: "/dashboard", label: "Studio", icon: Palette },
-    { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/dashboard/requests", label: "Material Requests", icon: FileQuestion },
+    {
+      items: [
+        { href: "/dashboard", label: "Studio", icon: Palette },
+        { href: "/dashboard/analytics", label: "Analytics", icon: BarChart3 },
+        { href: "/dashboard/requests", label: "Material Requests", icon: FileQuestion },
+      ],
+    },
   ],
   admin: [
-    { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-    { href: "/dashboard/users", label: "Users", icon: Users },
-    { href: "/dashboard/admin/approval", label: "Inbox Review", icon: CheckCircle },
-    { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
-    { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
-    { href: "/dashboard/settings", label: "System Settings", icon: Settings },
+    {
+      items: [
+        { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+        { href: "/dashboard/users", label: "Users", icon: Users },
+        { href: "/dashboard/admin/approval", label: "Inbox Review", icon: CheckCircle },
+        { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
+        { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
+        { href: "/dashboard/settings", label: "System Settings", icon: Settings },
+      ],
+    },
   ],
 };
 
 // Common items shown for all roles at the bottom
 // Note: Profile is accessed via user dropdown at footer, not duplicated here
 const COMMON_NAV_ITEMS: NavItem[] = [];
+
 
 // ============================================
 // LOADING SKELETON COMPONENT
@@ -177,7 +214,33 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
 
     // Get role-specific nav items with type safety
     const currentRole: AppRole = role ?? "user";
-    const navItems: NavItem[] = MENU_CONFIG[currentRole];
+
+    // Fetch pending approval count for admin
+    const { data: pendingCount = 0 } = useQuery({
+      queryKey: ["pending-approvals"],
+      queryFn: async () => {
+        const { count, error } = await supabase
+          .from("incoming_contents")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "pending");
+
+        if (error) throw error;
+        return count || 0;
+      },
+      enabled: currentRole === "admin",
+      refetchInterval: 30000, // Refresh every 30s
+    });
+
+    const navGroups: NavGroup[] = MENU_CONFIG[currentRole].map(group => ({
+      ...group,
+      items: group.items.map(item => {
+        // Add badge to Inbox Review for admin
+        if (currentRole === "admin" && item.href === "/dashboard/admin/approval" && pendingCount > 0) {
+          return { ...item, badge: pendingCount };
+        }
+        return item;
+      })
+    }));
 
     const displayName =
       profile?.full_name ||
@@ -279,7 +342,7 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
             </div>
           )}
 
-          {/* Role-Based Navigation */}
+          {/* Role-Based Navigation with Groups */}
           <nav className="flex-1 overflow-y-auto p-2 space-y-1">
             {/* Role Badge */}
             {!isCollapsed && (
@@ -296,44 +359,69 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
               </div>
             )}
 
-            {/* Main Navigation Items */}
-            {navItems.map((item) => {
-              const isActive = location.pathname === item.href;
-              const IconComponent = item.icon;
+            {/* Grouped Navigation Items */}
+            {navGroups.map((group, groupIndex) => (
+              <div key={groupIndex} className="space-y-1">
+                {/* Section Header (if title exists) */}
+                {group.title && !isCollapsed && (
+                  <div className="px-3 pt-4 pb-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                      {group.title}
+                    </span>
+                  </div>
+                )}
+                {group.title && isCollapsed && (
+                  <div className="my-2 border-t border-sidebar-border" />
+                )}
 
-              return (
-                <Link
-                  key={item.href}
-                  to={item.href}
-                  title={isCollapsed ? item.label : undefined}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all relative",
-                    isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-sidebar-foreground hover:bg-muted hover:text-foreground",
-                    isCollapsed && "justify-center px-0"
-                  )}
-                >
-                  <IconComponent className="h-4 w-4 shrink-0" />
-                  {!isCollapsed && (
-                    <>
-                      <span className="flex-1">{item.label}</span>
-                      {item.badge && (
-                        <Badge variant="secondary" className="text-[10px] px-1.5">
-                          {item.badge}
-                        </Badge>
-                      )}
-                      {isActive && (
-                        <ChevronRight className="h-4 w-4 text-primary/50" />
-                      )}
-                    </>
-                  )}
-                </Link>
-              );
-            })}
+                {/* Nav Items in this group */}
+                {group.items.map((item) => {
+                  const isActive = location.pathname === item.href || location.pathname + location.search === item.href;
+                  const IconComponent = item.icon;
 
-            {/* Separator */}
-            <div className="my-4 border-t border-sidebar-border" />
+                  return (
+                    <Link
+                      key={item.href}
+                      to={item.href}
+                      title={isCollapsed ? `${item.label}${item.badge ? ` (${item.badge})` : ''}` : undefined}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all relative",
+                        isActive
+                          ? "bg-primary/10 text-primary"
+                          : "text-sidebar-foreground hover:bg-muted hover:text-foreground",
+                        isCollapsed && "justify-center px-0"
+                      )}
+                    >
+                      <div className="relative">
+                        <IconComponent className="h-4 w-4 shrink-0" />
+                        {/* Badge indicator when collapsed */}
+                        {isCollapsed && item.badge && (
+                          <span className="absolute -top-1 -right-1 h-2 w-2 bg-destructive rounded-full animate-pulse" />
+                        )}
+                      </div>
+                      {!isCollapsed && (
+                        <>
+                          <span className="flex-1">{item.label}</span>
+                          {item.badge && (
+                            <Badge className="text-[10px] px-1.5 bg-destructive text-destructive-foreground">
+                              {item.badge}
+                            </Badge>
+                          )}
+                          {isActive && (
+                            <ChevronRight className="h-4 w-4 text-primary/50" />
+                          )}
+                        </>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
+
+            {/* Separator before common items */}
+            {COMMON_NAV_ITEMS.length > 0 && (
+              <div className="my-4 border-t border-sidebar-border" />
+            )}
 
             {/* Common Navigation Items */}
             {COMMON_NAV_ITEMS.map((item) => {
@@ -545,8 +633,8 @@ export const DashboardLayout = forwardRef<HTMLDivElement, DashboardLayoutProps>(
         {/* Mobile Bottom Nav - Role-Specific (max 5 items) */}
         <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-card/95 backdrop-blur-sm">
           <div className="flex items-center justify-around h-16">
-            {/* Show first 4 role-specific items + Profile */}
-            {[...navItems.slice(0, 4), { href: "/dashboard/profile", label: "Profile", icon: User }].map((item) => {
+            {/* Flatten groups and show first 4 items + Profile */}
+            {[...navGroups.flatMap(g => g.items).slice(0, 4), { href: "/dashboard/profile", label: "Profile", icon: User }].map((item) => {
               const isActive = location.pathname === item.href;
               const IconComponent = item.icon;
 

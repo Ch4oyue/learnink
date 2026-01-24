@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -55,7 +56,7 @@ export function useCreateLearningNote() {
       queryClient.invalidateQueries({ queryKey: ["learning-notes"] });
     },
     onError: (error) => {
-      console.error("Error creating note:", error);
+      logger.error("Error creating note:", error);
       toast({
         title: "Error",
         description: "Gagal membuat catatan",
@@ -89,7 +90,7 @@ export function useUpdateLearningNote() {
       });
     },
     onError: (error) => {
-      console.error("Error updating note:", error);
+      logger.error("Error updating note:", error);
       toast({
         title: "Error",
         description: "Gagal memperbarui catatan",
@@ -120,7 +121,7 @@ export function useDeleteLearningNote() {
       });
     },
     onError: (error) => {
-      console.error("Error deleting note:", error);
+      logger.error("Error deleting note:", error);
       toast({
         title: "Error",
         description: "Gagal menghapus catatan",

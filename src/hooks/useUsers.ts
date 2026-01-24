@@ -80,7 +80,8 @@ export function useUsers() {
 
 export function isSuperAdmin(user: { id: string; email?: string | null }): boolean {
   // Check by email (primary) or by ID (fallback)
-  const emailMatch = user.email === SUPER_ADMIN_EMAIL;
+  // Note: user.email might be null if fetched from public profiles
+  const emailMatch = !!user.email && user.email === SUPER_ADMIN_EMAIL;
   const idMatch = SUPER_ADMIN_USER_ID !== null && user.id === SUPER_ADMIN_USER_ID;
 
   return emailMatch || idMatch;

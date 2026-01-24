@@ -22,6 +22,7 @@ export interface Module {
     full_name: string | null;
     avatar_url: string | null;
   } | null;
+  status?: string | null;
 }
 
 export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; minimal?: boolean } | boolean = {}) {
@@ -33,13 +34,17 @@ export function useModules(optionsOrPublishedOnly: { publishedOnly?: boolean; mi
   const { publishedOnly = false, minimal = true } = options;
 
   return useQuery({
-    queryKey: ["modules", publishedOnly],
+    queryKey: ["modules", publishedOnly, minimal],
     queryFn: async () => {
-      let query = supabase
-        .from("modules")
-        .select(
-          "id, title, summary, level, category, is_published, created_at"
+      let query = supabase.from("modules");
+
+      if (minimal) {
+        query = query.select(
+          "id, title, summary, level, category, is_published, created_at, status"
         );
+      } else {
+        query = query.select("*");
+      }
 
       if (publishedOnly) {
         query = query.eq("is_published", true);

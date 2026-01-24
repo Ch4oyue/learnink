@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -58,10 +58,19 @@ export const ModulesSection = () => {
     setVisibleCount((prev) => Math.min(prev + 6, modules?.length || 0));
   };
 
+  const progressMap = useMemo(() => {
+    const map = new Map<string, number>();
+    if (userProgress) {
+      userProgress.forEach((p) => {
+        map.set(p.module_id, p.progress_percent || 0);
+      });
+    }
+    return map;
+  }, [userProgress]);
+
   // Get progress for a module
   const getModuleProgress = (moduleId: string) => {
-    const progress = userProgress?.find((p) => p.module_id === moduleId);
-    return progress?.progress_percent || 0;
+    return progressMap.get(moduleId) || 0;
   };
 
   // Loading skeleton

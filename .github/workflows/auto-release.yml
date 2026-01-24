@@ -1,0 +1,120 @@
+name: Auto Release
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'CHANGELOG.md'
+
+permissions:
+  contents: write
+
+jobs:
+  release-flow:
+    name: Release Flow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Parse Latest Version
+        id: parse
+        run: |
+          python3 -c "
+          import re, os
+          try:
+              with open('CHANGELOG.md', 'r') as f:
+                  content = f.read()
+
+              # Regex to match the version header: ## [1.4.2] - ...
+              pattern = r'^## \[(.*?)\] - (.*)$'
+              match = re.search(pattern, content, re.MULTILINE)
+
+              if match:
+                  version = match.group(1)
+                  # We don't strictly need the date for the tag/release logic, but we extract it
+
+                  # Find the start of the body (immediately after the header line)
+                  start = match.end()
+
+                  # Find the next header (## [...) or separator (---) to determine the end of body
+                  next_match = re.search(r'(^## \[|^---)', content[start:], re.MULTILINE)
+
+                  if next_match:
+                      body = content[start : start + next_match.start()].strip()
+                  else:
+                      body = content[start:].strip()
+
+                  # Output to GITHUB_OUTPUT
+                  with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+                      f.write(f'version={version}\n')
+                      f.write('body<<EOF\n' + body + '\nEOF\n')
+
+                  print(f'::notice::Detected version: {version}')
+              else:
+                  print('::error::No version header found in CHANGELOG.md')
+                  exit(1)
+          except Exception as e:
+              print(f'::error::{e}')
+              exit(1)
+          "
+
+      - name: Check Tag
+        id: check_tag
+        run: |
+          TAG_NAME="${{ steps.parse.outputs.version }}"
+          if git rev-parse "refs/tags/$TAG_NAME" >/dev/null 2>&1; then
+            echo "::notice::Tag $TAG_NAME already exists. Skipping release."
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "::notice::Tag $TAG_NAME does not exist. Proceeding with release."
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Sync Package.json
+        id: sync_package
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          VERSION="${{ steps.parse.outputs.version }}"
+
+          # Update version in package.json and package-lock.json without creating a git tag
+          npm version $VERSION --no-git-tag-version --allow-same-version
+
+          # Stage the files
+          git add package.json
+          if [ -f package-lock.json ]; then
+            git add package-lock.json
+          fi
+
+          # Check if there are changes to commit
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(release): bump version to $VERSION [skip ci]"
+            git push origin main
+
+            # Output the new commit SHA to be used for tagging
+            echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          else
+            echo "::notice::package.json is already up to date."
+            echo "sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Tag & Release
+        if: steps.check_tag.outputs.exists == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ steps.parse.outputs.version }}"
+          SHA="${{ steps.sync_package.outputs.sha }}"
+
+          echo "Creating release for version $VERSION at commit $SHA"
+
+          gh release create "$VERSION" \
+            --title "$VERSION" \
+            --notes "${{ steps.parse.outputs.body }}" \
+            --target "$SHA"

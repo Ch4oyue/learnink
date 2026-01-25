@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.3] - January 24, 2026
+
+### Performance
+
+- Optimized module progress lookup to O(1) for improved dashboard performance.
+
 ## [1.4.2] - January 24, 2026
 
 ### Bug Fixes & Code Quality
@@ -198,6 +204,8 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.3 | Jan 24, 2026 | Performance Optimization |
+| 1.4.2 | Jan 24, 2026 | Bug Fixes & Code Quality |
 | 1.4.1 | Jan 20, 2026 | Code Quality & Security Audit |
 | 1.4.0 | Jan 19, 2026 | Major Frontend Upgrade & Premium UX |
 | 1.3.1 | Jan 18, 2026 | Bug Fixes & Database Schema |

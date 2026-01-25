@@ -1,90 +1,112 @@
 # LearnInk
 
-LearnInk is a modern learning management system (LMS) and educational platform designed to provide an interactive and engaging learning experience. Built with performance and developer experience in mind, it utilizes the latest web technologies.
+LearnInk is a modern, high-performance Learning Management System (LMS) designed to deliver an interactive and seamless educational experience. It combines a premium "Glass Liquid" aesthetic with robust technical architecture, featuring in-browser code execution, real-time analytics, and mobile-first responsiveness.
 
-## Features
+## ✨ Key Features
 
-- **Interactive Learning Modules:** Structured learning content with support for rich media.
-- **Dynamic Theme System:** Native support for Light, Dark, and System themes across all pages (including Auth).
-- **Premium UX & Motion:** GSAP-powered smooth scrolling and animated custom cursor for a high-end feel.
-- **In-Browser Coding:** Integrated Python code execution environment using Pyodide.
-- **Student Dashboard:** Track progress, manage enrolled courses, and view notifications.
-- **Authentication:** Secure user authentication with Supabase, featuring show/hide password states.
-- **Code Quality:** Comprehensive ESLint configuration and strict TypeScript usage for reliable development.
+### 🎓 Interactive Learning Experience
+- **In-Browser Coding:** Integrated Python environment using **Pyodide** running in a dedicated Web Worker for non-blocking execution.
+- **Rich Media Support:** Structured modules with video, text, and interactive quizzes.
+- **Dynamic Progress Tracking:** Real-time updates with optimistic UI patterns.
 
-## Tech Stack
+### 🎨 "Glass Liquid" Design System
+- **VisionOS/iOS Aesthetic:** A custom design language featuring translucent glass effects, consistent rounded corners (`rounded-[24px/32px]`), and light borders.
+- **Fluid Motion:** Powered by **GSAP** and **Framer Motion** for smooth transitions and scroll effects.
+- **Theme Support:** Native Light, Dark, and System modes.
 
-This project is built with:
+### 📊 Comprehensive Dashboard
+- **Analytics & Stats:** Visual breakdown of learning progress, streaks, and quiz performance.
+- **Achievements:** Gamified milestone tracking system.
+- **Requests:** Management interface for user requests and administrative actions.
+- **Mobile Optimized:** Dedicated `MobileBottomNav` and responsive table layouts for small screens.
 
-- **Runtime & Package Manager:** [Bun](https://bun.sh/)
-- **Frontend Framework:** [React](https://react.dev/) with [Vite](https://vitejs.dev/)
+### 🛡️ Security & Performance
+- **Supabase Authentication:** Secure, role-based access control (RBAC).
+- **Row Level Security (RLS):** Granular data protection at the database level.
+- **Edge Functions:** Optimized content ingestion and API key management.
+- **Server-Side Aggregation:** Heavy statistics calculations offloaded to RPC functions (e.g., `get_user_learning_stats`).
+
+## 🛠️ Tech Stack
+
+- **Runtime:** [Bun](https://bun.sh/)
+- **Frontend:** [React](https://react.dev/) + [Vite](https://vitejs.dev/)
 - **Language:** [TypeScript](https://www.typescriptlang.org/)
-- **Styling:** [Tailwind CSS](https://tailwindcss.com/) and [shadcn-ui](https://ui.shadcn.com/)
-- **State Management:** [TanStack Query (React Query)](https://tanstack.com/query/latest)
-- **Backend & Database:** [Supabase](https://supabase.com/)
-- **Code Execution:** [Pyodide](https://pyodide.org/) (Python in the browser)
-- **Animations:** Framer Motion, GSAP
-- **Charts:** Recharts
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- **State Management:** [TanStack Query](https://tanstack.com/query/latest)
+- **Backend:** [Supabase](https://supabase.com/) (PostgreSQL, Auth, Edge Functions)
+- **Code Execution:** [Pyodide](https://pyodide.org/) (Web Worker implementation)
+- **Animation:** [GSAP](https://greensock.com/gsap/), [Framer Motion](https://www.framer.com/motion/)
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- [Bun](https://bun.sh/) (v1.0.0 or higher)
-- Node.js (optional, Bun is preferred)
+- **Bun** (v1.0.0+)
+- **Supabase Account** (for backend setup)
 
 ### Installation
 
 1.  **Clone the repository:**
-
-    ```sh
+    ```bash
     git clone <YOUR_GIT_URL>
-    cd <YOUR_PROJECT_NAME>
+    cd learnink
     ```
 
 2.  **Install dependencies:**
-
-    ```sh
+    ```bash
     bun install
     ```
 
 3.  **Environment Setup:**
-
-    Create a `.env` file in the root directory and add your Supabase configuration:
-
+    Create a `.env` file in the root directory:
     ```env
-    VITE_SUPABASE_URL=your_supabase_url
-    VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+    VITE_SUPABASE_URL=your_supabase_project_url
+    VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_anon_key
     ```
 
-4.  **Start the development server:**
-
-    ```sh
+4.  **Start Development Server:**
+    ```bash
     bun run dev
     ```
+    Access the app at `http://localhost:8080`.
 
-    The application will be available at `http://localhost:8080`.
+## 🧪 Testing & Quality
 
-## Scripts
+- **Linting:**
+    ```bash
+    bun run lint
+    ```
+- **Benchmarks & Tests:**
+    Run performance benchmarks (including Pyodide optimizations):
+    ```bash
+    bun test
+    ```
 
-- `bun run dev`: Start the development server.
-- `bun run build`: Build the application for production.
-- `bun run lint`: Run ESLint to check for code quality issues.
-- `bun run preview`: Preview the production build locally.
+## 📂 Project Structure
 
-## Project Structure
+```
+src/
+├── components/     # Reusable UI components (Glass Liquid style)
+├── contexts/       # React Contexts (Auth, Theme)
+├── hooks/          # Custom hooks (useLearningStats, useDebounce)
+├── integrations/   # Supabase client and types
+├── lib/            # Utilities & Workers
+│   ├── pyodide.worker.ts  # Python execution worker
+│   └── ...
+├── pages/          # Application routes (Dashboard, Modules)
+├── types/          # Global TypeScript definitions
+└── App.tsx         # Main entry with routing
+supabase/
+├── migrations/     # Database schema & RPC functions
+└── functions/      # Edge Functions (ingest-content, etc.)
+tests/              # Benchmarks and integration tests
+```
 
-- `src/components`: Reusable UI components.
-- `src/pages`: Application views and routes (Dashboard, Modules, Admin, etc.).
-- `src/hooks`: Custom React hooks (including data fetching).
-- `src/integrations`: External service integrations (Supabase).
-- `src/lib`: Utility functions and helpers.
-- `supabase`: Supabase configuration and migrations.
-
-## Contributing
+## 🤝 Contributing
 
 1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/amazing-feature`).
-3.  Commit your changes (`git commit -m 'Add some amazing feature'`).
-4.  Push to the branch (`git push origin feature/amazing-feature`).
-5.  Open a Pull Request.
+2.  Create a feature branch (`git checkout -b feature/amazing-feature`).
+3.  Commit your changes.
+4.  Push to the branch and open a Pull Request.
+
+---
+*Built with ❤️ using Bun & React.*

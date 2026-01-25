@@ -41,67 +41,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  const fetchEnrolledTracks = async (userId: string) => {
+  // Combined fetch using RPC for performance
+  const fetchAuthData = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from('user_tracks')
-        .select('track_id')
-        .eq('user_id', userId);
+      const { data, error } = await supabase.rpc('get_user_auth_data', { p_user_id: userId });
 
       if (error) {
-        logger.error('Error fetching enrollments:', error);
+        logger.error('Error fetching auth data:', error);
+        // Fallback or default states on error
+        setRole('user');
+        setProfile(null);
         setEnrolledTrackIds([]);
         return;
       }
 
-      setEnrolledTrackIds(data.map(d => d.track_id));
+      // Parse the response
+      // Expected structure: { role, profile, enrolled_tracks }
+      // We use a temporary type definition for the RPC response
+      type AuthDataResponse = {
+        role: AppRole;
+        profile: Profile;
+        enrolled_tracks: string[];
+      };
+
+      const result = data as unknown as AuthDataResponse;
+
+      setRole(result?.role || 'user');
+      setProfile(result?.profile || null);
+      setEnrolledTrackIds(result?.enrolled_tracks || []);
+
     } catch (error) {
-      logger.error('Error fetching enrollments:', error);
-      setEnrolledTrackIds([]);
-    }
-  };
-
-  // Fetch user profile from profiles table
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url')
-        .eq('id', userId)
-        .single();
-
-      if (error) {
-        logger.error('Error fetching profile:', error);
-        setProfile(null);
-        return;
-      }
-
-      setProfile(data as Profile);
-    } catch (error) {
-      logger.error('Error fetching profile:', error);
-      setProfile(null);
-    }
-  };
-
-  const fetchUserRole = async (userId: string) => {
-    try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
-
-      if (error) {
-        logger.error('Error fetching user role:', error);
-        // Default to 'user' if no role found
-        setRole('user');
-        return;
-      }
-
-      setRole(data?.role as AppRole || 'user');
-    } catch (error) {
-      logger.error('Error fetching user role:', error);
+      logger.error('Error fetching auth data:', error);
       setRole('user');
+      setProfile(null);
+      setEnrolledTrackIds([]);
     }
   };
 
@@ -125,11 +98,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          await Promise.all([
-            fetchUserRole(session.user.id),
-            fetchUserProfile(session.user.id),
-            fetchEnrolledTracks(session.user.id)
-          ]);
+          // Optimized: Single RPC call instead of 3 separate requests
+          await fetchAuthData(session.user.id);
         }
 
         if (mounted) {
@@ -157,9 +127,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Defer Supabase calls with setTimeout to avoid deadlock
           setTimeout(() => {
             if (mounted) {
-              fetchUserRole(session.user.id);
-              fetchUserProfile(session.user.id);
-              fetchEnrolledTracks(session.user.id);
+              fetchAuthData(session.user.id);
             }
           }, 0);
         } else {
@@ -234,10 +202,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Utility to manually refresh profile
   const refreshProfile = async () => {
     if (user) {
-      await Promise.all([
-        fetchUserProfile(user.id),
-        fetchEnrolledTracks(user.id)
-      ]);
+      // Optimized: Reuse the single RPC call
+      await fetchAuthData(user.id);
     }
   };
 

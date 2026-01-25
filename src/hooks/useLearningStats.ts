@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { logger } from "@/lib/logger";
 
 // ============================================
 // TYPES
@@ -34,7 +35,7 @@ async function fetchLearningStats(userId: string): Promise<LearningStats> {
         .rpc("get_user_learning_stats", { target_user_id: userId });
 
     if (error) {
-        console.error("Error fetching learning stats:", error);
+        logger.error("Error fetching learning stats:", error);
         throw error;
     }
 

@@ -92,7 +92,7 @@ export function useModule(id?: string) {
         .single();
 
       if (error) {
-        console.error('Module fetch error:', error.message, error.details);
+        logger.error('Module fetch error:', error.message, error.details);
         throw error;
       }
 
@@ -116,7 +116,7 @@ export function useModuleByRequestId(requestId?: string) {
         .maybeSingle();
 
       if (error) {
-        console.error('Module fetch by request error:', error.message);
+        logger.error('Module fetch by request error:', error.message);
         throw error;
       }
 

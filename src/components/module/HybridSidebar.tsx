@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     GraduationCap,
@@ -35,7 +36,7 @@ interface HybridSidebarProps {
 // HYBRID SIDEBAR (72px Rail - Layout from variant_2, Colors from dark_mode)
 // ============================================
 
-export function HybridSidebar({
+export const HybridSidebar = memo(function HybridSidebar({
     onTableOfContentsClick,
     onSearchClick,
     onBackClick,
@@ -126,4 +127,4 @@ export function HybridSidebar({
             </div>
         </aside>
     );
-}
+});

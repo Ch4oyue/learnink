@@ -32,7 +32,7 @@ export function Hero() {
                 </Badge>
 
                 {/* Main Heading */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tighter text-foreground mb-8 leading-[1.1]">
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.1]">
                     Master Tech Skills,
                     <br className="hidden sm:block" />
                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-500 to-cyan-400">

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTracks, useEnrollTrack } from "@/hooks/useTracks";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -29,16 +29,23 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 export default function DashboardCourses() {
   const { user, enrolledTrackIds } = useAuth();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
+
+  const trackSlug = searchParams.get("track");
 
   const { data: tracks, isLoading } = useTracks();
   const enrollTrack = useEnrollTrack();
 
-  const filteredTracks = tracks?.filter(track =>
-    track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    track.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredTracks = tracks?.filter(track => {
+    const matchesSearch = track.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      track.description?.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesSlug = trackSlug ? track.slug === trackSlug : true;
+
+    return matchesSearch && matchesSlug;
+  });
 
   const handleEnroll = async (trackId: string) => {
     if (!user) {
@@ -66,16 +73,28 @@ export default function DashboardCourses() {
           </p>
         </div>
 
-        {/* Search */}
-        <div className="bg-card border border-border rounded-xl p-6 shadow-soft">
-          <div className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Cari kursus..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
+        {/* Search & Filter */}
+        <div className="bg-card border border-border rounded-xl p-6 shadow-soft space-y-4">
+          <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+            <div className="relative max-w-md w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Cari kursus..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+
+            {trackSlug && (
+              <Button
+                variant="ghost"
+                onClick={() => setSearchParams({})}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                Clear Filter ({trackSlug})
+              </Button>
+            )}
           </div>
         </div>
 

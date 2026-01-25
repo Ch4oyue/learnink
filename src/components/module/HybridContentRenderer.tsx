@@ -1,13 +1,11 @@
-import { forwardRef, memo } from "react";
+import { forwardRef, memo, useState, useEffect } from "react";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
     Clock,
     PlusCircle,
-    Bookmark,
     LibraryBig,
-    Copy,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -40,6 +38,50 @@ interface HybridContentRendererProps {
 export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentRendererProps>(
     ({ content, metadata, onAddToNotes, onCopyCode, isLoading }, ref) => {
         const { resolvedTheme } = useTheme();
+        const [selection, setSelection] = useState<{ text: string; top: number; left: number } | null>(null);
+
+        useEffect(() => {
+            const handleSelection = () => {
+                const sel = window.getSelection();
+                if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+                    setSelection(null);
+                    return;
+                }
+
+                // Check if selection is within the reading content
+                const contentElement = document.querySelector('.reading-content');
+                if (contentElement && !contentElement.contains(sel.anchorNode)) {
+                    setSelection(null);
+                    return;
+                }
+
+                const range = sel.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+
+                // Show popover above the selection
+                setSelection({
+                    text: sel.toString().trim(),
+                    top: rect.top - 50,
+                    left: rect.left + (rect.width / 2)
+                });
+            };
+
+            document.addEventListener('mouseup', handleSelection);
+            document.addEventListener('keyup', handleSelection);
+            document.addEventListener('selectionchange', () => {
+                 // Clear selection if it becomes empty
+                 const sel = window.getSelection();
+                 if (!sel || sel.isCollapsed) {
+                     setSelection(null);
+                 }
+            });
+
+            return () => {
+                document.removeEventListener('mouseup', handleSelection);
+                document.removeEventListener('keyup', handleSelection);
+                document.removeEventListener('selectionchange', handleSelection);
+            };
+        }, []);
 
         if (isLoading) {
             return (
@@ -62,6 +104,33 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                 className="flex-1 overflow-y-auto bg-background relative scroll-smooth"
                 style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted)) transparent" }}
             >
+                {/* Text Selection Floating Button */}
+                {selection && (
+                    <div
+                        className="fixed z-50 animate-in fade-in zoom-in duration-200"
+                        style={{ top: selection.top, left: selection.left, transform: 'translateX(-50%)' }}
+                    >
+                        <Button
+                            size="sm"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault(); // Prevent text deselection on mousedown
+                                onAddToNotes?.(selection.text);
+
+                                // Optional: Clear selection after adding
+                                window.getSelection()?.removeAllRanges();
+                                setSelection(null);
+                            }}
+                            className="shadow-xl gap-2 rounded-full bg-primary text-primary-foreground hover:scale-105 transition-all"
+                        >
+                            <PlusCircle className="h-4 w-4" />
+                            Highlight & Add Note
+                        </Button>
+                        {/* Little arrow/triangle */}
+                        <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-primary absolute left-1/2 -translate-x-1/2 -bottom-1.5"></div>
+                    </div>
+                )}
+
                 {/* Focus Container - 800px max like variant_2 */}
                 <div className="max-w-[800px] mx-auto py-16 px-10 flex flex-col gap-10">
                     {/* Page Title Block - Hover interaction from variant_2, colors from dark_mode */}
@@ -123,11 +192,12 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                                     <MarkdownRenderer content={content} />
                                 </div>
 
-                                {/* Add to Notes Button (appears on hover) */}
+                                {/* Fallback Add to Notes Button (if no selection) */}
                                 <button
                                     onClick={() => onAddToNotes?.(content)}
-                                    aria-label="Add to Notes"
+                                    aria-label="Add Section to Notes"
                                     className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-200 p-2 text-primary bg-card shadow-subtle rounded-lg hover:scale-105 active:scale-95"
+                                    title="Add entire section to notes"
                                 >
                                     <PlusCircle className="h-5 w-5" aria-hidden="true" />
                                 </button>

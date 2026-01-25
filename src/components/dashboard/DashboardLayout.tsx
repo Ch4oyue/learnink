@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
@@ -54,6 +54,13 @@ import {
   SidebarRail,
   useSidebar
 } from "@/components/ui/sidebar";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 
 /**
  * DashboardLayout - Scalable Dashboard Shell
@@ -213,7 +220,7 @@ function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-white/5 bg-background/60 backdrop-blur-xl">
+    <Sidebar collapsible="icon" className="hidden md:flex border-r border-white/5 bg-background/60 backdrop-blur-xl">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -341,14 +348,21 @@ function AppSidebar() {
 // ============================================
 
 function MobileBottomNav() {
-  const { role, profile } = useAuth();
+  const { role, signOut } = useAuth();
   const currentRole: AppRole = role ?? "user";
   const location = useLocation();
-  const { toggleSidebar, openMobile } = useSidebar();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
 
   const navGroups = MENU_CONFIG[currentRole];
   // Flatten items for mobile view, take top 4 + "Menu" trigger
   const primaryItems = navGroups.flatMap(g => g.items).slice(0, 4);
+
+  const handleSignOut = async () => {
+    setOpen(false);
+    await signOut();
+    navigate("/");
+  };
 
   return (
     <div className="md:hidden fixed bottom-4 left-4 right-4 z-50 pb-[env(safe-area-inset-bottom)]">
@@ -375,19 +389,72 @@ function MobileBottomNav() {
             );
           })}
 
-          {/* Menu Trigger (Opens Sidebar Sheet) */}
+          {/* Menu Trigger (Opens Sheet) */}
           <li>
-            <button
-              onClick={toggleSidebar}
-              className={cn(
-                "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300",
-                openMobile
-                  ? "bg-secondary text-secondary-foreground"
-                  : "text-muted-foreground hover:bg-white/5 active:scale-95"
-              )}
-            >
-              <Menu className="w-5 h-5" />
-            </button>
+            <Sheet open={open} onOpenChange={setOpen}>
+              <SheetTrigger asChild>
+                <button
+                  className={cn(
+                    "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 text-muted-foreground hover:bg-white/5 active:scale-95"
+                  )}
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="glass-liquid border-t-white/10 rounded-t-3xl max-h-[85vh] overflow-y-auto z-[60]">
+                <SheetHeader className="text-left mb-6 px-2">
+                  <SheetTitle className="flex items-center gap-2">
+                    <Layers className="size-5 text-primary" />
+                    Menu
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="space-y-6 pb-8">
+                  {navGroups.map((group, i) => (
+                    <div key={i} className="space-y-2">
+                      {group.title && <h3 className="text-xs font-bold text-muted-foreground px-4 uppercase tracking-wider">{group.title}</h3>}
+                      <div className="grid grid-cols-1 gap-1">
+                        {group.items.map(item => {
+                          const isActive = location.pathname === item.href;
+                          const Icon = item.icon;
+                          return (
+                            <Link
+                              key={item.href}
+                              to={item.href}
+                              onClick={() => setOpen(false)}
+                              className={cn(
+                                "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors",
+                                isActive ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 text-foreground"
+                              )}
+                            >
+                              <Icon className="w-5 h-5" />
+                              <span>{item.label}</span>
+                              {item.badge && <Badge className="ml-auto">{formatBadgeCount(item.badge)}</Badge>}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+
+                  <div className="pt-4 mt-4 border-t border-white/10">
+                    <div className="space-y-1">
+                      <Link
+                        to="/dashboard/profile"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-colors"
+                      >
+                        <User className="w-5 h-5" />
+                        <span className="font-medium">Profile</span>
+                      </Link>
+                      <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors text-left">
+                        <LogOut className="w-5 h-5" />
+                        <span className="font-medium">Log out</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </SheetContent>
+            </Sheet>
           </li>
         </ul>
       </nav>
@@ -416,7 +483,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <SidebarProvider>
             <AppSidebar />
             <MobileBottomNav />
-            <SidebarInset className="min-h-[100dvh]">
+            <SidebarInset className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden">
                 <header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/5 bg-background/60 px-4 backdrop-blur-xl transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:flex hidden">
                     <SidebarTrigger className="-ml-1" />
                     <div className="mr-4 flex">

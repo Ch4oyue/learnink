@@ -189,7 +189,7 @@ export default function DashboardUsers() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-card border border-border rounded-xl overflow-hidden">
+        <div className="bg-card border border-border rounded-xl overflow-hidden w-full max-w-full">
           {isLoading ? (
             <div className="flex items-center justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />

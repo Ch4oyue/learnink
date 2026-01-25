@@ -148,7 +148,7 @@ export function useBanUser() {
         description: error.message || "Gagal mengubah status ban pengguna",
         variant: "destructive",
       });
-      console.error('Error banning user:', error);
+      logger.error('Error banning user:', error);
     },
   });
 }

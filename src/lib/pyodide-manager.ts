@@ -1,6 +1,8 @@
 // Refactored Pyodide Manager using Web Worker
 // Ensures Pyodide runs off the main thread to prevent UI blocking
 
+import { logger } from "@/lib/logger";
+
 interface PyodideConfig {
   indexURL: string;
 }
@@ -20,7 +22,7 @@ class PyodideManager {
   private static instance: PyodideManager;
   private worker: Worker | null = null;
   private workerReadyPromise: Promise<void> | null = null;
-  private pendingRuns = new Map<string, { resolve: (val: any) => void; reject: (err: any) => void }>();
+  private pendingRuns = new Map<string, { resolve: (val: unknown) => void; reject: (err: unknown) => void }>();
 
   // Callbacks for stdout/stderr
   private onStdout: ((text: string) => void) | null = null;
@@ -75,7 +77,7 @@ class PyodideManager {
         case 'STDERR':
           this.onStderr?.(text);
           break;
-        case 'RESULTS':
+        case 'RESULTS': {
           const pending = this.pendingRuns.get(id);
           if (pending) {
             if (error) {
@@ -86,8 +88,9 @@ class PyodideManager {
             this.pendingRuns.delete(id);
           }
           break;
+        }
         case 'ERROR':
-            console.error("Pyodide Worker Error:", error);
+            logger.error("Pyodide Worker Error:", error);
             break;
       }
     };

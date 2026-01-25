@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppRole } from "@/contexts/AuthContext";
+import { logger } from "@/lib/logger";
 
 // Super admin identification
 export const SUPER_ADMIN_EMAIL = 'agen.salva@gmail.com';
@@ -60,7 +61,7 @@ export function useUsers() {
         .order('created_at', { ascending: false });
 
       if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
+        logger.error('Error fetching profiles:', profilesError);
         throw profilesError;
       }
 
@@ -70,7 +71,7 @@ export function useUsers() {
         .select('user_id, role');
 
       if (rolesError) {
-        console.error('Error fetching roles:', rolesError);
+        logger.error('Error fetching roles:', rolesError);
       }
 
       // Create a map of user_id -> role

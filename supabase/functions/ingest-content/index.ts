@@ -280,9 +280,36 @@ serve(async (req) => {
         // -------------------------
         // 2. Validate Authorization
         // -------------------------
+        let body: unknown;
+        try {
+            body = await req.json();
+        } catch {
+            // Body might be empty or invalid, but we'll check token first
+            body = {};
+        }
+
+        // Try to get token from Header OR Body
+        let token = "";
         const authHeader = req.headers.get("Authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            await logSecurityEvent(supabase, "auth_failure", req, 401, "Missing Authorization header");
+
+        // Helper to safely access api_key from unknown body
+        const getApiKeyFromBody = (b: unknown): string | null => {
+            if (b && typeof b === 'object' && 'api_key' in b) {
+                const key = (b as Record<string, unknown>).api_key;
+                return typeof key === 'string' ? key : null;
+            }
+            return null;
+        };
+
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+            token = authHeader.replace("Bearer ", "");
+        } else {
+            const bodyKey = getApiKeyFromBody(body);
+            if (bodyKey) token = bodyKey;
+        }
+
+        if (!token) {
+            await logSecurityEvent(supabase, "auth_failure", req, 401, "Missing API Key (Header or Body)");
             return new Response(
                 JSON.stringify({ error: "Missing or invalid Authorization header", success: false }),
                 { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }

@@ -68,6 +68,14 @@ serve(async (req) => {
     }
 
     try {
+        if (!SUPABASE_SERVICE_ROLE_KEY) {
+            console.error("SUPABASE_SERVICE_ROLE_KEY is missing");
+            return new Response(
+                JSON.stringify({ error: "Server configuration error", success: false }),
+                { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+        }
+
         // -------------------------
         // 1. Verify User Authorization
         // -------------------------
@@ -163,7 +171,16 @@ serve(async (req) => {
 
         // Hash the key with bcrypt
         console.log("Hashing API key with bcrypt...");
-        const apiKeyHash = await bcrypt.hash(apiKey);
+        let apiKeyHash: string;
+        try {
+            apiKeyHash = await bcrypt.hash(apiKey);
+        } catch (bcryptError) {
+             console.error("Bcrypt hashing failed:", bcryptError);
+             return new Response(
+                JSON.stringify({ error: "Failed to secure API key", success: false }),
+                { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+            );
+        }
 
         console.log(`Generating integration: ${body.name} (${body.source})`);
 

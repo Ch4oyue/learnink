@@ -200,95 +200,97 @@ export default function DashboardUsers() {
               <p className="text-muted-foreground">Tidak ada pengguna ditemukan</p>
             </div>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Pengguna</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead className="hidden md:table-cell">Bergabung</TableHead>
-                  <TableHead>Ubah Role</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredUsers?.map((user) => {
-                  const config = roleConfig[user.role];
-                  const isSelf = user.id === currentUser?.id;
-                  // Check if this user is a super admin
-                  const isUserSuperAdmin = user.role === 'superadmin';
-                  // Legacy check for backward compatibility during migration
-                  const isLegacySuperAdmin = (SUPER_ADMIN_USER_ID && user.id === SUPER_ADMIN_USER_ID) ||
-                    (user.email === SUPER_ADMIN_EMAIL);
+            <div className="w-full overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Pengguna</TableHead>
+                    <TableHead>Role</TableHead>
+                    <TableHead className="hidden md:table-cell">Bergabung</TableHead>
+                    <TableHead>Ubah Role</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredUsers?.map((user) => {
+                    const config = roleConfig[user.role];
+                    const isSelf = user.id === currentUser?.id;
+                    // Check if this user is a super admin
+                    const isUserSuperAdmin = user.role === 'superadmin';
+                    // Legacy check for backward compatibility during migration
+                    const isLegacySuperAdmin = (SUPER_ADMIN_USER_ID && user.id === SUPER_ADMIN_USER_ID) ||
+                      (user.email === SUPER_ADMIN_EMAIL);
 
-                  const isProtected = isUserSuperAdmin || isLegacySuperAdmin;
+                    const isProtected = isUserSuperAdmin || isLegacySuperAdmin;
 
-                  return (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-9 w-9">
-                            <AvatarImage src={user.avatar_url || undefined} />
-                            <AvatarFallback className="bg-primary/10 text-primary text-sm">
-                              {getInitials(user.display_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium text-foreground">
-                              {user.display_name || "Pengguna"}
-                              {isSelf && (
-                                <span className="ml-2 text-xs text-muted-foreground">(Anda)</span>
-                              )}
-                              {(isProtected) && (
-                                <Badge variant="outline" className="ml-2 text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
-                                  👑 Super Admin
-                                </Badge>
-                              )}
-                            </div>
-                            <div className="text-xs text-muted-foreground font-mono">
-                              {user.id.slice(0, 8)}...
+                    return (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-9 w-9">
+                              <AvatarImage src={user.avatar_url || undefined} />
+                              <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                                {getInitials(user.display_name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <div className="font-medium text-foreground">
+                                {user.display_name || "Pengguna"}
+                                {isSelf && (
+                                  <span className="ml-2 text-xs text-muted-foreground">(Anda)</span>
+                                )}
+                                {(isProtected) && (
+                                  <Badge variant="outline" className="ml-2 text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
+                                    👑 Super Admin
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-xs text-muted-foreground font-mono">
+                                {user.id.slice(0, 8)}...
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={config.variant} className="gap-1">
-                          {config.icon}
-                          {config.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="hidden md:table-cell text-muted-foreground">
-                        {user.created_at
-                          ? format(new Date(user.created_at), "d MMM yyyy", { locale: id })
-                          : "-"
-                        }
-                      </TableCell>
-                      <TableCell>
-                        {isProtected ? (
-                          <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
-                            <Shield className="h-3 w-3 mr-1" />
-                            Immutable
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={config.variant} className="gap-1">
+                            {config.icon}
+                            {config.label}
                           </Badge>
-                        ) : (
-                          <Select
-                            value={user.role}
-                            onValueChange={(v) => handleRoleChange(user, v as AppRole)}
-                            disabled={isSelf || updateRole.isPending}
-                          >
-                            <SelectTrigger className="w-[120px]" disabled={isSelf}>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="user">User</SelectItem>
-                              <SelectItem value="tutor">Tutor</SelectItem>
-                              <SelectItem value="admin">Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
+                        </TableCell>
+                        <TableCell className="hidden md:table-cell text-muted-foreground">
+                          {user.created_at
+                            ? format(new Date(user.created_at), "d MMM yyyy", { locale: id })
+                            : "-"
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {isProtected ? (
+                            <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
+                              <Shield className="h-3 w-3 mr-1" />
+                              Immutable
+                            </Badge>
+                          ) : (
+                            <Select
+                              value={user.role}
+                              onValueChange={(v) => handleRoleChange(user, v as AppRole)}
+                              disabled={isSelf || updateRole.isPending}
+                            >
+                              <SelectTrigger className="w-[120px]" disabled={isSelf}>
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="user">User</SelectItem>
+                                <SelectItem value="tutor">Tutor</SelectItem>
+                                <SelectItem value="admin">Admin</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </div>
       </div>

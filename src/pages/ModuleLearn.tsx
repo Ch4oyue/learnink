@@ -16,10 +16,10 @@ import {
   StickyNote,
   Check,
   Loader2,
-  X,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { useDebouncedCallback } from "@/hooks/useDebounce";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/module/HybridSidebar";
@@ -117,7 +117,7 @@ export default function ModuleLearn() {
   // Data hooks
   // Optimized: Fetching single module by ID instead of all modules
   const { data: module, isLoading } = useModule(moduleId ?? "");
-  const { data: progress, refetch: refetchProgress } = useModuleProgress(user?.id, moduleId);
+  const { data: progress } = useModuleProgress(user?.id, moduleId);
   const updateProgress = useUpdateProgress();
 
   // Access Control Check
@@ -172,8 +172,44 @@ export default function ModuleLearn() {
   const handleToggleTOC = useCallback(() => handleSetShowTOC(!showTOC), [handleSetShowTOC, showTOC]);
   const handleBack = useCallback(() => navigate("/dashboard"), [navigate]);
 
-  // Derived state
-  const currentProgress = progress?.progress_percent || 0;
+  // ============================================
+  // PROGRESS OPTIMIZATION
+  // ============================================
+
+  // Optimistic local progress to update UI immediately
+  const [localMaxProgress, setLocalMaxProgress] = useState(0);
+
+  // Sync with server progress on initial load (only if server is ahead)
+  useEffect(() => {
+    if (progress?.progress_percent) {
+      setLocalMaxProgress(prev => Math.max(prev, progress.progress_percent || 0));
+    }
+  }, [progress?.progress_percent]);
+
+  // Derived state for UI (use max of local and server)
+  const currentProgress = Math.max(localMaxProgress, progress?.progress_percent || 0);
+
+  // Track last saved progress to avoid redundant calls
+  const lastSavedProgressRef = useRef<number>(0);
+
+  // Define the actual API call
+  const saveProgress = useCallback((newProgress: number) => {
+    if (!user || !moduleId) return;
+
+    // Only save if progress increased and is new
+    if (newProgress > lastSavedProgressRef.current) {
+        lastSavedProgressRef.current = newProgress;
+        updateProgress.mutate({
+            userId: user.id,
+            moduleId: moduleId,
+            progressPercent: Math.min(newProgress, 100),
+            isCompleted: newProgress >= 100,
+        });
+    }
+  }, [user, moduleId, updateProgress]);
+
+  // Create a debounced version of the save function (3s delay) to prevent database spam
+  const debouncedSaveProgress = useDebouncedCallback(saveProgress, 3000);
 
   // ============================================
   // OPTIMIZED: Parse sections ONCE when content changes
@@ -213,39 +249,20 @@ export default function ModuleLearn() {
     }
   }, [currentSectionId]);
 
-  // Track last saved progress to prevent duplicate API calls
-  const lastSavedProgressRef = useRef<number>(0);
-  const updatePendingRef = useRef<boolean>(false);
-
-  // Update progress when changing sections (debounced to prevent API spam)
+  // Update progress when changing sections (Using debounced save)
   useEffect(() => {
-    if (!user || !moduleId || order.length === 0 || currentSectionIndex < 0) return;
-    if (updatePendingRef.current) return; // Skip if update is in flight
+    if (order.length === 0 || currentSectionIndex < 0) return;
 
     const newProgress = Math.round(((currentSectionIndex + 1) / order.length) * 100);
 
-    // Only update if progress actually increased AND hasn't been saved yet
-    if (newProgress > currentProgress && newProgress > lastSavedProgressRef.current) {
-      updatePendingRef.current = true;
-      lastSavedProgressRef.current = newProgress;
+    // Update local optimistic state immediately if it's a new high
+    if (newProgress > localMaxProgress) {
+      setLocalMaxProgress(newProgress);
 
-      // Silently save progress without notification
-      updateProgress.mutate(
-        {
-          userId: user.id,
-          moduleId: moduleId,
-          progressPercent: Math.min(newProgress, 100),
-          isCompleted: newProgress >= 100,
-        },
-        {
-          onSettled: () => {
-            updatePendingRef.current = false;
-          },
-        }
-      );
+      // Schedule DB update (debounced)
+      debouncedSaveProgress(newProgress);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSectionIndex, order.length, user?.id, moduleId, currentProgress]);
+  }, [currentSectionIndex, order.length, localMaxProgress, debouncedSaveProgress]);
 
   // Navigation handlers (Wrapped in useCallback)
   const handlePrevious = useCallback(() => {

@@ -731,6 +731,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      get_user_learning_stats: {
+        Args: { target_user_id: string }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "user" | "moderator" | "admin" | "tutor" | "superadmin"

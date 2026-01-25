@@ -220,7 +220,7 @@ function AppSidebar() {
   };
 
   return (
-    <Sidebar collapsible="icon" className="hidden md:flex border-r border-white/5 bg-background/60 backdrop-blur-xl">
+    <Sidebar collapsible="icon" className="hidden md:flex m-4 h-[calc(100vh-2rem)] border-none glass-liquid rounded-[32px] overflow-hidden transition-all duration-300 shadow-glow">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -365,8 +365,8 @@ function MobileBottomNav() {
   };
 
   return (
-    <div className="md:hidden fixed bottom-4 left-4 right-4 z-50 pb-[env(safe-area-inset-bottom)]">
-      <nav className="glass-liquid rounded-2xl p-2 transition-all duration-300">
+    <div className="md:hidden fixed bottom-6 left-6 right-6 z-50 pb-[env(safe-area-inset-bottom)]">
+      <nav className="glass-liquid rounded-[32px] p-2 transition-all duration-300 shadow-glow">
         <ul className="flex items-center justify-around">
           {primaryItems.map((item) => {
             const isActive = location.pathname === item.href;
@@ -401,7 +401,7 @@ function MobileBottomNav() {
                   <Menu className="w-5 h-5" />
                 </button>
               </SheetTrigger>
-              <SheetContent side="bottom" className="glass-liquid border-t-white/10 rounded-t-3xl max-h-[85vh] overflow-y-auto z-[60]">
+              <SheetContent side="bottom" className="glass-liquid border-none rounded-t-[32px] max-h-[85vh] overflow-y-auto z-[60] shadow-[0_-8px_30px_rgba(0,0,0,0.1)]">
                 <SheetHeader className="text-left mb-6 px-2">
                   <SheetTitle className="flex items-center gap-2">
                     <Layers className="size-5 text-primary" />
@@ -483,8 +483,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <SidebarProvider>
             <AppSidebar />
             <MobileBottomNav />
-            <SidebarInset className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden">
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/5 bg-background/60 px-4 backdrop-blur-xl transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:flex hidden">
+            <SidebarInset className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden bg-transparent">
+                <header className="flex h-16 shrink-0 items-center gap-2 border-none glass-liquid px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:flex hidden m-4 rounded-2xl shadow-sm">
                     <SidebarTrigger className="-ml-1" />
                     <div className="mr-4 flex">
                         <Badge
@@ -499,7 +499,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                 </header>
                 {/* Mobile Header (Simplified) */}
-                <header className="md:hidden sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/5 bg-background/60 px-4 backdrop-blur-xl">
+                <header className="md:hidden sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/5 glass-liquid px-4 backdrop-blur-xl">
                    <div className="flex items-center gap-2">
                       <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                         <Layers className="size-4" />

@@ -186,27 +186,35 @@
         -webkit-backdrop-filter: blur(12px);
     }
 
-    /* Liquid Glass (Apple VisionOS Style) */
+    /* Liquid Glass (Apple VisionOS Style / iOS System Material) */
     .glass-liquid {
-        background: rgba(255, 255, 255, 0.4);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        /* Lighter, more premium transparency for Light Mode */
+        background: rgba(255, 255, 255, 0.75);
+        backdrop-filter: blur(25px) saturate(180%);
+        -webkit-backdrop-filter: blur(25px) saturate(180%);
+        /* Soft, diffuse shadow like iOS HUDs */
         box-shadow:
-            0 4px 30px rgba(0, 0, 0, 0.1),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.5);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+            0 8px 40px -10px rgba(0, 0, 0, 0.1),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+        /* No border property, handled by inset shadow for hairline precision */
     }
 
     .dark .glass-liquid {
-        background: rgba(30, 30, 30, 0.4);
+        /* Sophisticated dark glass */
+        background: rgba(22, 22, 24, 0.70);
         box-shadow:
-            0 4px 30px rgba(0, 0, 0, 0.3),
+            0 8px 40px -10px rgba(0, 0, 0, 0.4),
             inset 0 0 0 1px rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
     .text-balance {
         text-wrap: balance;
+    }
+
+    /* Micro-interactions */
+    .active-bounce:active {
+        transform: scale(0.95);
+        transition: transform 0.1s cubic-bezier(0.32, 0.72, 0, 1);
     }
 }
 

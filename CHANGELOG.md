@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.4] - January 25, 2026
+
+### Sidebar Stability & UX Fixes
+
+#### Fixes (1)
+- Fixed sidebar persistence issue where it collapsed on refresh, ensuring consistent user preference.
+
 ## [1.4.3] - January 24, 2026
 
 ### Performance
@@ -203,6 +210,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.4 | Jan 25, 2026 | Sidebar Stability & UX Fixes |
 | 1.4.3 | Jan 24, 2026 | Performance Optimization |
 | 1.4.2 | Jan 24, 2026 | Bug Fixes & Code Quality |
 | 1.4.1 | Jan 20, 2026 | Code Quality & Security Audit |

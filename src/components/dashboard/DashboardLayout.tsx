@@ -352,7 +352,7 @@ function MobileBottomNav() {
 
   return (
     <div className="md:hidden fixed bottom-4 left-4 right-4 z-50 pb-[env(safe-area-inset-bottom)]">
-      <nav className="bg-background/80 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-lg shadow-black/5 p-2">
+      <nav className="glass-liquid rounded-2xl p-2 transition-all duration-300">
         <ul className="flex items-center justify-around">
           {primaryItems.map((item) => {
             const isActive = location.pathname === item.href;
@@ -365,8 +365,8 @@ function MobileBottomNav() {
                   className={cn(
                     "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300",
                     isActive
-                      ? "bg-primary text-primary-foreground shadow-sm scale-110"
-                      : "text-muted-foreground hover:bg-white/5 active:scale-95"
+                      ? "bg-primary/20 text-primary shadow-glow scale-110 border border-primary/20 backdrop-blur-md"
+                      : "text-muted-foreground hover:bg-white/10 active:scale-95"
                   )}
                 >
                   <Icon className="w-5 h-5" />

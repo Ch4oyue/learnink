@@ -69,9 +69,9 @@ export function Navbar() {
     <header
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled
-          ? "bg-background/80 backdrop-blur-lg shadow-soft"
-          : "bg-transparent"
+        isScrolled || isMobileMenuOpen
+          ? "glass-liquid m-4 rounded-[32px] shadow-glow border-none"
+          : "bg-transparent m-4 border-transparent"
       )}
     >
       <nav className="container mx-auto px-6 lg:px-8">
@@ -202,12 +202,12 @@ export function Navbar() {
       {/* Mobile Menu */}
       <div
         className={cn(
-          "lg:hidden overflow-hidden transition-all duration-300 ease-out",
-          isMobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
+          "lg:hidden overflow-hidden transition-all duration-500 ease-in-out",
+          isMobileMenuOpen ? "max-h-[80vh] opacity-100 pb-4" : "max-h-0 opacity-0"
         )}
       >
-        <div className="container mx-auto px-6 pb-6 bg-background/95 backdrop-blur-lg">
-          <div className="flex flex-col gap-1 pt-4 border-t border-border">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col gap-1 pt-4 border-t border-white/10">
             {navLinks.map((link, index) => (
               link.isRoute ? (
                 <Link

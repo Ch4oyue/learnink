@@ -101,6 +101,8 @@
         scroll-behavior: smooth;
         /* Smooth theme transition */
         transition: background-color 0.3s ease, color 0.3s ease;
+        /* Fix for mobile address bar */
+        min-height: 100dvh;
     }
 
     body {
@@ -109,6 +111,8 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-rendering: optimizeLegibility;
+        /* Fix for mobile address bar */
+        min-height: 100dvh;
     }
 
     /* Autofill styling - Light Mode */

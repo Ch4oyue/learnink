@@ -351,7 +351,7 @@ function MobileBottomNav() {
   const primaryItems = navGroups.flatMap(g => g.items).slice(0, 4);
 
   return (
-    <div className="md:hidden fixed bottom-6 left-6 right-6 z-50">
+    <div className="md:hidden fixed bottom-4 left-4 right-4 z-50 pb-[env(safe-area-inset-bottom)]">
       <nav className="bg-background/80 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-lg shadow-black/5 p-2">
         <ul className="flex items-center justify-around">
           {primaryItems.map((item) => {
@@ -406,7 +406,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     if (loading) {
         return (
-             <div className="flex h-screen w-full items-center justify-center">
+             <div className="flex min-h-[100dvh] w-full items-center justify-center">
                 <Skeleton className="h-[500px] w-[800px] rounded-xl" />
              </div>
         );
@@ -416,7 +416,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <SidebarProvider>
             <AppSidebar />
             <MobileBottomNav />
-            <SidebarInset>
+            <SidebarInset className="min-h-[100dvh]">
                 <header className="flex h-16 shrink-0 items-center gap-2 border-b border-white/5 bg-background/60 px-4 backdrop-blur-xl transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:flex hidden">
                     <SidebarTrigger className="-ml-1" />
                     <div className="mr-4 flex">
@@ -432,7 +432,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                 </header>
                 {/* Mobile Header (Simplified) */}
-                <header className="md:hidden flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/5 bg-background/60 px-4 backdrop-blur-xl">
+                <header className="md:hidden sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/5 bg-background/60 px-4 backdrop-blur-xl">
                    <div className="flex items-center gap-2">
                       <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                         <Layers className="size-4" />
@@ -451,7 +451,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </header>
 
                 {/* Add bottom padding for mobile to account for floating nav */}
-                <div className="flex-1 p-4 md:p-8 pt-4 pb-24 md:pb-8">
+                <div className="flex-1 p-4 md:p-8 pt-4 pb-32 md:pb-8">
                     {children}
                 </div>
             </SidebarInset>

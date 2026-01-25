@@ -183,3 +183,26 @@ Sebelum deploy, pastikan:
 - [ ] Rate limiting aktif untuk public endpoints
 - [ ] Error messages tidak expose internal details
 - [ ] Fungsi DB `SECURITY DEFINER` memiliki `search_path` yang eksplisit.
+
+---
+
+## Changelog Rules
+
+### 1. Release Cadence
+- **1 Hari 1 Versi:** Jangan buat versi baru jika sudah ada rilis di hari yang sama. Update versi yang ada (kecuali hotfix kritis).
+
+### 2. Format
+- **Strict Format:** `H3 Theme Title` -> `H4 Category`.
+- **NO Visible Description:** Jangan tambahkan paragraf deskripsi setelah Theme Title.
+- **Empty Description Hack:** Karena parser memiliki bug pada deskripsi kosong, **WAJIB** tambahkan `<!-- -->` setelah Theme Title untuk mencegah H4 header terdeteksi sebagai teks.
+
+```markdown
+## [1.4.4] - January 25, 2026
+
+### Theme Title
+
+<!-- -->
+
+#### Fixes (1)
+- Fixed bug...
+```

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useModuleCategories, useModuleLevels, useCreateCategory, useCreateLevel, useDeleteCategory, useDeleteLevel } from "@/hooks/useModuleSettings";
+import { useGetLatestIntegration, useGenerateApiKey } from "@/hooks/useIntegrations";
 import {
   Settings,
   Folder,
@@ -51,10 +52,48 @@ export default function DashboardSettings() {
   const [newLevelColor, setNewLevelColor] = useState("#10B981");
 
   // Integrations
-  const [webhookUrl] = useState(`${window.location.origin}/api/webhook/notes`);
-  const [secretKey, setSecretKey] = useState("sk_live_xxxxxxxxxxxxxxxxxxxxxxxx");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const { data: latestIntegration, isLoading: integrationLoading } = useGetLatestIntegration();
+  const generateApiKey = useGenerateApiKey();
+
+  const [webhookUrl, setWebhookUrl] = useState(`${window.location.origin}/api/webhook/notes`);
+  const [secretKey, setSecretKey] = useState("sk_live_••••••••••••••••••••••••");
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (latestIntegration) {
+      setSecretKey(latestIntegration.api_key_preview);
+      if (latestIntegration.webhook_url) {
+        setWebhookUrl(latestIntegration.webhook_url);
+      }
+    }
+  }, [latestIntegration]);
+
+  const handleGenerateKey = () => {
+    if (confirm("Membuat key baru akan menonaktifkan key lama jika ada (tergantung implementasi backend). Lanjutkan?")) {
+      generateApiKey.mutate(
+        { name: "n8n Integration" },
+        {
+          onSuccess: (data) => {
+            setSecretKey(data.api_key); // Show full key once
+            if (data.integration?.webhook_url) {
+              setWebhookUrl(data.integration.webhook_url);
+            }
+            toast({
+              title: "Key Baru Dibuat",
+              description: "Secret key baru telah digenerate. Simpan dengan aman, ini tidak akan ditampilkan lagi!",
+            });
+          },
+          onError: (error) => {
+            toast({
+              title: "Gagal",
+              description: error.message,
+              variant: "destructive",
+            });
+          }
+        }
+      );
+    }
+  };
 
   // Theme options
   const themeOptions = [
@@ -472,27 +511,21 @@ export default function DashboardSettings() {
                       id="secretKey"
                       value={secretKey}
                       readOnly
-                      type="password"
+                      // Show password type only if it's not the full key (starts with sk_live and has no dots)
+                      // Actually, let's keep it password type unless user wants to toggle visibility,
+                      // but typically we want to allow copying.
+                      // The requirements said: "Show the full key only immediately after generation"
+                      // So for the preview, it is fine to be text since it is already masked.
+                      // For the full key, it should probably be visible text so they can copy it.
+                      type="text"
                       className="font-mono text-sm bg-muted"
                     />
                     <Button
                       variant="outline"
-                      onClick={() => {
-                        setIsGenerating(true);
-                        // Simulate key generation
-                        setTimeout(() => {
-                          const newKey = `sk_live_${Math.random().toString(36).substring(2, 26)}`;
-                          setSecretKey(newKey);
-                          setIsGenerating(false);
-                          toast({
-                            title: "Key Baru Dibuat",
-                            description: "Secret key baru telah digenerate. Simpan dengan aman!",
-                          });
-                        }, 1000);
-                      }}
-                      disabled={isGenerating}
+                      onClick={handleGenerateKey}
+                      disabled={generateApiKey.isPending}
                     >
-                      {isGenerating ? (
+                      {generateApiKey.isPending ? (
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       ) : (
                         <RefreshCw className="h-4 w-4 mr-2" />
@@ -501,7 +534,7 @@ export default function DashboardSettings() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Add this key as a header: <code className="bg-muted px-1 rounded">X-Webhook-Secret</code>
+                    Add this key as a header: <code className="bg-muted px-1 rounded">X-Webhook-Secret</code> (or <code>Authorization: Bearer &lt;key&gt;</code>)
                   </p>
                 </div>
 

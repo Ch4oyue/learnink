@@ -63,6 +63,14 @@ export function Button({ children, onClick, variant = 'primary' }: ButtonProps) 
 }
 ```
 
+### Performance Optimization (HP Kentang Friendly)
+- **Minimalkan Main Thread Work:** Hindari komputasi berat di render cycle. Gunakan `useMemo` dan `useCallback`.
+- **Scroll Optimization:**
+  - **No Layout Thrashing:** JANGAN membaca properti layout (seperti `offsetHeight`, `scrollTop`) dan menulis style di frame yang sama berulang kali.
+  - Gunakan `requestAnimationFrame` untuk scroll handler.
+  - Cache layout metrics via `ResizeObserver` jika memungkinkan.
+- **Virtualization:** Pertimbangkan virtual scroll untuk list yang sangat panjang.
+
 ---
 
 ## Supabase Rules
@@ -70,6 +78,7 @@ export function Button({ children, onClick, variant = 'primary' }: ButtonProps) 
 ### Row Level Security (RLS) - WAJIB
 - **Setiap tabel HARUS memiliki RLS enabled**.
 - Policies HARUS menggunakan `(SELECT auth.uid())` (bukan `auth.uid()` langsung) untuk optimasi.
+- **Security Definer:** Fungsi DB (`SECURITY DEFINER`) wajib menetapkan `SET search_path = public` untuk mencegah serangan schema hijacking.
 
 ```sql
 -- ✅ GOOD: Optimized RLS
@@ -122,6 +131,15 @@ Gunakan CSS variables dari design system, bukan hex langsung.
 
 ---
 
+## Release & Deployment Workflow
+
+### Automated Release
+- Proses rilis ke production dan bumping version (`package.json`) harus dilakukan secara **OTOMATIS** melalui CI/CD pipeline (GitHub Actions).
+- Trigger: Push/Merge ke branch `main` atau pembuatan Tag.
+- Jangan lakukan bump version manual kecuali dalam kondisi darurat.
+
+---
+
 ## File Structure
 
 ```
@@ -164,3 +182,4 @@ Sebelum deploy, pastikan:
 - [ ] Input dari user di-sanitize (DOMPurify untuk HTML)
 - [ ] Rate limiting aktif untuk public endpoints
 - [ ] Error messages tidak expose internal details
+- [ ] Fungsi DB `SECURITY DEFINER` memiliki `search_path` yang eksplisit.

@@ -11,13 +11,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Performance
 
+#### Improvements (1)
 - Optimized module progress lookup to O(1) for improved dashboard performance.
 
 ## [1.4.2] - January 24, 2026
 
 ### Bug Fixes & Code Quality
-
-Resolved multiple ESLint errors and warnings across the project to improve code stability and maintainability.
 
 #### Fixes (5)
 - Replaced `any` types with proper TypeScript types in `DashboardProfile.tsx` and `generate-quiz` Supabase function.

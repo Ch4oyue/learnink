@@ -316,8 +316,6 @@ serve(async (req) => {
             );
         }
 
-        const token = authHeader.replace("Bearer ", "");
-
         // Validate API key against integrations table or legacy keys
         const integration = await validateApiKey(supabase, token);
 
@@ -337,15 +335,7 @@ serve(async (req) => {
         // -------------------------
         // 3. Parse and Validate Body
         // -------------------------
-        let body: unknown;
-        try {
-            body = await req.json();
-        } catch {
-            return new Response(
-                JSON.stringify({ error: "Invalid JSON body", success: false }),
-                { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
+        // Body is already parsed above
 
         const payload = validatePayload(body);
         console.log("Received content:", payload.title);

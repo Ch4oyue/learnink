@@ -11,8 +11,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Sidebar Stability & UX Fixes
 
-<!-- -->
-
 #### Improvements (2)
 - Updated Changelog UI to use 'Glass Liquid' design system.
 - Added 'Version History Summary' table to the Changelog page.
@@ -25,8 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Performance & Database Optimizations
 
-<!-- -->
-
 #### Improvements (1)
 - Optimized module progress lookup to O(1) for improved dashboard performance.
 
@@ -37,8 +33,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.4.2] - January 24, 2026
 
 ### Bug Fixes & Code Quality
-
-<!-- -->
 
 #### Fixes (5)
 - Replaced `any` types with proper TypeScript types in `DashboardProfile.tsx` and `generate-quiz` Supabase function.

@@ -1,7 +1,5 @@
 # LearnInk Master Plan
 
-**Current Version: v1.4.4**
-
 ## Visi
 **LearnInk** adalah platform Learning Management System (LMS) yang dirancang untuk memberikan **pendidikan gratis berkualitas tinggi** kepada semua orang. Platform ini bukan sekadar LMS statis, melainkan "LMS yang hidup" dengan kemampuan menerima dan memproses konten secara otomatis.
 

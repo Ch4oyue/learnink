@@ -1,15 +1,26 @@
 
 import { describe, test, expect } from "bun:test";
 
+interface ProgressRecord {
+  progress_percent: number;
+  is_completed: boolean;
+}
+
+interface QuizAttempt {
+  score: number;
+  percentage: number;
+  passed: boolean;
+}
+
 // Mock data generators
-const generateProgress = (count: number) => {
+const generateProgress = (count: number): ProgressRecord[] => {
   return Array.from({ length: count }, () => ({
     progress_percent: Math.floor(Math.random() * 100),
     is_completed: Math.random() > 0.5,
   }));
 };
 
-const generateQuizAttempts = (count: number) => {
+const generateQuizAttempts = (count: number): QuizAttempt[] => {
   return Array.from({ length: count }, () => ({
     score: Math.floor(Math.random() * 10),
     percentage: Math.floor(Math.random() * 100),
@@ -18,7 +29,7 @@ const generateQuizAttempts = (count: number) => {
 };
 
 // Original Client-Side Logic
-const clientSideAggregation = (progressData: any[], quizData: any[], notesCount: number, notesWeekCount: number) => {
+const clientSideAggregation = (progressData: ProgressRecord[], quizData: QuizAttempt[], notesCount: number, notesWeekCount: number) => {
   const totalModulesStarted = progressData.length;
   const completedModules = progressData.filter((p) => p.is_completed).length;
   const averageProgress =

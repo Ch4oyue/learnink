@@ -1,16 +1,21 @@
 -- Fix All RPCs and Roles (Super Admin & Stats)
 -- Created: 2026-02-02
 -- Purpose: Consolidates all fixes for Roles, Super Admin, and Missing RPCs (404 errors)
+-- UPDATED: Includes fix for 'prevent_moderator_role' constraint
 
 -- 1. Ensure 'superadmin' exists in app_role enum
 ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'superadmin';
 
--- 2. Downgrade Moderators to User (Clean up deprecated role)
+-- 2. Remove the restrictive constraint that blocks superadmin
+-- This constraint was originally added to prevent 'moderator' but it hardcoded allowed roles
+ALTER TABLE public.user_roles DROP CONSTRAINT IF EXISTS prevent_moderator_role;
+
+-- 3. Downgrade Moderators to User (Clean up deprecated role)
 UPDATE public.user_roles
 SET role = 'user'
 WHERE role = 'moderator';
 
--- 3. Assign Super Admin to agen.salva@gmail.com
+-- 4. Assign Super Admin to agen.salva@gmail.com
 DO $$
 DECLARE
   target_email TEXT := 'agen.salva@gmail.com';
@@ -31,7 +36,7 @@ BEGIN
   END IF;
 END $$;
 
--- 4. Re-create get_user_auth_data RPC (Fixes "Everyone is User" and 404s)
+-- 5. Re-create get_user_auth_data RPC (Fixes "Everyone is User" and 404s)
 CREATE OR REPLACE FUNCTION get_user_auth_data(p_user_id uuid)
 RETURNS jsonb
 LANGUAGE plpgsql
@@ -79,7 +84,7 @@ $$;
 GRANT EXECUTE ON FUNCTION get_user_auth_data(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_user_auth_data(uuid) TO service_role;
 
--- 5. Re-create get_user_learning_stats RPC (Fixes stats 404s)
+-- 6. Re-create get_user_learning_stats RPC (Fixes stats 404s)
 CREATE OR REPLACE FUNCTION get_user_learning_stats(target_user_id uuid)
 RETURNS json
 LANGUAGE plpgsql
@@ -137,7 +142,7 @@ $$;
 GRANT EXECUTE ON FUNCTION get_user_learning_stats(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_user_learning_stats(uuid) TO service_role;
 
--- 6. Update has_role to support Super Admin hierarchy
+-- 7. Update has_role to support Super Admin hierarchy
 CREATE OR REPLACE FUNCTION public.has_role(_role public.app_role, _user_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql

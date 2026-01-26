@@ -36,8 +36,9 @@ function generateData(count: number) {
 
 describe("Array.find vs Map Lookup Benchmark", () => {
   test("compares O(N*M) Array.find vs O(N) Map Creation + O(1) Lookup", () => {
-    const SIZES = [100, 1000, 5000]; // Test different scales
-    const ITERATIONS = 1000;
+    // Reduced for CI compliance (timeout < 5000ms)
+    const SIZES = [100, 500];
+    const ITERATIONS = 100;
 
     console.log("\n--- Starting Lookup Benchmark ---");
 

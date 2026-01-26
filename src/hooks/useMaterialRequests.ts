@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 
 export type RequestStatus = 'pending' | 'reviewing' | 'completed' | 'rejected';
+export type RequestType = 'module' | 'feature' | 'bug';
 
 export interface MaterialRequest {
   id: string;
@@ -18,23 +19,31 @@ export interface MaterialRequest {
   category: string | null;
   priority: string | null;
   ai_summary: string | null;
+  type: RequestType;
+  image_url: string | null;
 }
 
 export interface MaterialRequestWithUser extends MaterialRequest {
   user_display_name?: string | null;
 }
 
-export function useMyRequests(userId?: string) {
+export function useMyRequests(userId?: string, type?: RequestType) {
   return useQuery({
-    queryKey: ['my-requests', userId],
+    queryKey: ['my-requests', userId, type],
     queryFn: async () => {
       if (!userId) return [];
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('material_requests')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
+
+      if (type) {
+        query = query.eq('type', type);
+      }
+
+      const { data, error } = await query;
       
       if (error) throw error;
       return data as MaterialRequest[];
@@ -43,9 +52,9 @@ export function useMyRequests(userId?: string) {
   });
 }
 
-export function useAllRequests(statusFilter?: RequestStatus) {
+export function useAllRequests(statusFilter?: RequestStatus, type?: RequestType) {
   return useQuery({
-    queryKey: ['all-requests', statusFilter],
+    queryKey: ['all-requests', statusFilter, type],
     queryFn: async () => {
       let query = supabase
         .from('material_requests')
@@ -54,6 +63,9 @@ export function useAllRequests(statusFilter?: RequestStatus) {
       
       if (statusFilter) {
         query = query.eq('status', statusFilter);
+      }
+      if (type) {
+        query = query.eq('type', type);
       }
       
       const { data, error } = await query;
@@ -93,13 +105,17 @@ export function useCreateRequest() {
       topic, 
       description,
       category,
-      priority
+      priority,
+      type = 'module',
+      imageUrl
     }: { 
       userId: string; 
       topic: string; 
       description?: string;
       category?: string;
       priority?: string;
+      type?: RequestType;
+      imageUrl?: string;
     }) => {
       const { data, error } = await supabase
         .from('material_requests')
@@ -109,6 +125,8 @@ export function useCreateRequest() {
           description,
           category,
           priority,
+          type,
+          image_url: imageUrl,
         })
         .select()
         .single();
@@ -121,7 +139,7 @@ export function useCreateRequest() {
       queryClient.invalidateQueries({ queryKey: ['all-requests'] });
       toast({
         title: "Request terkirim",
-        description: "Request materi Anda telah dikirim untuk ditinjau",
+        description: "Permintaan Anda telah berhasil dikirim",
       });
     },
     onError: (error) => {

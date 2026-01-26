@@ -130,6 +130,7 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
       items: [
         { href: "/dashboard", label: "Home", icon: LayoutDashboard },
         { href: "/dashboard/second-brain", label: "Second Brain", icon: StickyNote },
+        { href: "/dashboard/requests", label: "Requests", icon: FileQuestion },
       ],
     },
     {

@@ -66,7 +66,7 @@ export function parseChangelog(): ChangelogEntry[] {
         // Improved regex to handle variable whitespace and comments correctly
         // Stops at the next section header (####), separator (---), or next version (##)
         // Matches title line, then captures content until a newline followed by ####, ---, or ##
-        const descMatch = block.match(/### .+[\r\n]+([\s\S]*?)(?=[\r\n]+####|[\r\n]+---|[\r\n]+##|$)/);
+        const descMatch = block.match(/### .+([\s\S]*?)(?=[\r\n]+####|[\r\n]+---|[\r\n]+##|$)/);
         const description = descMatch ? sanitizeText(descMatch[1]) : '';
 
         // Extract improvements

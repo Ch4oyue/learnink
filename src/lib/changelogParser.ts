@@ -24,6 +24,7 @@ export interface VersionSummary {
 
 // Import the raw changelog content at build time
 import changelogContent from '/CHANGELOG.md?raw';
+import { extractListItems } from './changelogUtils';
 
 /**
  * Sanitize text to prevent XSS attacks
@@ -121,39 +122,6 @@ export function parseVersionSummary(): VersionSummary[] {
         }
     }
     return summary;
-}
-
-/**
- * Extract list items under a specific header
- */
-function extractListItems(block: string, header: string): string[] {
-    // Match section: #### Header (count)\n- item1\n- item2
-    // Improved regex to handle variable whitespace
-    const sectionRegex = new RegExp(`#### ${header}[^\\n]*\\n([\\s\\S]*?)(?=####|---|##|$)`, 'i');
-    const sectionMatch = block.match(sectionRegex);
-
-    if (!sectionMatch) return [];
-
-    const items: string[] = [];
-    const lines = sectionMatch[1].split('\n');
-
-    for (const line of lines) {
-        // Match markdown list items: - Item text or - `code` text
-        const itemMatch = line.match(/^-\s+(.+)/);
-        if (itemMatch) {
-            // Sanitize: remove any script tags or dangerous patterns
-            const cleanItem = itemMatch[1]
-                .trim()
-                .replace(/<script[^>]*>.*?<\/script>/gi, '')
-                .replace(/javascript:/gi, '')
-                .replace(/on\w+=/gi, '');
-            if (cleanItem) {
-                items.push(cleanItem);
-            }
-        }
-    }
-
-    return items;
 }
 
 /**

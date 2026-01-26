@@ -216,14 +216,14 @@ function AppSidebar() {
       if (error) throw error;
       return count || 0;
     },
-    enabled: currentRole === "admin",
+    enabled: currentRole === "admin" || currentRole === "superadmin",
     refetchInterval: 30000,
   });
 
   const navGroups: NavGroup[] = MENU_CONFIG[currentRole].map(group => ({
     ...group,
     items: group.items.map(item => {
-      if (currentRole === "admin" && item.href === "/dashboard/admin/approval" && pendingCount > 0) {
+      if ((currentRole === "admin" || currentRole === "superadmin") && item.href === "/dashboard/admin/approval" && pendingCount > 0) {
         return { ...item, badge: pendingCount };
       }
       return item;

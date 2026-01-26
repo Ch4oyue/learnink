@@ -41,6 +41,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { useToast } from "@/hooks/use-toast";
 import {
     Plug,
@@ -700,14 +701,14 @@ export default function IntegrationManager() {
                             {templateModal.source && SOURCE_INFO[templateModal.source].label} Setup Guide
                         </DialogTitle>
                     </DialogHeader>
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <div className="max-w-none">
                         {templateModal.source && (
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: getTemplatesBySource(templateModal.source)
+                            <MarkdownRenderer
+                                content={
+                                    getTemplatesBySource(templateModal.source)
                                         .find((t) => t.type === "setup_guide")
-                                        ?.content.replace(/\n/g, "<br>") || "No guide available.",
-                                }}
+                                        ?.content || "No guide available."
+                                }
                             />
                         )}
                     </div>

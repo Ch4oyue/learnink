@@ -35,6 +35,12 @@ export default function CourseDetail() {
   const isEnrolled = trackId && enrolledTrackIds.includes(trackId);
   const canAccess = isEnrolled || isAdmin || isTutor;
 
+  // Optimize progress lookup from O(N^2) to O(N) using a Map
+  const progressMap = useMemo(() => {
+    if (!userProgress) return new Map();
+    return new Map(userProgress.map((p) => [p.module_id, p]));
+  }, [userProgress]);
+
   // Calculate course progress
   const totalModules = modules?.length || 0;
   const completedModules = modules?.filter(m => {

@@ -33,7 +33,8 @@ import {
   StickyNote,
   Plug,
   MoreHorizontal,
-  Menu
+  Menu,
+  Crown
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -60,6 +61,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetDescription,
 } from "@/components/ui/sheet";
 
 /**
@@ -107,12 +109,14 @@ const roleLabels: Record<AppRole, string> = {
   user: "Pelajar",
   tutor: "Tutor",
   admin: "Admin",
+  superadmin: "Super Admin",
 };
 
 const roleBadgeColors: Record<AppRole, string> = {
   user: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   tutor: "bg-green-500/10 text-green-400 border-green-500/20",
   admin: "bg-red-500/10 text-red-400 border-red-500/20",
+  superadmin: "bg-amber-500/10 text-amber-500 border-amber-500/20",
 };
 
 // ============================================
@@ -157,6 +161,18 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
     },
   ],
   admin: [
+    {
+      items: [
+        { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+        { href: "/dashboard/users", label: "Users", icon: Users },
+        { href: "/dashboard/admin/approval", label: "Inbox Review", icon: CheckCircle },
+        { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
+        { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
+        { href: "/dashboard/settings", label: "System Settings", icon: Settings },
+      ],
+    },
+  ],
+  superadmin: [
     {
       items: [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -231,7 +247,12 @@ function AppSidebar() {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">LearnInk</span>
-                  <span className="truncate text-xs text-muted-foreground">{roleLabels[currentRole]}</span>
+                  <div className="flex items-center gap-1">
+                    <span className={cn("truncate text-xs text-muted-foreground", currentRole === 'superadmin' && "text-amber-500 font-medium")}>
+                      {roleLabels[currentRole]}
+                    </span>
+                    {currentRole === 'superadmin' && <Crown className="size-3 text-amber-500" />}
+                  </div>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -407,6 +428,9 @@ function MobileBottomNav() {
                     <Layers className="size-5 text-primary" />
                     Menu
                   </SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Mobile navigation menu
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="space-y-6 pb-8">
                   {navGroups.map((group, i) => (

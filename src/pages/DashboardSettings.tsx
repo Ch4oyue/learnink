@@ -32,10 +32,9 @@ import { useToast } from "@/hooks/use-toast";
 import { IncomingNoteAlert } from "@/components/admin/IncomingNoteAlert";
 
 export default function DashboardSettings() {
-  const { role } = useAuth();
+  const { isAdmin } = useAuth();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
-  const isAdmin = role === 'admin';
 
   // Categories
   const { data: categories, isLoading: categoriesLoading } = useModuleCategories();

@@ -73,6 +73,7 @@ export default function DashboardHome() {
     const renderContent = () => {
         switch (safeRole) {
             case "admin":
+            case "superadmin":
                 return <AdminDashboardContent />;
             case "tutor":
                 return <TutorDashboardContent />;

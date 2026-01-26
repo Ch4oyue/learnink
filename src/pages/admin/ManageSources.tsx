@@ -121,7 +121,7 @@ function TableSkeleton() {
 // ============================================
 
 export default function ManageSources() {
-    const { role, loading: authLoading } = useAuth();
+    const { isAdmin, loading: authLoading } = useAuth();
     const [searchQuery, setSearchQuery] = useState("");
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [editingSource, setEditingSource] = useState<LearningSource | null>(null);
@@ -147,7 +147,7 @@ export default function ManageSources() {
         );
     }
 
-    if (role !== "admin") {
+    if (!isAdmin) {
         return <Navigate to="/dashboard" replace />;
     }
 

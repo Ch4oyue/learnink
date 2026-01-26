@@ -30,7 +30,7 @@ export function RoleProtectedRoute({
 
   if (!role || !allowedRoles.includes(role)) {
     // Redirect to appropriate dashboard based on role
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'superadmin') {
       return <Navigate to="/dashboard/admin" replace />;
     } else if (role === 'tutor') {
       return <Navigate to="/dashboard/tutor" replace />;

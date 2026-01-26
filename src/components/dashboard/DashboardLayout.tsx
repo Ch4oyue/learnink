@@ -33,7 +33,8 @@ import {
   StickyNote,
   Plug,
   MoreHorizontal,
-  Menu
+  Menu,
+  Crown
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -107,12 +108,14 @@ const roleLabels: Record<AppRole, string> = {
   user: "Pelajar",
   tutor: "Tutor",
   admin: "Admin",
+  superadmin: "Super Admin",
 };
 
 const roleBadgeColors: Record<AppRole, string> = {
   user: "bg-blue-500/10 text-blue-400 border-blue-500/20",
   tutor: "bg-green-500/10 text-green-400 border-green-500/20",
   admin: "bg-red-500/10 text-red-400 border-red-500/20",
+  superadmin: "bg-amber-500/10 text-amber-500 border-amber-500/20 shadow-[0_0_10px_rgba(245,158,11,0.2)]",
 };
 
 // ============================================
@@ -168,6 +171,18 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
       ],
     },
   ],
+  superadmin: [
+    {
+      items: [
+        { href: "/dashboard", label: "HQ Overview", icon: LayoutDashboard },
+        { href: "/dashboard/users", label: "Manage Users", icon: Users },
+        { href: "/dashboard/admin/approval", label: "Content Approvals", icon: CheckCircle },
+        { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
+        { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
+        { href: "/dashboard/settings", label: "Global Settings", icon: Settings },
+      ],
+    },
+  ],
 };
 
 // ============================================
@@ -181,6 +196,7 @@ function AppSidebar() {
   const { state } = useSidebar();
 
   const currentRole: AppRole = role ?? "user";
+  const isSuperAdmin = currentRole === "superadmin";
   const displayName =
     profile?.display_name ||
     user?.user_metadata?.display_name ||
@@ -188,7 +204,7 @@ function AppSidebar() {
     "User";
   const userInitials = displayName.slice(0, 2).toUpperCase();
 
-  // Fetch pending approval count for admin
+  // Fetch pending approval count for admin/superadmin
   const { data: pendingCount = 0 } = useQuery({
     queryKey: ["pending-approvals"],
     queryFn: async () => {
@@ -200,14 +216,14 @@ function AppSidebar() {
       if (error) throw error;
       return count || 0;
     },
-    enabled: currentRole === "admin",
+    enabled: currentRole === "admin" || isSuperAdmin,
     refetchInterval: 30000,
   });
 
   const navGroups: NavGroup[] = MENU_CONFIG[currentRole].map(group => ({
     ...group,
     items: group.items.map(item => {
-      if (currentRole === "admin" && item.href === "/dashboard/admin/approval" && pendingCount > 0) {
+      if ((currentRole === "admin" || isSuperAdmin) && item.href === "/dashboard/admin/approval" && pendingCount > 0) {
         return { ...item, badge: pendingCount };
       }
       return item;
@@ -280,12 +296,15 @@ function AppSidebar() {
                   size="lg"
                   className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                 >
-                  <Avatar className="h-8 w-8 rounded-lg">
+                  <Avatar className={cn("h-8 w-8 rounded-lg transition-all", isSuperAdmin && "ring-2 ring-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.5)]")}>
                     <AvatarImage src={profile?.avatar_url || undefined} alt={displayName} />
                     <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">{displayName}</span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={cn("truncate font-semibold", isSuperAdmin && "text-amber-500")}>{displayName}</span>
+                      {isSuperAdmin && <Crown className="size-3 text-amber-500 fill-amber-500 animate-pulse" />}
+                    </div>
                     <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                   </div>
                   <MoreHorizontal className="ml-auto size-4" />

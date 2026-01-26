@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -90,12 +89,6 @@ export default function Syllabus() {
   const { data: modules, isLoading } = useModules(true);
   const { data: progress } = useUserProgress(user?.id);
 
-  // Optimize progress lookup from O(N^2) to O(N) using a Map
-  const progressMap = useMemo(() => {
-    if (!progress) return new Map();
-    return new Map(progress.map((p) => [p.module_id, p]));
-  }, [progress]);
-
   const getModulesForPath = (path: (typeof learningPaths)[0]) => {
     if (!modules) return [];
     return modules.filter((m) => {
@@ -112,7 +105,7 @@ export default function Syllabus() {
   };
 
   const getProgressForModule = (moduleId: string) => {
-    return progressMap.get(moduleId);
+    return progress?.find((p) => p.module_id === moduleId);
   };
 
   const calculatePathProgress = (path: (typeof learningPaths)[0]) => {

@@ -20,9 +20,6 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks(id) {
           if (id.includes("node_modules")) {
-            if (id.includes("@radix-ui")) {
-              return "vendor-radix";
-            }
             if (id.includes("recharts")) {
               return "vendor-charts";
             }
@@ -35,7 +32,7 @@ export default defineConfig(({ mode }) => ({
             if (id.includes("@supabase/supabase-js")) {
               return "vendor-supabase";
             }
-            if (id.includes("react-dom") || id.includes("react-router-dom") || id.match(/\/react\//)) {
+            if (id.includes("@radix-ui") || id.includes("react-dom") || id.includes("react-router-dom") || id.match(/\/react\//)) {
               return "vendor-react";
             }
           }

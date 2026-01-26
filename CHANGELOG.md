@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.5] - January 26, 2026
+
+### Admin Dashboard Stability
+
+Fixed a critical crash in the Admin Dashboard for Super Admin users and resolved missing backend function errors.
+
+<!-- -->
+
+#### Fixes (3)
+- Fixed React crash in Admin Dashboard by adding missing `superadmin` role mapping for icons and labels.
+- Restored missing `get_popular_modules` database function to resolve 404 errors.
+- Added error handling to `usePopularModules` hook to prevent dashboard crashes when analytics data is unavailable.
+
 ## [1.4.4] - January 25, 2026
 
 ### Sidebar Stability & UX Fixes
@@ -231,6 +244,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.5 | Jan 26, 2026 | Admin Dashboard Stability |
 | 1.4.4 | Jan 25, 2026 | Sidebar Stability & Changelog UI |
 | 1.4.3 | Jan 24, 2026 | Performance & Database Optimizations |
 | 1.4.2 | Jan 24, 2026 | Bug Fixes & Code Quality |

@@ -20,6 +20,7 @@ import {
   Loader2,
   Clock,
   Eye,
+  Crown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -55,18 +56,21 @@ const roleLabels: Record<AppRole, string> = {
   user: 'Pelajar',
   tutor: 'Tutor',
   admin: 'Admin',
+  superadmin: 'Super Admin',
 };
 
 const roleColors: Record<AppRole, string> = {
   user: 'bg-muted text-muted-foreground',
   tutor: 'bg-primary/10 text-primary',
   admin: 'bg-destructive/10 text-destructive',
+  superadmin: 'bg-amber-500/10 text-amber-500',
 };
 
 const roleIcons: Record<AppRole, typeof UserCircle> = {
   user: UserCircle,
   tutor: GraduationCap,
   admin: Shield,
+  superadmin: Crown,
 };
 
 const statusLabels: Record<RequestStatus, string> = {

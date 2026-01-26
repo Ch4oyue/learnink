@@ -72,7 +72,10 @@ export function usePopularModules(limit = 6) {
       const { data, error } = await supabase
         .rpc('get_popular_modules', { limit_count: limit });
 
-      if (error) throw error;
+      if (error) {
+        logger.error("get_popular_modules error:", error);
+        return [];
+      }
       return data;
     },
   });

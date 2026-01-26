@@ -1,8 +1,8 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 interface UseScrollProgressOptions {
   contentRef: React.RefObject<HTMLElement>;
-  onProgressChange: (progress: number) => void;
+  onProgressChange?: (progress: number) => void;
   debounceMs?: number;
 }
 
@@ -11,6 +11,7 @@ export function useScrollProgress({
   onProgressChange,
   debounceMs = 500,
 }: UseScrollProgressOptions) {
+  const [progress, setProgress] = useState(0);
   const lastProgress = useRef(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rafRef = useRef<number | null>(null);
@@ -39,9 +40,11 @@ export function useScrollProgress({
   }, [contentRef]);
 
   const calculateProgress = useCallback(() => {
-    // Fallback: If metrics aren't ready, measure immediately (should be rare)
+    // Optimization: Don't measure if metrics are 0 (e.g. hidden element).
+    // Reliance on ResizeObserver handles the update when it becomes visible.
+    // This prevents Layout Thrashing when the element is initially empty or hidden.
     if (metrics.current.height === 0) {
-      updateMetrics();
+      return 0;
     }
 
     const { top, height, windowHeight } = metrics.current;
@@ -58,9 +61,9 @@ export function useScrollProgress({
 
     if (maxScroll <= 0) return 100;
 
-    const progress = Math.min(100, Math.max(0, (scrolled / maxScroll) * 100));
-    return Math.round(progress);
-  }, [updateMetrics]);
+    const currentP = Math.min(100, Math.max(0, (scrolled / maxScroll) * 100));
+    return Math.round(currentP);
+  }, []); // removed updateMetrics dependency as it's not called
 
   const handleScroll = useCallback(() => {
     // Throttle with requestAnimationFrame
@@ -72,15 +75,18 @@ export function useScrollProgress({
       // Only update if progress increased (don't decrease on scroll up)
       if (currentProgress > lastProgress.current) {
         lastProgress.current = currentProgress;
+        setProgress(currentProgress); // Immediate update for UI
 
-        // Debounce the callback to avoid too many updates
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
+        // Debounce the callback to avoid too many updates (e.g. database writes)
+        if (onProgressChange) {
+          if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+          }
+
+          timeoutRef.current = setTimeout(() => {
+            onProgressChange(currentProgress);
+          }, debounceMs);
         }
-
-        timeoutRef.current = setTimeout(() => {
-          onProgressChange(currentProgress);
-        }, debounceMs);
       }
 
       rafRef.current = null;
@@ -120,9 +126,10 @@ export function useScrollProgress({
     };
   }, [handleScroll, updateMetrics, contentRef]);
 
-  const setInitialProgress = useCallback((progress: number) => {
-    lastProgress.current = progress;
+  const setInitialProgress = useCallback((initialValue: number) => {
+    lastProgress.current = initialValue;
+    setProgress(initialValue);
   }, []);
 
-  return { setInitialProgress };
+  return { progress, setInitialProgress };
 }

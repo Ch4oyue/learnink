@@ -126,7 +126,8 @@ serve(async (req) => {
             );
         }
 
-        if (roleData?.role !== "admin") {
+        const allowedRoles = ["admin", "superadmin"];
+        if (!allowedRoles.includes(roleData?.role)) {
             return new Response(
                 JSON.stringify({ error: "Admin access required", success: false }),
                 { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }

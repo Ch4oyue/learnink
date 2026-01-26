@@ -57,6 +57,11 @@ export function useUpdateUserRole() {
         throw new Error('Super Admin role bersifat permanen dan tidak dapat diubah');
       }
 
+      // Prevent promoting any user to superadmin
+      if (newRole === 'superadmin') {
+        throw new Error('Tidak dapat mengubah pengguna menjadi Super Admin');
+      }
+
       const { data, error } = await supabase
         .from('user_roles')
         .update({ role: newRole })

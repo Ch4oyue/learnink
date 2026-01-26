@@ -1,17 +1,12 @@
--- Fix Roles, Add Superadmin, and Repair RPC
--- Created: 2026-02-02
+-- Part 2: Role Logic, Assignments, and RPC Fixes
+-- Run this AFTER '20260202000000_add_superadmin_enum.sql'
 
--- 1. Ensure 'superadmin' exists in app_role enum
--- Note: ALTER TYPE cannot run inside a transaction block in some environments.
--- If this fails, run it separately.
-ALTER TYPE public.app_role ADD VALUE IF NOT EXISTS 'superadmin';
-
--- 2. Downgrade Moderators to User
+-- 1. Downgrade Moderators to User
 UPDATE public.user_roles
 SET role = 'user'
 WHERE role = 'moderator';
 
--- 3. Assign Super Admin to agen.salva@gmail.com
+-- 2. Assign Super Admin to agen.salva@gmail.com
 DO $$
 DECLARE
   target_email TEXT := 'agen.salva@gmail.com';
@@ -32,7 +27,7 @@ BEGIN
   END IF;
 END $$;
 
--- 4. Re-create get_user_auth_data RPC to ensure it works
+-- 3. Re-create get_user_auth_data RPC to ensure it works
 -- This fixes the "Everyone is User" bug if the function was missing
 CREATE OR REPLACE FUNCTION get_user_auth_data(p_user_id uuid)
 RETURNS jsonb
@@ -82,7 +77,7 @@ $$;
 GRANT EXECUTE ON FUNCTION get_user_auth_data(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION get_user_auth_data(uuid) TO service_role;
 
--- 5. Update has_role to support Super Admin hierarchy
+-- 4. Update has_role to support Super Admin hierarchy
 CREATE OR REPLACE FUNCTION public.has_role(_role public.app_role, _user_id uuid)
 RETURNS boolean
 LANGUAGE plpgsql

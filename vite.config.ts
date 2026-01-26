@@ -18,13 +18,27 @@ export default defineConfig(({ mode }) => ({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Core React - cached for a long time
-          "vendor-react": ["react", "react-dom", "react-router-dom"],
-          // Data fetching
-          "vendor-query": ["@tanstack/react-query"],
-          // Supabase client
-          "vendor-supabase": ["@supabase/supabase-js"],
+        manualChunks(id) {
+          if (id.includes("node_modules")) {
+            if (id.includes("@radix-ui")) {
+              return "vendor-radix";
+            }
+            if (id.includes("recharts")) {
+              return "vendor-charts";
+            }
+            if (id.includes("framer-motion") || id.includes("gsap") || id.includes("lucide-react")) {
+              return "vendor-ui";
+            }
+            if (id.includes("@tanstack/react-query")) {
+              return "vendor-query";
+            }
+            if (id.includes("@supabase/supabase-js")) {
+              return "vendor-supabase";
+            }
+            if (id.includes("react-dom") || id.includes("react-router-dom") || id.match(/\/react\//)) {
+              return "vendor-react";
+            }
+          }
         },
       },
     },

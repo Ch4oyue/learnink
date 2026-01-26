@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTrack } from "@/hooks/useTracks";
@@ -25,14 +26,21 @@ export default function CourseDetail() {
   const { data: modules, isLoading: modulesLoading } = useModules({ trackId, publishedOnly: true });
   const { data: userProgress } = useUserProgress(user?.id);
 
+  // Optimization: Create a Map for O(1) lookup
+  const progressMap = useMemo(() => {
+    if (!userProgress) return new Map();
+    return new Map(userProgress.map(p => [p.module_id, p]));
+  }, [userProgress]);
+
   const isEnrolled = trackId && enrolledTrackIds.includes(trackId);
   const canAccess = isEnrolled || isAdmin || isTutor;
 
   // Calculate course progress
   const totalModules = modules?.length || 0;
-  const completedModules = modules?.filter(m =>
-    userProgress?.some(p => p.module_id === m.id && p.is_completed)
-  ).length || 0;
+  const completedModules = modules?.filter(m => {
+    const p = progressMap.get(m.id);
+    return p?.is_completed;
+  }).length || 0;
 
   const courseProgress = totalModules > 0
     ? Math.round((completedModules / totalModules) * 100)
@@ -120,7 +128,7 @@ export default function CourseDetail() {
 
            <div className="grid gap-4">
               {modules?.map((module, index) => {
-                 const progress = userProgress?.find(p => p.module_id === module.id);
+                 const progress = progressMap.get(module.id);
                  const isCompleted = progress?.is_completed;
                  const isLocked = !canAccess;
 

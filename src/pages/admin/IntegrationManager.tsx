@@ -113,7 +113,7 @@ function CardSkeleton() {
 // ============================================
 
 export default function IntegrationManager() {
-    const { role, loading: authLoading } = useAuth();
+    const { isAdmin, loading: authLoading } = useAuth();
     const { toast } = useToast();
     const queryClient = useQueryClient();
 
@@ -141,7 +141,7 @@ export default function IntegrationManager() {
             if (error) throw error;
             return data as Integration[];
         },
-        enabled: role === "admin",
+        enabled: isAdmin,
     });
 
     // Create integration mutation
@@ -306,7 +306,7 @@ export default function IntegrationManager() {
         );
     }
 
-    if (role !== "admin") {
+    if (!isAdmin) {
         return <Navigate to="/dashboard" replace />;
     }
 

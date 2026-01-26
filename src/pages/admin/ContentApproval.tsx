@@ -105,7 +105,7 @@ function CardSkeleton() {
 // ============================================
 
 export default function ContentApproval() {
-    const { role, loading: authLoading, user } = useAuth();
+    const { isAdmin, loading: authLoading, user } = useAuth();
     const { toast } = useToast();
     const queryClient = useQueryClient();
 
@@ -132,12 +132,12 @@ export default function ContentApproval() {
             if (error) throw error;
             return data as IncomingContent[];
         },
-        enabled: role === "admin",
+        enabled: isAdmin,
     });
 
     // Realtime subscription for incoming_contents
     useEffect(() => {
-        if (role !== "admin") return;
+        if (!isAdmin) return;
 
         const channel = supabase
             .channel("incoming-contents-realtime")
@@ -154,7 +154,7 @@ export default function ContentApproval() {
         return () => {
             supabase.removeChannel(channel);
         };
-    }, [role, queryClient]);
+    }, [isAdmin, queryClient]);
 
     // Approve and publish mutation
     const publishMutation = useMutation({
@@ -280,7 +280,7 @@ export default function ContentApproval() {
         );
     }
 
-    if (role !== "admin") {
+    if (!isAdmin) {
         return <Navigate to="/dashboard" replace />;
     }
 

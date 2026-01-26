@@ -7,12 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.4] - January 25, 2026
+
+### Sidebar Stability & UX Fixes
+
+#### Improvements (2)
+- Updated Changelog UI to use 'Glass Liquid' design system.
+- Added 'Version History Summary' table to the Changelog page.
+
+#### Fixes (2)
+- Fixed sidebar persistence issue where it collapsed on refresh, ensuring consistent user preference.
+- Fixed changelog parser regex to correctly handle section headers and descriptions.
+
 ## [1.4.3] - January 24, 2026
 
-### Performance
+### Performance & Database Optimizations
 
 #### Improvements (1)
 - Optimized module progress lookup to O(1) for improved dashboard performance.
+
+#### Database (2)
+- Updated `public.has_role` function to support role hierarchy (Super Admin > Admin).
+- Added index on `user_progress.module_id` for faster filtering.
 
 ## [1.4.2] - January 24, 2026
 
@@ -203,7 +219,8 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.3 | Jan 24, 2026 | Performance Optimization |
+| 1.4.4 | Jan 25, 2026 | Sidebar Stability & Changelog UI |
+| 1.4.3 | Jan 24, 2026 | Performance & Database Optimizations |
 | 1.4.2 | Jan 24, 2026 | Bug Fixes & Code Quality |
 | 1.4.1 | Jan 20, 2026 | Code Quality & Security Audit |
 | 1.4.0 | Jan 19, 2026 | Major Frontend Upgrade & Premium UX |

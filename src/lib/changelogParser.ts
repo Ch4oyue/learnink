@@ -16,6 +16,12 @@ export interface ChangelogEntry {
     patches: string[];
 }
 
+export interface VersionSummary {
+    version: string;
+    date: string;
+    highlights: string;
+}
+
 // Import the raw changelog content at build time
 import changelogContent from '/CHANGELOG.md?raw';
 
@@ -57,7 +63,10 @@ export function parseChangelog(): ChangelogEntry[] {
         const title = titleMatch ? sanitizeText(titleMatch[1]) : 'Update';
 
         // Extract description (first paragraph after title)
-        const descMatch = block.match(/### .+\n\n(.+?)(?=\n\n####|\n\n---|\n\n##|$)/s);
+        // Improved regex to handle variable whitespace and comments correctly
+        // Stops at the next section header (####), separator (---), or next version (##)
+        // Matches title line, then captures content until a newline followed by ####, ---, or ##
+        const descMatch = block.match(/### .+[\r\n]+([\s\S]*?)(?=[\r\n]+####|[\r\n]+---|[\r\n]+##|$)/);
         const description = descMatch ? sanitizeText(descMatch[1]) : '';
 
         // Extract improvements
@@ -88,10 +97,38 @@ export function parseChangelog(): ChangelogEntry[] {
 }
 
 /**
+ * Parse the Version History Summary table from the bottom of CHANGELOG.md
+ */
+export function parseVersionSummary(): VersionSummary[] {
+    const summary: VersionSummary[] = [];
+    // Match the table starting with headers
+    const tableRegex = /\| Version \| Date \| Highlights \|[\r\n]+\|[-|]+\|[\r\n]+([\s\S]+?)(?=$)/;
+    const match = changelogContent.match(tableRegex);
+
+    if (match) {
+        const rows = match[1].trim().split('\n');
+        for (const row of rows) {
+            // Split by pipe and clean up
+            const cols = row.split('|').map(c => c.trim()).filter(c => c !== '');
+            // We expect at least 3 columns: Version, Date, Highlights
+            if (cols.length >= 3) {
+                summary.push({
+                    version: cols[0],
+                    date: cols[1],
+                    highlights: cols[2]
+                });
+            }
+        }
+    }
+    return summary;
+}
+
+/**
  * Extract list items under a specific header
  */
 function extractListItems(block: string, header: string): string[] {
     // Match section: #### Header (count)\n- item1\n- item2
+    // Improved regex to handle variable whitespace
     const sectionRegex = new RegExp(`#### ${header}[^\\n]*\\n([\\s\\S]*?)(?=####|---|##|$)`, 'i');
     const sectionMatch = block.match(sectionRegex);
 
@@ -140,10 +177,18 @@ function formatDate(dateStr: string): string {
 
 // Export parsed changelog data (cached)
 let cachedChangelog: ChangelogEntry[] | null = null;
+let cachedSummary: VersionSummary[] | null = null;
 
 export function getChangelog(): ChangelogEntry[] {
     if (!cachedChangelog) {
         cachedChangelog = parseChangelog();
     }
     return cachedChangelog;
+}
+
+export function getVersionSummary(): VersionSummary[] {
+    if (!cachedSummary) {
+        cachedSummary = parseVersionSummary();
+    }
+    return cachedSummary;
 }

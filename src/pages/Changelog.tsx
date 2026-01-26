@@ -8,6 +8,14 @@ import {
     CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
+import {
     ArrowLeft,
     ChevronDown,
     Sparkles,
@@ -15,8 +23,9 @@ import {
     Package,
     Calendar,
     Tag,
+    History,
 } from "lucide-react";
-import { getChangelog, type ChangelogEntry } from "@/lib/changelogParser";
+import { getChangelog, getVersionSummary, type ChangelogEntry } from "@/lib/changelogParser";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,6 +35,7 @@ import { motion, AnimatePresence } from "framer-motion";
 // ============================================
 
 const CHANGELOG_DATA: ChangelogEntry[] = getChangelog();
+const SUMMARY_DATA = getVersionSummary();
 
 // ============================================
 // COLLAPSIBLE SECTION COMPONENT
@@ -221,8 +231,8 @@ export default function Changelog() {
 
                             {/* Content Column */}
                             <div className={cn(
-                                "bg-card border border-border rounded-xl p-5 md:p-6 shadow-sm transition-all duration-300",
-                                "hover:shadow-md hover:border-primary/20",
+                                "glass-liquid rounded-[24px] p-5 md:p-6 transition-all duration-300",
+                                "hover:shadow-lg hover:bg-opacity-80",
                                 index === 0 && "ring-1 ring-primary/10"
                             )}>
                                 <h2 className="text-lg font-bold text-foreground mb-2">
@@ -264,6 +274,39 @@ export default function Changelog() {
                         </motion.div>
                     ))}
                 </div>
+
+                {/* Version History Summary */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                    className="mt-12"
+                >
+                    <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                        <History className="h-5 w-5" />
+                        Version History Summary
+                    </h2>
+                    <div className="glass-liquid rounded-[24px] overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent border-b-black/5 dark:border-b-white/10">
+                                    <TableHead className="w-[100px]">Version</TableHead>
+                                    <TableHead>Date</TableHead>
+                                    <TableHead>Highlights</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {SUMMARY_DATA.map((item) => (
+                                    <TableRow key={item.version} className="hover:bg-primary/5 border-b-black/5 dark:border-b-white/10">
+                                        <TableCell className="font-medium">{item.version}</TableCell>
+                                        <TableCell>{item.date}</TableCell>
+                                        <TableCell>{item.highlights}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </motion.div>
 
                 {/* Footer */}
                 <motion.div

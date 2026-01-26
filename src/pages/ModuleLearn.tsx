@@ -33,7 +33,7 @@ import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
  * Premium Dark Mode: #0b0c0e background, purple accents
  */
 
-import { parseModuleSections } from "@/lib/moduleParser";
+import { parseModuleSections, type SectionData } from "@/lib/moduleParser";
 
 // ============================================
 // MAIN COMPONENT

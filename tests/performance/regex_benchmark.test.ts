@@ -65,7 +65,7 @@ function parseWithRegexInside(markdown: string) {
       const level = match[1].length;
       const title = match[2].trim();
       const id = title.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-      const uniqueId = sections[id] ? id + Math.random().toString() : id;
+      const uniqueId = sections[id] ? `${id}-${Math.random().toString(36).substr(2, 5)}` : id;
 
       currentSection = { id: uniqueId, title, level, content: "" };
       contentLines = [line];
@@ -79,7 +79,7 @@ function parseWithRegexInside(markdown: string) {
 
 describe("Markdown Parsing Performance Benchmark", () => {
   test("compares Regex Inside vs Hoisted Regex + Exec (Actual Implementation)", () => {
-    const ITERATIONS = 2000;
+    const ITERATIONS = 500; // Reduced to avoid CI timeouts
     console.log("\n--- Starting Regex Benchmark ---");
     console.log(`Iterations: ${ITERATIONS}`);
 

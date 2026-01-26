@@ -61,6 +61,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetDescription,
 } from "@/components/ui/sheet";
 
 /**
@@ -427,6 +428,9 @@ function MobileBottomNav() {
                     <Layers className="size-5 text-primary" />
                     Menu
                   </SheetTitle>
+                  <SheetDescription className="sr-only">
+                    Mobile navigation menu
+                  </SheetDescription>
                 </SheetHeader>
                 <div className="space-y-6 pb-8">
                   {navGroups.map((group, i) => (

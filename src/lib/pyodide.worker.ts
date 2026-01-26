@@ -14,10 +14,18 @@ type WorkerResponse =
   | { type: 'STDERR'; text: string }
   | { type: 'RESULTS'; id: string; results: unknown; error?: string };
 
+// Interface for Pyodide object
+interface PyodideAPI {
+  setStdout: (options: { batched: (text: string) => void }) => void;
+  setStderr: (options: { batched: (text: string) => void }) => void;
+  runPythonAsync: (code: string) => Promise<unknown>;
+  loadPackagesFromImports: (code: string) => Promise<void>;
+}
+
 // Global context for the worker
 declare const self: DedicatedWorkerGlobalScope;
 // Declare loadPyodide which comes from the imported script
-let pyodide: any = null;
+let pyodide: PyodideAPI | null = null;
 
 self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
   const { type } = event.data;
@@ -28,12 +36,13 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 
       // Load the Pyodide script
       // Using dynamic import for Module Worker compatibility
-      const { loadPyodide } = await import(config.scriptURL);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { loadPyodide } = await import(config.scriptURL) as any;
 
       // Initialize Pyodide
       pyodide = await loadPyodide({
         indexURL: config.indexURL,
-      });
+      }) as PyodideAPI;
 
       // Set up standard streams
       pyodide.setStdout({
@@ -72,8 +81,11 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     if (type === 'RUN') {
-      // @ts-ignore
-      self.postMessage({ type: 'RESULTS', id: event.data.id, error: errorMessage });
+        // We know event.data is likely the RUN message, but TS can't prove it in catch block easily without checks.
+        // However, we accessed event.data.id above safely? No, only after check.
+        // Let's assert safely.
+        const id = 'id' in event.data ? (event.data as { id: string }).id : 'unknown';
+        self.postMessage({ type: 'RESULTS', id, error: errorMessage });
     } else {
       self.postMessage({ type: 'ERROR', error: errorMessage });
     }

@@ -52,6 +52,25 @@ export function useMyRequests(userId?: string, type?: RequestType) {
   });
 }
 
+export function useMaterialRequest(requestId?: string) {
+  return useQuery({
+    queryKey: ['material-request', requestId],
+    queryFn: async () => {
+      if (!requestId) return null;
+
+      const { data, error } = await supabase
+        .from('material_requests')
+        .select('*')
+        .eq('id', requestId)
+        .single();
+
+      if (error) throw error;
+      return data as MaterialRequest;
+    },
+    enabled: !!requestId,
+  });
+}
+
 export function useAllRequests(statusFilter?: RequestStatus, type?: RequestType) {
   return useQuery({
     queryKey: ['all-requests', statusFilter, type],

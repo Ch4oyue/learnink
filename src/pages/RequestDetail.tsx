@@ -1,6 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useAuth } from "@/contexts/AuthContext";
-import { useMyRequests } from "@/hooks/useMaterialRequests";
+import { useMaterialRequest } from "@/hooks/useMaterialRequests";
 import { useModuleByRequestId } from "@/hooks/useModules";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -62,14 +61,11 @@ const priorityLabels: Record<string, string> = {
 export default function RequestDetail() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
   
-  const { data: requests, isLoading: requestsLoading } = useMyRequests(user?.id);
+  const { data: request, isLoading: requestLoading } = useMaterialRequest(id);
   const { data: relatedModule } = useModuleByRequestId(id);
 
-  const request = requests?.find(r => r.id === id);
-
-  if (requestsLoading) {
+  if (requestLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />

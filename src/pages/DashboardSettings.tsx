@@ -27,8 +27,11 @@ import {
   Sun,
   Moon,
   Monitor,
-  Edit
+  Edit,
+  Download,
+  CheckCircle2
 } from "lucide-react";
+import { usePWA } from "@/contexts/PWAContext";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -43,6 +46,7 @@ export default function DashboardSettings() {
   const { isAdmin } = useAuth();
   const { theme, setTheme } = useTheme();
   const { toast } = useToast();
+  const { isInstalled, deferredPrompt, installApp } = usePWA();
 
   // Categories
   const { data: categories, isLoading: categoriesLoading } = useModuleCategories();
@@ -108,6 +112,35 @@ export default function DashboardSettings() {
                     </div>
                   </button>
                 ))}
+              </div>
+
+              {/* Install PWA Section */}
+              <div className="mt-8 border-t pt-6">
+                <h3 className="text-base font-medium mb-1">Install Application</h3>
+                <p className="text-sm text-muted-foreground mb-4">Install LearnAI to your device for better experience and fullscreen view.</p>
+                {isInstalled ? (
+                   <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
+                     <CheckCircle2 className="h-5 w-5 text-green-500" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium text-foreground">App Installed</span>
+                        <span className="text-xs font-normal">You are using the app version</span>
+                     </div>
+                   </Button>
+                ) : deferredPrompt ? (
+                   <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3">
+                     <Download className="h-5 w-5" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium">Install App</span>
+                        <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
+                     </div>
+                   </Button>
+                ) : (
+                   <div className="bg-muted/50 rounded-lg p-4 border border-dashed">
+                     <p className="text-sm text-muted-foreground text-center">
+                       To install, use your browser's <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong> feature in the menu.
+                     </p>
+                   </div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -161,10 +161,12 @@ export function useCreateRequest() {
         description: "Permintaan Anda telah berhasil dikirim",
       });
     },
-    onError: (error) => {
+    onError: (error, variables) => {
+      const typeLabel = variables.type === 'bug' ? 'laporan bug' :
+                       variables.type === 'feature' ? 'request fitur' : 'request materi';
       toast({
         title: "Error",
-        description: "Gagal mengirim request materi",
+        description: `Gagal mengirim ${typeLabel}`,
         variant: "destructive",
       });
       logger.error('Error creating request:', error);

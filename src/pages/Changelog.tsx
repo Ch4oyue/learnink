@@ -317,7 +317,7 @@ export default function Changelog() {
                 >
                     <p className="text-sm text-muted-foreground">
                         Want to request a feature?{" "}
-                        <Link to="/dashboard/material-requests" className="text-primary hover:underline font-medium">
+                        <Link to="/dashboard/requests?tab=feature" className="text-primary hover:underline font-medium">
                             Let us know
                         </Link>
                     </p>

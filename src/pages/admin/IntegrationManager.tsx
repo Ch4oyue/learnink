@@ -41,6 +41,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { useToast } from "@/hooks/use-toast";
 import {
     Plug,
@@ -665,13 +666,32 @@ export default function IntegrationManager() {
 
                             <div className="space-y-2">
                                 <Label htmlFor="description">Deskripsi (opsional)</Label>
-                                <Textarea
-                                    id="description"
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Jelaskan kegunaan integrasi ini..."
-                                    rows={2}
-                                />
+                                <Tabs defaultValue="write" className="w-full">
+                                    <TabsList className="grid w-full grid-cols-2 mb-2">
+                                        <TabsTrigger value="write">Write</TabsTrigger>
+                                        <TabsTrigger value="preview">Preview</TabsTrigger>
+                                    </TabsList>
+                                    <TabsContent value="write" className="mt-0">
+                                        <Textarea
+                                            id="description"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder="Jelaskan kegunaan integrasi ini (mendukung Markdown)..."
+                                            rows={4}
+                                        />
+                                    </TabsContent>
+                                    <TabsContent value="preview" className="mt-0">
+                                        <div className="min-h-[114px] max-h-[200px] p-3 rounded-md border bg-muted/50 overflow-y-auto">
+                                            {formData.description ? (
+                                                <MarkdownRenderer content={formData.description} variant="compact" />
+                                            ) : (
+                                                <span className="text-muted-foreground text-sm italic">
+                                                    Tidak ada konten untuk dipreview
+                                                </span>
+                                            )}
+                                        </div>
+                                    </TabsContent>
+                                </Tabs>
                             </div>
 
                             <DialogFooter>
@@ -700,14 +720,14 @@ export default function IntegrationManager() {
                             {templateModal.source && SOURCE_INFO[templateModal.source].label} Setup Guide
                         </DialogTitle>
                     </DialogHeader>
-                    <div className="prose prose-sm dark:prose-invert max-w-none">
+                    <div className="max-w-none">
                         {templateModal.source && (
-                            <div
-                                dangerouslySetInnerHTML={{
-                                    __html: getTemplatesBySource(templateModal.source)
+                            <MarkdownRenderer
+                                content={
+                                    getTemplatesBySource(templateModal.source)
                                         .find((t) => t.type === "setup_guide")
-                                        ?.content.replace(/\n/g, "<br>") || "No guide available.",
-                                }}
+                                        ?.content || "No guide available."
+                                }
                             />
                         )}
                     </div>

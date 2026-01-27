@@ -286,10 +286,19 @@ export default function DashboardModules() {
               <Card>
                 <CardContent className="py-12 text-center">
                   <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                  <h3 className="font-medium mb-2">Belum ada modul tersedia</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Modul akan muncul di sini ketika sudah dipublikasikan
+                  <h3 className="font-medium mb-2">
+                    {searchQuery ? `Tidak ditemukan modul "${searchQuery}"` : "Belum ada modul tersedia"}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {searchQuery
+                      ? "Mungkin belum ada yang membuatnya. Jadilah yang pertama merequest!"
+                      : "Modul akan muncul di sini ketika sudah dipublikasikan"}
                   </p>
+                  <Button asChild variant="outline">
+                    <Link to={`/dashboard/requests?tab=module&topic=${encodeURIComponent(searchQuery)}`}>
+                      Request Modul Ini
+                    </Link>
+                  </Button>
                 </CardContent>
               </Card>
             ) : (

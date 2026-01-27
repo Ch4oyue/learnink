@@ -27,6 +27,7 @@ const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
 const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
 const DashboardCourses = lazy(() => import("./pages/DashboardCourses"));
 const DashboardModules = lazy(() => import("./pages/DashboardModules"));
+const DashboardRequests = lazy(() => import("./pages/DashboardRequests"));
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon"));
 const SecondBrain = lazy(() => import("./pages/SecondBrain"));
@@ -205,9 +206,14 @@ const App = () => (
                     path="/dashboard/requests"
                     element={
                       <ProtectedRoute>
-                        <ComingSoon title="Request Materi" description="Fitur untuk melihat dan mengelola permintaan materi dari pengguna sedang dalam pengembangan." />
+                        <DashboardRequests />
                       </ProtectedRoute>
                     }
+                  />
+                  {/* Alias for singular path requested by user */}
+                  <Route
+                    path="/dashboard/request"
+                    element={<Navigate to="/dashboard/requests" replace />}
                   />
 
                   {/* ============================

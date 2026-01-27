@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModule } from "@/hooks/useModules";
-import { useUserProgress, useUpdateProgress } from "@/hooks/useUserProgress";
+import { useModuleProgress, useUpdateProgress } from "@/hooks/useUserProgress";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -44,9 +44,8 @@ export default function ModuleDetail() {
   const { user } = useAuth();
 
   const { data: module, isLoading } = useModule(id ?? "");
-  const { data: userProgress } = useUserProgress(user?.id);
+  const { data: progress } = useModuleProgress(user?.id, id);
   const updateProgress = useUpdateProgress();
-  const progress = userProgress?.find(p => p.module_id === id);
   const currentProgress = progress?.progress_percent || 0;
   const isCompleted = progress?.is_completed || false;
   const hasStartedLearning = currentProgress > 0 || isCompleted;

@@ -196,7 +196,7 @@ function AppSidebar() {
   const { user, role, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  const { state } = useSidebar();
+  const { state, isMobile } = useSidebar();
 
   const currentRole: AppRole = role ?? "user";
   const displayName =
@@ -273,18 +273,23 @@ function AppSidebar() {
                 {group.items.map((item) => {
                   const isActive = location.pathname === item.href || location.pathname + location.search === item.href;
                   return (
-                    <SidebarMenuItem key={item.href}>
+                    <SidebarMenuItem key={item.href} className="relative">
                       <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
                         <Link to={item.href}>
                           <item.icon />
                           <span>{item.label}</span>
-                          {item.badge && (
+                          {(state !== 'collapsed' || isMobile) && item.badge && (
                             <Badge className="ml-auto h-5 px-1.5 min-w-[20px] justify-center bg-destructive text-destructive-foreground hover:bg-destructive">
                                {formatBadgeCount(item.badge)}
                             </Badge>
                           )}
                         </Link>
                       </SidebarMenuButton>
+                      {state === 'collapsed' && !isMobile && item.badge && (
+                        <div className="absolute -top-1 right-0 z-50 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#f03e3e] px-1 text-[10px] font-bold text-white shadow-sm ring-1 ring-background pointer-events-none">
+                            {formatBadgeCount(item.badge)}
+                        </div>
+                      )}
                     </SidebarMenuItem>
                   );
                 })}

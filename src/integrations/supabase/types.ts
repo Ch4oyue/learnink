@@ -200,6 +200,8 @@ export type Database = {
           topic: string
           updated_at: string | null
           user_id: string | null
+          type: Database["public"]["Enums"]["request_type"] | null
+          image_url: string | null
         }
         Insert: {
           admin_notes?: string | null
@@ -214,6 +216,8 @@ export type Database = {
           topic: string
           updated_at?: string | null
           user_id?: string | null
+          type?: Database["public"]["Enums"]["request_type"] | null
+          image_url?: string | null
         }
         Update: {
           admin_notes?: string | null
@@ -228,6 +232,8 @@ export type Database = {
           topic?: string
           updated_at?: string | null
           user_id?: string | null
+          type?: Database["public"]["Enums"]["request_type"] | null
+          image_url?: string | null
         }
         Relationships: []
       }
@@ -800,6 +806,7 @@ export type Database = {
       content_status: "pending" | "approved" | "rejected"
       integration_source: "n8n" | "notion" | "chatgpt" | "zapier" | "custom"
       request_status: "pending" | "reviewing" | "completed" | "rejected"
+      request_type: "module" | "feature" | "bug"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -931,6 +938,7 @@ export const Constants = {
       content_status: ["pending", "approved", "rejected"],
       integration_source: ["n8n", "notion", "chatgpt", "zapier", "custom"],
       request_status: ["pending", "reviewing", "completed", "rejected"],
+      request_type: ["module", "feature", "bug"],
     },
   },
 } as const

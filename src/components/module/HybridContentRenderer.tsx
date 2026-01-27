@@ -85,7 +85,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
 
         if (isLoading) {
             return (
-                <main className="flex-1 overflow-y-auto bg-background relative" aria-busy="true">
+                <main className="md:flex-1 md:overflow-y-auto overflow-visible bg-background relative" aria-busy="true">
                     <div className="max-w-[800px] mx-auto py-16 px-10 flex flex-col gap-10">
                         <div className="animate-pulse space-y-4">
                             <div className="h-6 w-32 bg-muted rounded" />
@@ -101,7 +101,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
         return (
             <main
                 ref={ref}
-                className="flex-1 overflow-y-auto bg-background relative scroll-smooth"
+                className="md:flex-1 md:overflow-y-auto overflow-visible bg-background relative scroll-smooth"
                 style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted)) transparent" }}
             >
                 {/* Text Selection Floating Button */}

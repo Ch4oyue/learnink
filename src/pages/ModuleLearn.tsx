@@ -176,6 +176,7 @@ export default function ModuleLearn() {
 
   // Scroll to top when section changes
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
     if (contentRef.current) {
       contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -302,7 +303,7 @@ export default function ModuleLearn() {
   // ============================================
 
   return (
-    <div className="h-screen overflow-hidden flex bg-background">
+    <div className="flex bg-background min-h-screen md:h-screen md:overflow-hidden">
       {/* ============================================
           PANEL 1: Icon Rail (72px) - Desktop Only
       ============================================ */}
@@ -386,9 +387,9 @@ export default function ModuleLearn() {
       {/* ============================================
           PANEL 3: Main Content (Flex 1)
       ============================================ */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="w-full md:flex-1 flex flex-col md:overflow-hidden">
         {/* Mobile Header */}
-        <header className="md:hidden h-14 flex items-center justify-between px-4 border-b border-border bg-card shrink-0">
+        <header className="md:hidden sticky top-0 z-50 h-14 flex items-center justify-between px-4 border-b border-border bg-card shrink-0">
           {/* Progress Bar */}
           <div className="absolute top-0 left-0 w-full h-1 bg-muted">
             <div
@@ -480,7 +481,7 @@ export default function ModuleLearn() {
         />
 
         {/* Navigation Buttons (Bottom Bar) */}
-        <div className="h-16 border-t border-border bg-card flex items-center justify-between px-6 shrink-0">
+        <div className="h-16 border-t border-border bg-card flex items-center justify-between px-6 shrink-0 sticky bottom-0 z-50 md:static">
           <Button
             variant="outline"
             onClick={handlePrevious}
@@ -501,7 +502,7 @@ export default function ModuleLearn() {
             </Button>
           ) : (
             <Button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
               className="bg-green-600 hover:bg-green-500 text-white"
             >
               <Check className="h-4 w-4 mr-2" />

@@ -2,8 +2,26 @@
 import { describe, test, expect } from "bun:test";
 import { performance } from "perf_hooks";
 
+// Define type for mock request to avoid any
+interface MockRequest {
+  id: string;
+  user_id: string;
+  topic: string;
+  description: string;
+  status: string;
+  assigned_to: null;
+  admin_notes: null;
+  created_at: string;
+  updated_at: string;
+  category: string;
+  priority: string;
+  ai_summary: null;
+  type: string;
+  image_url: null;
+}
+
 // Mock data generator
-const createMockRequest = (id: string) => ({
+const createMockRequest = (id: string): MockRequest => ({
   id,
   user_id: `user-${id}`,
   topic: `Topic ${id}`,
@@ -39,7 +57,7 @@ describe("Material Request Fetch Strategy Benchmark", () => {
 
     // 2. Simulate Client-side Processing (Parsing + Find)
     const parsedAll = JSON.parse(baselinePayload);
-    const foundItem = parsedAll.find((r: any) => r.id === TARGET_ID);
+    const foundItem = parsedAll.find((r: MockRequest) => r.id === TARGET_ID);
 
     const endBaseline = performance.now();
     const baselineTime = endBaseline - startBaseline;

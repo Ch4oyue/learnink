@@ -1,92 +1,159 @@
-import { appendFile } from "node:fs/promises";
+// ==========================================
+// CONFIGURATION
+// ==========================================
+const SIMULATION_USERS = 10000; // As requested by user
+const DB_MAX_CONNECTIONS = 500; // Realistic PgBouncer/Postgres pool size for a decent server
+const BASE_DB_QUERY_TIME = 5;   // ms (fast query)
+const NETWORK_LATENCY = 50;     // ms (one way)
 
-// Configuration
-const ITERATIONS = 1000;
-const NETWORK_LATENCY_MEAN = 100; // ms
-const NETWORK_LATENCY_JITTER = 40; // +/- ms
-const DB_QUERY_TIME = 2; // ms per query - Postgres is fast!
+// ==========================================
+// SIMULATION ENGINE
+// ==========================================
 
-// Helper to simulate network request
-// Returns a promise that resolves after (Latency + Processing) ms
-const simulateRequest = async (queryCost = 1) => {
-  // Random latency between MEAN - JITTER and MEAN + JITTER
-  const latency = NETWORK_LATENCY_MEAN + (Math.random() * 2 - 1) * NETWORK_LATENCY_JITTER;
-  const processing = DB_QUERY_TIME * queryCost;
-  const totalDuration = Math.max(5, latency + processing);
+class DatabaseSimulator {
+  private activeConnections = 0;
+  private queueLength = 0;
+  private maxConnections: number;
 
-  await new Promise(resolve => setTimeout(resolve, totalDuration));
-  return { data: "simulated_data" };
-};
+  constructor(maxConnections: number) {
+    this.maxConnections = maxConnections;
+  }
 
-async function benchmarkOld() {
-    const start = performance.now();
-    // The old method used Promise.all for 4 parallel requests
-    // user_progress, user_quiz_attempts, learning_notes (count), learning_notes (week)
-    await Promise.all([
-        simulateRequest(1),
-        simulateRequest(1),
-        simulateRequest(1),
-        simulateRequest(1)
-    ]);
-    return performance.now() - start;
-}
-
-async function benchmarkNew() {
-    const start = performance.now();
-    // The new method uses 1 RPC call
-    // The query is slightly more complex (CTEs), so we estimate 2x DB processing time of a simple select,
-    // but only 1 network round trip.
-    await simulateRequest(2.0);
-    return performance.now() - start;
-}
-
-async function run() {
-    console.log(`Running benchmark with ${ITERATIONS} iterations...`);
-    console.log(`Simulating Network: ${NETWORK_LATENCY_MEAN}ms ±${NETWORK_LATENCY_JITTER}ms`);
-
-    const oldTimes: number[] = [];
-    const newTimes: number[] = [];
-
-    // Warmup
-    await benchmarkOld();
-    await benchmarkNew();
-
-    for (let i = 0; i < ITERATIONS; i++) {
-        oldTimes.push(await benchmarkOld());
-        newTimes.push(await benchmarkNew());
+  // Simulates executing a query
+  // Returns: processing time in ms
+  async executeQuery(complexityWeight: number): Promise<number> {
+    // 1. Connection Pool Queueing
+    // If pool is full, wait.
+    const startWait = performance.now();
+    while (this.activeConnections >= this.maxConnections) {
+      this.queueLength++;
+      await new Promise(resolve => setTimeout(resolve, 10)); // Check every 10ms
+      this.queueLength--;
     }
+    const waitTime = performance.now() - startWait;
 
-    const avg = (arr: number[]) => arr.reduce((a, b) => a + b, 0) / arr.length;
-    const p95 = (arr: number[]) => {
-        const sorted = [...arr].sort((a, b) => a - b);
-        return sorted[Math.floor(sorted.length * 0.95)];
+    // 2. Execution
+    this.activeConnections++;
+
+    // Simulate DB degradation under load (CPU/IO contention)
+    // When pool is 100% full, queries are 5x slower due to context switching/locks
+    const loadRatio = this.activeConnections / this.maxConnections;
+    const performanceDegradation = 1 + (loadRatio * 4);
+
+    const processingTime = (BASE_DB_QUERY_TIME * complexityWeight) * performanceDegradation;
+
+    await new Promise(resolve => setTimeout(resolve, processingTime));
+
+    this.activeConnections--;
+
+    return waitTime + processingTime;
+  }
+
+  getStats() {
+    return {
+      active: this.activeConnections,
+      queued: this.queueLength
     };
-    const min = (arr: number[]) => Math.min(...arr);
-    const max = (arr: number[]) => Math.max(...arr);
-
-    const oldAvg = avg(oldTimes);
-    const newAvg = avg(newTimes);
-
-    const results = `
-Benchmark Results (Simulated):
-==================================================
-Old Method (Client-Side Aggregation - 4 reqs):
-  Average: ${oldAvg.toFixed(2)}ms
-  p95:     ${p95(oldTimes).toFixed(2)}ms
-  Range:   ${min(oldTimes).toFixed(0)} - ${max(oldTimes).toFixed(0)}ms
-
-New Method (Server-Side RPC - 1 req):
-  Average: ${newAvg.toFixed(2)}ms
-  p95:     ${p95(newTimes).toFixed(2)}ms
-  Range:   ${min(newTimes).toFixed(0)} - ${max(newTimes).toFixed(0)}ms
-
---------------------------------------------------
-IMPROVEMENT:
-  Speedup: ${(oldAvg / newAvg).toFixed(2)}x faster
-  Latency Reduction: -${(oldAvg - newAvg).toFixed(2)}ms (-${(100 * (1 - newAvg/oldAvg)).toFixed(1)}%)
-==================================================
-`;
-    console.log(results);
+  }
 }
 
-run().catch(console.error);
+// Global DB Instance
+const db = new DatabaseSimulator(DB_MAX_CONNECTIONS);
+
+// Helper: Simulate Network Round Trip
+async function networkRoundTrip() {
+  await new Promise(r => setTimeout(r, NETWORK_LATENCY));
+}
+
+// ==========================================
+// USER BEHAVIORS
+// ==========================================
+
+// Scenario A: Client-Side Aggregation (Old Way)
+// Fetches 4 different resources in parallel
+async function fetchUserData_OldWay() {
+  await networkRoundTrip(); // Request sent
+
+  // 4 Parallel Queries hitting the DB
+  // Each query is simple (weight 1)
+  const results = await Promise.all([
+    db.executeQuery(1),
+    db.executeQuery(1),
+    db.executeQuery(1),
+    db.executeQuery(1)
+  ]);
+
+  await networkRoundTrip(); // Response received
+
+  const totalDbTime = results.reduce((a, b) => a + b, 0);
+  return Math.max(...results) + (NETWORK_LATENCY * 2); // User perceived latency
+}
+
+// Scenario B: RPC / Backend Aggregation (New Way)
+// Fetches 1 aggregated resource
+async function fetchUserData_RPC() {
+  await networkRoundTrip();
+
+  // 1 Complex Query (weight 1.5 - joins are slightly heavier than simple select)
+  const dbTime = await db.executeQuery(1.5);
+
+  await networkRoundTrip();
+  return dbTime + (NETWORK_LATENCY * 2);
+}
+
+// ==========================================
+// RUNNER
+// ==========================================
+
+async function runStressTest(scenarioName: string, userFn: () => Promise<number>) {
+  console.log(`\nStarting Stress Test: ${scenarioName}`);
+  console.log(`Simulating ${SIMULATION_USERS} concurrent users...`);
+
+  const start = performance.now();
+
+  // Launch all users "at once" (staggered slightly to be realistic JS event loop)
+  const promises = Array.from({ length: SIMULATION_USERS }, () => userFn());
+
+  const latencies = await Promise.all(promises);
+
+  const duration = performance.now() - start;
+
+  // Stats
+  const avg = latencies.reduce((a,b) => a+b, 0) / latencies.length;
+  const max = Math.max(...latencies);
+  const p95 = latencies.sort((a,b) => a-b)[Math.floor(latencies.length * 0.95)];
+
+  console.log(`Results for ${scenarioName}:`);
+  console.log(`- Total Wall Time: ${(duration/1000).toFixed(2)}s`);
+  console.log(`- Avg User Latency: ${avg.toFixed(0)}ms`);
+  console.log(`- p95 User Latency: ${p95.toFixed(0)}ms`);
+  console.log(`- Max User Latency: ${max.toFixed(0)}ms`);
+
+  return { avg, p95, max, duration };
+}
+
+async function main() {
+  console.log("=== DB STRESS SIMULATION ===");
+  console.log(`Config: ${SIMULATION_USERS} Users, ${DB_MAX_CONNECTIONS} DB Connections`);
+
+  // Run Old Way
+  const statsOld = await runStressTest("Client-Side Aggregation (4 reqs/user)", fetchUserData_OldWay);
+
+  // Cool down
+  await new Promise(r => setTimeout(r, 2000));
+
+  // Run New Way
+  const statsNew = await runStressTest("RPC Aggregation (1 req/user)", fetchUserData_RPC);
+
+  console.log("\n=== FINAL VERDICT ===");
+  console.log(`Throughput Improvement: ${(statsOld.duration / statsNew.duration).toFixed(1)}x faster total completion`);
+  console.log(`Latency Improvement:    RPC is ${(statsOld.avg / statsNew.avg).toFixed(1)}x faster per user`);
+
+  if (statsOld.p95 > 2000) {
+    console.log(`\nCRITICAL WARNING: Client-Side Aggregation caused massive bottlenecks (p95 > 2s).`);
+    console.log(`Reason: ${SIMULATION_USERS} users generated ${SIMULATION_USERS * 4} simultaneous DB queries,`);
+    console.log(`overwhelming the connection pool (${DB_MAX_CONNECTIONS} slots).`);
+  }
+}
+
+main().catch(console.error);

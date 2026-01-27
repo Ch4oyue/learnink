@@ -7,6 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress } from "@/hooks/useUserProgress";
+import { useMemo } from "react";
 import {
   Bot,
   Cpu,
@@ -89,6 +90,10 @@ export default function Syllabus() {
   const { data: modules, isLoading } = useModules(true);
   const { data: progress } = useUserProgress(user?.id);
 
+  const progressMap = useMemo(() => {
+    return new Map(progress?.map((p) => [p.module_id, p]));
+  }, [progress]);
+
   const getModulesForPath = (path: (typeof learningPaths)[0]) => {
     if (!modules) return [];
     return modules.filter((m) => {
@@ -105,7 +110,7 @@ export default function Syllabus() {
   };
 
   const getProgressForModule = (moduleId: string) => {
-    return progress?.find((p) => p.module_id === moduleId);
+    return progressMap.get(moduleId);
   };
 
   const calculatePathProgress = (path: (typeof learningPaths)[0]) => {

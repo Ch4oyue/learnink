@@ -9,6 +9,8 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
+import { PWAProvider } from "@/contexts/PWAContext";
 
 // ============================================
 // LAZY LOADED PAGES
@@ -93,9 +95,11 @@ const ModuleRedirect = () => {
 const App = () => (
   <ErrorBoundary>
     <ThemeProvider>
-      <CustomCursor />
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
+      <PWAProvider>
+        <CustomCursor />
+        <PWAInstallPrompt />
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
           <AuthProvider>
             <Toaster />
             <Sonner />
@@ -267,8 +271,9 @@ const App = () => (
               </Suspense>
             </BrowserRouter>
           </AuthProvider>
-        </TooltipProvider>
-      </QueryClientProvider>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </PWAProvider>
     </ThemeProvider>
   </ErrorBoundary>
 );

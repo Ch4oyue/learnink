@@ -97,7 +97,7 @@ export default function DashboardUsers() {
 
   const stats = {
     total: users?.length || 0,
-    admin: users?.filter(u => u.role === "admin").length || 0,
+    admin: users?.filter(u => u.role === "admin" || u.role === "superadmin").length || 0,
     tutor: users?.filter(u => u.role === "tutor").length || 0,
     user: users?.filter(u => u.role === "user").length || 0,
   };

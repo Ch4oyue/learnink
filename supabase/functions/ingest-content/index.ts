@@ -2,6 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
+import { validatePayload, ValidationError } from "./validation.ts";
 
 // =============================================
 // ENVIRONMENT & CONFIG
@@ -25,12 +26,6 @@ const corsHeaders = {
 // =============================================
 // TYPES
 // =============================================
-
-interface IngestPayload {
-    title: string;
-    content: string;
-    tags?: string[];
-}
 
 interface ValidatedIntegration {
     id: string;
@@ -101,49 +96,6 @@ async function checkRateLimit(
         console.warn("Rate limit error:", e);
         return true; // Allow request if check fails
     }
-}
-
-// =============================================
-// INPUT VALIDATION
-// =============================================
-
-function validatePayload(body: unknown): IngestPayload {
-    if (!body || typeof body !== "object") {
-        throw new Error("Request body must be a JSON object");
-    }
-
-    const payload = body as Record<string, unknown>;
-
-    if (!payload.title || typeof payload.title !== "string") {
-        throw new Error("'title' is required and must be a string");
-    }
-
-    if (!payload.content || typeof payload.content !== "string") {
-        throw new Error("'content' is required and must be a string");
-    }
-
-    // Sanitize title (max 200 chars)
-    const title = payload.title.trim().substring(0, 200);
-    if (!title) {
-        throw new Error("'title' cannot be empty");
-    }
-
-    // Sanitize content (max 50KB)
-    const content = payload.content.trim().substring(0, 50000);
-
-    // Validate tags if provided
-    let tags: string[] = [];
-    if (payload.tags) {
-        if (!Array.isArray(payload.tags)) {
-            throw new Error("'tags' must be an array of strings");
-        }
-        tags = payload.tags
-            .filter((t): t is string => typeof t === "string")
-            .map((t) => t.trim().substring(0, 50))
-            .slice(0, 10); // Max 10 tags
-    }
-
-    return { title, content, tags };
 }
 
 // =============================================
@@ -394,6 +346,17 @@ serve(async (req) => {
     } catch (error: unknown) {
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
         console.error("Error in ingest-content function:", error);
+
+        // Check if it's a validation error
+        if (error instanceof ValidationError) {
+            return new Response(
+                JSON.stringify({ error: errorMessage, success: false }),
+                {
+                    status: 400,
+                    headers: { ...corsHeaders, "Content-Type": "application/json" },
+                }
+            );
+        }
 
         return new Response(
             JSON.stringify({ error: errorMessage, success: false }),

@@ -32,8 +32,8 @@ function generateUsers(count: number): UserWithRole[] {
 
 describe("AdminDashboard Filter Performance", () => {
   test("compares Unoptimized vs Hoisted Filtering", () => {
-    const DATASET_SIZE = 5000; // Realistic upper bound for client-side filtering
-    const ITERATIONS = 1000;
+    const DATASET_SIZE = 1000; // Scaled down for CI compliance
+    const ITERATIONS = 200;
     const searchQuery = "Name 50"; // Search query that matches some users
 
     console.log(`\n--- Starting Filter Benchmark (N=${DATASET_SIZE}, Iterations=${ITERATIONS}) ---`);

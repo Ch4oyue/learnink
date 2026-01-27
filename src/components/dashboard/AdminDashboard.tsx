@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -7,7 +7,6 @@ import { useModules, usePopularModules } from "@/hooks/useModules";
 import { useAllRequests, useUpdateRequest, RequestStatus } from "@/hooks/useMaterialRequests";
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useGenerateModule } from "@/hooks/useGenerateModule";
-import { filterUsers } from "@/lib/userUtils";
 import { AppRole } from "@/contexts/AuthContext";
 import {
   Users,
@@ -124,9 +123,9 @@ export function AdminDashboardContent() {
   const updateRequest = useUpdateRequest();
   const generateModule = useGenerateModule();
 
-  const filteredUsers = useMemo(
-    () => filterUsers(users, searchQuery),
-    [users, searchQuery]
+  const filteredUsers = users?.filter(u =>
+    u.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.id.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleRoleChange = (userId: string, newRole: AppRole, userName: string) => {

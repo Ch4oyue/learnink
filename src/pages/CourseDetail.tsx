@@ -26,20 +26,21 @@ export default function CourseDetail() {
   const { data: modules, isLoading: modulesLoading } = useModules({ trackId, publishedOnly: true });
   const { data: userProgress } = useUserProgress(user?.id);
 
+  // Optimization: Create a Map for O(1) lookup
+  const userProgressMap = useMemo(() => {
+    if (!userProgress) return new Map();
+    return new Map(userProgress.map(p => [p.module_id, p]));
+  }, [userProgress]);
+
   const isEnrolled = trackId && enrolledTrackIds.includes(trackId);
   const canAccess = isEnrolled || isAdmin || isTutor;
 
-  // Optimize progress lookup from O(N^2) to O(N) using a Map
-  const progressMap = useMemo(() => {
-    if (!userProgress) return new Map();
-    return new Map(userProgress.map((p) => [p.module_id, p]));
-  }, [userProgress]);
-
   // Calculate course progress
   const totalModules = modules?.length || 0;
-  const completedModules = modules?.filter(m =>
-    progressMap.get(m.id)?.is_completed
-  ).length || 0;
+  const completedModules = modules?.filter(m => {
+    const p = userProgressMap.get(m.id);
+    return p?.is_completed;
+  }).length || 0;
 
   const courseProgress = totalModules > 0
     ? Math.round((completedModules / totalModules) * 100)
@@ -127,7 +128,7 @@ export default function CourseDetail() {
 
            <div className="grid gap-4">
               {modules?.map((module, index) => {
-                 const progress = progressMap.get(module.id);
+                 const progress = userProgressMap.get(module.id);
                  const isCompleted = progress?.is_completed;
                  const isLocked = !canAccess;
 

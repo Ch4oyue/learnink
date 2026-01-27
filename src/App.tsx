@@ -19,6 +19,7 @@ const LandingPage = lazy(() => import("./pages/LandingPage"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const Changelog = lazy(() => import("./pages/Changelog"));
+const Syllabus = lazy(() => import("./pages/Syllabus"));
 
 // Dashboard Pages
 const DashboardHome = lazy(() => import("./pages/DashboardHome"));
@@ -108,6 +109,7 @@ const App = () => (
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/login" element={<Navigate to="/auth" replace />} />
                   <Route path="/changelog" element={<Changelog />} />
+                  <Route path="/syllabus" element={<Syllabus />} />
 
                   {/* ============================
                     DASHBOARD ROUTES

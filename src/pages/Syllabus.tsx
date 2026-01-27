@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -91,7 +92,8 @@ export default function Syllabus() {
   const { data: progress } = useUserProgress(user?.id);
 
   const progressMap = useMemo(() => {
-    return new Map(progress?.map((p) => [p.module_id, p]));
+    if (!progress) return new Map();
+    return new Map(progress.map((p) => [p.module_id, p]));
   }, [progress]);
 
   const getModulesForPath = (path: (typeof learningPaths)[0]) => {

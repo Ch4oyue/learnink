@@ -7,7 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useModuleCategories, useModuleLevels, useCreateCategory, useCreateLevel, useDeleteCategory, useDeleteLevel } from "@/hooks/useModuleSettings";
+import {
+  useModuleCategories,
+  useModuleLevels,
+  useCreateCategory,
+  useCreateLevel,
+  useDeleteCategory,
+  useDeleteLevel,
+  useUpdateCategory,
+  useUpdateLevel
+} from "@/hooks/useModuleSettings";
 import {
   Folder,
   Layers,
@@ -18,8 +27,17 @@ import {
   Sun,
   Moon,
   Monitor,
+  Edit
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function DashboardSettings() {
   const { isAdmin } = useAuth();
@@ -30,15 +48,30 @@ export default function DashboardSettings() {
   const { data: categories, isLoading: categoriesLoading } = useModuleCategories();
   const createCategory = useCreateCategory();
   const deleteCategory = useDeleteCategory();
+  const updateCategory = useUpdateCategory();
+
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryDesc, setNewCategoryDesc] = useState("");
   const [newCategoryColor, setNewCategoryColor] = useState("#3B82F6");
 
   // Levels
   const { data: levels, isLoading: levelsLoading } = useModuleLevels();
   const createLevel = useCreateLevel();
   const deleteLevel = useDeleteLevel();
+  const updateLevel = useUpdateLevel();
+
   const [newLevelName, setNewLevelName] = useState("");
+  const [newLevelDesc, setNewLevelDesc] = useState("");
   const [newLevelColor, setNewLevelColor] = useState("#10B981");
+
+  // Edit State
+  const [editingItem, setEditingItem] = useState<{
+    type: 'category' | 'level';
+    id: string;
+    name: string;
+    description: string;
+    color: string;
+  } | null>(null);
 
   // Theme options
   const themeOptions = [
@@ -47,24 +80,18 @@ export default function DashboardSettings() {
     { value: "system" as const, label: "System", icon: Monitor, description: "Follows your device settings" },
   ];
 
-  // Non-admin users only see appearance settings
   if (!isAdmin) {
     return (
       <DashboardLayout>
         <div className="space-y-6 max-w-3xl mx-auto">
           <div>
             <h1 className="text-2xl font-semibold">Settings</h1>
-            <p className="text-muted-foreground">
-              Manage your preferences
-            </p>
+            <p className="text-muted-foreground">Manage your preferences</p>
           </div>
-
           <Card>
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
-              <CardDescription>
-                Customize how LearnAI looks on your device
-              </CardDescription>
+              <CardDescription>Customize how LearnAI looks on your device</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -72,39 +99,21 @@ export default function DashboardSettings() {
                   <button
                     key={option.value}
                     onClick={() => setTheme(option.value)}
-                    className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
-                      }`}
+                    className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-muted/50"}`}
                   >
-                    <option.icon
-                      className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
-                        }`}
-                    />
+                    <option.icon className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"}`} />
                     <div className="text-center">
-                      <span
-                        className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
-                          }`}
-                      >
-                        {option.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground mt-1 block">
-                        {option.description}
-                      </span>
+                      <span className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"}`}>{option.label}</span>
+                      <span className="text-xs text-muted-foreground mt-1 block">{option.description}</span>
                     </div>
                   </button>
                 ))}
               </div>
             </CardContent>
           </Card>
-
-          {/* Changelog Link */}
           <Card>
             <CardContent className="py-4">
-              <a
-                href="/changelog"
-                className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <a href="/changelog" className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors">
                 <span>View Changelog & Version History</span>
                 <span className="text-xs">v1.4.0</span>
               </a>
@@ -117,266 +126,243 @@ export default function DashboardSettings() {
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
-
     createCategory.mutate({
       name: newCategoryName.trim(),
       color: newCategoryColor,
+      description: newCategoryDesc.trim() || undefined
     }, {
       onSuccess: () => {
         setNewCategoryName("");
-        toast({
-          title: "Sukses",
-          description: "Kategori berhasil ditambahkan",
-        });
+        setNewCategoryDesc("");
+        toast({ title: "Sukses", description: "Kategori berhasil ditambahkan" });
       }
     });
-  };
-
-  const handleDeleteCategory = (id: string, name: string) => {
-    if (confirm(`Hapus kategori "${name}"?`)) {
-      deleteCategory.mutate(id);
-    }
   };
 
   const handleAddLevel = () => {
     if (!newLevelName.trim()) return;
-
     createLevel.mutate({
       name: newLevelName.trim(),
       color: newLevelColor,
+      description: newLevelDesc.trim() || undefined
     }, {
       onSuccess: () => {
         setNewLevelName("");
-        toast({
-          title: "Sukses",
-          description: "Level berhasil ditambahkan",
-        });
+        setNewLevelDesc("");
+        toast({ title: "Sukses", description: "Level berhasil ditambahkan" });
       }
     });
   };
 
-  const handleDeleteLevel = (id: string, name: string) => {
-    if (confirm(`Hapus level "${name}"?`)) {
-      deleteLevel.mutate(id);
+  const handleUpdate = () => {
+    if (!editingItem) return;
+    const { id, type, name, color, description } = editingItem;
+
+    if (type === 'category') {
+      updateCategory.mutate({ id, name, color, description }, {
+        onSuccess: () => setEditingItem(null)
+      });
+    } else {
+      updateLevel.mutate({ id, name, color, description }, {
+        onSuccess: () => setEditingItem(null)
+      });
+    }
+  };
+
+  const handleDelete = (id: string, name: string, type: 'category' | 'level') => {
+    if (confirm(`Hapus ${type === 'category' ? 'kategori' : 'level'} "${name}"?`)) {
+      if (type === 'category') {
+        deleteCategory.mutate(id);
+      } else {
+        deleteLevel.mutate(id);
+      }
     }
   };
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Header */}
         <div>
           <h1 className="text-2xl font-semibold">Pengaturan</h1>
-          <p className="text-muted-foreground">
-            Kelola kategori dan level modul pembelajaran
-          </p>
+          <p className="text-muted-foreground">Kelola kategori dan level modul pembelajaran</p>
         </div>
 
         <Tabs defaultValue="categories">
           <TabsList>
-            <TabsTrigger value="categories" className="gap-2">
-              <Folder className="h-4 w-4" />
-              Kategori
-            </TabsTrigger>
-            <TabsTrigger value="levels" className="gap-2">
-              <Layers className="h-4 w-4" />
-              Level
-            </TabsTrigger>
+            <TabsTrigger value="categories" className="gap-2"><Folder className="h-4 w-4" /> Kategori</TabsTrigger>
+            <TabsTrigger value="levels" className="gap-2"><Layers className="h-4 w-4" /> Level</TabsTrigger>
           </TabsList>
 
-
-          {/* Categories Tab */}
           <TabsContent value="categories" className="space-y-4 mt-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Tambah Kategori Baru</CardTitle>
-                <CardDescription>
-                  Kategori digunakan untuk mengelompokkan modul pembelajaran
-                </CardDescription>
+                <CardDescription>Kategori digunakan untuk mengelompokkan modul pembelajaran</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-4 items-end">
-                  <div className="flex-1 space-y-2">
-                    <Label htmlFor="categoryName">Nama Kategori</Label>
-                    <Input
-                      id="categoryName"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      placeholder="Contoh: Web Development"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="categoryColor">Warna</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        id="categoryColor"
-                        type="color"
-                        value={newCategoryColor}
-                        onChange={(e) => setNewCategoryColor(e.target.value)}
-                        className="w-12 h-10 p-1 cursor-pointer"
-                      />
-                      <Palette className="h-4 w-4 text-muted-foreground" />
+                <div className="flex flex-col gap-4">
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-1 space-y-2">
+                        <Label>Nama Kategori</Label>
+                        <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Contoh: Web Development" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Warna</Label>
+                        <div className="flex items-center gap-2">
+                            <Input type="color" value={newCategoryColor} onChange={(e) => setNewCategoryColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
+                            <Palette className="h-4 w-4 text-muted-foreground" />
+                        </div>
                     </div>
                   </div>
-                  <Button
-                    onClick={handleAddCategory}
-                    disabled={createCategory.isPending || !newCategoryName.trim()}
-                  >
-                    {createCategory.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Plus className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <div className="flex gap-4 items-end">
+                      <div className="flex-1 space-y-2">
+                        <Label>Deskripsi (Opsional)</Label>
+                        <Input value={newCategoryDesc} onChange={(e) => setNewCategoryDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      </div>
+                      <Button onClick={handleAddCategory} disabled={createCategory.isPending || !newCategoryName.trim()}>
+                        {createCategory.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                      </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Daftar Kategori</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle className="text-lg">Daftar Kategori</CardTitle></CardHeader>
               <CardContent>
                 {categoriesLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  </div>
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
                 ) : categories && categories.length > 0 ? (
                   <div className="space-y-2">
                     {categories.map((cat) => (
-                      <div
-                        key={cat.id}
-                        className="flex items-center justify-between p-3 rounded-lg border"
-                      >
+                      <div key={cat.id} className="flex items-center justify-between p-3 rounded-lg border group hover:border-primary/50 transition-colors">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: cat.color }}
-                          />
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color }} />
                           <span className="font-medium">{cat.name}</span>
-                          {cat.description && (
-                            <span className="text-sm text-muted-foreground">
-                              - {cat.description}
-                            </span>
-                          )}
+                          {cat.description && <span className="text-sm text-muted-foreground">- {cat.description}</span>}
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteCategory(cat.id, cat.name)}
-                          disabled={deleteCategory.isPending}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => setEditingItem({ type: 'category', id: cat.id, name: cat.name, description: cat.description || '', color: cat.color })}>
+                                <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(cat.id, cat.name, 'category')}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    Belum ada kategori
-                  </p>
-                )}
+                ) : <p className="text-center text-muted-foreground py-8">Belum ada kategori</p>}
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Levels Tab */}
           <TabsContent value="levels" className="space-y-4 mt-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-lg">Tambah Level Baru</CardTitle>
-                <CardDescription>
-                  Level menunjukkan tingkat kesulitan modul
-                </CardDescription>
+                <CardDescription>Level menunjukkan tingkat kesulitan modul</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex gap-4 items-end">
-                  <div className="flex-1 space-y-2">
-                    <Label htmlFor="levelName">Nama Level</Label>
-                    <Input
-                      id="levelName"
-                      value={newLevelName}
-                      onChange={(e) => setNewLevelName(e.target.value)}
-                      placeholder="Contoh: Expert"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="levelColor">Warna</Label>
-                    <div className="flex items-center gap-2">
-                      <Input
-                        id="levelColor"
-                        type="color"
-                        value={newLevelColor}
-                        onChange={(e) => setNewLevelColor(e.target.value)}
-                        className="w-12 h-10 p-1 cursor-pointer"
-                      />
-                      <Palette className="h-4 w-4 text-muted-foreground" />
+                <div className="flex flex-col gap-4">
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-1 space-y-2">
+                        <Label>Nama Level</Label>
+                        <Input value={newLevelName} onChange={(e) => setNewLevelName(e.target.value)} placeholder="Contoh: Expert" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Warna</Label>
+                        <div className="flex items-center gap-2">
+                            <Input type="color" value={newLevelColor} onChange={(e) => setNewLevelColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
+                            <Palette className="h-4 w-4 text-muted-foreground" />
+                        </div>
                     </div>
                   </div>
-                  <Button
-                    onClick={handleAddLevel}
-                    disabled={createLevel.isPending || !newLevelName.trim()}
-                  >
-                    {createLevel.isPending ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Plus className="h-4 w-4" />
-                    )}
-                  </Button>
+                  <div className="flex gap-4 items-end">
+                      <div className="flex-1 space-y-2">
+                        <Label>Deskripsi (Opsional)</Label>
+                        <Input value={newLevelDesc} onChange={(e) => setNewLevelDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      </div>
+                      <Button onClick={handleAddLevel} disabled={createLevel.isPending || !newLevelName.trim()}>
+                        {createLevel.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                      </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Daftar Level</CardTitle>
-              </CardHeader>
+              <CardHeader><CardTitle className="text-lg">Daftar Level</CardTitle></CardHeader>
               <CardContent>
                 {levelsLoading ? (
-                  <div className="flex justify-center py-8">
-                    <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                  </div>
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
                 ) : levels && levels.length > 0 ? (
                   <div className="space-y-2">
                     {levels.map((level) => (
-                      <div
-                        key={level.id}
-                        className="flex items-center justify-between p-3 rounded-lg border"
-                      >
+                      <div key={level.id} className="flex items-center justify-between p-3 rounded-lg border group hover:border-primary/50 transition-colors">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: level.color }}
-                          />
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: level.color }} />
                           <span className="font-medium">{level.name}</span>
-                          {level.description && (
-                            <span className="text-sm text-muted-foreground">
-                              - {level.description}
-                            </span>
-                          )}
+                          {level.description && <span className="text-sm text-muted-foreground">- {level.description}</span>}
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDeleteLevel(level.id, level.name)}
-                          disabled={deleteLevel.isPending}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => setEditingItem({ type: 'level', id: level.id, name: level.name, description: level.description || '', color: level.color })}>
+                                <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(level.id, level.name, 'level')}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
                       </div>
                     ))}
                   </div>
-                ) : (
-                  <p className="text-center text-muted-foreground py-8">
-                    Belum ada level
-                  </p>
-                )}
+                ) : <p className="text-center text-muted-foreground py-8">Belum ada level</p>}
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
+            <DialogContent className="glass-liquid rounded-[24px]">
+                <DialogHeader>
+                    <DialogTitle>Edit {editingItem?.type === 'category' ? 'Kategori' : 'Level'}</DialogTitle>
+                    <DialogDescription>Ubah detail item di bawah ini.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label>Nama</Label>
+                        <Input
+                            value={editingItem?.name || ''}
+                            onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, name: e.target.value }) : null)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Warna</Label>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                type="color"
+                                value={editingItem?.color || '#000000'}
+                                onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, color: e.target.value }) : null)}
+                                className="w-12 h-10 p-1 cursor-pointer"
+                            />
+                            <span className="text-sm text-muted-foreground">{editingItem?.color}</span>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Deskripsi</Label>
+                        <Input
+                            value={editingItem?.description || ''}
+                            onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, description: e.target.value }) : null)}
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setEditingItem(null)}>Batal</Button>
+                    <Button onClick={handleUpdate} disabled={updateCategory.isPending || updateLevel.isPending}>Simpan Perubahan</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
       </div>
     </DashboardLayout>
   );

@@ -37,6 +37,74 @@ export function useModuleCategories() {
   });
 }
 
+export function useUpdateCategory() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; color?: string; description?: string }) => {
+      const { data, error } = await supabase
+        .from("module_categories")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as ModuleCategory;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["module-categories"] });
+      toast({
+        title: "Sukses",
+        description: "Kategori berhasil diperbarui",
+      });
+    },
+    onError: (error) => {
+      logger.error("Error updating category:", error);
+      toast({
+        title: "Error",
+        description: "Gagal memperbarui kategori",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
+export function useUpdateLevel() {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: { id: string; name?: string; color?: string; description?: string }) => {
+      const { data, error } = await supabase
+        .from("module_levels")
+        .update(updates)
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data as ModuleLevel;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["module-levels"] });
+      toast({
+        title: "Sukses",
+        description: "Level berhasil diperbarui",
+      });
+    },
+    onError: (error) => {
+      logger.error("Error updating level:", error);
+      toast({
+        title: "Error",
+        description: "Gagal memperbarui level",
+        variant: "destructive",
+      });
+    },
+  });
+}
+
 export function useModuleLevels() {
   return useQuery({
     queryKey: ["module-levels"],

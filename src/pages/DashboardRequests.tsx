@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -47,6 +47,8 @@ import { useGenerateModule } from "@/hooks/useGenerateModule";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import {
   Search,
   Sparkles,
@@ -59,7 +61,10 @@ import {
   Plus,
   Bug,
   Lightbulb,
-  BookOpen
+  BookOpen,
+  ImagePlus,
+  Upload,
+  X
 } from "lucide-react";
 
 const statusColors: Record<string, string> = {
@@ -83,12 +88,6 @@ const statusIcons: Record<string, typeof Clock> = {
   rejected: XCircle,
 };
 
-const typeIcons: Record<RequestType, React.ElementType> = {
-  module: BookOpen,
-  feature: Lightbulb,
-  bug: Bug,
-};
-
 const typeLabels: Record<RequestType, string> = {
   module: "Materi",
   feature: "Fitur",
@@ -97,6 +96,7 @@ const typeLabels: Record<RequestType, string> = {
 
 export default function DashboardRequests() {
   const { user, role } = useAuth();
+  const { toast } = useToast();
   const [searchParams] = useSearchParams();
   const initialTab = (searchParams.get("tab") as RequestType) || "module";
   const initialTopic = searchParams.get("topic") || "";
@@ -106,6 +106,8 @@ export default function DashboardRequests() {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [generateId, setGenerateId] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -161,6 +163,47 @@ export default function DashboardRequests() {
 
     setIsCreateOpen(false);
     setFormData({ topic: "", description: "", category: "", priority: "medium", imageUrl: "" });
+  };
+
+  const handleFileUpload = async (file: File) => {
+    try {
+      setUploading(true);
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('request-attachments')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage
+        .from('request-attachments')
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, imageUrl: data.publicUrl }));
+      toast({ title: "Berhasil upload gambar" });
+    } catch (error) {
+      logger.error('Upload error:', error);
+      toast({
+        title: "Gagal upload",
+        description: (error as Error).message || "Pastikan bucket 'request-attachments' tersedia & public.",
+        variant: "destructive"
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf("image") !== -1) {
+        const blob = items[i].getAsFile();
+        if (blob) handleFileUpload(blob);
+      }
+    }
   };
 
   const canManage = role === "tutor" || role === "admin" || role === "superadmin";
@@ -344,7 +387,7 @@ export default function DashboardRequests() {
 
       {/* Create Request Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="max-w-lg">
+        <DialogContent className="max-w-lg glass-liquid rounded-[24px]">
           <DialogHeader>
             <DialogTitle>
               {activeTab === 'module' && "Request Materi Baru"}
@@ -352,9 +395,7 @@ export default function DashboardRequests() {
               {activeTab === 'bug' && "Lapor Bug"}
             </DialogTitle>
             <DialogDescription>
-              {activeTab === 'module' && "Ajukan topik materi yang ingin Anda pelajari."}
-              {activeTab === 'feature' && "Berikan ide fitur yang dapat meningkatkan pengalaman belajar."}
-              {activeTab === 'bug' && "Laporkan masalah teknis yang Anda temukan."}
+              Isi detail di bawah ini. Anda juga bisa menempelkan (paste) gambar screenshot di kolom deskripsi.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">
@@ -384,31 +425,66 @@ export default function DashboardRequests() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="description">Deskripsi</Label>
-              <Textarea
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder={
-                  activeTab === 'module' ? "Jelaskan detail materi yang diinginkan..." :
-                  activeTab === 'feature' ? "Jelaskan manfaat dan cara kerja fitur..." :
-                  "Jelaskan langkah-langkah untuk mereproduksi bug..."
-                }
-                rows={3}
-              />
+              <Label htmlFor="description">Deskripsi & Screenshot</Label>
+              <div className="relative">
+                 <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    onPaste={handlePaste}
+                    placeholder="Deskripsi detail... (Paste gambar di sini)"
+                    rows={4}
+                  />
+                  {uploading && (
+                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md backdrop-blur-sm">
+                        <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    </div>
+                  )}
+              </div>
             </div>
 
-            {activeTab === 'bug' && (
-              <div className="space-y-2">
-                <Label htmlFor="imageUrl">URL Screenshot (Opsional)</Label>
-                <Input
-                  id="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  placeholder="https://..."
-                />
-              </div>
-            )}
+            {/* Attachment Preview Area */}
+            <div className="space-y-2">
+                <Label>Lampiran</Label>
+                <div className="flex items-center gap-4">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                    >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Gambar
+                    </Button>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        className="hidden"
+                        accept="image/*"
+                        onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(file);
+                        }}
+                    />
+
+                    {formData.imageUrl && (
+                        <div className="relative group">
+                            <img src={formData.imageUrl} alt="Preview" className="h-16 w-16 object-cover rounded-lg border" />
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, imageUrl: "" }))}
+                                className="absolute -top-2 -right-2 bg-destructive text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                                <X className="h-3 w-3" />
+                            </button>
+                        </div>
+                    )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                    Copy-paste gambar langsung ke kolom deskripsi atau gunakan tombol upload.
+                </p>
+            </div>
 
             <div className="space-y-2">
               <Label htmlFor="priority">Prioritas</Label>
@@ -431,7 +507,7 @@ export default function DashboardRequests() {
               <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
                 Batal
               </Button>
-              <Button type="submit" disabled={createRequest.isPending}>
+              <Button type="submit" disabled={createRequest.isPending || uploading}>
                 {createRequest.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
                 Kirim Request
               </Button>

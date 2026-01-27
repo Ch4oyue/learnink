@@ -373,7 +373,7 @@ export default function ManageSources() {
 
             {/* Add/Edit Dialog */}
             <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-                <DialogContent className="max-w-md">
+                <DialogContent className="max-w-md glass-liquid rounded-[24px]">
                     <DialogHeader>
                         <DialogTitle>
                             {editingSource ? "Edit Learning Source" : "Add New Learning Source"}
@@ -506,7 +506,7 @@ export default function ManageSources() {
 
             {/* Delete Confirmation */}
             <AlertDialog open={!!deleteSource} onOpenChange={() => setDeleteSource(null)}>
-                <AlertDialogContent>
+                <AlertDialogContent className="glass-liquid rounded-[24px]">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Learning Source</AlertDialogTitle>
                         <AlertDialogDescription>

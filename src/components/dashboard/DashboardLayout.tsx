@@ -34,7 +34,8 @@ import {
   Plug,
   MoreHorizontal,
   Menu,
-  Crown
+  Crown,
+  Inbox
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -166,7 +167,7 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
       items: [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/users", label: "Users", icon: Users },
-        { href: "/dashboard/admin/approval", label: "Inbox Review", icon: CheckCircle },
+        { href: "/dashboard/admin/approval", label: "Inbox", icon: Inbox },
         { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
         { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
         { href: "/dashboard/settings", label: "System Settings", icon: Settings },
@@ -178,7 +179,7 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
       items: [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/users", label: "Users", icon: Users },
-        { href: "/dashboard/admin/approval", label: "Inbox Review", icon: CheckCircle },
+        { href: "/dashboard/admin/approval", label: "Inbox", icon: Inbox },
         { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
         { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
         { href: "/dashboard/settings", label: "System Settings", icon: Settings },

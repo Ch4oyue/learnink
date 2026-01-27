@@ -71,7 +71,7 @@ const STATUS_CONFIG = {
 
 
 export default function DashboardModules() {
-  const { user, role } = useAuth();
+  const { user, role, enrolledTrackIds } = useAuth();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -81,16 +81,7 @@ export default function DashboardModules() {
   const { data: progress } = useUserProgress(user?.id);
   const deleteModule = useDeleteModule();
 
-  const isTutorOrAdmin = role === "tutor" || role === "admin";
-
-  const filterModules = (modules: typeof allModules) => {
-    if (!modules) return [];
-    return modules.filter(
-      (m) =>
-        m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        m.category?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
+  const isTutorOrAdmin = role === "tutor" || role === "admin" || role === "superadmin";
 
   const handleDelete = async () => {
     if (deleteId) {
@@ -109,8 +100,36 @@ export default function DashboardModules() {
     return progressMap.get(moduleId);
   };
 
-  const publishedModules = filterModules(allModules?.filter((m) => m.is_published));
-  const myFilteredModules = filterModules(myModules);
+  // Filter published modules based on search AND track visibility
+  const publishedModules = useMemo(() => {
+    if (!allModules) return [];
+
+    const query = searchQuery.toLowerCase();
+    // 1. Filter by published status
+    let mods = allModules.filter(m => m.is_published);
+
+    // 2. Filter by Search
+    mods = mods.filter(m =>
+      m.title.toLowerCase().includes(query) ||
+      m.category?.toLowerCase().includes(query)
+    );
+
+    // 3. Filter by Track Visibility
+    if (!isTutorOrAdmin) {
+      mods = mods.filter(m => !m.track_id || enrolledTrackIds.includes(m.track_id));
+    }
+
+    return mods;
+  }, [allModules, searchQuery, isTutorOrAdmin, enrolledTrackIds]);
+
+  const myFilteredModules = useMemo(() => {
+    if (!myModules) return [];
+    const query = searchQuery.toLowerCase();
+    return myModules.filter(m =>
+      m.title.toLowerCase().includes(query) ||
+      m.category?.toLowerCase().includes(query)
+    );
+  }, [myModules, searchQuery]);
 
   return (
     <DashboardLayout>
@@ -293,6 +312,7 @@ export default function DashboardModules() {
                     {searchQuery
                       ? "Mungkin belum ada yang membuatnya. Jadilah yang pertama merequest!"
                       : "Modul akan muncul di sini ketika sudah dipublikasikan"}
+                    {!isTutorOrAdmin && " (Hanya menampilkan modul sesuai Track Anda)"}
                   </p>
                   <Button asChild variant="outline">
                     <Link to={`/dashboard/requests?tab=module&topic=${encodeURIComponent(searchQuery)}`}>
@@ -363,7 +383,7 @@ export default function DashboardModules() {
 
       {/* Delete Dialog */}
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent className="glass-liquid rounded-[24px]">
           <AlertDialogHeader>
             <AlertDialogTitle>Hapus Modul?</AlertDialogTitle>
             <AlertDialogDescription>

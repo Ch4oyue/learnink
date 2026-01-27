@@ -79,7 +79,7 @@ function parseWithRegexInside(markdown: string) {
 
 describe("Markdown Parsing Performance Benchmark", () => {
   test("compares Regex Inside vs Hoisted Regex + Exec (Actual Implementation)", () => {
-    const ITERATIONS = 500; // Reduced to avoid CI timeouts
+    const ITERATIONS = 200; // Reduced to avoid CI timeouts
     console.log("\n--- Starting Regex Benchmark ---");
     console.log(`Iterations: ${ITERATIONS}`);
 

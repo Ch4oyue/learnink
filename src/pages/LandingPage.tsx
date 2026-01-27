@@ -2,12 +2,15 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Terminal, Moon, Sun, Heart, Github, BookOpen, LayoutDashboard } from "lucide-react";
 import { Hero } from "@/components/landing/Hero";
-import { Features } from "@/components/landing/Features";
-import { Footer } from "@/components/landing/Footer";
-import { LearningSourcesMarquee } from "@/components/landing/LearningSourcesMarquee";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
+import { lazy, Suspense } from "react";
+
+// Lazy load heavy below-the-fold components
+const Features = lazy(() => import("@/components/landing/Features").then(module => ({ default: module.Features })));
+const LearningSourcesMarquee = lazy(() => import("@/components/landing/LearningSourcesMarquee"));
+const Footer = lazy(() => import("@/components/landing/Footer").then(module => ({ default: module.Footer })));
 
 export default function LandingPage() {
     const { resolvedTheme, setTheme } = useTheme();
@@ -79,7 +82,10 @@ export default function LandingPage() {
             {/* Main Content */}
             <main className="flex-grow">
                 <Hero />
-                <Features />
+
+                <Suspense fallback={<div className="py-24 sm:py-32 bg-muted/50 border-t border-border flex items-center justify-center"><div className="animate-pulse bg-muted-foreground/10 w-full h-full max-w-7xl rounded-xl" /></div>}>
+                    <Features />
+                </Suspense>
 
                 {/* Open Source & Free Section */}
                 <section className="py-28 sm:py-32 bg-muted/30 border-t border-border">
@@ -114,10 +120,14 @@ export default function LandingPage() {
                 </section>
 
                 {/* Learning Sources Marquee */}
-                <LearningSourcesMarquee />
+                <Suspense fallback={<div className="py-16 sm:py-20 bg-card border-t border-border h-[300px]" />}>
+                    <LearningSourcesMarquee />
+                </Suspense>
             </main>
 
-            <Footer />
+            <Suspense fallback={<div className="h-20 bg-card border-t border-border" />}>
+                <Footer />
+            </Suspense>
         </div>
     );
 }

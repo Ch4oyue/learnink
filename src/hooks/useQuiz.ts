@@ -51,6 +51,8 @@ export interface QuizAttempt {
   completed_at: string | null;
 }
 
+export type QuizAttemptList = Omit<QuizAttempt, "answers">;
+
 export interface QuizValidationResult {
   attempt: QuizAttempt;
   results: {
@@ -144,14 +146,16 @@ export function useUserQuizAttempts(userId?: string, quizId?: string) {
       if (!userId) return [];
       let query = supabase
         .from("user_quiz_attempts")
-        .select("*")
+        .select(
+          "id, user_id, quiz_id, score, total_points, percentage, passed, started_at, completed_at"
+        )
         .eq("user_id", userId);
       if (quizId) {
         query = query.eq("quiz_id", quizId);
       }
       const { data, error } = await query.order("completed_at", { ascending: false });
       if (error) throw error;
-      return data as QuizAttempt[];
+      return data as QuizAttemptList[];
     },
     enabled: !!userId,
   });

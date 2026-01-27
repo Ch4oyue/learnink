@@ -14,6 +14,23 @@
 
 const isDev = import.meta.env.DEV;
 
+// Extended list of sensitive keys to redact
+const SENSITIVE_KEYS = new Set([
+  "password",
+  "token",
+  "accesstoken",
+  "refreshtoken",
+  "apikey",
+  "api_key",
+  "secret",
+  "authorization",
+  "cookie",
+  "session",
+  "creditcard",
+  "cvv",
+  "passwd"
+]);
+
 /**
  * Safely stringify objects for logging (handles circular refs)
  */
@@ -31,10 +48,10 @@ function safeStringify(obj: unknown): string {
 }
 
 /**
- * Sanitize sensitive data before logging
+ * Sanitize sensitive data before logging (Recursive)
  * Masks common sensitive fields like tokens, passwords, etc.
  */
-function sanitize(data: unknown): unknown {
+export function sanitize(data: unknown, seen = new WeakSet()): unknown {
     if (typeof data === "string") {
         return data;
     }
@@ -43,24 +60,30 @@ function sanitize(data: unknown): unknown {
         return data;
     }
 
-    const sensitiveFields = [
-        "password",
-        "token",
-        "accessToken",
-        "refreshToken",
-        "apiKey",
-        "api_key",
-        "secret",
-        "authorization",
-        "cookie",
-        "session",
-    ];
+    if (seen.has(data)) {
+        return "[Circular Reference]";
+    }
+    seen.add(data);
 
-    const sanitized = { ...data as Record<string, unknown> };
+    if (Array.isArray(data)) {
+        return data.map(item => sanitize(item, seen));
+    }
 
-    for (const field of sensitiveFields) {
-        if (field in sanitized) {
-            sanitized[field] = "[REDACTED]";
+    const sanitized: Record<string, unknown> = {};
+    const obj = data as Record<string, unknown>;
+
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const lowerKey = key.toLowerCase();
+            // Check exact match or contains keywords
+            if (SENSITIVE_KEYS.has(lowerKey) ||
+                lowerKey.includes('token') ||
+                lowerKey.includes('password') ||
+                lowerKey.includes('secret')) {
+                sanitized[key] = "[REDACTED]";
+            } else {
+                sanitized[key] = sanitize(obj[key], seen);
+            }
         }
     }
 
@@ -73,7 +96,8 @@ export const logger = {
      */
     log: (...args: unknown[]): void => {
         if (isDev) {
-            console.log("[LearnInk]", ...args.map(sanitize));
+            // Note: pass explicit arrow function to avoid passing index/array from map to sanitize
+            console.log("[LearnInk]", ...args.map(arg => sanitize(arg)));
         }
     },
 
@@ -82,7 +106,7 @@ export const logger = {
      */
     warn: (...args: unknown[]): void => {
         if (isDev) {
-            console.warn("[LearnInk WARN]", ...args.map(sanitize));
+            console.warn("[LearnInk WARN]", ...args.map(arg => sanitize(arg)));
         }
     },
 
@@ -92,7 +116,7 @@ export const logger = {
      */
     error: (...args: unknown[]): void => {
         if (isDev) {
-            console.error("[LearnInk ERROR]", ...args.map(sanitize));
+            console.error("[LearnInk ERROR]", ...args.map(arg => sanitize(arg)));
         } else {
             // In production: optionally send to error monitoring service
             // Example: Sentry, LogRocket, etc.
@@ -105,7 +129,7 @@ export const logger = {
      */
     info: (...args: unknown[]): void => {
         if (isDev) {
-            console.info("[LearnInk INFO]", ...args.map(sanitize));
+            console.info("[LearnInk INFO]", ...args.map(arg => sanitize(arg)));
         }
     },
 

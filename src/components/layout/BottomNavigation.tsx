@@ -31,12 +31,12 @@ export function BottomNavigation() {
       if (error) throw error;
       return count || 0;
     },
-    enabled: role === "admin",
+    enabled: role === "admin" || role === "superadmin",
     refetchInterval: 30000,
   });
 
   const getDashboardPath = () => {
-    if (role === "admin") return "/dashboard/admin";
+    if (role === "admin" || role === "superadmin") return "/dashboard/admin";
     if (role === "tutor") return "/dashboard/tutor";
     return "/dashboard/user";
   };
@@ -46,13 +46,13 @@ export function BottomNavigation() {
       href: getDashboardPath(),
       label: "Home",
       icon: LayoutDashboard,
-      roles: ["user", "tutor", "admin"],
+      roles: ["user", "tutor", "admin", "superadmin"],
     },
     {
       href: "/dashboard/modules",
       label: "Modul",
       icon: BookOpen,
-      roles: ["user", "tutor", "admin"],
+      roles: ["user", "tutor", "admin", "superadmin"],
     },
     {
       href: "/dashboard/request-material",
@@ -64,34 +64,34 @@ export function BottomNavigation() {
       href: "/dashboard/requests",
       label: "Request",
       icon: FileQuestion,
-      roles: ["tutor", "admin"],
+      roles: ["tutor", "admin", "superadmin"],
     },
     {
       href: "/dashboard/users",
       label: "Users",
       icon: Users,
-      roles: ["admin"],
+      roles: ["admin", "superadmin"],
     },
     {
       href: "/dashboard/admin/approval",
       label: "Inbox",
       icon: CheckCircle,
       badge: pendingApprovalCount,
-      roles: ["admin"],
+      roles: ["admin", "superadmin"],
     },
     {
       href: "/dashboard/notifications",
       label: "Notifikasi",
       icon: Bell,
       badge: unreadCount,
-      roles: ["user", "tutor", "admin"],
+      roles: ["user", "tutor", "admin", "superadmin"],
       hideOnPath: "/dashboard/notifications", // Hide when on this page
     },
     {
       href: "/dashboard/profile",
       label: "Profil",
       icon: User,
-      roles: ["user", "tutor", "admin"],
+      roles: ["user", "tutor", "admin", "superadmin"],
     },
   ];
 

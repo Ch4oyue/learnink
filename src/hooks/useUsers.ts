@@ -106,7 +106,8 @@ export function useUserStats() {
   const { data: users } = useUsers();
 
   const totalUsers = users?.length || 0;
-  const adminCount = users?.filter(u => u.role === 'admin').length || 0;
+  // Include superadmin in admin count
+  const adminCount = users?.filter(u => u.role === 'admin' || u.role === 'superadmin').length || 0;
   const tutorCount = users?.filter(u => u.role === 'tutor').length || 0;
   const userCount = users?.filter(u => u.role === 'user').length || 0;
 

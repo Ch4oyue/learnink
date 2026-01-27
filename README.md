@@ -1,4 +1,4 @@
-# LearnInk
+# LearnInk (v1.4.6)
 
 LearnInk is a modern, high-performance Learning Management System (LMS) designed to deliver an interactive and seamless educational experience. It combines a premium "Glass Liquid" aesthetic with robust technical architecture, featuring in-browser code execution, real-time analytics, and mobile-first responsiveness.
 
@@ -18,7 +18,7 @@ LearnInk is a modern, high-performance Learning Management System (LMS) designed
 - **Analytics & Stats:** Visual breakdown of learning progress, streaks, and quiz performance.
 - **Achievements:** Gamified milestone tracking system.
 - **Requests:** Management interface for user requests and administrative actions.
-- **Mobile Optimized:** Dedicated `MobileBottomNav` and responsive table layouts for small screens.
+- **Mobile Optimized:** Dedicated `MobileBottomNav`, responsive table layouts, and official **PWA Support**.
 
 ### 🛡️ Security & Performance
 - **Supabase Authentication:** Secure, role-based access control (RBAC).

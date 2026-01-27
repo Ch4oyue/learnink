@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.6] - January 27, 2026
+
+### PWA & Security Hardening
+
+Official introduction of PWA support and critical security hardening for administrative roles.
+
+<!-- -->
+
+#### Improvements (2)
+- Added Progressive Web App (PWA) support with standalone mode and custom installation prompt.
+- Enhanced `material_requests` table with support for different request types (Module, Feature, Bug) and image uploads.
+
+#### Fixes (3)
+- Fixed Superadmin RLS permissions using `SECURITY DEFINER` to prevent recursion and ensure consistent access.
+- Added database trigger to prevent unauthorized privilege escalation to the superadmin role.
+- Fixed mobile layout scrolling issues and sidebar badge visibility for pending requests.
+
+#### Patches (1)
+- Switched to Bun as the primary runner for build and installation to resolve permission errors on Windows.
+
 ## [1.4.5] - January 26, 2026
 
 ### Admin Dashboard Stability
@@ -244,6 +264,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.6 | Jan 27, 2026 | PWA Support & Security Hardening |
 | 1.4.5 | Jan 26, 2026 | Admin Dashboard Stability |
 | 1.4.4 | Jan 25, 2026 | Sidebar Stability & Changelog UI |
 | 1.4.3 | Jan 24, 2026 | Performance & Database Optimizations |

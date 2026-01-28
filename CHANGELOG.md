@@ -7,22 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.8] - January 29, 2026
+## [1.4.8] - January 28, 2026
 
-### Security Patch
+### Admin UX, Sync & Security Hardening
 
-Critical security patch for Edge Function access control.
-
-<!-- -->
-
-#### Security (1)
-- **Broken Access Control**: Fixed a critical vulnerability in `get-users` Edge Function where the Service Role key was used without proper role validation. Implemented strict RBAC checks using `auth.getUser()` and `user_roles` verification.
-
-## [1.4.7] - January 28, 2026
-
-### Admin UX & Content Synchronization
-
-Major improvements to the Content Approval workflow, Mobile Admin Experience, and Notion Synchronization robustness.
+Major improvements to the admin interface, Notion synchronization, and critical security patches for Edge Functions.
 
 <!-- -->
 
@@ -31,7 +20,8 @@ Major improvements to the Content Approval workflow, Mobile Admin Experience, an
 - **Notion Sync Upgrade**: Upgraded `sync-notion-page` Edge Function to recursively fetch nested blocks (toggles, lists) and support `Category` (case-sensitive), `Slug`, and `Cover` fields.
 - **Mobile Inbox Badge**: Added real-time badge count to the floating mobile dock for Admin Inbox.
 
-#### Fixes (3)
+#### Fixes (4)
+- **Broken Access Control**: Fixed a critical vulnerability in `get-users` Edge Function where the Service Role key was used without proper role validation.
 - **User List Visibility**: Implemented `get-users` Edge Function fallback to bypass RLS limitations, ensuring Admins can see all users.
 - **Mobile Menu**: Filtered out redundant items from the mobile "Menu" sheet that are already present in the floating dock.
 - **PWA Prompt**: Fixed `useEffect` dependency error in `DashboardProfile` and optimized PWA prompt logic.

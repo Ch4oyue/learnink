@@ -87,6 +87,23 @@
         --sidebar-accent: 240 3.7% 15.9%;
         --sidebar-accent-foreground: 0 0% 98%;
     }
+
+    /* ======================================
+       TRANSPARENT MODE (Glass Effect)
+       ====================================== */
+    .transparent-mode {
+        /* Lighter opacity for backgrounds */
+        --card: 0 0% 100% / 0.7;
+        --popover: 0 0% 100% / 0.7;
+        --sidebar: 220 14% 96% / 0.7;
+    }
+
+    .transparent-mode.dark {
+        /* Darker opacity for backgrounds */
+        --card: 240 10% 3.9% / 0.6;
+        --popover: 240 10% 3.9% / 0.6;
+        --sidebar: 220 13% 8% / 0.6;
+    }
 }
 
 /* ======================================
@@ -113,6 +130,21 @@
         text-rendering: optimizeLegibility;
         /* Fix for mobile address bar */
         min-height: 100dvh;
+    }
+
+    /* Apply blur when transparent mode is active */
+    .transparent-mode body {
+        /* Subtle global texture or effect if needed */
+    }
+
+    /* Target generic card/surface classes if they use bg-card */
+    .transparent-mode .bg-card,
+    .transparent-mode .bg-popover,
+    .transparent-mode .bg-sidebar,
+    .transparent-mode .glass-liquid {
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid hsl(var(--border) / 0.5); /* Faint border for contrast */
     }
 
     /* Autofill styling - Light Mode */

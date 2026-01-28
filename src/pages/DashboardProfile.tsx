@@ -123,6 +123,15 @@ export default function DashboardProfile() {
     return localStorage.getItem("transparentMobileNav") === "true";
   });
 
+  // Apply transparent mode class on mount and change
+  useEffect(() => {
+    if (transparentMobile) {
+      document.documentElement.classList.add("transparent-mode");
+    } else {
+      document.documentElement.classList.remove("transparent-mode");
+    }
+  }, [transparentMobile]);
+
   const toggleTransparentMobile = () => {
     const newValue = !transparentMobile;
     setTransparentMobile(newValue);
@@ -760,29 +769,38 @@ export default function DashboardProfile() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                   {[
-                    { name: "Abelion", initial: "A", color: "bg-red-500", image: "https://ik.imagekit.io/focustimerin/preview%20image1?updatedAt=1757343104763" },
-                    { name: "Gemini", initial: "G", color: "bg-blue-500" },
-                    { name: "Stitch", initial: "S", color: "bg-green-500" },
-                    { name: "Claude", initial: "C", color: "bg-purple-500" },
-                    { name: "Jules (Google)", initial: "J", color: "bg-yellow-500" },
-                    { name: "IDE Antigravity", initial: "I", color: "bg-indigo-500" }
+                    { name: "Stitch", url: "https://stitch.withgoogle.com/", image: "/assets/contributors/stitch.png", initial: "S", color: "bg-pink-500" },
+                    { name: "Lovable", url: "https://lovable.dev/", image: "/assets/contributors/lovable.png", initial: "L", color: "bg-purple-500" },
+                    { name: "Antigravity", url: "https://antigravity.google/", image: "/assets/contributors/antigravity.png", initial: "A", color: "bg-blue-500" },
+                    { name: "Jules", url: "https://jules.google.com/", image: "/assets/contributors/jules.png", initial: "J", color: "bg-indigo-500" },
+                    { name: "Claude", url: "https://claude.ai/", image: "/assets/contributors/claude.png", initial: "C", color: "bg-orange-500" },
+                    { name: "Gemini", url: "https://gemini.google.com/", image: "/assets/contributors/gemini.png", initial: "G", color: "bg-blue-600" },
+                    { name: "Abelion", url: null, image: "https://ik.imagekit.io/focustimerin/preview%20image1?updatedAt=1757343104763", initial: "A", color: "bg-red-500" },
                   ].map((contrib) => (
-                    <div key={contrib.name} className="flex flex-col items-center gap-2">
-                      <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
-                        {contrib.image && <AvatarImage src={contrib.image} alt={contrib.name} />}
-                        <AvatarFallback className={`${contrib.color} text-white font-bold`}>
-                          {contrib.initial}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-xs font-medium text-center max-w-[80px] leading-tight">
+                    <a
+                      key={contrib.name}
+                      href={contrib.url || "#"}
+                      target={contrib.url ? "_blank" : undefined}
+                      rel={contrib.url ? "noopener noreferrer" : undefined}
+                      className={`flex flex-col items-center gap-2 group ${!contrib.url && "cursor-default"}`}
+                    >
+                      <div className="relative">
+                        <Avatar className="h-14 w-14 border-2 border-background shadow-sm group-hover:scale-110 transition-transform duration-200 group-hover:shadow-glow">
+                          <AvatarImage src={contrib.image} alt={contrib.name} className="object-cover" />
+                          <AvatarFallback className={`${contrib.color} text-white font-bold`}>
+                            {contrib.initial}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <span className="text-xs font-medium text-center max-w-[80px] leading-tight group-hover:text-primary transition-colors">
                         {contrib.name}
                       </span>
-                    </div>
+                    </a>
                   ))}
                   <div className="flex flex-col items-center gap-2">
-                     <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
+                     <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
                         <span className="text-xs text-muted-foreground">+300</span>
                      </div>
                      <span className="text-xs text-muted-foreground">Others</span>

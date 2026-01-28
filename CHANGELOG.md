@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.9] - January 29, 2026
+
+### Audit & Stability
+
+Comprehensive security audit, performance verification, and environment stabilization.
+
+<!-- -->
+
+#### Patches (2)
+- **Environment Fix**: Resolved missing dependency issues by strictly enforcing `bun install` for Windows stability.
+- **Audit Verification**: Verified all 22 system tests and performance benchmarks (up to ~21000x faster lookups) passed successfully.
+
 ## [1.4.8] - January 28, 2026
 
 ### Admin UX, Sync & Security Hardening
@@ -289,6 +301,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.9 | Jan 29, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 29, 2026 | Critical Security Patch (Edge Function RBAC) |
 | 1.4.7 | Jan 28, 2026 | Admin UX & Notion Sync Upgrade |
 | 1.4.6 | Jan 27, 2026 | PWA Support & Security Hardening |

@@ -192,7 +192,11 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
 // APP SIDEBAR COMPONENT
 // ============================================
 
-function AppSidebar() {
+interface SidebarProps {
+  pendingCount?: number;
+}
+
+function AppSidebar({ pendingCount = 0 }: SidebarProps) {
   const { user, role, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -205,22 +209,6 @@ function AppSidebar() {
     user?.email?.split("@")[0] ||
     "User";
   const userInitials = displayName.slice(0, 2).toUpperCase();
-
-  // Fetch pending approval count for admin
-  const { data: pendingCount = 0 } = useQuery({
-    queryKey: ["pending-approvals"],
-    queryFn: async () => {
-      const { count, error } = await supabase
-        .from("incoming_contents")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      if (error) throw error;
-      return count || 0;
-    },
-    enabled: currentRole === "admin" || currentRole === "superadmin",
-    refetchInterval: 30000,
-  });
 
   const navGroups: NavGroup[] = MENU_CONFIG[currentRole].map(group => ({
     ...group,
@@ -375,16 +363,30 @@ function AppSidebar() {
 // MOBILE BOTTOM NAV COMPONENT (Floating)
 // ============================================
 
-function MobileBottomNav() {
+interface MobileNavProps {
+  pendingCount?: number;
+}
+
+function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
   const { role, signOut } = useAuth();
   const currentRole: AppRole = role ?? "user";
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
-  const navGroups = MENU_CONFIG[currentRole];
+  const navGroups = MENU_CONFIG[currentRole].map(group => ({
+    ...group,
+    items: group.items.map(item => {
+      if ((currentRole === "admin" || currentRole === "superadmin") && item.href === "/dashboard/admin/approval" && pendingCount > 0) {
+        return { ...item, badge: pendingCount };
+      }
+      return item;
+    })
+  }));
+
   // Flatten items for mobile view, take top 4 + "Menu" trigger
   const primaryItems = navGroups.flatMap(g => g.items).slice(0, 4);
+  const primaryHrefs = new Set(primaryItems.map(item => item.href));
 
   const handleSignOut = async () => {
     setOpen(false);
@@ -440,32 +442,39 @@ function MobileBottomNav() {
                   </SheetDescription>
                 </SheetHeader>
                 <div className="space-y-6 pb-8">
-                  {navGroups.map((group, i) => (
-                    <div key={i} className="space-y-2">
-                      {group.title && <h3 className="text-xs font-bold text-muted-foreground px-4 uppercase tracking-wider">{group.title}</h3>}
-                      <div className="grid grid-cols-1 gap-1">
-                        {group.items.map(item => {
-                          const isActive = location.pathname === item.href;
-                          const Icon = item.icon;
-                          return (
-                            <Link
-                              key={item.href}
-                              to={item.href}
-                              onClick={() => setOpen(false)}
-                              className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors",
-                                isActive ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 text-foreground"
-                              )}
-                            >
-                              <Icon className="w-5 h-5" />
-                              <span>{item.label}</span>
-                              {item.badge && <Badge className="ml-auto">{formatBadgeCount(item.badge)}</Badge>}
-                            </Link>
-                          );
-                        })}
+                  {navGroups.map((group, i) => {
+                    // Filter items that are already in the floating dock (primaryItems)
+                    const filteredItems = group.items.filter(item => !primaryHrefs.has(item.href));
+
+                    if (filteredItems.length === 0) return null;
+
+                    return (
+                      <div key={i} className="space-y-2">
+                        {group.title && <h3 className="text-xs font-bold text-muted-foreground px-4 uppercase tracking-wider">{group.title}</h3>}
+                        <div className="grid grid-cols-1 gap-1">
+                          {filteredItems.map(item => {
+                            const isActive = location.pathname === item.href;
+                            const Icon = item.icon;
+                            return (
+                              <Link
+                                key={item.href}
+                                to={item.href}
+                                onClick={() => setOpen(false)}
+                                className={cn(
+                                  "flex items-center gap-3 px-4 py-3 rounded-xl transition-colors",
+                                  isActive ? "bg-primary/10 text-primary font-medium" : "hover:bg-white/5 text-foreground"
+                                )}
+                              >
+                                <Icon className="w-5 h-5" />
+                                <span>{item.label}</span>
+                                {item.badge && <Badge className="ml-auto">{formatBadgeCount(item.badge)}</Badge>}
+                              </Link>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   <div className="pt-4 mt-4 border-t border-white/10">
                     <div className="space-y-1">
@@ -498,9 +507,34 @@ function MobileBottomNav() {
 // ============================================
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
-    const { loading } = useAuth();
-    const { role } = useAuth();
+    const { loading, role } = useAuth();
     const currentRole: AppRole = role ?? "user";
+
+    // Fetch pending approval count for admin - Lifted up to share between Sidebar and MobileNav
+    const { data: pendingCount = 0 } = useQuery({
+      queryKey: ["pending-approvals"],
+      queryFn: async () => {
+        // Count pending content
+        const { count: contentCount, error: contentError } = await supabase
+          .from("incoming_contents")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "pending");
+
+        if (contentError) throw contentError;
+
+        // Count pending requests
+        const { count: requestCount, error: requestError } = await supabase
+          .from("material_requests")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "pending");
+
+        if (requestError) throw requestError;
+
+        return (contentCount || 0) + (requestCount || 0);
+      },
+      enabled: currentRole === "admin" || currentRole === "superadmin",
+      refetchInterval: 30000,
+    });
 
     if (loading) {
         return (
@@ -512,8 +546,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     return (
         <SidebarProvider>
-            <AppSidebar />
-            <MobileBottomNav />
+            <AppSidebar pendingCount={pendingCount} />
+            <MobileBottomNav pendingCount={pendingCount} />
             <SidebarInset className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden bg-transparent">
                 <header className="flex h-16 shrink-0 items-center gap-2 border-none glass-liquid px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:flex hidden m-4 rounded-2xl shadow-sm">
                     <SidebarTrigger className="-ml-1" />

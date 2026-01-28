@@ -3,7 +3,7 @@ interface NotionBlock {
   type: string;
   has_children: boolean;
   children?: NotionBlock[];
-  [key: string]: unknown; // Safer than any
+  [key: string]: unknown;
 }
 
 interface RichTextAnnotation {
@@ -38,6 +38,11 @@ export class NotionToMarkdown {
       },
     });
     if (!res.ok) {
+      // Handle rate limits or errors gracefully
+      if (res.status === 429) {
+          // Simple backoff could be implemented here, or just throw
+          throw new Error("Notion API Rate Limit Exceeded");
+      }
       throw new Error(`Notion API Error: ${res.status} ${res.statusText}`);
     }
     return res.json();
@@ -48,16 +53,25 @@ export class NotionToMarkdown {
     let blocks: NotionBlock[] = [];
     let cursor: string | undefined = undefined;
 
-    do {
-      const url = `/blocks/${blockId}/children?page_size=100${cursor ? `&start_cursor=${cursor}` : ""}`;
-      const data = await this.fetch(url);
-      blocks = [...blocks, ...data.results];
-      cursor = data.next_cursor;
-    } while (cursor);
+    try {
+      do {
+        const url: string = `/blocks/${blockId}/children?page_size=100${cursor ? `&start_cursor=${cursor}` : ""}`;
+        const data = await this.fetch(url);
+        blocks = [...blocks, ...data.results];
+        cursor = data.next_cursor;
+      } while (cursor);
+    } catch (e) {
+      console.error(`Error fetching blocks for ${blockId}:`, e);
+      return []; // Return partial blocks if fails
+    }
 
-    // Fetch children sequentially to avoid Notion API rate limits (429)
+    // Fetch children strictly sequentially to avoid rate limits
+    // Optimization: Only fetch children for supported container types to save API calls
+    const containerTypes = ['toggle', 'column_list', 'column', 'bulleted_list_item', 'numbered_list_item', 'to_do', 'quote', 'callout', 'table', 'synced_block'];
+
     for (const block of blocks) {
-      if (block.has_children) {
+      if (block.has_children && containerTypes.includes(block.type)) {
+        // recursive call
         const children = await this.getBlocks(block.id);
         block.children = children;
       }
@@ -70,25 +84,51 @@ export class NotionToMarkdown {
   toMarkdown(blocks: NotionBlock[], depth = 0): string {
     let md = "";
 
-    for (const block of blocks) {
-      const content = this.blockToMarkdown(block);
+    // Helper to handle list numbering resets
+    let numberListIndex = 0;
+
+    for (let i = 0; i < blocks.length; i++) {
+      const block = blocks[i];
+      const prevBlock = blocks[i-1];
+
+      // Reset numbered list index if previous block wasn't a numbered list
+      if (block.type === 'numbered_list_item') {
+          if (prevBlock?.type !== 'numbered_list_item') {
+              numberListIndex = 1;
+          } else {
+              numberListIndex++;
+          }
+      }
+
+      const content = this.blockToMarkdown(block, numberListIndex);
+
       if (content) {
+        // Add indentation for current depth
+        // But blockToMarkdown usually handles the prefix.
+        // We mainly need to handle the *children's* indentation.
         md += content + "\n\n";
       }
 
       if (block.children && block.children.length > 0) {
-        // Indentation handling for lists
-        const isList = block.type === 'bulleted_list_item' || block.type === 'numbered_list_item';
         const childMd = this.toMarkdown(block.children, depth + 1);
 
-        if (isList) {
-            md += childMd.split('\n').map(line => line ? '  ' + line : '').join('\n') + '\n';
-        } else if (block.type === 'column_list' || block.type === 'column') {
-            md += childMd; // Just render children for columns
-        } else if (block.type === 'table') {
-            md += childMd; // Table rows handled inside
-        } else {
-            md += childMd;
+        // Indentation logic
+        if (block.type === 'table') {
+            // Table children are rows, processed inside blockToMarkdown usually?
+            // Actually notion table rows are children blocks.
+            // We need to render them specially.
+            // Let's handle table rows in blockToMarkdown if possible, or here.
+            // If blockToMarkdown returned the header, childMd is the body?
+            // Notion table structure: Table Block -> Children (Row Blocks) -> Cells
+            // So blockToMarkdown for Table returns nothing, and we render children.
+        }
+
+        // Standard indentation for lists/toggles
+        const indent = (block.type === 'bulleted_list_item' || block.type === 'numbered_list_item' || block.type === 'to_do') ? "   " : "";
+
+        if (childMd) {
+             const indentedChildren = childMd.split('\n').map(line => line ? indent + line : '').join('\n');
+             md += indentedChildren + "\n\n";
         }
       }
     }
@@ -108,9 +148,9 @@ export class NotionToMarkdown {
     }).join("");
   }
 
-  private blockToMarkdown(block: NotionBlock): string {
+  private blockToMarkdown(block: NotionBlock, listIndex = 1): string {
     const type = block.type;
-    const data = block[type] as Record<string, unknown>; // Type assertion for block data
+    const data = block[type] as Record<string, unknown>;
 
     switch (type) {
       case "paragraph":
@@ -124,13 +164,13 @@ export class NotionToMarkdown {
       case "bulleted_list_item":
         return `- ${this.getRichText(data.rich_text as RichText[])}`;
       case "numbered_list_item":
-        return `1. ${this.getRichText(data.rich_text as RichText[])}`;
+        return `${listIndex}. ${this.getRichText(data.rich_text as RichText[])}`;
       case "to_do":
         return `- [${data.checked ? "x" : " "}] ${this.getRichText(data.rich_text as RichText[])}`;
       case "toggle":
-        return `<details><summary>${this.getRichText(data.rich_text as RichText[])}</summary>\n\n</details>`;
+        return `<details><summary>${this.getRichText(data.rich_text as RichText[])}</summary>`; // Children will follow
       case "code":
-        return "```" + data.language + "\n" + this.getRichText(data.rich_text as RichText[]) + "\n```";
+        return "```" + (data.language || "") + "\n" + this.getRichText(data.rich_text as RichText[]) + "\n```";
       case "image": {
         const external = data.external as { url: string } | undefined;
         const file = data.file as { url: string } | undefined;
@@ -167,17 +207,16 @@ export class NotionToMarkdown {
          return `> ${icon} **${this.getRichText(data.rich_text as RichText[])}**`;
       }
       case "table":
-         return ""; // Table container, children are rows
+         return ""; // Container
       case "table_row": {
-         // Simple table row support
          const cells = data.cells as RichText[][];
          const cellContent = cells.map((cell) => this.getRichText(cell));
          return `| ${cellContent.join(" | ")} |`;
       }
       case "column_list":
-         return "";
+         return ""; // Container
       case "column":
-         return "";
+         return ""; // Container
       default:
         return "";
     }

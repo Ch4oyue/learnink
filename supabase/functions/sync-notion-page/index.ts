@@ -23,6 +23,7 @@ interface NotionPageProperties {
   category?: { select?: NotionPropertySelect };
   Track?: { select?: NotionPropertySelect };
   Slug?: { rich_text?: { plain_text: string }[] };
+  Cover?: { type: 'external' | 'file'; external?: { url: string }; file?: { url: string } };
 }
 
 interface NotionPageCover {
@@ -78,7 +79,7 @@ serve(async (req) => {
     let category = "Umum";
     if (props.Category?.select) {
         category = props.Category.select.name;
-    } else if (props.Category?.multi_select) {
+    } else if (props.Category?.multi_select && props.Category.multi_select.length > 0) {
         category = props.Category.multi_select.map((c) => c.name).join(", ");
     } else if (props.category?.select) { // Fallback to lowercase
         category = props.category.select.name;
@@ -99,6 +100,7 @@ serve(async (req) => {
     }
 
     // 2. Recursive Fetch & Convert
+    // This will now use the updated recursive getBlocks
     const blocks = await converter.getBlocks(pageId);
     const content = converter.toMarkdown(blocks);
 

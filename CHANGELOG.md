@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.7] - January 28, 2026
+
+### Admin UX & Content Synchronization
+
+Major improvements to the Content Approval workflow, Mobile Admin Experience, and Notion Synchronization robustness.
+
+<!-- -->
+
+#### Improvements (3)
+- **Review Split View**: Implemented a responsive Split-View (Editor + Live Preview) for content approval, using `ResizablePanel` on desktop.
+- **Notion Sync Upgrade**: Upgraded `sync-notion-page` Edge Function to recursively fetch nested blocks (toggles, lists) and support `Category` (case-sensitive), `Slug`, and `Cover` fields.
+- **Mobile Inbox Badge**: Added real-time badge count to the floating mobile dock for Admin Inbox.
+
+#### Fixes (3)
+- **User List Visibility**: Implemented `get-users` Edge Function fallback to bypass RLS limitations, ensuring Admins can see all users.
+- **Mobile Menu**: Filtered out redundant items from the mobile "Menu" sheet that are already present in the floating dock.
+- **PWA Prompt**: Fixed `useEffect` dependency error in `DashboardProfile` and optimized PWA prompt logic.
+
 ## [1.4.6] - January 27, 2026
 
 ### PWA & Security Hardening
@@ -266,6 +284,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.7 | Jan 28, 2026 | Admin UX & Notion Sync Upgrade |
 | 1.4.6 | Jan 27, 2026 | PWA Support & Security Hardening |
 | 1.4.5 | Jan 26, 2026 | Admin Dashboard & Optimized Chunks |
 | 1.4.4 | Jan 25, 2026 | Premium Design & Performance Overhaul |

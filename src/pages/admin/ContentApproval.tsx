@@ -17,6 +17,11 @@ import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
+    ResizableHandle,
+    ResizablePanel,
+    ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import {
     Dialog,
     DialogContent,
     DialogDescription,
@@ -451,66 +456,104 @@ export default function ContentApproval() {
 
             {/* --- DIALOG: PUBLISH CONTENT --- */}
             <Dialog open={isPublishOpen} onOpenChange={setIsPublishOpen}>
-                <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto glass-liquid rounded-[24px]">
-                    <DialogHeader>
-                        <DialogTitle>Review & Publish</DialogTitle>
-                        <DialogDescription>Edit konten sebelum publikasi.</DialogDescription>
-                    </DialogHeader>
-                    <form onSubmit={handlePublishSubmit} className="space-y-4">
+                <DialogContent className="max-w-7xl w-full h-[90vh] flex flex-col glass-liquid rounded-[24px] p-0 gap-0 overflow-hidden">
+                    <div className="p-6 pb-0">
+                        <DialogHeader>
+                            <DialogTitle>Review & Publish</DialogTitle>
+                            <DialogDescription>Edit konten sebelum publikasi.</DialogDescription>
+                        </DialogHeader>
+                    </div>
+                    <form onSubmit={handlePublishSubmit} className="flex-1 flex flex-col p-6 pt-4 gap-4 overflow-hidden">
                         <div className="space-y-2">
                             <Label>Judul</Label>
                             <Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
                         </div>
-                        <div className="space-y-2">
-                            <Label>Ringkasan</Label>
-                            <Textarea value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Kategori</Label>
-                                <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        {categories.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
+                                <Label>Ringkasan</Label>
+                                <Textarea value={formData.summary} onChange={e => setFormData({...formData, summary: e.target.value})} className="h-20 resize-none" />
                             </div>
-                            <div className="space-y-2">
-                                <Label>Level</Label>
-                                <Select value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
-                                    <SelectTrigger><SelectValue /></SelectTrigger>
-                                    <SelectContent>
-                                        {levels.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
-                                    </SelectContent>
-                                </Select>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label>Kategori</Label>
+                                    <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            {categories.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Level</Label>
+                                    <Select value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
+                                        <SelectTrigger><SelectValue /></SelectTrigger>
+                                        <SelectContent>
+                                            {levels.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
                         </div>
-                        <div className="space-y-2">
+                        <div className="space-y-2 flex-1 flex flex-col min-h-0">
                             <Label>Konten</Label>
-                            <Tabs defaultValue="edit" className="w-full">
-                                <TabsList className="grid w-full grid-cols-2">
-                                    <TabsTrigger value="edit">Editor (Markdown)</TabsTrigger>
-                                    <TabsTrigger value="preview">Live Preview</TabsTrigger>
-                                </TabsList>
-                                <TabsContent value="edit" className="mt-2">
-                                    <Textarea
-                                        value={formData.content}
-                                        onChange={e => setFormData({...formData, content: e.target.value})}
-                                        rows={15}
-                                        className="font-mono text-sm min-h-[300px]"
-                                        placeholder="Tulis konten menggunakan format Markdown..."
-                                    />
-                                </TabsContent>
-                                <TabsContent value="preview" className="mt-2">
-                                    <div className="border rounded-md p-4 min-h-[300px] max-h-[500px] overflow-y-auto bg-card">
-                                        {formData.content ? (
-                                            <MarkdownRenderer content={formData.content} />
-                                        ) : (
-                                            <p className="text-muted-foreground text-center italic py-8">Belum ada konten untuk dipreview.</p>
-                                        )}
+                            {/* Desktop: Split View, Mobile: Tabs */}
+                            <div className="hidden md:block flex-1 border rounded-lg overflow-hidden min-h-0">
+                                <ResizablePanelGroup direction="horizontal">
+                                    <ResizablePanel defaultSize={50} minSize={30}>
+                                        <div className="h-full flex flex-col p-2">
+                                            <span className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1">
+                                                <FileText className="h-3 w-3" /> Editor
+                                            </span>
+                                            <Textarea
+                                                value={formData.content}
+                                                onChange={e => setFormData({...formData, content: e.target.value})}
+                                                className="flex-1 font-mono text-sm resize-none border-none focus-visible:ring-0 p-2"
+                                                placeholder="Tulis konten menggunakan format Markdown..."
+                                            />
+                                        </div>
+                                    </ResizablePanel>
+                                    <ResizableHandle withHandle />
+                                    <ResizablePanel defaultSize={50} minSize={30}>
+                                        <div className="h-full flex flex-col p-2 bg-muted/30">
+                                            <span className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1">
+                                                <Eye className="h-3 w-3" /> Live Preview
+                                            </span>
+                                            <div className="flex-1 overflow-y-auto prose dark:prose-invert max-w-none p-2 bg-card rounded-md border shadow-sm">
+                                                {formData.content ? (
+                                                    <MarkdownRenderer content={formData.content} />
+                                                ) : (
+                                                    <p className="text-muted-foreground text-center italic py-8">Belum ada konten untuk dipreview.</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </ResizablePanel>
+                                </ResizablePanelGroup>
+                            </div>
+
+                            {/* Mobile View */}
+                            <div className="md:hidden flex-1 flex flex-col min-h-0">
+                                <Tabs defaultValue="edit" className="w-full flex-1 flex flex-col">
+                                    <TabsList className="grid w-full grid-cols-2">
+                                        <TabsTrigger value="edit">Editor</TabsTrigger>
+                                        <TabsTrigger value="preview">Preview</TabsTrigger>
+                                    </TabsList>
+                                    <div className="flex-1 min-h-0 overflow-y-auto mt-2">
+                                        <TabsContent value="edit" className="h-full mt-0">
+                                            <Textarea
+                                                value={formData.content}
+                                                onChange={e => setFormData({...formData, content: e.target.value})}
+                                                className="font-mono text-sm h-full min-h-[300px]"
+                                                placeholder="Tulis konten menggunakan format Markdown..."
+                                            />
+                                        </TabsContent>
+                                        <TabsContent value="preview" className="h-full mt-0">
+                                            <div className="border rounded-md p-4 h-full min-h-[300px] overflow-y-auto bg-card">
+                                                <MarkdownRenderer content={formData.content} />
+                                            </div>
+                                        </TabsContent>
                                     </div>
-                                </TabsContent>
-                            </Tabs>
+                                </Tabs>
+                            </div>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="ghost" onClick={() => setIsPublishOpen(false)}>Batal</Button>

@@ -53,6 +53,27 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         return () => mediaQuery.removeEventListener("change", handleChange);
     }, [theme]);
 
+    // Update meta tags for PWA/System UI
+    useEffect(() => {
+        const lightColor = "#ffffff";
+        const darkColor = "#08080a";
+        const color = resolvedTheme === "dark" ? darkColor : lightColor;
+
+        // Update theme-color meta tags
+        const metaThemeColors = document.querySelectorAll('meta[name="theme-color"]');
+        metaThemeColors.forEach((meta) => {
+            meta.setAttribute("content", color);
+        });
+
+        // Update iOS status bar style
+        const metaStatusBarStyle = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+        if (metaStatusBarStyle) {
+            // black-translucent = white text (for dark bg)
+            // default = dark text (for light bg)
+            metaStatusBarStyle.setAttribute("content", resolvedTheme === "dark" ? "black-translucent" : "default");
+        }
+    }, [resolvedTheme]);
+
     return (
         <ThemeContext.Provider value={{ theme, setTheme, resolvedTheme }}>
             {children}

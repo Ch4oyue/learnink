@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.7] - January 29, 2026
+
+### System UI Theming
+
+Implemented dynamic system bar theming to ensure a seamless visual experience across mobile devices and PWA installations.
+
+<!-- -->
+
+#### Improvements (2)
+- Implemented dynamic `theme-color` meta tag updates to match the system status bar and navigation bar with the application theme (Dark/Light).
+- Added `.safe-area-bottom` utility to handle safe area insets on modern mobile devices.
+
 ## [1.4.6] - January 27, 2026
 
 ### PWA & Security Hardening
@@ -266,6 +278,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.7 | Jan 29, 2026 | System UI Theming |
 | 1.4.6 | Jan 27, 2026 | PWA Support & Security Hardening |
 | 1.4.5 | Jan 26, 2026 | Admin Dashboard & Optimized Chunks |
 | 1.4.4 | Jan 25, 2026 | Premium Design & Performance Overhaul |

@@ -24,12 +24,23 @@ export function BottomNavigation() {
   const { data: pendingApprovalCount } = useQuery({
     queryKey: ["pending-approval-count-mobile"],
     queryFn: async () => {
-      const { count, error } = await supabase
+      // 1. Count Pending Contents
+      const { count: contentsCount, error: contentsError } = await supabase
         .from("incoming_contents")
         .select("*", { count: "exact", head: true })
         .eq("status", "pending");
-      if (error) throw error;
-      return count || 0;
+
+      if (contentsError) throw contentsError;
+
+      // 2. Count Pending Material Requests
+      const { count: requestsCount, error: requestsError } = await supabase
+        .from("material_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "pending");
+
+      if (requestsError) throw requestsError;
+
+      return (contentsCount || 0) + (requestsCount || 0);
     },
     enabled: role === "admin" || role === "superadmin",
     refetchInterval: 30000,

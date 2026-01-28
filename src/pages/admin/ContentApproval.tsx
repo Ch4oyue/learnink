@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { MarkdownRenderer } from "@/components/MarkdownRenderer";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -485,8 +486,31 @@ export default function ContentApproval() {
                             </div>
                         </div>
                         <div className="space-y-2">
-                            <Label>Konten (Markdown)</Label>
-                            <Textarea value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} rows={10} className="font-mono text-sm" />
+                            <Label>Konten</Label>
+                            <Tabs defaultValue="edit" className="w-full">
+                                <TabsList className="grid w-full grid-cols-2">
+                                    <TabsTrigger value="edit">Editor (Markdown)</TabsTrigger>
+                                    <TabsTrigger value="preview">Live Preview</TabsTrigger>
+                                </TabsList>
+                                <TabsContent value="edit" className="mt-2">
+                                    <Textarea
+                                        value={formData.content}
+                                        onChange={e => setFormData({...formData, content: e.target.value})}
+                                        rows={15}
+                                        className="font-mono text-sm min-h-[300px]"
+                                        placeholder="Tulis konten menggunakan format Markdown..."
+                                    />
+                                </TabsContent>
+                                <TabsContent value="preview" className="mt-2">
+                                    <div className="border rounded-md p-4 min-h-[300px] max-h-[500px] overflow-y-auto bg-card">
+                                        {formData.content ? (
+                                            <MarkdownRenderer content={formData.content} />
+                                        ) : (
+                                            <p className="text-muted-foreground text-center italic py-8">Belum ada konten untuk dipreview.</p>
+                                        )}
+                                    </div>
+                                </TabsContent>
+                            </Tabs>
                         </div>
                         <DialogFooter>
                             <Button type="button" variant="ghost" onClick={() => setIsPublishOpen(false)}>Batal</Button>

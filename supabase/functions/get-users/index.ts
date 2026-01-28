@@ -12,13 +12,59 @@ serve(async (req) => {
   }
 
   try {
-    // 1. Get User from JWT to ensure only admin can access
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 
+    // 1. Validate Auth Header
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Missing Authorization header" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // 2. Validate User (using Anon Key + User Token)
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+
+    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
+
+    if (userError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // 3. Create Admin Client (Service Role) for privileged operations
+    const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
+
+    // 4. Validate Role (Must be 'admin' or 'superadmin')
+    const { data: userRoles, error: roleError } = await supabaseAdmin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    if (roleError) {
+       console.error("Role check error:", roleError);
+       throw roleError;
+    }
+
+    const hasAccess = userRoles?.some((r) => ["admin", "superadmin"].includes(r.role));
+
+    if (!hasAccess) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden: Admin access required" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // 5. Fetch Data (using Admin Client)
     // Fetch all profiles
-    const { data: profiles, error: profilesError } = await supabase
+    const { data: profiles, error: profilesError } = await supabaseAdmin
       .from("profiles")
       .select("id, display_name, avatar_url, created_at")
       .order("created_at", { ascending: false });
@@ -26,7 +72,7 @@ serve(async (req) => {
     if (profilesError) throw profilesError;
 
     // Fetch all roles
-    const { data: roles, error: rolesError } = await supabase
+    const { data: roles, error: rolesError } = await supabaseAdmin
       .from("user_roles")
       .select("user_id, role");
 

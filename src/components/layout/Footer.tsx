@@ -98,8 +98,20 @@ export const Footer = () => {
         {/* Divider */}
         <div className="border-t border-background/10 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-background/50 text-sm">
-              © {currentYear} LearnAI. All rights reserved.
+            <p className="text-background/50 text-sm flex flex-col md:flex-row items-center gap-1 md:gap-2">
+              <span>© {currentYear} LearnAI. All rights reserved.</span>
+              <span className="hidden md:inline text-background/30">•</span>
+              <span className="flex items-center gap-1">
+                Powered by
+                <a
+                  href="https://lynk.id/abelion"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-primary transition-colors font-medium underline underline-offset-2 decoration-background/30"
+                >
+                  Abelion
+                </a>
+              </span>
             </p>
             <div className="flex items-center gap-6 text-sm">
               <a

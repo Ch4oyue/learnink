@@ -69,11 +69,16 @@ export function usePopularModules(limit = 6) {
   return useQuery({
     queryKey: ["popular-modules", limit],
     queryFn: async () => {
+      // Fallback to fetching latest modules since RPC 'get_popular_modules' is missing
       const { data, error } = await supabase
-        .rpc('get_popular_modules', { limit_count: limit });
+        .from('modules')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(limit);
 
       if (error) {
-        logger.error("get_popular_modules error:", error);
+        logger.error("Popular modules fetch error:", error);
         return [];
       }
       return data;

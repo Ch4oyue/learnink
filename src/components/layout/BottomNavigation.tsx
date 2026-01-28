@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadNotificationCount } from "@/hooks/useNotifications";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   BookOpen,
@@ -18,21 +19,74 @@ import {
 export function BottomNavigation() {
   const { user, role } = useAuth();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { data: unreadCount } = useUnreadNotificationCount(user?.id);
+
+  const [isTransparent, setIsTransparent] = useState(() => localStorage.getItem("transparentMobileNav") === "true");
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setIsTransparent(localStorage.getItem("transparentMobileNav") === "true");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
+  // Realtime subscription for badges
+  useEffect(() => {
+    if (!user) return;
+
+    // Admin subscriptions
+    if (role === "admin" || role === "superadmin") {
+      const adminChannel = supabase
+        .channel("mobile-nav-admin-badges")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "incoming_contents" },
+          () => queryClient.invalidateQueries({ queryKey: ["pending-approval-count-mobile"] })
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "material_requests" },
+          () => queryClient.invalidateQueries({ queryKey: ["pending-approval-count-mobile"] })
+        )
+        .subscribe();
+
+      return () => { supabase.removeChannel(adminChannel); };
+    }
+
+    // User subscriptions (Notifications)
+    const userChannel = supabase
+      .channel(`mobile-nav-user-badges-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] })
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(userChannel);
+    };
+  }, [user, role, queryClient]);
 
   // Fetch pending approval count for admin
   const { data: pendingApprovalCount } = useQuery({
     queryKey: ["pending-approval-count-mobile"],
     queryFn: async () => {
-      const { count, error } = await supabase
-        .from("incoming_contents")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-      if (error) throw error;
-      return count || 0;
+      if (role !== "admin" && role !== "superadmin") return 0;
+
+      const [contentsResult, requestsResult] = await Promise.all([
+        supabase.from("incoming_contents").select("*", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("material_requests").select("*", { count: "exact", head: true }).eq("status", "pending")
+      ]);
+
+      if (contentsResult.error) throw contentsResult.error;
+      if (requestsResult.error) throw requestsResult.error;
+
+      return (contentsResult.count || 0) + (requestsResult.count || 0);
     },
     enabled: role === "admin" || role === "superadmin",
-    refetchInterval: 30000,
   });
 
   const getDashboardPath = () => {
@@ -109,7 +163,13 @@ export function BottomNavigation() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-sm md:hidden safe-area-bottom">
+    <nav className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 border-t md:hidden safe-area-bottom transition-all duration-300",
+      // iOS Style Frosted Glass Effect
+      isTransparent
+        ? "bg-background/70 backdrop-blur-[20px] saturate-150 border-t-white/10 dark:border-t-white/5 shadow-[0_-1px_3px_rgba(0,0,0,0.05)]"
+        : "bg-card/95 border-t backdrop-blur-md"
+    )}>
       <div className="flex items-center justify-around h-16 px-2">
         {filteredItems.map((item) => {
           const active = isActive(item.href);
@@ -124,8 +184,8 @@ export function BottomNavigation() {
             >
               <div className="relative">
                 <item.icon className={cn("h-5 w-5", active && "text-primary")} />
-                {item.badge && item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium flex items-center justify-center badge-pulse">
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm z-10 animate-in zoom-in duration-300">
                     {item.badge > 99 ? "99+" : item.badge}
                   </span>
                 )}

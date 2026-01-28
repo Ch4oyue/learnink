@@ -53,12 +53,23 @@ export function useUsers() {
   return useQuery({
     queryKey: ['users'],
     queryFn: async (): Promise<UserWithRole[]> => {
-      // Direct query from profiles + user_roles
-      // Simple and works without custom RPC functions
+      // Try to fetch via Edge Function first (bypasses RLS)
+      try {
+        const { data, error } = await supabase.functions.invoke('get-users');
+        if (error) throw error;
+        if (data && data.users) {
+          return data.users as UserWithRole[];
+        }
+      } catch (edgeError) {
+        logger.warn('Edge function fetch failed, falling back to client query', edgeError);
+      }
+
+      // Fallback: Direct query from profiles + user_roles
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, display_name, avatar_url, created_at')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(0, 10000);
 
       if (profilesError) {
         logger.error('Error fetching profiles:', profilesError);
@@ -68,7 +79,8 @@ export function useUsers() {
       // Get roles for all users
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
-        .select('user_id, role');
+        .select('user_id, role')
+        .range(0, 10000);
 
       if (rolesError) {
         logger.error('Error fetching roles:', rolesError);

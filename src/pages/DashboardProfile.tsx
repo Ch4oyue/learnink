@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { usePWA } from "@/contexts/PWAContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { useLearningStats } from "@/hooks/useLearningStats";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +22,10 @@ import {
   Camera,
   Edit,
   CheckCircle,
+  Smartphone,
+  Users,
+  CheckCircle2,
+  Download,
   MapPin,
   Flame,
   Trophy,
@@ -104,6 +109,7 @@ export default function DashboardProfile() {
   const navigate = useNavigate();
   const { user, role, profile, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { isInstalled, deferredPrompt, installApp } = usePWA();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
   const { data: stats, isLoading: statsLoading } = useLearningStats(user?.id);
@@ -111,6 +117,28 @@ export default function DashboardProfile() {
   const [displayName, setDisplayName] = useState(
     user?.user_metadata?.display_name || ""
   );
+
+  // Mobile Transparency State
+  const [transparentMobile, setTransparentMobile] = useState(() => {
+    return localStorage.getItem("transparentMobileNav") === "true";
+  });
+
+  // Apply transparent mode class on mount and change
+  useEffect(() => {
+    if (transparentMobile) {
+      document.documentElement.classList.add("transparent-mode");
+    } else {
+      document.documentElement.classList.remove("transparent-mode");
+    }
+  }, [transparentMobile]);
+
+  const toggleTransparentMobile = () => {
+    const newValue = !transparentMobile;
+    setTransparentMobile(newValue);
+    localStorage.setItem("transparentMobileNav", String(newValue));
+    // Trigger storage event for other components to pick up
+    window.dispatchEvent(new Event("storage"));
+  };
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -309,6 +337,19 @@ export default function DashboardProfile() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Quick Actions (e.g. Changelog) */}
+            <div className="flex gap-4">
+              <Link to="/changelog" className="flex-1">
+                 <Button variant="outline" className="w-full h-auto py-3 gap-2 justify-start bg-card hover:bg-muted/50 border shadow-sm">
+                   <Clock className="h-5 w-5 text-primary" />
+                   <div className="flex flex-col items-start text-left">
+                     <span className="font-semibold text-foreground">Changelog & Updates</span>
+                     <span className="text-xs text-muted-foreground font-normal">Lihat riwayat pembaruan aplikasi</span>
+                   </div>
+                 </Button>
+              </Link>
+            </div>
 
             {/* Learning Activity Card - Hidden during edit mode for focus */}
             {!isEditing && (
@@ -625,50 +666,156 @@ export default function DashboardProfile() {
           </Card>
         )}
 
-        {/* Settings Tab Content - Appearance */}
+        {/* Settings Tab Content */}
         {activeTab === "settings" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>
-                Customize how LearnInk looks on your device
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { value: "light" as const, label: "Light", icon: Sun, description: "Light background" },
-                  { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background" },
-                  { value: "system" as const, label: "System", icon: Monitor, description: "Match device" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setTheme(option.value)}
-                    className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
-                      }`}
-                  >
-                    <option.icon
-                      className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
+          <div className="space-y-6">
+            {/* Appearance */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Appearance</CardTitle>
+                <CardDescription>
+                  Customize how LearnInk looks on your device
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[
+                    { value: "light" as const, label: "Light", icon: Sun, description: "Light background" },
+                    { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background" },
+                    { value: "system" as const, label: "System", icon: Monitor, description: "Match device" },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setTheme(option.value)}
+                      className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
                         }`}
-                    />
-                    <div className="text-center">
-                      <span
-                        className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
+                    >
+                      <option.icon
+                        className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
                           }`}
-                      >
-                        {option.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground mt-1 block">
-                        {option.description}
-                      </span>
+                      />
+                      <div className="text-center">
+                        <span
+                          className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
+                            }`}
+                        >
+                          {option.label}
+                        </span>
+                        <span className="text-xs text-muted-foreground mt-1 block">
+                          {option.description}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Mobile Preferences */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mobile Preferences</CardTitle>
+                <CardDescription>Adjust settings for mobile experience</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Smartphone className="h-5 w-5 text-primary" />
                     </div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                    <div>
+                      <p className="font-medium">Transparent Mode</p>
+                      <p className="text-sm text-muted-foreground">Enable iOS-style glassmorphism effect</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant={transparentMobile ? "default" : "outline"}
+                    onClick={toggleTransparentMobile}
+                  >
+                    {transparentMobile ? "Enabled" : "Disabled"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Install App */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Install Application</CardTitle>
+                <CardDescription>Install LearnAI for a better experience</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isInstalled ? (
+                   <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
+                     <CheckCircle2 className="h-5 w-5 text-green-500" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium text-foreground">App Installed</span>
+                        <span className="text-xs font-normal">You are using the app version</span>
+                     </div>
+                   </Button>
+                ) : deferredPrompt ? (
+                   <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3">
+                     <Download className="h-5 w-5" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium">Install App</span>
+                        <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
+                     </div>
+                   </Button>
+                ) : (
+                   <div className="bg-muted/50 rounded-lg p-4 border border-dashed text-center">
+                     <p className="text-sm text-muted-foreground">
+                       Use your browser's menu to <strong>"Install App"</strong> or <strong>"Add to Home Screen"</strong>.
+                     </p>
+                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Contributors */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  Contributors
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+                  {[
+                    { name: "Stitch", url: "https://stitch.withgoogle.com/", image: "/assets/contributors/stitch.png", initial: "S", color: "bg-pink-500" },
+                    { name: "Lovable", url: "https://lovable.dev/", image: "/assets/contributors/lovable.png", initial: "L", color: "bg-purple-500" },
+                    { name: "Antigravity", url: "https://antigravity.google/", image: "/assets/contributors/antigravity.png", initial: "A", color: "bg-blue-500" },
+                    { name: "Jules", url: "https://jules.google.com/", image: "/assets/contributors/jules.png", initial: "J", color: "bg-indigo-500" },
+                    { name: "Claude", url: "https://claude.ai/", image: "/assets/contributors/claude.png", initial: "C", color: "bg-orange-500" },
+                    { name: "Gemini", url: "https://gemini.google.com/", image: "/assets/contributors/gemini.png", initial: "G", color: "bg-blue-600" },
+                    { name: "Abelion", url: null, image: "https://ik.imagekit.io/focustimerin/preview%20image1?updatedAt=1757343104763", initial: "A", color: "bg-red-500" },
+                  ].map((contrib) => (
+                    <a
+                      key={contrib.name}
+                      href={contrib.url || "#"}
+                      target={contrib.url ? "_blank" : undefined}
+                      rel={contrib.url ? "noopener noreferrer" : undefined}
+                      className={`flex flex-col items-center gap-2 group ${!contrib.url && "cursor-default"}`}
+                    >
+                      <div className="relative">
+                        <Avatar className="h-14 w-14 border-2 border-background shadow-sm group-hover:scale-110 transition-transform duration-200 group-hover:shadow-glow">
+                          <AvatarImage src={contrib.image} alt={contrib.name} className="object-cover" />
+                          <AvatarFallback className={`${contrib.color} text-white font-bold`}>
+                            {contrib.initial}
+                          </AvatarFallback>
+                        </Avatar>
+                      </div>
+                      <span className="text-xs font-medium text-center max-w-[80px] leading-tight group-hover:text-primary transition-colors">
+                        {contrib.name}
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </DashboardLayout>

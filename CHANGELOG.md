@@ -39,55 +39,57 @@ Fixed a critical crash in the Admin Dashboard for Super Admin users and resolved
 - Fixed React crash in Admin Dashboard by adding missing `superadmin` role mapping for icons and labels.
 - Restored missing `get_popular_modules` database function to resolve 404 errors.
 - Added error handling to `usePopularModules` hook to prevent dashboard crashes when analytics data is unavailable.
+- Implemented real-time n8n API key generation and secure storage.
+- Optimized Vite chunking strategy to reduce initial bundle size.
+- Refactored Auth initialization to improve performance.
+
+#### Improvements (1)
+- Optimized learning stats with server-side aggregation for faster dashboard loading.
 
 ## [1.4.4] - January 25, 2026
 
-### Sidebar Stability & UX Fixes
+### Premium Design & Performance
 
-Focused on improving sidebar stability and enhancing the Changelog UI with the 'Glass Liquid' design system.
+Major overhaul of the visual system and critical performance optimizations for the learning environment.
 
 <!-- -->
 
-#### Improvements (2)
-- Updated Changelog UI to use 'Glass Liquid' design system.
-- Added 'Version History Summary' table to the Changelog page.
+#### Improvements (3)
+- **Dark Mode Premium**: Implemented Glassmorphism, improved typography, and added mobile-friendly navigation tabs.
+- Optimized `ModuleLearn` rendering by offloading Pyodide (Python execution) to a dedicated Web Worker.
+- Updated Changelog UI with a modern 'Glass Liquid' aesthetic and version summary table.
 
-#### Fixes (2)
-- Fixed sidebar persistence issue where it collapsed on refresh, ensuring consistent user preference.
-- Fixed changelog parser regex to correctly handle section headers and descriptions.
+#### Fixes (3)
+- Fixed runtime crash `j.map is not a function` in `ModuleLearn` when handling empty content.
+- Fixed sidebar persistence issue where the collapsed state was lost on page refresh.
+- Resolved RLS and API validation security vulnerabilities.
+
+#### Patches (1)
+- Added RLS policies for the `rate_limits` table to prevent unauthorized access.
 
 ## [1.4.3] - January 24, 2026
 
-### Performance & Database Optimizations
+### Security Hardening & Data Protection
 
-Implemented critical database optimizations and performance improvements for smoother dashboard navigation.
+Comprehensive security audit and resolution of data leakage vulnerabilities.
 
 <!-- -->
 
-#### Improvements (1)
+#### Security (3)
+- **PII Leakage Fix**: Resolved Personally Identifiable Information (PII) exposure in profile RLS policies.
+- **Console Audit**: Removed debug logs in production that leaked sensitive system information.
+- Hardened RLS rules for `profiles` table to prevent unauthorized data access.
+
+#### Improvements (2)
+- Optimized module fetching logic by request ID for faster navigation.
 - Optimized module progress lookup to O(1) for improved dashboard performance.
-
-#### Database (2)
-- Updated `public.has_role` function to support role hierarchy (Super Admin > Admin).
-- Added index on `user_progress.module_id` for faster filtering.
-
-## [1.4.2] - January 24, 2026
-
-### Bug Fixes & Code Quality
-
-Addressed various code quality issues, fixed regex errors, and resolved dependency warnings for a more stable build.
-
-<!-- -->
 
 #### Fixes (5)
 - Replaced `any` types with proper TypeScript types in `DashboardProfile.tsx` and `generate-quiz` Supabase function.
 - Fixed regex-related ESLint errors (`no-control-regex`, `no-useless-escape`) in Supabase Edge Functions.
 - Converted `require()` statements to ES module imports in `tailwind.config.ts`.
 - Resolved missing dependency warnings in `QuizPlayer.tsx` and `CustomCursor.tsx`.
-- Removed duplicate variable definitions in `CustomCursor.tsx`.
-
-#### Improvements (1)
-- Refactored `ModuleTOC.tsx` and other components to reduce Fast Refresh warnings and improve HMR.
+- Added index on `user_progress.module_id` for faster filtering.
 
 ## [1.4.1] - January 20, 2026
 
@@ -265,9 +267,9 @@ First stable release of LearnInk learning platform.
 | Version | Date | Highlights |
 |---------|------|------------|
 | 1.4.6 | Jan 27, 2026 | PWA Support & Security Hardening |
-| 1.4.5 | Jan 26, 2026 | Admin Dashboard Stability |
-| 1.4.4 | Jan 25, 2026 | Sidebar Stability & Changelog UI |
-| 1.4.3 | Jan 24, 2026 | Performance & Database Optimizations |
+| 1.4.5 | Jan 26, 2026 | Admin Dashboard & Optimized Chunks |
+| 1.4.4 | Jan 25, 2026 | Premium Design & Performance Overhaul |
+| 1.4.3 | Jan 24, 2026 | Security Hardening & PII Leakage Fix |
 | 1.4.2 | Jan 24, 2026 | Bug Fixes & Code Quality |
 | 1.4.1 | Jan 20, 2026 | Code Quality & Security Audit |
 | 1.4.0 | Jan 19, 2026 | Major Frontend Upgrade & Premium UX |

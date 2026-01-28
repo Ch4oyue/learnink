@@ -58,7 +58,8 @@ export function useUsers() {
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('id, display_name, avatar_url, created_at')
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .range(0, 10000);
 
       if (profilesError) {
         logger.error('Error fetching profiles:', profilesError);
@@ -68,7 +69,8 @@ export function useUsers() {
       // Get roles for all users
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
-        .select('user_id, role');
+        .select('user_id, role')
+        .range(0, 10000);
 
       if (rolesError) {
         logger.error('Error fetching roles:', rolesError);

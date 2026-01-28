@@ -10,6 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
+import { usePWA } from "@/contexts/PWAContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { useLearningStats } from "@/hooks/useLearningStats";
 import { useToast } from "@/hooks/use-toast";
@@ -21,6 +22,10 @@ import {
   Camera,
   Edit,
   CheckCircle,
+  Smartphone,
+  Users,
+  CheckCircle2,
+  Download,
   MapPin,
   Flame,
   Trophy,
@@ -104,6 +109,7 @@ export default function DashboardProfile() {
   const navigate = useNavigate();
   const { user, role, profile, signOut } = useAuth();
   const { theme, setTheme } = useTheme();
+  const { isInstalled, deferredPrompt, installApp } = usePWA();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
   const { data: stats, isLoading: statsLoading } = useLearningStats(user?.id);
@@ -111,6 +117,19 @@ export default function DashboardProfile() {
   const [displayName, setDisplayName] = useState(
     user?.user_metadata?.display_name || ""
   );
+
+  // Mobile Transparency State
+  const [transparentMobile, setTransparentMobile] = useState(() => {
+    return localStorage.getItem("transparentMobileNav") === "true";
+  });
+
+  const toggleTransparentMobile = () => {
+    const newValue = !transparentMobile;
+    setTransparentMobile(newValue);
+    localStorage.setItem("transparentMobileNav", String(newValue));
+    // Trigger storage event for other components to pick up
+    window.dispatchEvent(new Event("storage"));
+  };
   const [isUpdating, setIsUpdating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
@@ -625,50 +644,153 @@ export default function DashboardProfile() {
           </Card>
         )}
 
-        {/* Settings Tab Content - Appearance */}
+        {/* Settings Tab Content */}
         {activeTab === "settings" && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-              <CardDescription>
-                Customize how LearnInk looks on your device
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {[
-                  { value: "light" as const, label: "Light", icon: Sun, description: "Light background" },
-                  { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background" },
-                  { value: "system" as const, label: "System", icon: Monitor, description: "Match device" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setTheme(option.value)}
-                    className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50 hover:bg-muted/50"
-                      }`}
-                  >
-                    <option.icon
-                      className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
+          <div className="space-y-6">
+            {/* Appearance */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Appearance</CardTitle>
+                <CardDescription>
+                  Customize how LearnInk looks on your device
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[
+                    { value: "light" as const, label: "Light", icon: Sun, description: "Light background" },
+                    { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background" },
+                    { value: "system" as const, label: "System", icon: Monitor, description: "Match device" },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setTheme(option.value)}
+                      className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/50 hover:bg-muted/50"
                         }`}
-                    />
-                    <div className="text-center">
-                      <span
-                        className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
+                    >
+                      <option.icon
+                        className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
                           }`}
-                      >
-                        {option.label}
-                      </span>
-                      <span className="text-xs text-muted-foreground mt-1 block">
-                        {option.description}
+                      />
+                      <div className="text-center">
+                        <span
+                          className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
+                            }`}
+                        >
+                          {option.label}
+                        </span>
+                        <span className="text-xs text-muted-foreground mt-1 block">
+                          {option.description}
+                        </span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Mobile Preferences */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Mobile Preferences</CardTitle>
+                <CardDescription>Adjust settings for mobile experience</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Smartphone className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">Transparent Navigation</p>
+                      <p className="text-sm text-muted-foreground">Make bottom navigation bar transparent on mobile</p>
+                    </div>
+                  </div>
+                  <Button
+                    variant={transparentMobile ? "default" : "outline"}
+                    onClick={toggleTransparentMobile}
+                  >
+                    {transparentMobile ? "Enabled" : "Disabled"}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Install App */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Install Application</CardTitle>
+                <CardDescription>Install LearnAI for a better experience</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {isInstalled ? (
+                   <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
+                     <CheckCircle2 className="h-5 w-5 text-green-500" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium text-foreground">App Installed</span>
+                        <span className="text-xs font-normal">You are using the app version</span>
+                     </div>
+                   </Button>
+                ) : deferredPrompt ? (
+                   <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3">
+                     <Download className="h-5 w-5" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium">Install App</span>
+                        <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
+                     </div>
+                   </Button>
+                ) : (
+                   <div className="bg-muted/50 rounded-lg p-4 border border-dashed text-center">
+                     <p className="text-sm text-muted-foreground">
+                       Use your browser's menu to <strong>"Install App"</strong> or <strong>"Add to Home Screen"</strong>.
+                     </p>
+                   </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Contributors */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Users className="h-5 w-5 text-primary" />
+                  Contributors
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4">
+                  {[
+                    { name: "Abelion", initial: "A", color: "bg-red-500", image: "https://ik.imagekit.io/focustimerin/preview%20image1?updatedAt=1757343104763" },
+                    { name: "Gemini", initial: "G", color: "bg-blue-500" },
+                    { name: "Stitch", initial: "S", color: "bg-green-500" },
+                    { name: "Claude", initial: "C", color: "bg-purple-500" },
+                    { name: "Jules (Google)", initial: "J", color: "bg-yellow-500" },
+                    { name: "IDE Antigravity", initial: "I", color: "bg-indigo-500" }
+                  ].map((contrib) => (
+                    <div key={contrib.name} className="flex flex-col items-center gap-2">
+                      <Avatar className="h-12 w-12 border-2 border-background shadow-sm">
+                        {contrib.image && <AvatarImage src={contrib.image} alt={contrib.name} />}
+                        <AvatarFallback className={`${contrib.color} text-white font-bold`}>
+                          {contrib.initial}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-xs font-medium text-center max-w-[80px] leading-tight">
+                        {contrib.name}
                       </span>
                     </div>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  ))}
+                  <div className="flex flex-col items-center gap-2">
+                     <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
+                        <span className="text-xs text-muted-foreground">+300</span>
+                     </div>
+                     <span className="text-xs text-muted-foreground">Others</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
       </div>
     </DashboardLayout>

@@ -4,6 +4,7 @@ import { useUnreadNotificationCount } from "@/hooks/useNotifications";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   BookOpen,
@@ -20,27 +21,29 @@ export function BottomNavigation() {
   const location = useLocation();
   const { data: unreadCount } = useUnreadNotificationCount(user?.id);
 
+  const [isTransparent, setIsTransparent] = useState(() => localStorage.getItem("transparentMobileNav") === "true");
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setIsTransparent(localStorage.getItem("transparentMobileNav") === "true");
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
+
   // Fetch pending approval count for admin
   const { data: pendingApprovalCount } = useQuery({
     queryKey: ["pending-approval-count-mobile"],
     queryFn: async () => {
-      // 1. Count Pending Contents
-      const { count: contentsCount, error: contentsError } = await supabase
-        .from("incoming_contents")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
+      const [contentsResult, requestsResult] = await Promise.all([
+        supabase.from("incoming_contents").select("*", { count: "exact", head: true }).eq("status", "pending"),
+        supabase.from("material_requests").select("*", { count: "exact", head: true }).eq("status", "pending")
+      ]);
 
-      if (contentsError) throw contentsError;
+      if (contentsResult.error) throw contentsResult.error;
+      if (requestsResult.error) throw requestsResult.error;
 
-      // 2. Count Pending Material Requests
-      const { count: requestsCount, error: requestsError } = await supabase
-        .from("material_requests")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "pending");
-
-      if (requestsError) throw requestsError;
-
-      return (contentsCount || 0) + (requestsCount || 0);
+      return (contentsResult.count || 0) + (requestsResult.count || 0);
     },
     enabled: role === "admin" || role === "superadmin",
     refetchInterval: 30000,
@@ -120,7 +123,10 @@ export function BottomNavigation() {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-card/95 backdrop-blur-sm md:hidden safe-area-bottom">
+    <nav className={cn(
+      "fixed bottom-0 left-0 right-0 z-50 border-t backdrop-blur-sm md:hidden safe-area-bottom transition-colors duration-300",
+      isTransparent ? "bg-background/60 border-t-border/50" : "bg-card/95 border-t"
+    )}>
       <div className="flex items-center justify-around h-16 px-2">
         {filteredItems.map((item) => {
           const active = isActive(item.href);
@@ -135,8 +141,8 @@ export function BottomNavigation() {
             >
               <div className="relative">
                 <item.icon className={cn("h-5 w-5", active && "text-primary")} />
-                {item.badge && item.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 h-4 min-w-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium flex items-center justify-center badge-pulse">
+                {item.badge !== undefined && item.badge > 0 && (
+                  <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm z-10 animate-in zoom-in duration-300">
                     {item.badge > 99 ? "99+" : item.badge}
                   </span>
                 )}

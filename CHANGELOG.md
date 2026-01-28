@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.8] - January 29, 2026
+
+### Security Patch
+
+Critical security patch for Edge Function access control.
+
+<!-- -->
+
+#### Security (1)
+- **Broken Access Control**: Fixed a critical vulnerability in `get-users` Edge Function where the Service Role key was used without proper role validation. Implemented strict RBAC checks using `auth.getUser()` and `user_roles` verification.
+
 ## [1.4.7] - January 28, 2026
 
 ### Admin UX & Content Synchronization
@@ -284,6 +295,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.8 | Jan 29, 2026 | Critical Security Patch (Edge Function RBAC) |
 | 1.4.7 | Jan 28, 2026 | Admin UX & Notion Sync Upgrade |
 | 1.4.6 | Jan 27, 2026 | PWA Support & Security Hardening |
 | 1.4.5 | Jan 26, 2026 | Admin Dashboard & Optimized Chunks |
@@ -297,4 +309,3 @@ First stable release of LearnInk learning platform.
 | 1.2.0 | Jan 15, 2026 | Learning Interface Redesign |
 | 1.1.0 | Jan 10, 2026 | Dashboard & Auth Implementation |
 | 1.0.0 | Dec 23, 2025 | Initial Release |
-

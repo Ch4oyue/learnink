@@ -338,6 +338,19 @@ export default function DashboardProfile() {
               </CardContent>
             </Card>
 
+            {/* Quick Actions (e.g. Changelog) */}
+            <div className="flex gap-4">
+              <Link to="/changelog" className="flex-1">
+                 <Button variant="outline" className="w-full h-auto py-3 gap-2 justify-start bg-card hover:bg-muted/50 border shadow-sm">
+                   <Clock className="h-5 w-5 text-primary" />
+                   <div className="flex flex-col items-start text-left">
+                     <span className="font-semibold text-foreground">Changelog & Updates</span>
+                     <span className="text-xs text-muted-foreground font-normal">Lihat riwayat pembaruan aplikasi</span>
+                   </div>
+                 </Button>
+              </Link>
+            </div>
+
             {/* Learning Activity Card - Hidden during edit mode for focus */}
             {!isEditing && (
               <Card>

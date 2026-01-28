@@ -84,6 +84,16 @@ export default function DashboardSettings() {
     { value: "system" as const, label: "System", icon: Monitor, description: "Follows your device settings" },
   ];
 
+  // Mobile Preferences State (Moved from BottomNavigation logic if needed, but handled here via localStorage)
+  const [transparentNav, setTransparentNav] = useState(() => localStorage.getItem("transparentMobileNav") === "true");
+
+  const toggleTransparentNav = () => {
+    const newVal = !transparentNav;
+    setTransparentNav(newVal);
+    localStorage.setItem("transparentMobileNav", String(newVal));
+    window.dispatchEvent(new Event("storage")); // Notify other components
+  };
+
   if (!isAdmin) {
     return (
       <DashboardLayout>
@@ -112,6 +122,26 @@ export default function DashboardSettings() {
                     </div>
                   </button>
                 ))}
+              </div>
+
+              {/* Mobile Preferences - Only visible on mobile/tablet */}
+              <div className="mt-8 border-t pt-6 md:hidden">
+                <h3 className="text-base font-medium mb-1">Mobile Preferences</h3>
+                <p className="text-sm text-muted-foreground mb-4">Adjust settings for mobile experience</p>
+                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-md">
+                            <Layers className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                            <span className="font-medium block">Transparent Navigation</span>
+                            <span className="text-xs text-muted-foreground">Make bottom navigation bar glass-like</span>
+                        </div>
+                    </div>
+                    <Button variant={transparentNav ? "default" : "outline"} size="sm" onClick={toggleTransparentNav}>
+                        {transparentNav ? "Enabled" : "Disabled"}
+                    </Button>
+                </div>
               </div>
 
               {/* Install PWA Section */}

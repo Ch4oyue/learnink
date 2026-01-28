@@ -12,6 +12,7 @@ serve(async (req) => {
   }
 
   try {
+    // 1. Get User from JWT to ensure only admin can access
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabase = createClient(supabaseUrl, supabaseKey);

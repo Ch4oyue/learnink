@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadNotificationCount } from "@/hooks/useNotifications";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
@@ -19,6 +19,7 @@ import {
 export function BottomNavigation() {
   const { user, role } = useAuth();
   const location = useLocation();
+  const queryClient = useQueryClient();
   const { data: unreadCount } = useUnreadNotificationCount(user?.id);
 
   const [isTransparent, setIsTransparent] = useState(() => localStorage.getItem("transparentMobileNav") === "true");
@@ -31,10 +32,50 @@ export function BottomNavigation() {
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
+  // Realtime subscription for badges
+  useEffect(() => {
+    if (!user) return;
+
+    // Admin subscriptions
+    if (role === "admin" || role === "superadmin") {
+      const adminChannel = supabase
+        .channel("mobile-nav-admin-badges")
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "incoming_contents" },
+          () => queryClient.invalidateQueries({ queryKey: ["pending-approval-count-mobile"] })
+        )
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "material_requests" },
+          () => queryClient.invalidateQueries({ queryKey: ["pending-approval-count-mobile"] })
+        )
+        .subscribe();
+
+      return () => { supabase.removeChannel(adminChannel); };
+    }
+
+    // User subscriptions (Notifications)
+    const userChannel = supabase
+      .channel(`mobile-nav-user-badges-${user.id}`)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
+        () => queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] })
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(userChannel);
+    };
+  }, [user, role, queryClient]);
+
   // Fetch pending approval count for admin
   const { data: pendingApprovalCount } = useQuery({
     queryKey: ["pending-approval-count-mobile"],
     queryFn: async () => {
+      if (role !== "admin" && role !== "superadmin") return 0;
+
       const [contentsResult, requestsResult] = await Promise.all([
         supabase.from("incoming_contents").select("*", { count: "exact", head: true }).eq("status", "pending"),
         supabase.from("material_requests").select("*", { count: "exact", head: true }).eq("status", "pending")
@@ -46,7 +87,6 @@ export function BottomNavigation() {
       return (contentsResult.count || 0) + (requestsResult.count || 0);
     },
     enabled: role === "admin" || role === "superadmin",
-    refetchInterval: 30000,
   });
 
   const getDashboardPath = () => {
@@ -124,8 +164,11 @@ export function BottomNavigation() {
 
   return (
     <nav className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 border-t backdrop-blur-sm md:hidden safe-area-bottom transition-colors duration-300",
-      isTransparent ? "bg-background/60 border-t-border/50" : "bg-card/95 border-t"
+      "fixed bottom-0 left-0 right-0 z-50 border-t md:hidden safe-area-bottom transition-all duration-300",
+      // iOS Style Frosted Glass Effect
+      isTransparent
+        ? "bg-background/70 backdrop-blur-[20px] saturate-150 border-t-white/10 dark:border-t-white/5 shadow-[0_-1px_3px_rgba(0,0,0,0.05)]"
+        : "bg-card/95 border-t backdrop-blur-md"
     )}>
       <div className="flex items-center justify-around h-16 px-2">
         {filteredItems.map((item) => {

@@ -548,7 +548,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         <SidebarProvider>
             <AppSidebar pendingCount={pendingCount} />
             <MobileBottomNav pendingCount={pendingCount} />
-            <SidebarInset className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden bg-transparent">
+            <SidebarInset className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden bg-transparent relative z-10">
                 <header className="flex h-16 shrink-0 items-center gap-2 border-none glass-liquid px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 md:flex hidden m-4 rounded-2xl shadow-sm">
                     <SidebarTrigger className="-ml-1" />
                     <div className="mr-4 flex">

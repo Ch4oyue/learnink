@@ -92,17 +92,21 @@
        TRANSPARENT MODE (Glass Effect)
        ====================================== */
     .transparent-mode {
-        /* Lighter opacity for backgrounds */
-        --card: 0 0% 100% / 0.7;
-        --popover: 0 0% 100% / 0.7;
-        --sidebar: 220 14% 96% / 0.7;
+        /* Lighter opacity for backgrounds - iOS Style */
+        --background: 0 0% 98%; /* Slightly gray for contrast with white cards */
+        --card: 0 0% 100% / 0.65;
+        --popover: 0 0% 100% / 0.75;
+        --muted: 240 4.8% 95.9% / 0.5;
+        --sidebar: 0 0% 100% / 0.65;
     }
 
     .transparent-mode.dark {
-        /* Darker opacity for backgrounds */
-        --card: 240 10% 3.9% / 0.6;
-        --popover: 240 10% 3.9% / 0.6;
-        --sidebar: 220 13% 8% / 0.6;
+        /* Darker opacity for backgrounds - iOS Style */
+        --background: 240 10% 3.9%; /* Keep dark background */
+        --card: 240 10% 10% / 0.6; /* Slightly lighter than bg for layering */
+        --popover: 240 10% 10% / 0.7;
+        --muted: 240 3.7% 15.9% / 0.5;
+        --sidebar: 240 10% 10% / 0.6;
     }
 }
 
@@ -132,19 +136,25 @@
         min-height: 100dvh;
     }
 
-    /* Apply blur when transparent mode is active */
-    .transparent-mode body {
-        /* Subtle global texture or effect if needed */
-    }
-
     /* Target generic card/surface classes if they use bg-card */
     .transparent-mode .bg-card,
     .transparent-mode .bg-popover,
     .transparent-mode .bg-sidebar,
-    .transparent-mode .glass-liquid {
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid hsl(var(--border) / 0.5); /* Faint border for contrast */
+    .transparent-mode .glass-liquid,
+    .transparent-mode .bg-muted {
+        backdrop-filter: blur(20px) saturate(150%);
+        -webkit-backdrop-filter: blur(20px) saturate(150%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .transparent-mode.dark .bg-card,
+    .transparent-mode.dark .bg-popover,
+    .transparent-mode.dark .bg-sidebar,
+    .transparent-mode.dark .glass-liquid,
+    .transparent-mode.dark .bg-muted {
+         border: 1px solid rgba(255, 255, 255, 0.05);
+         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
     }
 
     /* Autofill styling - Light Mode */
@@ -247,10 +257,6 @@
     .active-bounce:active {
         transform: scale(0.95);
         transition: transform 0.1s cubic-bezier(0.32, 0.72, 0, 1);
-    }
-
-    .safe-area-bottom {
-        padding-bottom: env(safe-area-inset-bottom);
     }
 }
 

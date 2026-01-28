@@ -713,8 +713,8 @@ export default function DashboardProfile() {
                       <Smartphone className="h-5 w-5 text-primary" />
                     </div>
                     <div>
-                      <p className="font-medium">Transparent Navigation</p>
-                      <p className="text-sm text-muted-foreground">Make bottom navigation bar transparent on mobile</p>
+                      <p className="font-medium">Transparent Mode</p>
+                      <p className="text-sm text-muted-foreground">Enable iOS-style glassmorphism effect</p>
                     </div>
                   </div>
                   <Button
@@ -799,12 +799,6 @@ export default function DashboardProfile() {
                       </span>
                     </a>
                   ))}
-                  <div className="flex flex-col items-center gap-2">
-                     <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center border-2 border-dashed border-muted-foreground/30">
-                        <span className="text-xs text-muted-foreground">+300</span>
-                     </div>
-                     <span className="text-xs text-muted-foreground">Others</span>
-                  </div>
                 </div>
               </CardContent>
             </Card>

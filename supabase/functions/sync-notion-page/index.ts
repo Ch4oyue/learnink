@@ -7,6 +7,35 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+interface NotionPropertySelect {
+  name: string;
+}
+
+interface NotionPropertyMultiSelect {
+  name: string;
+}
+
+interface NotionPageProperties {
+  Name?: { title?: { plain_text: string }[] };
+  Summary?: { rich_text?: { plain_text: string }[] };
+  Level?: { select?: NotionPropertySelect };
+  Category?: { select?: NotionPropertySelect; multi_select?: NotionPropertyMultiSelect[] };
+  category?: { select?: NotionPropertySelect };
+  Track?: { select?: NotionPropertySelect };
+  Slug?: { rich_text?: { plain_text: string }[] };
+}
+
+interface NotionPageCover {
+  type: 'external' | 'file';
+  external?: { url: string };
+  file?: { url: string };
+}
+
+interface NotionPageData {
+  properties: NotionPageProperties;
+  cover?: NotionPageCover;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -37,7 +66,7 @@ serve(async (req) => {
         throw new Error(`Failed to fetch page: ${pageRes.statusText}`);
     }
 
-    const pageData = await pageRes.json();
+    const pageData = await pageRes.json() as NotionPageData;
     const props = pageData.properties;
 
     // Extract Properties
@@ -50,7 +79,7 @@ serve(async (req) => {
     if (props.Category?.select) {
         category = props.Category.select.name;
     } else if (props.Category?.multi_select) {
-        category = props.Category.multi_select.map((c: any) => c.name).join(", ");
+        category = props.Category.multi_select.map((c) => c.name).join(", ");
     } else if (props.category?.select) { // Fallback to lowercase
         category = props.category.select.name;
     }
@@ -62,9 +91,9 @@ serve(async (req) => {
 
     let cover = "";
     if (pageData.cover) {
-        if (pageData.cover.type === 'external') {
+        if (pageData.cover.type === 'external' && pageData.cover.external) {
             cover = pageData.cover.external.url;
-        } else if (pageData.cover.type === 'file') {
+        } else if (pageData.cover.type === 'file' && pageData.cover.file) {
             cover = pageData.cover.file.url;
         }
     }
@@ -100,13 +129,6 @@ serve(async (req) => {
         status: "pending"
     };
 
-    // Try to insert slug/cover if columns exist (Supabase ignores extra fields if properly typed,
-    // but here we are using JS client which might error if column missing.
-    // We will stick to raw_content for safety unless user confirmed columns exist.
-    // However, to satisfy the requirement "include slug & cover fields", we add them to the payload.
-    // If the columns don't exist, this might fail.
-    // Use `upsert` or `update`/`insert` explicitly.
-
     let result;
 
     if (existing) {
@@ -136,8 +158,10 @@ serve(async (req) => {
     );
 
   } catch (error) {
+    // Error type handling
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: errorMessage }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }

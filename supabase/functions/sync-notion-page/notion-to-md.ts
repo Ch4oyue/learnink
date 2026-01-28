@@ -3,7 +3,23 @@ interface NotionBlock {
   type: string;
   has_children: boolean;
   children?: NotionBlock[];
-  [key: string]: any;
+  [key: string]: unknown; // Safer than any
+}
+
+interface RichTextAnnotation {
+  bold: boolean;
+  italic: boolean;
+  strikethrough: boolean;
+  underline: boolean;
+  code: boolean;
+  color: string;
+}
+
+interface RichText {
+  plain_text: string;
+  href?: string | null;
+  annotations: RichTextAnnotation;
+  type?: string;
 }
 
 export class NotionToMarkdown {
@@ -79,9 +95,9 @@ export class NotionToMarkdown {
     return md.trim();
   }
 
-  private getRichText(richText: any[]): string {
+  private getRichText(richText: RichText[]): string {
     if (!richText) return "";
-    return richText.map((t: any) => {
+    return richText.map((t) => {
       let text = t.plain_text;
       if (t.annotations.bold) text = `**${text}**`;
       if (t.annotations.italic) text = `*${text}*`;
@@ -94,38 +110,47 @@ export class NotionToMarkdown {
 
   private blockToMarkdown(block: NotionBlock): string {
     const type = block.type;
-    const data = block[type];
+    const data = block[type] as Record<string, unknown>; // Type assertion for block data
 
     switch (type) {
       case "paragraph":
-        return this.getRichText(data.rich_text);
+        return this.getRichText(data.rich_text as RichText[]);
       case "heading_1":
-        return `# ${this.getRichText(data.rich_text)}`;
+        return `# ${this.getRichText(data.rich_text as RichText[])}`;
       case "heading_2":
-        return `## ${this.getRichText(data.rich_text)}`;
+        return `## ${this.getRichText(data.rich_text as RichText[])}`;
       case "heading_3":
-        return `### ${this.getRichText(data.rich_text)}`;
+        return `### ${this.getRichText(data.rich_text as RichText[])}`;
       case "bulleted_list_item":
-        return `- ${this.getRichText(data.rich_text)}`;
+        return `- ${this.getRichText(data.rich_text as RichText[])}`;
       case "numbered_list_item":
-        return `1. ${this.getRichText(data.rich_text)}`;
+        return `1. ${this.getRichText(data.rich_text as RichText[])}`;
       case "to_do":
-        return `- [${data.checked ? "x" : " "}] ${this.getRichText(data.rich_text)}`;
+        return `- [${data.checked ? "x" : " "}] ${this.getRichText(data.rich_text as RichText[])}`;
       case "toggle":
-        return `<details><summary>${this.getRichText(data.rich_text)}</summary>\n\n</details>`;
+        return `<details><summary>${this.getRichText(data.rich_text as RichText[])}</summary>\n\n</details>`;
       case "code":
-        return "```" + data.language + "\n" + this.getRichText(data.rich_text) + "\n```";
-      case "image":
-        const imgUrl = data.type === "external" ? data.external.url : data.file?.url;
-        const imgCaption = data.caption ? this.getRichText(data.caption) : "Image";
-        return `![${imgCaption}](${imgUrl})`;
-      case "video":
-        const vidUrl = data.type === "external" ? data.external.url : data.file?.url;
+        return "```" + data.language + "\n" + this.getRichText(data.rich_text as RichText[]) + "\n```";
+      case "image": {
+        const external = data.external as { url: string } | undefined;
+        const file = data.file as { url: string } | undefined;
+        const imgUrl = data.type === "external" ? external?.url : file?.url;
+        const caption = data.caption ? this.getRichText(data.caption as RichText[]) : "Image";
+        return `![${caption}](${imgUrl})`;
+      }
+      case "video": {
+        const external = data.external as { url: string } | undefined;
+        const file = data.file as { url: string } | undefined;
+        const vidUrl = data.type === "external" ? external?.url : file?.url;
         return `[Video: ${vidUrl}](${vidUrl})`;
-      case "file":
-        const fileUrl = data.type === "external" ? data.external.url : data.file?.url;
-        const fileName = data.caption ? this.getRichText(data.caption) : "File";
+      }
+      case "file": {
+        const external = data.external as { url: string } | undefined;
+        const file = data.file as { url: string } | undefined;
+        const fileUrl = data.type === "external" ? external?.url : file?.url;
+        const fileName = data.caption ? this.getRichText(data.caption as RichText[]) : "File";
         return `[📎 ${fileName}](${fileUrl})`;
+      }
       case "bookmark":
         return `[🔖 ${data.url}](${data.url})`;
       case "embed":
@@ -133,18 +158,22 @@ export class NotionToMarkdown {
       case "equation":
          return `$$ ${data.expression} $$`;
       case "quote":
-        return `> ${this.getRichText(data.rich_text)}`;
+        return `> ${this.getRichText(data.rich_text as RichText[])}`;
       case "divider":
         return "---";
-      case "callout":
-         const icon = data.icon?.emoji || "💡";
-         return `> ${icon} **${this.getRichText(data.rich_text)}**`;
+      case "callout": {
+         const iconData = data.icon as { emoji?: string } | undefined;
+         const icon = iconData?.emoji || "💡";
+         return `> ${icon} **${this.getRichText(data.rich_text as RichText[])}**`;
+      }
       case "table":
          return ""; // Table container, children are rows
-      case "table_row":
+      case "table_row": {
          // Simple table row support
-         const cells = data.cells.map((cell: any) => this.getRichText(cell));
-         return `| ${cells.join(" | ")} |`;
+         const cells = data.cells as RichText[][];
+         const cellContent = cells.map((cell) => this.getRichText(cell));
+         return `| ${cellContent.join(" | ")} |`;
+      }
       case "column_list":
          return "";
       case "column":

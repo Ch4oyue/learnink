@@ -36,6 +36,10 @@ Major improvements to the Content Approval workflow, Mobile Admin Experience, an
 - **Mobile Menu**: Filtered out redundant items from the mobile "Menu" sheet that are already present in the floating dock.
 - **PWA Prompt**: Fixed `useEffect` dependency error in `DashboardProfile` and optimized PWA prompt logic.
 
+#### Patches (2)
+- **Contributor Updates**: Expanded the contributor list in the Profile page to include **Manus** and updated **Abelion**'s social profile links.
+- **Icon Refinement**: Upgraded high-resolution logos for Antigravity, Claude, Gemini, Jules, and Stitch in the contributor section.
+
 ## [1.4.6] - January 27, 2026
 
 ### PWA & Security Hardening

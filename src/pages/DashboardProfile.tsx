@@ -785,12 +785,14 @@ export default function DashboardProfile() {
                 <div className="flex flex-wrap gap-4 justify-center sm:justify-start">
                   {[
                     { name: "Stitch", url: "https://stitch.withgoogle.com/", image: "/assets/contributors/stitch.png", initial: "S", color: "bg-pink-500" },
+                    { name: "Bolt", url: "https://bolt.new/", image: "/assets/contributors/bolt.png", initial: "B", color: "bg-red-500" },
                     { name: "Lovable", url: "https://lovable.dev/", image: "/assets/contributors/lovable.png", initial: "L", color: "bg-purple-500" },
                     { name: "Antigravity", url: "https://antigravity.google/", image: "/assets/contributors/antigravity.png", initial: "A", color: "bg-blue-500" },
                     { name: "Jules", url: "https://jules.google.com/", image: "/assets/contributors/jules.png", initial: "J", color: "bg-indigo-500" },
                     { name: "Claude", url: "https://claude.ai/", image: "/assets/contributors/claude.png", initial: "C", color: "bg-orange-500" },
                     { name: "Gemini", url: "https://gemini.google.com/", image: "/assets/contributors/gemini.png", initial: "G", color: "bg-blue-600" },
-                    { name: "Abelion", url: null, image: "https://ik.imagekit.io/focustimerin/preview%20image1?updatedAt=1757343104763", initial: "A", color: "bg-red-500" },
+                    { name: "Manus", url: "https://manus.im/", image: "/assets/contributors/manus-ai.png", initial: "M", color: "bg-red-500" },
+                    { name: "Abelion", url: "https://lynk.id/abelion/", image: "https://ik.imagekit.io/focustimerin/preview%20image1?updatedAt=1757343104763", initial: "A", color: "bg-red-500" },
                   ].map((contrib) => (
                     <a
                       key={contrib.name}

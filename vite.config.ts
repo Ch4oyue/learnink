@@ -20,8 +20,8 @@ export default defineConfig(({ mode }) => ({
         name: 'LearnAI',
         short_name: 'LearnAI',
         description: 'Platform Belajar AI Automation',
-        theme_color: '#ffffff',
-        background_color: '#ffffff',
+        theme_color: '#08080a',
+        background_color: '#08080a',
         display: 'standalone',
         icons: [
           {

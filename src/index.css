@@ -248,6 +248,10 @@
         transform: scale(0.95);
         transition: transform 0.1s cubic-bezier(0.32, 0.72, 0, 1);
     }
+
+    .safe-area-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
 }
 
 /* ======================================

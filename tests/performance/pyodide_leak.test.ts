@@ -54,13 +54,13 @@ describe("Pyodide Memory Leak Diagnosis (Fixed)", () => {
 
     // 2. Attach Listener A
     let countA = 0;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const listenerA = (_text: string) => { countA++; };
     const unsubA = instance.setStdout(listenerA);
 
     // 3. Attach Listener B
     let countB = 0;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const listenerB = (_text: string) => { countB++; };
     const unsubB = instance.setStdout(listenerB);
 

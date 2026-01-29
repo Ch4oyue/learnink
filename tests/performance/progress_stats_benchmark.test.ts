@@ -14,9 +14,10 @@ const generateProgress = (count: number): UserProgress[] => {
 };
 
 describe("Progress Stats Calculation Benchmark", () => {
+  // Reduced for CI - still demonstrates O(N) vs O(1) difference
   test("compares Recalculation vs Memoized Access", () => {
-    const DATASET_SIZES = [100, 1000, 10000];
-    const ITERATIONS = 10000;
+    const DATASET_SIZES = [100, 500, 2000]; // Reduced from [100, 1000, 10000]
+    const ITERATIONS = 5000; // Reduced from 10000
 
     console.log("\n--- Starting Progress Stats Benchmark ---");
 

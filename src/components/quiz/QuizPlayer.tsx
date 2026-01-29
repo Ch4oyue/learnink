@@ -36,6 +36,9 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
   const [showResults, setShowResults] = useState(false);
   const [results, setResults] = useState<QuizValidationResult["results"] | null>(null);
 
+  // Track start time for anti-cheat
+  const startTimeRef = useRef(Date.now());
+
   const currentQuestion = questions[currentIndex];
   const progress = ((currentIndex + 1) / questions.length) * 100;
 
@@ -43,9 +46,13 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
     if (validateQuiz.isPending || !user) return;
 
     try {
+      // Calculate time taken in seconds
+      const timeTaken = Math.round((Date.now() - startTimeRef.current) / 1000);
+
       const result = await validateQuiz.mutateAsync({
         quiz_id: quiz.id,
         answers,
+        time_taken: timeTaken,
       });
 
       setResults(result.results);

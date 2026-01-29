@@ -4,11 +4,14 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
+  "Access-Control-Max-Age": "86400",
 };
 
 serve(async (req) => {
+  // Handle CORS preflight request
   if (req.method === "OPTIONS") {
-    return new Response("ok", { status: 200, headers: corsHeaders });
+    return new Response(null, { status: 200, headers: corsHeaders });
   }
 
   try {
@@ -49,14 +52,15 @@ serve(async (req) => {
       .eq("user_id", user.id);
 
     if (roleError) {
-       console.error("Role check error:", roleError);
-       throw roleError;
+      console.error("Role check error:", roleError);
+      throw roleError;
     }
 
-    // Explicitly check for both admin and superadmin
-    const hasAccess = userRoles?.some((r) => r.role === "admin" || r.role === "superadmin");
+    // Explicitly check for admin or superadmin roles
+    const isSuperAdmin = userRoles?.some(r => r.role === 'superadmin');
+    const isAdmin = userRoles?.some(r => r.role === 'admin');
 
-    if (!hasAccess) {
+    if (!isSuperAdmin && !isAdmin) {
       return new Response(
         JSON.stringify({ error: "Forbidden: Admin access required" }),
         { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }

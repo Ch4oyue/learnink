@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.4.10] - January 29, 2026
 
-### Notifications & Testing
+### Notifications, Testing & Security
 
-Implemented real-time notification system and enhanced unit testing infrastructure.
+Implemented real-time notification system, enhanced unit testing infrastructure, and quiz anti-cheat security.
 
 <!-- -->
 
-#### Improvements (2)
+#### Improvements (3)
+- **Time-Based Anti-Cheat**: Implemented validation in `validate-quiz-answers` Edge Function to reject submissions that are completed faster than humanly possible (min 2 seconds per question), preventing script attacks.
 - **Real-time Notifications**: Integrated Supabase Realtime for instant notification toasts and added a dedicated notification center page.
 - **Testing Infrastructure**: Configured `bun test` with preload scripts to support robust unit testing of static assets.
 
@@ -332,7 +333,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.10 | Jan 29, 2026 | Notifications & Testing Infrastructure |
+| 1.4.10 | Jan 29, 2026 | Notifications, Testing & Security (Anti-Cheat) |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |
 | 1.4.7 | Jan 26, 2026 | Admin UX & Notion Sync Upgrade |

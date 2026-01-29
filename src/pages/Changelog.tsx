@@ -165,9 +165,9 @@ export default function Changelog() {
                 <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <Button 
-                                variant="ghost" 
-                                size="icon" 
+                            <Button
+                                variant="ghost"
+                                size="icon"
                                 onClick={() => {
                                     if (window.history.state && window.history.state.idx > 0) {
                                         navigate(-1);

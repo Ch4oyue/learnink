@@ -89,75 +89,204 @@
     }
 
     /* ======================================
-       TRANSPARENT MODE (Glass Effect)
+       TRANSPARENT MODE - Apple Liquid Glass Design
+       Inspired by SwiftUI, visionOS, iOS 26
+       ⚠️ MOBILE ONLY - Disabled on Desktop
        ====================================== */
+}
+
+/* ============================================================
+   TRANSPARENT MODE - MOBILE ONLY (max-width: 768px)
+   Apple Liquid Glass Design - SwiftUI / visionOS / iOS 26
+   ============================================================ */
+@media (max-width: 768px) {
+
+    /* ----- CSS Variables Override ----- */
     .transparent-mode {
-        /* Lighter opacity for backgrounds - iOS Style */
-        --background: 0 0% 98%; /* Slightly gray for contrast with white cards */
-        --card: 0 0% 100% / 0.65;
-        --popover: 0 0% 100% / 0.75;
-        --muted: 240 4.8% 95.9% / 0.5;
-        --sidebar: 0 0% 100% / 0.65;
+        --background: 220 15% 96%;
+        --card: 0 0% 100% / 0.35;
+        --popover: 0 0% 100% / 0.45;
+        --muted: 220 15% 95% / 0.25;
+        --sidebar: 0 0% 100% / 0.3;
+        --border: 0 0% 0% / 0.06;
+        --input: 0 0% 100% / 0.4;
     }
 
     .transparent-mode.dark {
-        /* Darker opacity for backgrounds - iOS Style */
-        --background: 240 10% 3.9%; /* Keep dark background */
-        --card: 240 10% 10% / 0.6; /* Slightly lighter than bg for layering */
-        --popover: 240 10% 10% / 0.7;
-        --muted: 240 3.7% 15.9% / 0.5;
-        --sidebar: 240 10% 10% / 0.6;
+        --background: 225 12% 5%;
+        --card: 0 0% 100% / 0.08;
+        --popover: 0 0% 100% / 0.12;
+        --muted: 0 0% 100% / 0.05;
+        --sidebar: 0 0% 100% / 0.06;
+        --border: 0 0% 100% / 0.1;
+        --input: 0 0% 100% / 0.08;
+    }
+
+    /* ----- Base Glass Effect ----- */
+    .transparent-mode .bg-card,
+    .transparent-mode .bg-popover,
+    .transparent-mode .bg-sidebar,
+    .transparent-mode .bg-muted,
+    .transparent-mode .bg-background {
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+    }
+
+    /* ----- Cards - Floating Glass Pill ----- */
+    .transparent-mode .bg-card {
+        background: rgba(255, 255, 255, 0.35);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        border-radius: 24px;
+        box-shadow:
+            0 2px 16px -2px rgba(0, 0, 0, 0.08),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .transparent-mode.dark .bg-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow:
+            0 2px 16px -2px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* ----- Inputs - Inset Glass ----- */
+    .transparent-mode input,
+    .transparent-mode textarea,
+    .transparent-mode select {
+        background: rgba(255, 255, 255, 0.4) !important;
+        backdrop-filter: blur(24px) !important;
+        -webkit-backdrop-filter: blur(24px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.5) !important;
+        border-radius: 12px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+    }
+
+    .transparent-mode.dark input,
+    .transparent-mode.dark textarea,
+    .transparent-mode.dark select {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* ----- Buttons - Pill Glass ----- */
+    .transparent-mode button:not([class*="ghost"]):not([class*="link"]),
+    .transparent-mode .btn,
+    .transparent-mode [role="button"]:not([class*="ghost"]) {
+        backdrop-filter: blur(24px) saturate(150%);
+        -webkit-backdrop-filter: blur(24px) saturate(150%);
+    }
+
+    /* ----- Popover/Dropdown - Elevated Glass ----- */
+    .transparent-mode .bg-popover,
+    .transparent-mode [data-radix-popper-content-wrapper]>div {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: 20px;
+        box-shadow:
+            0 8px 32px -4px rgba(0, 0, 0, 0.12),
+            inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .transparent-mode.dark .bg-popover,
+    .transparent-mode.dark [data-radix-popper-content-wrapper]>div {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow:
+            0 8px 32px -4px rgba(0, 0, 0, 0.5),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* ----- Sidebar (Mobile Sheet) ----- */
+    .transparent-mode .bg-sidebar,
+    .transparent-mode [data-sidebar] {
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border-right: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .transparent-mode.dark .bg-sidebar,
+    .transparent-mode.dark [data-sidebar] {
+        background: rgba(255, 255, 255, 0.06);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* ----- Badges - Mini Pill ----- */
+    .transparent-mode .badge,
+    .transparent-mode [class*="Badge"] {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+    }
+
+    /* ----- Glass Liquid Override ----- */
+    .transparent-mode .glass-liquid {
+        background: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(40px) saturate(180%);
+        -webkit-backdrop-filter: blur(40px) saturate(180%);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .transparent-mode.dark .glass-liquid {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    /* ----- Navigation Bars - Ultra Glass ----- */
+    .transparent-mode nav[class*="fixed"],
+    .transparent-mode header[class*="fixed"] {
+        background: rgba(255, 255, 255, 0.35) !important;
+        backdrop-filter: blur(40px) saturate(180%) !important;
+        -webkit-backdrop-filter: blur(40px) saturate(180%) !important;
+        border-color: rgba(255, 255, 255, 0.5) !important;
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .transparent-mode.dark nav[class*="fixed"],
+    .transparent-mode.dark header[class*="fixed"] {
+        background: rgba(255, 255, 255, 0.08) !important;
+        border-color: rgba(255, 255, 255, 0.12) !important;
+        box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08) !important;
+    }
+}
+
+/* Desktop: Ensure transparent-mode has NO effect */
+@media (min-width: 769px) {
+
+    .transparent-mode,
+    .transparent-mode.dark {
+        /* Reset all custom properties to default */
+    }
+
+    .transparent-mode .bg-card,
+    .transparent-mode .bg-popover,
+    .transparent-mode .bg-sidebar,
+    .transparent-mode .bg-muted,
+    .transparent-mode .glass-liquid,
+    .transparent-mode nav[class*="fixed"],
+    .transparent-mode header[class*="fixed"],
+    .transparent-mode.dark .bg-card,
+    .transparent-mode.dark .bg-popover,
+    .transparent-mode.dark .bg-sidebar,
+    .transparent-mode.dark .bg-muted,
+    .transparent-mode.dark .glass-liquid,
+    .transparent-mode.dark nav[class*="fixed"],
+    .transparent-mode.dark header[class*="fixed"] {
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        /* Use default styles from theme */
     }
 }
 
 /* ======================================
-   BASE STYLES
+   BASE STYLES (Continued)
    ====================================== */
 @layer base {
-    * {
-        @apply border-border;
-    }
-
-    html {
-        scroll-behavior: smooth;
-        /* Smooth theme transition */
-        transition: background-color 0.3s ease, color 0.3s ease;
-        /* Fix for mobile address bar */
-        min-height: 100dvh;
-        /* Remove tap highlight on mobile */
-        -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-        @apply bg-background text-foreground;
-        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-        /* Fix for mobile address bar */
-        min-height: 100dvh;
-    }
-
-    /* Target generic card/surface classes if they use bg-card */
-    .transparent-mode .bg-card,
-    .transparent-mode .bg-popover,
-    .transparent-mode .bg-sidebar,
-    .transparent-mode .glass-liquid,
-    .transparent-mode .bg-muted {
-        backdrop-filter: blur(20px) saturate(150%);
-        -webkit-backdrop-filter: blur(20px) saturate(150%);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
-    }
-
-    .transparent-mode.dark .bg-card,
-    .transparent-mode.dark .bg-popover,
-    .transparent-mode.dark .bg-sidebar,
-    .transparent-mode.dark .glass-liquid,
-    .transparent-mode.dark .bg-muted {
-         border: 1px solid rgba(255, 255, 255, 0.05);
-         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
-    }
 
     /* Autofill styling - Light Mode */
     input:-webkit-autofill,
@@ -250,6 +379,8 @@
             0 8px 40px -10px rgba(0, 0, 0, 0.4),
             inset 0 0 0 1px rgba(255, 255, 255, 0.1);
     }
+
+    /* NOTE: Transparent mode glass-liquid overrides are in mobile-only media query above */
 
     .text-balance {
         text-wrap: balance;

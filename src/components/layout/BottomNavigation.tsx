@@ -165,9 +165,15 @@ export function BottomNavigation() {
   return (
     <nav className={cn(
       "fixed bottom-0 left-0 right-0 z-50 border-t md:hidden safe-area-bottom transition-all duration-300",
-      // iOS Style Frosted Glass Effect
+      // Apple Liquid Glass - Mobile Only
       isTransparent
-        ? "bg-background/70 backdrop-blur-[20px] saturate-150 border-t-white/10 dark:border-t-white/5 shadow-[0_-1px_3px_rgba(0,0,0,0.05)]"
+        ? [
+          "bg-white/35 dark:bg-white/[0.08]",
+          "backdrop-blur-[40px] backdrop-saturate-[180%]",
+          "border-t border-white/50 dark:border-white/12",
+          "shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_-2px_16px_-2px_rgba(0,0,0,0.08)]",
+          "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_-2px_16px_-2px_rgba(0,0,0,0.3)]"
+        ].join(" ")
         : "bg-card/95 border-t backdrop-blur-md"
     )}>
       <div className="flex items-center justify-around h-16 px-2">

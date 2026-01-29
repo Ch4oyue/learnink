@@ -44,6 +44,7 @@ import {
   Sparkles,
   StickyNote,
   Crown,
+  History,
 } from "lucide-react";
 
 // ============================================
@@ -337,19 +338,6 @@ export default function DashboardProfile() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Quick Actions (e.g. Changelog) */}
-            <div className="flex gap-4">
-              <Link to="/changelog" className="flex-1">
-                 <Button variant="outline" className="w-full h-auto py-3 gap-2 justify-start bg-card hover:bg-muted/50 border shadow-sm">
-                   <Clock className="h-5 w-5 text-primary" />
-                   <div className="flex flex-col items-start text-left">
-                     <span className="font-semibold text-foreground">Changelog & Updates</span>
-                     <span className="text-xs text-muted-foreground font-normal">Lihat riwayat pembaruan aplikasi</span>
-                   </div>
-                 </Button>
-              </Link>
-            </div>
 
             {/* Learning Activity Card - Hidden during edit mode for focus */}
             {!isEditing && (
@@ -748,28 +736,53 @@ export default function DashboardProfile() {
               </CardHeader>
               <CardContent>
                 {isInstalled ? (
-                   <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
-                     <CheckCircle2 className="h-5 w-5 text-green-500" />
-                     <div className="flex flex-col items-start">
-                        <span className="font-medium text-foreground">App Installed</span>
-                        <span className="text-xs font-normal">You are using the app version</span>
-                     </div>
-                   </Button>
+                  <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-500" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium text-foreground">App Installed</span>
+                      <span className="text-xs font-normal">You are using the app version</span>
+                    </div>
+                  </Button>
                 ) : deferredPrompt ? (
-                   <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3">
-                     <Download className="h-5 w-5" />
-                     <div className="flex flex-col items-start">
-                        <span className="font-medium">Install App</span>
-                        <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
-                     </div>
-                   </Button>
+                  <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3">
+                    <Download className="h-5 w-5" />
+                    <div className="flex flex-col items-start">
+                      <span className="font-medium">Install App</span>
+                      <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
+                    </div>
+                  </Button>
                 ) : (
-                   <div className="bg-muted/50 rounded-lg p-4 border border-dashed text-center">
-                     <p className="text-sm text-muted-foreground">
-                       Use your browser's menu to <strong>"Install App"</strong> or <strong>"Add to Home Screen"</strong>.
-                     </p>
-                   </div>
+                  <div className="bg-muted/50 rounded-lg p-4 border border-dashed text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Use your browser's menu to <strong>"Install App"</strong> or <strong>"Add to Home Screen"</strong>.
+                    </p>
+                  </div>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Changelog & Updates */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <History className="h-5 w-5 text-primary" />
+                  Changelog & Updates
+                </CardTitle>
+                <CardDescription>
+                  View version history and recent updates
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Link to="/changelog">
+                  <Button variant="outline" className="w-full gap-2 justify-start h-auto py-3 hover:bg-muted/50">
+                    <Clock className="h-5 w-5 text-primary" />
+                    <div className="flex flex-col items-start text-left">
+                      <span className="font-medium text-foreground">View Changelog</span>
+                      <span className="text-xs font-normal text-muted-foreground">Lihat riwayat pembaruan aplikasi</span>
+                    </div>
+                    <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
 

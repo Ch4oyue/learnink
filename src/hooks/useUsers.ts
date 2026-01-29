@@ -61,7 +61,7 @@ export function useUsers(page = 1, limit = 50, search = "") {
   }, [queryClient]);
 
   return useQuery({
-    queryKey: ['users', page, limit],
+    queryKey: ['users', page, limit, search],
     queryFn: async (): Promise<UsersResponse> => {
       // Try to fetch via Edge Function first (bypasses RLS & Handles Pagination)
       try {
@@ -138,51 +138,17 @@ export function isSuperAdmin(user: { id: string; email?: string | null }): boole
 }
 
 export function useUserStats() {
-  return useQuery({
-    queryKey: ['user-stats'],
-    queryFn: async () => {
-      // 1. Total Users
-      const { count: total, error: countError } = await supabase
-        .from('profiles')
-        .select('*', { count: 'exact', head: true });
+  // Use the useUsers data to calculate stats (already bypasses RLS via Edge Function or fallback)
+  const { data: usersData, isLoading, error } = useUsers(1, 1000); // Fetch all for stats
 
-      if (countError) throw countError;
+  const users = usersData?.users || [];
 
-      // 2. Role Counts (Requires fetching user_roles since we can't perform complex group-by count easily via loose valid client)
-      // Actually we can count by filtering
-      // But multiple queries is fine.
+  const stats = {
+    totalUsers: usersData?.meta?.total || users.length,
+    adminCount: users.filter(u => u.role === 'admin' || u.role === 'superadmin').length,
+    tutorCount: users.filter(u => u.role === 'tutor').length,
+    userCount: users.filter(u => u.role === 'user').length,
+  };
 
-      const { count: superadminCount } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'superadmin');
-
-      const { count: adminCount } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'admin');
-
-      const { count: tutorCount } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'tutor');
-
-      // User role is default if not in user_roles? No, usually inserted.
-      const { count: userRoleCount } = await supabase
-        .from('user_roles')
-        .select('*', { count: 'exact', head: true })
-        .eq('role', 'user');
-
-      // Note: "user" role logic might be tricky if it's implicit. 
-      // Current system seems to insert 'user' role explicitly?
-      // If not, userCount = total - (admin + tutor + superadmin)
-
-      return {
-        totalUsers: total || 0,
-        adminCount: (adminCount || 0) + (superadminCount || 0),
-        tutorCount: tutorCount || 0,
-        userCount: total ? (total - ((adminCount || 0) + (superadminCount || 0) + (tutorCount || 0))) : 0 // implicit users
-      };
-    }
-  });
+  return { data: stats, isLoading, error };
 }

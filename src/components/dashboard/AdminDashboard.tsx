@@ -112,20 +112,28 @@ export function AdminDashboardContent() {
     topic: string;
   }>({ open: false, requestId: '', topic: '' });
 
-  const { data: users, isLoading: usersLoading } = useUsers();
+  const { data: usersData, isLoading: usersLoading } = useUsers();
   const { data: modules } = useModules();
   const { data: popularModules } = usePopularModules();
   const { data: requests, isLoading: requestsLoading } = useAllRequests(
     statusFilter === 'all' ? undefined : statusFilter
   );
-  const { totalUsers, adminCount, tutorCount, userCount } = useUserStats();
+  const { data: statsData } = useUserStats();
   const updateUserRole = useUpdateUserRole();
   const updateRequest = useUpdateRequest();
   const generateModule = useGenerateModule();
 
+  // Extract users array from the data (new format: { users, meta })
+  const users = usersData?.users || [];
+
+  // Extract stats (new async format)
+  const totalUsers = statsData?.totalUsers || users.length;
+  const adminCount = statsData?.adminCount || 0;
+  const tutorCount = statsData?.tutorCount || 0;
+
   const filteredUsers = useMemo(() => {
     const lowerQuery = searchQuery.toLowerCase();
-    return users?.filter(u =>
+    return users.filter(u =>
       u.display_name?.toLowerCase().includes(lowerQuery) ||
       u.id.toLowerCase().includes(lowerQuery)
     );

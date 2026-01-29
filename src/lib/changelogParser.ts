@@ -40,13 +40,13 @@ function sanitizeText(text: string): string {
 }
 
 /**
- * Parse the CHANGELOG.md content into structured entries
+ * Parse raw changelog content into structured entries
  */
-export function parseChangelog(): ChangelogEntry[] {
+export function parseChangelogContent(content: string): ChangelogEntry[] {
     const entries: ChangelogEntry[] = [];
 
     // Split by version headers (## [x.x.x])
-    const versionBlocks = changelogContent.split(/(?=## \[\d+\.\d+\.\d+\])/);
+    const versionBlocks = content.split(/(?=## \[\d+\.\d+\.\d+\])/);
 
     for (const block of versionBlocks) {
         // Skip empty blocks or non-version blocks
@@ -98,13 +98,20 @@ export function parseChangelog(): ChangelogEntry[] {
 }
 
 /**
- * Parse the Version History Summary table from the bottom of CHANGELOG.md
+ * Parse the CHANGELOG.md content into structured entries
  */
-export function parseVersionSummary(): VersionSummary[] {
+export function parseChangelog(): ChangelogEntry[] {
+    return parseChangelogContent(changelogContent);
+}
+
+/**
+ * Parse raw version summary content
+ */
+export function parseVersionSummaryContent(content: string): VersionSummary[] {
     const summary: VersionSummary[] = [];
     // Match the table starting with headers
     const tableRegex = /\| Version \| Date \| Highlights \|[\r\n]+\|[-|]+\|[\r\n]+([\s\S]+?)(?=$)/;
-    const match = changelogContent.match(tableRegex);
+    const match = content.match(tableRegex);
 
     if (match) {
         const rows = match[1].trim().split('\n');
@@ -122,6 +129,13 @@ export function parseVersionSummary(): VersionSummary[] {
         }
     }
     return summary;
+}
+
+/**
+ * Parse the Version History Summary table from the bottom of CHANGELOG.md
+ */
+export function parseVersionSummary(): VersionSummary[] {
+    return parseVersionSummaryContent(changelogContent);
 }
 
 /**

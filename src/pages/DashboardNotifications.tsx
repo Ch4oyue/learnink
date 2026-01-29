@@ -1,3 +1,10 @@
+/**
+ * DashboardNotifications.tsx
+ *
+ * Displays a list of user notifications with realtime updates.
+ * Integrated with Supabase Realtime via useNotifications hook.
+ */
+
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";

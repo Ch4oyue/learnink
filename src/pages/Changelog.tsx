@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -156,6 +156,8 @@ function CollapsibleSection({ title, count, items, icon, type, defaultOpen = fal
 // ============================================
 
 export default function Changelog() {
+    const navigate = useNavigate();
+
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
@@ -163,10 +165,14 @@ export default function Changelog() {
                 <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                            <Button variant="ghost" size="icon" asChild>
-                                <Link to="/">
-                                    <ArrowLeft className="h-4 w-4" />
-                                </Link>
+                            <Button variant="ghost" size="icon" onClick={() => {
+                                if (window.history.state && window.history.state.idx > 0) {
+                                    navigate(-1);
+                                } else {
+                                    navigate("/dashboard");
+                                }
+                            }}>
+                                <ArrowLeft className="h-4 w-4" />
                             </Button>
                             <div>
                                 <h1 className="text-xl font-bold text-foreground">Changelog</h1>

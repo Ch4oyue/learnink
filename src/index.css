@@ -124,6 +124,8 @@
         transition: background-color 0.3s ease, color 0.3s ease;
         /* Fix for mobile address bar */
         min-height: 100dvh;
+        /* Remove tap highlight on mobile */
+        -webkit-tap-highlight-color: transparent;
     }
 
     body {

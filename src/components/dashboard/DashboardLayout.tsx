@@ -414,7 +414,14 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
                       : "text-muted-foreground hover:bg-white/10 active:scale-95"
                   )}
                 >
-                  <Icon className="w-5 h-5" />
+                  <div className="relative">
+                    <Icon className="w-5 h-5" />
+                    {item.badge && (
+                      <Badge className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-destructive text-destructive-foreground p-0 flex items-center justify-center text-[10px] pointer-events-none">
+                        {formatBadgeCount(item.badge)}
+                      </Badge>
+                    )}
+                  </div>
                 </Link>
               </li>
             );

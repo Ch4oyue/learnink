@@ -21,6 +21,7 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
 
   const pyodideRef = useRef<PyodideInstance | null>(null);
   const outputBuffer = useRef<string[]>([]);
+  const unsubscribeRef = useRef<(() => void) | null>(null);
 
   // Use refs for callbacks to avoid re-creating functions when callbacks change
   const onOutputRef = useRef(onOutput);
@@ -34,19 +35,41 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
     onErrorRef.current = onError;
   }, [onError]);
 
-  const setupStreams = useCallback((pyodide: PyodideInstance) => {
-    pyodide.setStdout({
-      batched: (text: string) => {
-        outputBuffer.current.push(text);
-      },
+  const cleanupSubscriptions = useCallback(() => {
+    if (unsubscribeRef.current) {
+      unsubscribeRef.current();
+      unsubscribeRef.current = null;
+    }
+  }, []);
+
+  const subscribeStreams = useCallback((pyodide: PyodideInstance) => {
+    cleanupSubscriptions();
+
+    const unsubStdout = pyodide.setStdout((text) => {
+      outputBuffer.current.push(text);
     });
 
-    pyodide.setStderr({
-      batched: (text: string) => {
-        outputBuffer.current.push(`[Error] ${text}`);
-      },
+    const unsubStderr = pyodide.setStderr((text) => {
+      outputBuffer.current.push(`[Error] ${text}`);
     });
-  }, []);
+
+    unsubscribeRef.current = () => {
+      unsubStdout();
+      unsubStderr();
+    };
+  }, [cleanupSubscriptions]);
+
+  // Ensure subscriptions are cleaned up on unmount
+  useEffect(() => {
+    return () => cleanupSubscriptions();
+  }, [cleanupSubscriptions]);
+
+  // Subscribe when ready
+  useEffect(() => {
+    if (state.isReady && pyodideRef.current) {
+      subscribeStreams(pyodideRef.current);
+    }
+  }, [state.isReady, subscribeStreams]);
 
   const loadPyodide = useCallback(async () => {
     if (pyodideRef.current || state.isLoading) return;
@@ -75,15 +98,17 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
       return { output: "", error: "Python runtime not loaded" };
     }
 
-    // Ensure streams are directed to this hook's buffer
-    setupStreams(pyodideRef.current);
+    // Ensure we are subscribed (in case of fresh load before effect runs)
+    if (!unsubscribeRef.current) {
+      subscribeStreams(pyodideRef.current);
+    }
 
     outputBuffer.current = [];
 
     try {
       // Note: Previous implementation defined `wrappedCode` but didn't use it.
       // We maintain the existing behavior of running `code` directly.
-      // Output is captured via setStdout (setupStreams).
+      // Output is captured via setStdout (subscribeStreams).
 
       const result = await pyodideRef.current.runPythonAsync(code);
       const bufferedOutput = outputBuffer.current.join('\n');
@@ -101,7 +126,7 @@ export function usePyodide({ onOutput, onError }: UsePyodideOptions = {}) {
       onErrorRef.current?.(errorMsg);
       return { output: outputBuffer.current.join('\n'), error: errorMsg };
     }
-  }, [loadPyodide, setupStreams]);
+  }, [loadPyodide, subscribeStreams]);
 
   const reset = useCallback(() => {
     outputBuffer.current = [];

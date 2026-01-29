@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.12] - February 01, 2026
+
+### Performance & Optimization
+
+Optimized initialization of heavy runtime dependencies.
+
+#### Improvements (1)
+- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction, using `requestIdleCallback` to prevent main thread blocking.
+
 ## [1.4.11] - January 29, 2026
 
 ### Notifications, Testing & Security

@@ -21,6 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { usePyodidePreload } from "@/hooks/usePyodidePreload";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/module/HybridSidebar";
@@ -52,6 +53,9 @@ export default function ModuleLearn() {
   const { data: module, isLoading } = useModule(moduleId ?? "");
   const { data: progress } = useModuleProgress(user?.id, moduleId);
   const updateProgress = useUpdateProgress();
+
+  // Performance: Preload Pyodide if needed
+  usePyodidePreload(module?.content);
 
   // Access Control Check
   useEffect(() => {

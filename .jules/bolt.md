@@ -26,3 +26,9 @@
     - **Animation**: Isolated `framer-motion` and `gsap` into `vendor-animation` (235 kB).
     - **Utils**: Isolated `zod` and `date-fns` into `vendor-utils` (107 kB) to enable better caching.
 - **Key Takeaway**: Allowing Vite to handle UI component splitting naturally (instead of forcing a vendor chunk) significantly improves the critical path size.
+
+### [2026-02-01] Pyodide Initialization Optimization
+- **Action**: Implemented `usePyodidePreload` hook in `ModuleLearn.tsx`.
+- **Reasoning**: Pyodide is a heavy dependency. Previous implementation waited for user focus on the editor to load it, causing a delay.
+- **Implementation**: The new hook checks if the module content contains Python code blocks (` ```python `) and triggers a low-priority background load using `requestIdleCallback` (or `setTimeout` fallback).
+- **Result**: The Python environment is initialized during reading time, making the editor "instantly" ready when accessed.

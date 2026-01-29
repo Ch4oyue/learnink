@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.11] - January 30, 2026
+
+### Performance & Memory Stability
+
+Critical memory leak fix in the learning interface and validation of scroll performance.
+
+<!-- -->
+
+#### Fixes (1)
+- **Memory Leak**: Resolved a memory leak in `HybridContentRenderer` caused by mismatched event listeners during component cleanup, verified by static analysis.
+
+#### Improvements (1)
+- **Benchmark Validation**: Confirmed `useScrollProgress` performance with 0MB memory delta over 1000 scroll iterations.
+
 ## [1.4.10] - January 29, 2026
 
 ### Notifications & Testing
@@ -332,6 +346,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.11 | Jan 30, 2026 | Memory Leak Fix & Scroll Benchmark |
 | 1.4.10 | Jan 29, 2026 | Notifications & Testing Infrastructure |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |

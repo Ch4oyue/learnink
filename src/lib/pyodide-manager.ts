@@ -10,8 +10,8 @@ interface PyodideConfig {
 // Pyodide instance type definition (Proxy to Worker)
 export interface PyodideInstance {
   runPythonAsync: (code: string) => Promise<unknown>;
-  setStdout: (options: { batched: (text: string) => void }) => void;
-  setStderr: (options: { batched: (text: string) => void }) => void;
+  setStdout: (callback: (text: string) => void) => () => void;
+  setStderr: (callback: (text: string) => void) => () => void;
 }
 
 const PYODIDE_VERSION = "v0.26.1";
@@ -25,8 +25,8 @@ class PyodideManager {
   private pendingRuns = new Map<string, { resolve: (val: unknown) => void; reject: (err: unknown) => void }>();
 
   // Callbacks for stdout/stderr
-  private onStdout: ((text: string) => void) | null = null;
-  private onStderr: ((text: string) => void) | null = null;
+  private onStdout = new Set<(text: string) => void>();
+  private onStderr = new Set<(text: string) => void>();
 
   private constructor() { }
 
@@ -47,11 +47,13 @@ class PyodideManager {
     // Return a proxy object that looks like the original PyodideInstance
     return {
       runPythonAsync: (code: string) => this.runPythonAsync(code),
-      setStdout: (options) => {
-        this.onStdout = options.batched;
+      setStdout: (callback) => {
+        this.onStdout.add(callback);
+        return () => this.onStdout.delete(callback);
       },
-      setStderr: (options) => {
-        this.onStderr = options.batched;
+      setStderr: (callback) => {
+        this.onStderr.add(callback);
+        return () => this.onStderr.delete(callback);
       }
     };
   }
@@ -72,10 +74,10 @@ class PyodideManager {
           // so we'll just handle it via the init flow)
           break;
         case 'STDOUT':
-          this.onStdout?.(text);
+          this.onStdout.forEach(cb => cb(text));
           break;
         case 'STDERR':
-          this.onStderr?.(text);
+          this.onStderr.forEach(cb => cb(text));
           break;
         case 'RESULTS': {
           const pending = this.pendingRuns.get(id);

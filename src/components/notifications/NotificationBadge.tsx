@@ -81,7 +81,7 @@ export function NotificationBadge() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, queryClient]);
+  }, [user?.id, queryClient, navigate]);
 
   const handleNotificationClick = (notification: Notification) => {
     if (!notification.is_read) {

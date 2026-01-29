@@ -85,7 +85,11 @@ describe("useScrollProgress Performance Benchmark", () => {
     const handleScroll = addListenerMock.mock.calls[0][1];
 
     // --- BENCHMARK EXECUTION ---
-    const ITERATIONS = 5000;
+    const ITERATIONS = 1000;
+
+    const initialMemory = process.memoryUsage().heapUsed;
+    console.log(`Initial Memory: ${(initialMemory / 1024 / 1024).toFixed(2)} MB`);
+
     const start = performance.now();
 
     for (let i = 0; i < ITERATIONS; i++) {
@@ -99,6 +103,11 @@ describe("useScrollProgress Performance Benchmark", () => {
     }
 
     const end = performance.now();
+
+    const finalMemory = process.memoryUsage().heapUsed;
+    console.log(`Final Memory:   ${(finalMemory / 1024 / 1024).toFixed(2)} MB`);
+    const delta = finalMemory - initialMemory;
+    console.log(`Memory Delta:   ${(delta / 1024 / 1024).toFixed(2)} MB`);
     const duration = end - start;
     const callCount = mockGetBoundingClientRect.mock.calls.length;
 

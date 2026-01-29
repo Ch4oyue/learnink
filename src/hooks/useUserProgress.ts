@@ -2,6 +2,7 @@ import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useMemo } from "react";
 
 export interface UserProgress {
   id: string;
@@ -188,16 +189,18 @@ export function useUpdateProgress() {
 export function useProgressStats(userId?: string) {
   const { data: progress } = useUserProgress(userId);
 
-  const totalModules = progress?.length || 0;
-  const completedModules = progress?.filter(p => p.is_completed).length || 0;
-  const averageProgress = totalModules > 0
-    ? Math.round(progress!.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / totalModules)
-    : 0;
+  return useMemo(() => {
+    const totalModules = progress?.length || 0;
+    const completedModules = progress?.filter(p => p.is_completed).length || 0;
+    const averageProgress = totalModules > 0
+      ? Math.round(progress!.reduce((sum, p) => sum + (p.progress_percent || 0), 0) / totalModules)
+      : 0;
 
-  return {
-    totalModules,
-    completedModules,
-    averageProgress,
-    inProgressModules: totalModules - completedModules,
-  };
+    return {
+      totalModules,
+      completedModules,
+      averageProgress,
+      inProgressModules: totalModules - completedModules,
+    };
+  }, [progress]);
 }

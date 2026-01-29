@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.11] - January 30, 2026
+## [1.4.11] - January 29, 2026
 
 ### Security: Quiz Anti-Cheat
 
@@ -18,7 +18,7 @@ Implemented a time-based validation mechanism to prevent automated quiz submissi
 #### Improvements (1)
 - **Time-Based Anti-Cheat**: Implemented validation in `validate-quiz-answers` Edge Function to reject submissions that are completed faster than humanly possible (min 2 seconds per question), preventing script attacks.
 
-## [1.4.10] - January 29, 2026
+## [1.4.10] - January 28, 2026
 
 ### Notifications & Testing
 
@@ -33,7 +33,7 @@ Implemented real-time notification system and enhanced unit testing infrastructu
 #### Fixes (1)
 - **Notification Routing**: Connected isolated notification components to the main dashboard router and layout.
 
-## [1.4.9] - January 28, 2026
+## [1.4.9] - January 27, 2026
 
 ### Audit & Stability
 
@@ -45,7 +45,7 @@ Comprehensive security audit, performance verification, and environment stabiliz
 - **Environment Fix**: Resolved missing dependency issues by strictly enforcing `bun install` for Windows stability.
 - **Audit Verification**: Verified all 22 system tests and performance benchmarks (up to ~21000x faster lookups) passed successfully.
 
-## [1.4.8] - January 27, 2026
+## [1.4.8] - January 26, 2026
 
 ### Security Hardening & Mobile Fixes
 
@@ -63,7 +63,7 @@ Critical security patches for Edge Functions and mobile interface corrections.
 - **Contributor Updates**: Expanded the contributor list in the Profile page to include **Manus** and updated **Abelion**'s social profile links.
 - **Icon Refinement**: Upgraded high-resolution logos for Antigravity, Claude, Gemini, Jules, and Stitch in the contributor section.
 
-## [1.4.7] - January 26, 2026
+## [1.4.7] - January 25, 2026
 
 ### Admin UX & Notion Sync Upgrade
 
@@ -76,7 +76,7 @@ Major improvements to the admin interface and Notion synchronization capabilitie
 - **Notion Sync Upgrade**: Upgraded `sync-notion-page` Edge Function to recursively fetch nested blocks (toggles, lists) and support `Category` (case-sensitive), `Slug`, and `Cover` fields.
 - **Mobile Inbox Badge**: Added real-time badge count to the floating mobile dock for Admin Inbox.
 
-## [1.4.6] - January 25, 2026
+## [1.4.6] - January 24, 2026
 
 ### PWA & Security Hardening
 
@@ -96,7 +96,7 @@ Official introduction of PWA support and critical security hardening for adminis
 #### Patches (1)
 - Switched to Bun as the primary runner for build and installation to resolve permission errors on Windows.
 
-## [1.4.5] - January 24, 2026
+## [1.4.5] - January 23, 2026
 
 ### Admin Dashboard Stability
 
@@ -115,7 +115,7 @@ Fixed a critical crash in the Admin Dashboard for Super Admin users and resolved
 #### Improvements (1)
 - Optimized learning stats with server-side aggregation for faster dashboard loading.
 
-## [1.4.4] - January 23, 2026
+## [1.4.4] - January 22, 2026
 
 ### Premium Design & Performance
 
@@ -136,7 +136,7 @@ Major overhaul of the visual system and critical performance optimizations for t
 #### Patches (1)
 - Added RLS policies for the `rate_limits` table to prevent unauthorized access.
 
-## [1.4.3] - January 22, 2026
+## [1.4.3] - January 21, 2026
 
 ### Critical Security Hardening
 
@@ -149,7 +149,7 @@ Comprehensive security audit and resolution of data leakage vulnerabilities.
 - **Console Audit**: Removed debug logs in production that leaked sensitive system information.
 - Hardened RLS rules for `profiles` table to prevent unauthorized data access.
 
-## [1.4.2] - January 21, 2026
+## [1.4.2] - January 20, 2026
 
 ### Performance & Code Quality
 
@@ -168,7 +168,7 @@ Optimization of module fetching and resolution of type safety issues.
 - Resolved missing dependency warnings in `QuizPlayer.tsx` and `CustomCursor.tsx`.
 - Added index on `user_progress.module_id` for faster filtering.
 
-## [1.4.1] - January 20, 2026
+## [1.4.1] - January 19, 2026
 
 ### Code Quality & Security Audit
 
@@ -189,7 +189,7 @@ Comprehensive codebase audit to resolve all ESLint errors and improve type safet
 
 
 
-## [1.4.0] - January 19, 2026
+## [1.4.0] - January 18, 2026
 
 ### Major Frontend Upgrade & Premium UX
 
@@ -220,7 +220,7 @@ A comprehensive upgrade to the user interface, introducing dynamic theming, prem
 
 ---
 
-## [1.3.1] - January 18, 2026
+## [1.3.1] - January 17, 2026
 
 ### Bug Fixes & Database Improvements
 
@@ -244,7 +244,7 @@ Critical bug fixes and database schema improvements for production stability.
 
 ---
 
-## [1.3.0] - January 17, 2026
+## [1.3.0] - January 16, 2026
 
 ### Total System Repair
 
@@ -343,20 +343,20 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.11 | Jan 30, 2026 | Security: Quiz Anti-Cheat |
-| 1.4.10 | Jan 29, 2026 | Notifications & Testing Infrastructure |
-| 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
-| 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |
-| 1.4.7 | Jan 26, 2026 | Admin UX & Notion Sync Upgrade |
-| 1.4.6 | Jan 25, 2026 | PWA Support & Security Hardening |
-| 1.4.5 | Jan 24, 2026 | Admin Dashboard & Optimized Chunks |
-| 1.4.4 | Jan 23, 2026 | Premium Design & Performance Overhaul |
-| 1.4.3 | Jan 22, 2026 | Critical Security Hardening |
-| 1.4.2 | Jan 21, 2026 | Performance & Code Quality |
-| 1.4.1 | Jan 20, 2026 | Code Quality & Security Audit |
-| 1.4.0 | Jan 19, 2026 | Major Frontend Upgrade & Premium UX |
-| 1.3.1 | Jan 18, 2026 | Bug Fixes & Database Schema |
-| 1.3.0 | Jan 17, 2026 | Total System Repair - Stability & Dark Mode |
+| 1.4.11 | Jan 29, 2026 | Security: Quiz Anti-Cheat |
+| 1.4.10 | Jan 28, 2026 | Notifications & Testing Infrastructure |
+| 1.4.9 | Jan 27, 2026 | Audit & Stability (Environment Fix) |
+| 1.4.8 | Jan 26, 2026 | Security Hardening & Mobile Fixes |
+| 1.4.7 | Jan 25, 2026 | Admin UX & Notion Sync Upgrade |
+| 1.4.6 | Jan 24, 2026 | PWA Support & Security Hardening |
+| 1.4.5 | Jan 23, 2026 | Admin Dashboard & Optimized Chunks |
+| 1.4.4 | Jan 22, 2026 | Premium Design & Performance Overhaul |
+| 1.4.3 | Jan 21, 2026 | Critical Security Hardening |
+| 1.4.2 | Jan 20, 2026 | Performance & Code Quality |
+| 1.4.1 | Jan 19, 2026 | Code Quality & Security Audit |
+| 1.4.0 | Jan 18, 2026 | Major Frontend Upgrade & Premium UX |
+| 1.3.1 | Jan 17, 2026 | Bug Fixes & Database Schema |
+| 1.3.0 | Jan 16, 2026 | Total System Repair - Stability & Dark Mode |
 | 1.2.0 | Jan 15, 2026 | Learning Interface Redesign |
 | 1.1.0 | Jan 10, 2026 | Dashboard & Auth Implementation |
 | 1.0.0 | Dec 23, 2025 | Initial Release |

@@ -223,7 +223,7 @@ export function useValidateQuizAnswers() {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: async (params: { quiz_id: string; answers: Record<string, string> }) => {
+    mutationFn: async (params: { quiz_id: string; answers: Record<string, string>; time_taken: number }) => {
       const { data, error } = await supabase.functions.invoke('validate-quiz-answers', {
         body: params,
       });

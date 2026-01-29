@@ -9,6 +9,7 @@ const corsHeaders = {
 interface ValidateRequest {
   quiz_id: string;
   answers: Record<string, string>;
+  time_taken: number;
 }
 
 serve(async (req) => {
@@ -43,7 +44,7 @@ serve(async (req) => {
       );
     }
 
-    const { quiz_id, answers }: ValidateRequest = await req.json();
+    const { quiz_id, answers, time_taken }: ValidateRequest = await req.json();
     console.log(`Validating quiz ${quiz_id} for user ${user.id}`);
 
     if (!quiz_id || !answers) {
@@ -79,6 +80,21 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({ error: 'Questions not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Anti-cheat: Check time taken
+    // Must spend at least 2 seconds per question
+    const MIN_SECONDS_PER_QUESTION = 2;
+    const minRequiredTime = questions.length * MIN_SECONDS_PER_QUESTION;
+
+    // Check if time_taken is provided and valid (allow 0 for very short quizzes if strictly logic, but realistically > 0)
+    // We treat missing time_taken (undefined) as failure if we want to enforce it.
+    if (typeof time_taken !== 'number' || time_taken < minRequiredTime) {
+      console.warn(`Suspicious activity: User ${user.id} completed quiz ${quiz_id} in ${time_taken}s (min required: ${minRequiredTime}s)`);
+      return new Response(
+        JSON.stringify({ error: 'Suspicious activity: Quiz completed too quickly. Please take your time to read the questions.' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 

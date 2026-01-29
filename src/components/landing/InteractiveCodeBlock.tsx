@@ -164,24 +164,24 @@ export function InteractiveCodeBlock({
             {/* Glow effect on hover */}
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            <div className="relative bg-[#1e1e1e] rounded-xl border border-zinc-800/60 shadow-2xl overflow-hidden">
+            <div className="relative bg-zinc-900 rounded-xl border border-zinc-800/60 shadow-2xl overflow-hidden">
                 {/* Mac-style Window Header */}
-                <div className="flex items-center justify-between px-4 py-3 bg-[#2d2d2d] border-b border-zinc-700/50">
+                <div className="flex items-center justify-between px-4 py-3 bg-zinc-800 border-b border-zinc-700/50">
                     <div className="flex items-center gap-2">
                         {/* Traffic lights */}
                         <div className="flex gap-2">
                             <motion.span
-                                className="h-3 w-3 rounded-full bg-[#ff5f56] cursor-pointer"
+                                className="h-3 w-3 rounded-full bg-red-500 cursor-pointer"
                                 whileHover={{ scale: 1.2 }}
                                 transition={{ duration: 0.15 }}
                             />
                             <motion.span
-                                className="h-3 w-3 rounded-full bg-[#ffbd2e] cursor-pointer"
+                                className="h-3 w-3 rounded-full bg-yellow-500 cursor-pointer"
                                 whileHover={{ scale: 1.2 }}
                                 transition={{ duration: 0.15 }}
                             />
                             <motion.span
-                                className="h-3 w-3 rounded-full bg-[#27c93f] cursor-pointer"
+                                className="h-3 w-3 rounded-full bg-green-500 cursor-pointer"
                                 whileHover={{ scale: 1.2 }}
                                 transition={{ duration: 0.15 }}
                             />
@@ -189,7 +189,7 @@ export function InteractiveCodeBlock({
                     </div>
 
                     {/* Filename tab */}
-                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[#1e1e1e] rounded-t-lg border-t border-x border-zinc-700/50 -mb-3">
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 rounded-t-lg border-t border-x border-zinc-700/50 -mb-3">
                         <span className="text-xs font-mono text-zinc-400">
                             {displayFilename}
                         </span>
@@ -265,7 +265,7 @@ export function InteractiveCodeBlock({
                 </div>
 
                 {/* Status bar */}
-                <div className="flex items-center justify-between px-4 py-2 bg-[#2d2d2d] border-t border-zinc-700/50 text-xs text-zinc-500">
+                <div className="flex items-center justify-between px-4 py-2 bg-zinc-800 border-t border-zinc-700/50 text-xs text-zinc-500">
                     <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-green-500" />

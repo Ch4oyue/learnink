@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.12] - February 01, 2026
+## [1.4.12] - January 30, 2026
 
 ### Performance & Optimization
 

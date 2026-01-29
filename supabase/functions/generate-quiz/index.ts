@@ -10,12 +10,91 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting configuration
+const RATE_LIMIT_MAX_REQUESTS = 20; // Max requests per window
+const RATE_LIMIT_WINDOW_MINUTES = 60; // Time window in minutes
+
+// Rate Limiting Helper
+async function checkRateLimit(
+  supabase: ReturnType<typeof createClient>,
+  req: Request
+): Promise<boolean> {
+  try {
+    const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("x-real-ip")
+      || "unknown";
+
+    const { data, error } = await supabase.rpc("check_rate_limit", {
+      p_identifier: ipAddress,
+      p_endpoint: "/generate-quiz",
+      p_max_requests: RATE_LIMIT_MAX_REQUESTS,
+      p_window_minutes: RATE_LIMIT_WINDOW_MINUTES,
+    });
+
+    if (error) {
+      console.warn("Rate limit check failed:", error);
+      return true; // Use Open-Fail strategy if DB is down, or Closed-Fail. Let's allow but log.
+    }
+
+    return data === true;
+  } catch (e) {
+    console.warn("Rate limit error:", e);
+    return true;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // 1. Rate Limit Check
+    const withinLimit = await checkRateLimit(supabase, req);
+    if (!withinLimit) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // 2. Auth & Role Validation (Admin/Tutor Only)
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Check Roles
+    const { data: roles } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", user.id);
+
+    // Allow admins, tutors, and superadmins
+    const hasAccess = roles?.some(r => ['admin', 'tutor', 'superadmin'].includes(r.role));
+
+    if (!hasAccess) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden: Only Tutors and Admins can generate quizzes." }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { moduleId, questionCount = 5 } = await req.json();
 
     if (!moduleId) {
@@ -32,7 +111,7 @@ serve(async (req) => {
       );
     }
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Supabase client already created above
 
     // Get module content
     const { data: module, error: moduleError } = await supabase
@@ -135,7 +214,7 @@ PENTING:
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Lovable AI Gateway error:", response.status, errorText);
-      
+
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later.", success: false }),
@@ -148,7 +227,7 @@ PENTING:
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      
+
       return new Response(
         JSON.stringify({ error: "Failed to generate quiz content" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -185,14 +264,7 @@ PENTING:
       );
     }
 
-    // Get user from auth header
-    const authHeader = req.headers.get("Authorization");
-    let userId = null;
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      const { data: { user } } = await supabase.auth.getUser(token);
-      userId = user?.id;
-    }
+    const userId = user.id;
 
     // Create quiz
     const { data: quiz, error: quizError } = await supabase

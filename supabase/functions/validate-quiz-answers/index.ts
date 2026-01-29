@@ -35,7 +35,7 @@ serve(async (req) => {
     // Verify user token
     const token = authHeader.replace('Bearer ', '');
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-    
+
     if (authError || !user) {
       console.error('Auth error:', authError);
       return new Response(
@@ -109,12 +109,12 @@ serve(async (req) => {
       totalPoints += question.points || 10;
       const userAnswer = (answers[question.id] || '').toLowerCase().trim();
       const correctAnswer = (question.correct_answer || '').toLowerCase().trim();
-      
+
       const isCorrect = userAnswer === correctAnswer;
       correctAnswers[question.id] = isCorrect;
       explanations[question.id] = question.explanation;
       correctAnswerValues[question.id] = question.correct_answer;
-      
+
       if (isCorrect) {
         score += question.points || 10;
       }
@@ -158,8 +158,10 @@ serve(async (req) => {
           percentage,
           passed,
           correctAnswers,
-          explanations,
-          correctAnswerValues,
+          // SECURITY: Only show correct answers and explanations if passed
+          // This prevents users from farming answers by failing repeatedly
+          explanations: passed ? explanations : {},
+          correctAnswerValues: passed ? correctAnswerValues : {},
         },
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

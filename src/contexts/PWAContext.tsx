@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+import { logger } from "@/lib/logger";
 
 // Interface for the beforeinstallprompt event
 interface BeforeInstallPromptEvent extends Event {
@@ -37,7 +38,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     // Some browsers fire this
     const mediaQuery = window.matchMedia('(display-mode: standalone)');
     if (mediaQuery.addEventListener) {
-        mediaQuery.addEventListener('change', checkStandalone);
+      mediaQuery.addEventListener('change', checkStandalone);
     }
 
     // Detect iOS
@@ -48,16 +49,16 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
-      console.log("PWA Install Prompt captured");
+      logger.log("PWA Install Prompt captured");
     };
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
     // Listen for appinstalled
     const handleAppInstalled = () => {
-        setIsInstalled(true);
-        setDeferredPrompt(null);
-        console.log("PWA Installed");
+      setIsInstalled(true);
+      setDeferredPrompt(null);
+      logger.log("PWA Installed");
     };
     window.addEventListener('appinstalled', handleAppInstalled);
 
@@ -65,7 +66,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
       window.removeEventListener("appinstalled", handleAppInstalled);
       if (mediaQuery.removeEventListener) {
-          mediaQuery.removeEventListener('change', checkStandalone);
+        mediaQuery.removeEventListener('change', checkStandalone);
       }
     };
   }, []);

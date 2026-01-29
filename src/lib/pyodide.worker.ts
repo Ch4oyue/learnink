@@ -36,8 +36,13 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 
       // Load the Pyodide script
       // Using dynamic import for Module Worker compatibility
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { loadPyodide } = await import(config.scriptURL) as any;
+      // Define expected module shape
+      interface PyodideModule {
+        loadPyodide: (config: { indexURL: string }) => Promise<PyodideAPI>;
+      }
+
+      const module = await import(config.scriptURL) as PyodideModule;
+      const { loadPyodide } = module;
 
       // Initialize Pyodide
       pyodide = await loadPyodide({
@@ -81,11 +86,13 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
 
     if (type === 'RUN') {
-        // We know event.data is likely the RUN message, but TS can't prove it in catch block easily without checks.
-        // However, we accessed event.data.id above safely? No, only after check.
-        // Let's assert safely.
-        const id = 'id' in event.data ? (event.data as { id: string }).id : 'unknown';
-        self.postMessage({ type: 'RESULTS', id, error: errorMessage });
+      // We know event.data is likely the RUN message, but TS can't prove it in catch block easily without checks.
+      // However, we accessed event.data.id above safely? No, only after check.
+      // Let's assert safely.
+      // Type guard for RUN message to safely access ID
+      const runMessage = event.data as Extract<WorkerMessage, { type: 'RUN' }>;
+      const id = runMessage.id || 'unknown';
+      self.postMessage({ type: 'RESULTS', id, error: errorMessage });
     } else {
       self.postMessage({ type: 'ERROR', error: errorMessage });
     }

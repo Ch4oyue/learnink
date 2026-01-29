@@ -20,6 +20,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/module/HybridSidebar";
@@ -130,13 +131,13 @@ export default function ModuleLearn() {
 
     // Only save if progress increased and is new
     if (newProgress > lastSavedProgressRef.current) {
-        lastSavedProgressRef.current = newProgress;
-        updateProgress.mutate({
-            userId: user.id,
-            moduleId: moduleId,
-            progressPercent: Math.min(newProgress, 100),
-            isCompleted: newProgress >= 100,
-        });
+      lastSavedProgressRef.current = newProgress;
+      updateProgress.mutate({
+        userId: user.id,
+        moduleId: moduleId,
+        progressPercent: Math.min(newProgress, 100),
+        isCompleted: newProgress >= 100,
+      });
     }
   }, [user, moduleId, updateProgress]);
 
@@ -472,13 +473,15 @@ export default function ModuleLearn() {
         </header>
 
         {/* Content Renderer */}
-        <HybridContentRenderer
-          ref={contentRef}
-          content={currentContent}
-          metadata={metadata}
-          onAddToNotes={handleAddToNotes}
-          isLoading={false}
-        />
+        <ErrorBoundary>
+          <HybridContentRenderer
+            ref={contentRef}
+            content={currentContent}
+            metadata={metadata}
+            onAddToNotes={handleAddToNotes}
+            isLoading={false}
+          />
+        </ErrorBoundary>
 
         {/* Navigation Buttons (Bottom Bar) */}
         <div className="h-16 border-t border-border bg-card flex items-center justify-between px-6 shrink-0 sticky bottom-0 z-50 md:static">
@@ -517,14 +520,16 @@ export default function ModuleLearn() {
       ============================================ */}
       {showNotes && (
         <div className="hidden lg:block">
-          <HybridGuidedNotes
-            notes={notes || []}
-            isLoading={notesLoading}
-            onCreateNote={handleCreateNote}
-            onDeleteNote={handleDeleteNote}
-            isCreating={createNote.isPending}
-            isDeleting={deleteNote.isPending}
-          />
+          <ErrorBoundary>
+            <HybridGuidedNotes
+              notes={notes || []}
+              isLoading={notesLoading}
+              onCreateNote={handleCreateNote}
+              onDeleteNote={handleDeleteNote}
+              isCreating={createNote.isPending}
+              isDeleting={deleteNote.isPending}
+            />
+          </ErrorBoundary>
         </div>
       )}
     </div>

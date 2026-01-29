@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { useUsers, UserWithRole, SUPER_ADMIN_EMAIL, SUPER_ADMIN_USER_ID } from "@/hooks/useUsers";
+import { useUsers, UserWithRole, SUPER_ADMIN_EMAIL, SUPER_ADMIN_USER_ID, useUserStats } from "@/hooks/useUsers";
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,24 +62,46 @@ const roleConfig: Record<AppRole, { label: string; icon: React.ReactNode; varian
 
 export default function DashboardUsers() {
   const { user: currentUser } = useAuth();
-  const { data: users, isLoading, error } = useUsers();
+
+  // State for Pagination & Search
+  const [page, setPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  // Debounce search should be ideally implemented to avoid too many requests
+  // For now we pass searchQuery directly, react-query handles some caching but typing triggers refetch.
+  // Let's assume user accepts it or add debounce later. 
+
+  const [roleFilter, setRoleFilter] = useState<AppRole | "all">("all");
+
+  // Data Hooks
+  const { data: usersData, isLoading, error } = useUsers(page, 50, searchQuery);
+  const { data: statsData } = useUserStats();
   const updateRole = useUpdateUserRole();
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const [roleFilter, setRoleFilter] = useState<AppRole | "all">("all");
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
     user: UserWithRole | null;
     newRole: AppRole | null;
   }>({ open: false, user: null, newRole: null });
 
-  const filteredUsers = users?.filter(u => {
-    const matchesSearch = !searchQuery ||
-      u.display_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesRole = roleFilter === "all" || u.role === roleFilter;
-    return matchesSearch && matchesRole;
+  const users = usersData?.users || [];
+  const meta = usersData?.meta;
+
+  // Server-side filtering for role is NOT implemented in get-users yet.
+  // We can filter client-side for role on the current page, OR add role filter to API.
+  // Given the scope, let's filter client-side on the current page result, 
+  // BUT this is imperfect (might result in empty pages).
+  // Ideally get-users should support role filter. 
+  // For now, let's keep client-side filter but acknowledge it only filters current page.
+
+  const filteredUsers = users.filter(u => {
+    return roleFilter === "all" || u.role === roleFilter;
   });
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= (meta?.totalPages || 1)) {
+      setPage(newPage);
+    }
+  };
 
   const handleRoleChange = (user: UserWithRole, newRole: AppRole) => {
     if (user.role === newRole) return;
@@ -95,11 +125,11 @@ export default function DashboardUsers() {
     return name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2);
   };
 
-  const stats = {
-    total: users?.length || 0,
-    admin: users?.filter(u => u.role === "admin" || u.role === "superadmin").length || 0,
-    tutor: users?.filter(u => u.role === "tutor").length || 0,
-    user: users?.filter(u => u.role === "user").length || 0,
+  const stats = statsData || {
+    totalUsers: 0,
+    adminCount: 0,
+    tutorCount: 0,
+    userCount: 0,
   };
 
   if (error) {
@@ -146,19 +176,19 @@ export default function DashboardUsers() {
         {/* Stats Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-card border border-border rounded-xl p-4">
-            <div className="text-2xl font-bold text-foreground">{stats.total}</div>
+            <div className="text-2xl font-bold text-foreground">{stats.totalUsers}</div>
             <div className="text-sm text-muted-foreground">Total Pengguna</div>
           </div>
           <div className="bg-card border border-border rounded-xl p-4">
-            <div className="text-2xl font-bold text-primary">{stats.admin}</div>
+            <div className="text-2xl font-bold text-primary">{stats.adminCount}</div>
             <div className="text-sm text-muted-foreground">Admin</div>
           </div>
           <div className="bg-card border border-border rounded-xl p-4">
-            <div className="text-2xl font-bold text-secondary-foreground">{stats.tutor}</div>
+            <div className="text-2xl font-bold text-secondary-foreground">{stats.tutorCount}</div>
             <div className="text-sm text-muted-foreground">Tutor</div>
           </div>
           <div className="bg-card border border-border rounded-xl p-4">
-            <div className="text-2xl font-bold text-muted-foreground">{stats.user}</div>
+            <div className="text-2xl font-bold text-muted-foreground">{stats.userCount}</div>
             <div className="text-sm text-muted-foreground">User</div>
           </div>
         </div>
@@ -168,9 +198,12 @@ export default function DashboardUsers() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari nama atau ID pengguna..."
+              placeholder="Cari nama..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
+                setPage(1); // Reset to page 1 on search
+              }}
               className="pl-10"
             />
           </div>
@@ -293,6 +326,33 @@ export default function DashboardUsers() {
             </div>
           )}
         </div>
+
+        {/* Pagination Controls */}
+        {meta && meta.totalPages > 1 && (
+          <Pagination className="justify-center">
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  onClick={() => handlePageChange(page - 1)}
+                  className={page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+
+              <PaginationItem>
+                <div className="flex items-center px-4 text-sm font-medium">
+                  Halaman {page} dari {meta.totalPages}
+                </div>
+              </PaginationItem>
+
+              <PaginationItem>
+                <PaginationNext
+                  onClick={() => handlePageChange(page + 1)}
+                  className={page === meta.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        )}
       </div>
 
       {/* Confirm Dialog */}

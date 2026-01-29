@@ -30,39 +30,70 @@ function validateAndSanitizeInput(text: string | null | undefined, maxLength: nu
 // Comprehensive XSS sanitization for generated content
 function sanitizeGeneratedContent(content: string): string {
   let sanitized = content;
-  
+
   // Remove script tags
   sanitized = sanitized.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '');
-  
+
   // Remove javascript: and vbscript: URLs
   sanitized = sanitized.replace(/javascript:/gi, '');
   sanitized = sanitized.replace(/vbscript:/gi, '');
-  
+
   // Remove event handlers (onclick, onerror, onload, etc.)
   sanitized = sanitized.replace(/on\w+\s*=/gi, '');
-  
+
   // Remove data URIs that could contain JavaScript
   sanitized = sanitized.replace(/data:text\/html[^"'\s]*/gi, '');
-  
+
   // Remove SVG data URIs (can contain scripts)
   sanitized = sanitized.replace(/data:image\/svg\+xml[^"'\s]*/gi, '');
-  
+
   // Remove iframe tags
   sanitized = sanitized.replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, '');
-  
+
   // Remove object and embed tags
   sanitized = sanitized.replace(/<object[^>]*>[\s\S]*?<\/object>/gi, '');
   sanitized = sanitized.replace(/<embed[^>]*>/gi, '');
-  
+
   // Remove base tags (can redirect all URLs)
   sanitized = sanitized.replace(/<base[^>]*>/gi, '');
-  
+
   // Sanitize markdown links with javascript: URIs
   sanitized = sanitized.replace(/\[([^\]]+)\]\(javascript:[^)]*\)/gi, '[$1](#)');
   sanitized = sanitized.replace(/\[([^\]]+)\]\(vbscript:[^)]*\)/gi, '[$1](#)');
   sanitized = sanitized.replace(/\[([^\]]+)\]\(data:[^)]*\)/gi, '[$1](#)');
-  
+
   return sanitized;
+}
+
+// Rate limiting configuration
+const RATE_LIMIT_MAX_REQUESTS = 10; // Stricter limit for modules (expensive)
+const RATE_LIMIT_WINDOW_MINUTES = 60;
+
+async function checkRateLimit(
+  supabase: ReturnType<typeof createClient>,
+  req: Request
+): Promise<boolean> {
+  try {
+    const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+      || req.headers.get("x-real-ip")
+      || "unknown";
+
+    const { data, error } = await supabase.rpc("check_rate_limit", {
+      p_identifier: ipAddress,
+      p_endpoint: "/generate-module",
+      p_max_requests: RATE_LIMIT_MAX_REQUESTS,
+      p_window_minutes: RATE_LIMIT_WINDOW_MINUTES,
+    });
+
+    if (error) {
+      console.warn("Rate limit check failed:", error);
+      return true;
+    }
+    return data === true;
+  } catch (e) {
+    console.warn("Rate limit error:", e);
+    return true;
+  }
 }
 
 serve(async (req) => {
@@ -72,6 +103,17 @@ serve(async (req) => {
   }
 
   try {
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // 1. Rate Limit Check
+    const withinLimit = await checkRateLimit(supabase, req);
+    if (!withinLimit) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later.", success: false }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { request_id } = await req.json();
 
     if (!LOVABLE_API_KEY) {
@@ -90,8 +132,8 @@ serve(async (req) => {
 
     console.log("Processing request:", request_id);
 
-    // Create Supabase client with service role
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    // Create Supabase client with service role (Done above)
+    // const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     // Fetch the request
     const { data: request, error: requestError } = await supabase
@@ -198,7 +240,7 @@ Pastikan materi:
     if (!response.ok) {
       const errorText = await response.text();
       console.error("Lovable AI Gateway error:", response.status, errorText);
-      
+
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later.", success: false }),
@@ -211,7 +253,7 @@ Pastikan materi:
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      
+
       throw new Error(`AI Gateway error: ${response.status}`);
     }
 

@@ -19,6 +19,12 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 
+    const url = new URL(req.url);
+    const page = parseInt(url.searchParams.get("page") ?? "1");
+    const limit = Math.min(parseInt(url.searchParams.get("limit") ?? "50"), 100); // Hardcap at 100
+    const search = url.searchParams.get("search")?.trim() || "";
+    const offset = (page - 1) * limit;
+
     // 1. Validate Auth Header
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -68,10 +74,17 @@ serve(async (req) => {
     }
 
     // 5. Fetch Data (using Admin Client)
-    // Fetch all profiles
-    const { data: profiles, error: profilesError } = await supabaseAdmin
+    // Fetch profiles with pagination and search
+    let query = supabaseAdmin
       .from("profiles")
-      .select("id, display_name, avatar_url, created_at")
+      .select("id, display_name, avatar_url, created_at", { count: "exact" });
+
+    if (search) {
+      query = query.ilike("display_name", `%${search}%`);
+    }
+
+    const { data: profiles, error: profilesError, count } = await query
+      .range(offset, offset + limit - 1)
       .order("created_at", { ascending: false });
 
     if (profilesError) throw profilesError;
@@ -94,7 +107,15 @@ serve(async (req) => {
     }));
 
     return new Response(
-      JSON.stringify({ users }),
+      JSON.stringify({
+        users,
+        meta: {
+          page,
+          limit,
+          total: count,
+          totalPages: count ? Math.ceil(count / limit) : 0
+        }
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (error) {

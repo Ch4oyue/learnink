@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Notifications, Testing & Security
 
-Implemented real-time notification system, enhanced unit testing infrastructure, quiz anti-cheat security, and critical memory leak fixes.
+Implemented real-time notification system, enhanced unit testing infrastructure, quiz anti-cheat security, critical memory leak fixes, and comprehensive type-safety improvements.
 
 <!-- -->
 
@@ -19,10 +19,13 @@ Implemented real-time notification system, enhanced unit testing infrastructure,
 - **Time-Based Anti-Cheat**: Implemented validation in `validate-quiz-answers` Edge Function to reject submissions that are completed faster than humanly possible (min 2 seconds per question), preventing script attacks.
 - **Real-time Notifications**: Integrated Supabase Realtime for instant notification toasts and added a dedicated notification center page.
 - **Testing Infrastructure**: Configured `bun test` with preload scripts to support robust unit testing of static assets.
+- **Type Safety**: Refactored `useDebounce` and `pyodide.worker` to remove `any` types, preventing potential runtime type errors.
+- **Error Resilience**: Implemented granular `ErrorBoundary` wrapping in Dashboard and Learning modules to prevent full application crashes during isolated component failures.
 
 #### Fixes (2)
 - **Pyodide Management**: Resolved memory leak in `PyodideManager` by implementing a proper subscription pattern and cleanup strategy.
 - **Notification Routing**: Connected isolated notification components to the main dashboard router and layout.
+- **Logging Consistency**: Replaced direct `console.log` usage in `PWAContext` with the centralized `logger` utility to ensure production cleanliness.
 
 ## [1.4.9] - January 28, 2026
 
@@ -334,7 +337,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.11 | Jan 29, 2026 | Notifications, Testing & Security (Anti-Cheat & Memory Leak) |
+| 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |
 | 1.4.7 | Jan 26, 2026 | Admin UX & Notion Sync Upgrade |

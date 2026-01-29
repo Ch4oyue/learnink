@@ -66,20 +66,22 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                 });
             };
 
+            const handleSelectionChange = () => {
+                // Clear selection if it becomes empty
+                const sel = window.getSelection();
+                if (!sel || sel.isCollapsed) {
+                    setSelection(null);
+                }
+            };
+
             document.addEventListener('mouseup', handleSelection);
             document.addEventListener('keyup', handleSelection);
-            document.addEventListener('selectionchange', () => {
-                 // Clear selection if it becomes empty
-                 const sel = window.getSelection();
-                 if (!sel || sel.isCollapsed) {
-                     setSelection(null);
-                 }
-            });
+            document.addEventListener('selectionchange', handleSelectionChange);
 
             return () => {
                 document.removeEventListener('mouseup', handleSelection);
                 document.removeEventListener('keyup', handleSelection);
-                document.removeEventListener('selectionchange', handleSelection);
+                document.removeEventListener('selectionchange', handleSelectionChange);
             };
         }, []);
 

@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.10] - January 29, 2026
+## [1.4.11] - January 29, 2026
 
 ### Notifications, Testing & Security
 
-Implemented real-time notification system, enhanced unit testing infrastructure, and quiz anti-cheat security.
+Implemented real-time notification system, enhanced unit testing infrastructure, quiz anti-cheat security, and critical memory leak fixes.
 
 <!-- -->
 
@@ -20,7 +20,8 @@ Implemented real-time notification system, enhanced unit testing infrastructure,
 - **Real-time Notifications**: Integrated Supabase Realtime for instant notification toasts and added a dedicated notification center page.
 - **Testing Infrastructure**: Configured `bun test` with preload scripts to support robust unit testing of static assets.
 
-#### Fixes (1)
+#### Fixes (2)
+- **Pyodide Management**: Resolved memory leak in `PyodideManager` by implementing a proper subscription pattern and cleanup strategy.
 - **Notification Routing**: Connected isolated notification components to the main dashboard router and layout.
 
 ## [1.4.9] - January 28, 2026
@@ -333,7 +334,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.4.10 | Jan 29, 2026 | Notifications, Testing & Security (Anti-Cheat) |
+| 1.4.11 | Jan 29, 2026 | Notifications, Testing & Security (Anti-Cheat & Memory Leak) |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |
 | 1.4.7 | Jan 26, 2026 | Admin UX & Notion Sync Upgrade |

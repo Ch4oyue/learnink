@@ -64,7 +64,6 @@ import {
     MessageSquare,
     ExternalLink
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
 
@@ -406,11 +405,9 @@ export default function ContentApproval() {
                     {requestsLoading ? <CardSkeleton /> : pendingRequests && pendingRequests.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {pendingRequests.map((req) => (
-                                <Card key={req.id} className={cn(
-                                    "overflow-hidden hover:shadow-lg transition-shadow border-l-4",
-                                    req.type === 'bug' ? "border-l-red-500" :
-                                    req.type === 'feature' ? "border-l-amber-500" : "border-l-blue-500"
-                                )}>
+                                <Card key={req.id} className="overflow-hidden hover:shadow-lg transition-shadow border-l-4" style={{
+                                    borderLeftColor: req.type === 'bug' ? '#ef4444' : req.type === 'feature' ? '#f59e0b' : '#3b82f6'
+                                }}>
                                     <CardHeader className="pb-3">
                                         <div className="flex justify-between items-start">
                                             <div className="flex gap-2">

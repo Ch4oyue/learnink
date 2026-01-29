@@ -103,7 +103,7 @@ export function Hero() {
 
                     {/* Interactive Code Block */}
                     <Suspense fallback={
-                        <div className="w-full h-[400px] bg-zinc-950 rounded-xl border border-zinc-800/60 shadow-2xl animate-pulse flex items-center justify-center">
+                        <div className="w-full h-[400px] bg-[#1e1e1e] rounded-xl border border-zinc-800/60 shadow-2xl animate-pulse flex items-center justify-center">
                             <span className="text-zinc-500 font-mono">Loading Editor...</span>
                         </div>
                     }>

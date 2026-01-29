@@ -34,6 +34,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         root.classList.add(resolved);
         setResolvedTheme(resolved);
         localStorage.setItem("theme", theme);
+
+        // Update meta theme-color
+        const metaThemeColor = document.querySelector("meta[name='theme-color']");
+        if (metaThemeColor) {
+            metaThemeColor.setAttribute("content", resolved === "dark" ? "#09090b" : "#ffffff");
+        }
     }, [theme]);
 
     // Listen for system theme changes
@@ -47,6 +53,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
             const newTheme = e.matches ? "dark" : "light";
             root.classList.add(newTheme);
             setResolvedTheme(newTheme);
+
+            // Update meta theme-color for system changes
+            const metaThemeColor = document.querySelector("meta[name='theme-color']");
+            if (metaThemeColor) {
+                metaThemeColor.setAttribute("content", newTheme === "dark" ? "#09090b" : "#ffffff");
+            }
         };
 
         mediaQuery.addEventListener("change", handleChange);

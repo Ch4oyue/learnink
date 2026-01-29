@@ -702,7 +702,7 @@ export default function DashboardProfile() {
             </Card>
 
             {/* Mobile Preferences */}
-            <Card>
+            <Card className="md:hidden">
               <CardHeader>
                 <CardTitle>Mobile Preferences</CardTitle>
                 <CardDescription>Adjust settings for mobile experience</CardDescription>

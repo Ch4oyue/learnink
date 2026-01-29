@@ -165,14 +165,14 @@ export function BottomNavigation() {
   return (
     <nav className={cn(
       "fixed bottom-0 left-0 right-0 z-50 border-t md:hidden safe-area-bottom transition-all duration-300",
-      // Apple Liquid Glass - Mobile Only
+      // Apple Liquid Glass - Ultra Subtle
       isTransparent
         ? [
-          "bg-white/35 dark:bg-white/[0.08]",
-          "backdrop-blur-[40px] backdrop-saturate-[180%]",
-          "border-t border-white/50 dark:border-white/12",
-          "shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_-2px_16px_-2px_rgba(0,0,0,0.08)]",
-          "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.1),0_-2px_16px_-2px_rgba(0,0,0,0.3)]"
+          "bg-white/20 dark:bg-white/[0.06]",
+          "backdrop-blur-[20px] backdrop-saturate-[120%]",
+          "border-t-[0.5px] border-white/40 dark:border-white/10",
+          "shadow-[inset_0_0.5px_0_rgba(255,255,255,0.7)]",
+          "dark:shadow-[inset_0_0.5px_0_rgba(255,255,255,0.08)]"
         ].join(" ")
         : "bg-card/95 border-t backdrop-blur-md"
     )}>

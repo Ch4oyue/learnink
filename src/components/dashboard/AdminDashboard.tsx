@@ -124,7 +124,8 @@ export function AdminDashboardContent() {
   const generateModule = useGenerateModule();
 
   // Extract users array from the data (new format: { users, meta })
-  const users = usersData?.users || [];
+  // Memoized to prevent dependency changes on every render
+  const users = useMemo(() => usersData?.users || [], [usersData?.users]);
 
   // Extract stats (new async format)
   const totalUsers = statsData?.totalUsers || users.length;
@@ -470,7 +471,7 @@ export function AdminDashboardContent() {
                   </div>
                   <div className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded-md">
                     <Users className="h-3 w-3" />
-                    {module.student_count || 0} Siswa
+                    {module.level || 'Beginner'}
                   </div>
                 </div>
                 <h3 className="font-medium text-foreground mb-1">{module.title}</h3>

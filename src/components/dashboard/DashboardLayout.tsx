@@ -64,6 +64,7 @@ import {
   SheetTrigger,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { NotificationBadge } from "@/components/notifications/NotificationBadge";
 
 /**
  * DashboardLayout - Scalable Dashboard Shell
@@ -562,6 +563,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                             {roleLabels[currentRole]} Dashboard
                         </Badge>
                     </div>
+                    <div className="ml-auto">
+                      <NotificationBadge />
+                    </div>
                 </header>
                 {/* Mobile Header (Simplified) */}
                 <header className="md:hidden sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/5 glass-liquid px-4 backdrop-blur-xl">
@@ -571,15 +575,18 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                       </div>
                       <span className="font-semibold text-sm">LearnInk</span>
                    </div>
-                   <Badge
-                      variant="outline"
-                      className={cn(
-                          "text-[10px] font-bold uppercase tracking-wider",
-                          roleBadgeColors[currentRole]
-                      )}
-                  >
-                      {roleLabels[currentRole]}
-                  </Badge>
+                   <div className="flex items-center gap-3">
+                     <NotificationBadge />
+                     <Badge
+                        variant="outline"
+                        className={cn(
+                            "text-[10px] font-bold uppercase tracking-wider",
+                            roleBadgeColors[currentRole]
+                        )}
+                    >
+                        {roleLabels[currentRole]}
+                    </Badge>
+                   </div>
                 </header>
 
                 {/* Add bottom padding for mobile to account for floating nav */}

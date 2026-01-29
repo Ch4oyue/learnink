@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const typeIcons: Record<string, React.ElementType> = {
   module: BookOpen,
@@ -59,7 +60,17 @@ export function NotificationBadge() {
           table: "notifications",
           filter: `user_id=eq.${user.id}`,
         },
-        () => {
+        (payload) => {
+          // Show toast
+          const newNotification = payload.new as Notification;
+          toast(newNotification.title || "Notifikasi Baru", {
+            description: newNotification.message,
+            action: {
+              label: "Lihat",
+              onClick: () => navigate("/dashboard/notifications"),
+            },
+          });
+
           // Invalidate queries to refetch notifications
           queryClient.invalidateQueries({ queryKey: ["notifications"] });
           queryClient.invalidateQueries({ queryKey: ["notifications-unread-count"] });
@@ -201,7 +212,7 @@ export function NotificationBadge() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => navigate("/dashboard?tab=notifications")}
+              onClick={() => navigate("/dashboard/notifications")}
               className="w-full text-xs text-primary"
             >
               Lihat semua notifikasi

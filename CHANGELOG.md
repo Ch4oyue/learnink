@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.4.10] - February 14, 2026
+
+### Notifications & Testing
+
+Implemented real-time notification system and enhanced unit testing infrastructure.
+
+<!-- -->
+
+#### Improvements (2)
+- **Real-time Notifications**: Integrated Supabase Realtime for instant notification toasts and added a dedicated notification center page.
+- **Testing Infrastructure**: Configured `bun test` with preload scripts to support robust unit testing of static assets.
+
+#### Fixes (1)
+- **Notification Routing**: Connected isolated notification components to the main dashboard router and layout.
+
 ## [1.4.9] - January 29, 2026
 
 ### Audit & Stability
@@ -301,6 +316,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.4.10 | Feb 14, 2026 | Notifications & Testing Infrastructure |
 | 1.4.9 | Jan 29, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 29, 2026 | Critical Security Patch (Edge Function RBAC) |
 | 1.4.7 | Jan 28, 2026 | Admin UX & Notion Sync Upgrade |

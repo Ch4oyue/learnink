@@ -30,6 +30,7 @@ const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
 const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
 const DashboardCourses = lazy(() => import("./pages/DashboardCourses"));
 const DashboardModules = lazy(() => import("./pages/DashboardModules"));
+const DashboardNotifications = lazy(() => import("./pages/DashboardNotifications"));
 const DashboardRequests = lazy(() => import("./pages/DashboardRequests"));
 const CourseDetail = lazy(() => import("./pages/CourseDetail"));
 const ComingSoon = lazy(() => import("./pages/ComingSoon"));
@@ -213,6 +214,14 @@ const App = () => (
                     element={
                       <ProtectedRoute>
                         <DashboardRequests />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/dashboard/notifications"
+                    element={
+                      <ProtectedRoute>
+                        <DashboardNotifications />
                       </ProtectedRoute>
                     }
                   />

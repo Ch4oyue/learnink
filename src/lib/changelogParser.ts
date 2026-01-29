@@ -23,7 +23,7 @@ export interface VersionSummary {
 }
 
 // Import the raw changelog content at build time
-import changelogContent from '/CHANGELOG.md?raw';
+import changelogContent from '../../CHANGELOG.md?raw';
 import { extractListItems } from './changelogUtils';
 
 /**

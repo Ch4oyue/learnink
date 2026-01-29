@@ -3,9 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/contexts/AuthContext";
-
-// Super admin email that cannot be modified
-const SUPER_ADMIN_EMAIL = 'agen.salva@gmail.com';
+import { SUPER_ADMIN_USER_ID, SUPER_ADMIN_EMAIL } from "@/hooks/useUsers";
 
 export function useUserRole(userId?: string) {
   return useQuery({
@@ -32,17 +30,8 @@ export function useUpdateUserRole() {
 
   return useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: AppRole }) => {
-      // First, get the user's email from auth to check super admin protection
-      const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId);
-
-      // If admin API fails, try to get from rpc or just proceed (backwards compatibility)
-      let userEmail: string | null = null;
-      if (!userError && userData?.user?.email) {
-        userEmail = userData.user.email;
-      }
-
-      // Protect super admin from ANY role changes
-      if (userEmail === SUPER_ADMIN_EMAIL) {
+      // Protect super admin from ANY role changes (Using ID check)
+      if (userId === SUPER_ADMIN_USER_ID) {
         throw new Error('Super Admin tidak dapat diubah role-nya');
       }
 
@@ -98,9 +87,8 @@ export function useBanUser() {
 
   return useMutation({
     mutationFn: async ({ userId, banDuration }: { userId: string; banDuration: 'unban' | '1h' | '24h' | '7d' | '30d' | 'permanent' }) => {
-      // First, check if user is super admin
-      const { data: userData } = await supabase.auth.admin.getUserById(userId);
-      if (userData?.user?.email === SUPER_ADMIN_EMAIL) {
+      // Check if user is super admin
+      if (userId === SUPER_ADMIN_USER_ID) {
         throw new Error('Super Admin tidak dapat di-ban');
       }
 

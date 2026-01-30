@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { describe, it, expect, mock, beforeEach } from "bun:test";
+import { describe, it, expect, mock, beforeEach, afterEach } from "bun:test";
 
 // --- Mocks Setup ---
 
@@ -23,6 +23,9 @@ mock.module("react", () => ({
 import { usePyodidePreload } from "../../../src/hooks/usePyodidePreload";
 
 describe("usePyodidePreload", () => {
+  let originalSetTimeout: any;
+  let originalClearTimeout: any;
+
   beforeEach(() => {
     mockLoad.mockClear();
     effectCallback = undefined;
@@ -31,6 +34,20 @@ describe("usePyodidePreload", () => {
     global.window = {
         requestIdleCallback: (cb: any) => cb()
     } as any;
+
+    // Mock setTimeout to execute immediately
+    originalSetTimeout = global.setTimeout;
+    originalClearTimeout = global.clearTimeout;
+    global.setTimeout = ((cb: () => void) => {
+        cb();
+        return 123;
+    }) as any;
+    global.clearTimeout = (() => {}) as any;
+  });
+
+  afterEach(() => {
+    global.setTimeout = originalSetTimeout;
+    global.clearTimeout = originalClearTimeout;
   });
 
   it("should preload pyodide when python code block is present", () => {

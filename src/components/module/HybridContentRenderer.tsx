@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
+import { FloatingSelectionMenu } from "./FloatingSelectionMenu";
 
 // ============================================
 // TYPES
@@ -24,7 +25,7 @@ interface ModuleMetadata {
 interface HybridContentRendererProps {
     content?: string | null;
     metadata?: ModuleMetadata;
-    onAddToNotes?: (text: string) => void;
+    onAddToNotes?: (text: string, comment?: string) => void;
     onCopyCode?: (code: string) => void;
     isLoading?: boolean;
 }
@@ -104,31 +105,18 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                 className="md:flex-1 md:overflow-y-auto overflow-visible bg-background relative scroll-smooth"
                 style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted)) transparent" }}
             >
-                {/* Text Selection Floating Button */}
+                {/* Floating Selection Menu */}
                 {selection && (
-                    <div
-                        className="fixed z-50 animate-in fade-in zoom-in duration-200"
-                        style={{ top: selection.top, left: selection.left, transform: 'translateX(-50%)' }}
-                    >
-                        <Button
-                            size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                e.preventDefault(); // Prevent text deselection on mousedown
-                                onAddToNotes?.(selection.text);
-
-                                // Optional: Clear selection after adding
-                                window.getSelection()?.removeAllRanges();
-                                setSelection(null);
-                            }}
-                            className="shadow-xl gap-2 rounded-full bg-primary text-primary-foreground hover:scale-105 transition-all"
-                        >
-                            <PlusCircle className="h-4 w-4" />
-                            Highlight & Add Note
-                        </Button>
-                        {/* Little arrow/triangle */}
-                        <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-primary absolute left-1/2 -translate-x-1/2 -bottom-1.5"></div>
-                    </div>
+                    <FloatingSelectionMenu
+                        selection={selection}
+                        onAddNote={(text, comment) => {
+                            const noteContent = comment ? `${text}\n\nNote: ${comment}` : text;
+                            onAddToNotes?.(noteContent);
+                            window.getSelection()?.removeAllRanges();
+                            setSelection(null);
+                        }}
+                        onClose={() => setSelection(null)}
+                    />
                 )}
 
                 {/* Focus Container - 800px max like variant_2 */}

@@ -382,6 +382,8 @@ export default function ModuleLearn() {
                       if (!item) return null; // Defensive check
 
                       const isActive = item.id === currentSectionId;
+                      const isCompleted = index < maxVisitedSectionIndex;
+
                       return (
                         <button
                           key={item.id}
@@ -390,16 +392,22 @@ export default function ModuleLearn() {
                             "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
                             isActive
                               ? "bg-primary/10 text-primary"
-                              : "text-foreground hover:bg-muted"
+                              : isCompleted
+                                ? "text-muted-foreground hover:bg-muted"
+                                : "text-foreground hover:bg-muted"
                           )}
                         >
                           <span className={cn(
-                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                            isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                            "w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : isCompleted
+                                ? "bg-green-500/20 text-green-400"
+                                : "bg-muted text-muted-foreground"
                           )}>
-                            {index + 1}
+                            {isCompleted ? <Check className="h-3.5 w-3.5" /> : index + 1}
                           </span>
-                          {item.title}
+                          <span className="line-clamp-2">{item.title}</span>
                         </button>
                       );
                     })}

@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.3] - January 30, 2026
+
+### Apple-Style UI & Notes Upgrade
+
+Major aesthetic polish to align with Apple's "Glass Liquid" design system and a significant upgrade to the note-taking experience with a new Floating Selection Menu.
+
+#### Improvements (3)
+- **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons for a premium, responsive feel.
+- **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy) that works seamlessly on both desktop and mobile text selection.
+- **Mobile Progress**: Fixed visibility issues with progress checkmarks on mobile devices by ensuring high-contrast styling in the Table of Contents sheet.
+
 ## [1.5.2] - January 30, 2026
 
 ### Gamification & UI Polish

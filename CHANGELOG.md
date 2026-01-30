@@ -7,30 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.6.0] - February 12, 2026
+## [1.6.0] - January 30, 2026
 
-### Gacha Reward System
+### Gacha Rewards, Apple UI Polish & Mobile Experience
 
-Integrated a gamified "Gacha" reward system for module completion, featuring secure server-side XP generation and database-persisted claim status.
+A massive update consolidating the Gacha reward system, Apple-style UI improvements, and critical mobile experience upgrades.
 
-#### Improvements (3)
+#### Improvements (13)
 - **Gacha Rewards**: Implemented a secure reward system where users earn randomized XP (50-150) upon completing a module.
 - **Secure Validation**: Created `award-xp` Edge Function to securely calculate and award XP, preventing client-side manipulation.
 - **Claim Persistence**: Added `reward_claimed` tracking to `user_progress` to ensure users can only claim rewards once per module.
-
-#### Fixes (1)
-- **Modal Design**: Refactored `GachaCompletionModal` to align with the "Premium Dark Mode" aesthetic and "Glass Liquid" design system.
-
-## [1.5.3] - January 30, 2026
-
-### Apple-Style UI, Gamification & Mobile Polish
-
-A massive update consolidating three major releases. Aligned the UI with Apple's "Glass Liquid" design system, introduced "Gacha" XP rewards, and implemented comprehensive analytics and mobile experience upgrades.
-
-#### Improvements (10)
 - **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons for a premium, responsive feel.
 - **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy) that works seamlessly on both desktop and mobile text selection.
-- **Gamification**: Added "Gacha XP" system with randomized rewards (simulated) and celebration modal upon module completion.
 - **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug by tracking maximum visited section index.
 - **Navigation UI**: Simplified "Previous" and "Next" buttons to be icon-only for a cleaner mobile interface.
 - **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection (mouse, scroll, visibility) stored via LocalStorage.
@@ -39,7 +27,8 @@ A massive update consolidating three major releases. Aligned the UI with Apple's
 - **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction.
 - **Mobile Progress Visibility**: Enhanced Table of Contents sheet to ensure progress checkmarks are clearly visible on mobile devices.
 
-#### Fixes (4)
+#### Fixes (5)
+- **Modal Design**: Refactored `GachaCompletionModal` to align with the "Premium Dark Mode" aesthetic and "Glass Liquid" design system.
 - **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
 - **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering and improve overall stability.
 - **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.
@@ -377,8 +366,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.6.0 | Feb 12, 2026 | Gacha Reward System & Secure XP Validation |
-| 1.5.3 | Jan 30, 2026 | Apple-Style UI, Gamification & Mobile Polish |
+| 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |

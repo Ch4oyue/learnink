@@ -38,7 +38,7 @@ describe("usePyodidePreload", () => {
     // Mock setTimeout to execute immediately
     originalSetTimeout = global.setTimeout;
     originalClearTimeout = global.clearTimeout;
-    global.setTimeout = ((cb: Function) => {
+    global.setTimeout = ((cb: () => void) => {
         cb();
         return 123;
     }) as any;

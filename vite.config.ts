@@ -44,6 +44,8 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
+    target: "es2020",
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -78,7 +80,7 @@ export default defineConfig(({ mode }) => ({
 
             // 6. Common Utilities
             // Separated so they don't bloat the UI chunks.
-            if (id.includes("date-fns") || id.includes("zod")) {
+            if (id.includes("date-fns") || id.includes("zod") || id.includes("react-hook-form") || id.includes("clsx") || id.includes("tailwind-merge")) {
               return "vendor-utils";
             }
 

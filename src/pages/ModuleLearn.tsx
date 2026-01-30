@@ -30,7 +30,7 @@ import { HybridSidebar } from "@/components/module/HybridSidebar";
 import { HybridContentRenderer } from "@/components/module/HybridContentRenderer";
 import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
 import { GachaCompletionModal } from "@/components/module/GachaCompletionModal";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Gift } from "lucide-react";
 
 /**
  * ModuleLearn - Hybrid View with 4-Panel Layout
@@ -545,13 +545,23 @@ export default function ModuleLearn() {
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
-              <Button
-                onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
-                className="bg-green-600 hover:bg-green-500 text-white"
-              >
-                <Check className="h-4 w-4 mr-2" />
-                Complete
-              </Button>
+              {!progress?.reward_claimed ? (
+                <Button
+                  onClick={() => setShowGacha(true)}
+                  className="bg-amber-500 hover:bg-amber-400 text-black font-bold shadow-lg animate-pulse"
+                >
+                  <Gift className="h-4 w-4 mr-2" />
+                  Claim XP
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
+                  className="bg-green-600 hover:bg-green-500 text-white"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Complete
+                </Button>
+              )}
             </div>
           )}
         </div>

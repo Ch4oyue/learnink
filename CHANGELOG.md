@@ -45,7 +45,7 @@ A massive update consolidating three major releases. Aligned the UI with Apple's
 - **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.
 - **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links and updated the GitHub repository URL.
 
-#### Refactor (2)
+#### Patches (2)
 - **Module Architecture**: Extracted complex navigation and progress logic from `ModuleLearn.tsx` into a reusable `useModuleNavigation` hook, significantly improving code maintainability.
 - **Unit Testing**: Added robust unit tests for module parsing logic to ensure stability of content rendering.
 
@@ -92,7 +92,7 @@ Critical security patches for Edge Functions and mobile interface corrections.
 #### Fixes (4)
 - **Broken Access Control**: Fixed a critical vulnerability in `get-users` Edge Function where the Service Role key was used without proper role validation.
 - **User List Visibility**: Implemented `get-users` Edge Function fallback to bypass RLS limitations, ensuring Admins can see all users.
-- **Mobile Menu**: Filtered out redundant items from the mobile "Menu" sheet that are already present in the floating dock.
+- **Mobile Menu**: Filtered out redundant items from the mobile "Menu" sheet that are already present in the floating mobile dock.
 - **PWA Prompt**: Fixed `useEffect` dependency error in `DashboardProfile` and optimized PWA prompt logic.
 
 #### Patches (2)
@@ -180,7 +180,7 @@ Comprehensive security audit and resolution of data leakage vulnerabilities.
 
 <!-- -->
 
-#### Security (3)
+#### Fixes (3)
 - **PII Leakage Fix**: Resolved Personally Identifiable Information (PII) exposure in profile RLS policies.
 - **Console Audit**: Removed debug logs in production that leaked sensitive system information.
 - Hardened RLS rules for `profiles` table to prevent unauthorized data access.
@@ -269,12 +269,10 @@ Critical bug fixes and database schema improvements for production stability.
 - Fixed `DashboardProfile` to use `display_name` instead of non-existent profile fields
 - Added React Router v7 future flags (`v7_startTransition`, `v7_relativeSplatPath`)
 
-#### Database (3)
+#### Improvements (5)
 - Created `learning_sources` table with correct RLS policies
 - Created `integrations` table for API key management
 - Created `incoming_contents` table for n8n webhook integration
-
-#### Infrastructure (2)
 - Added Edge Function `generate-api-key` for integration API key generation
 - Created standalone SQL migration for missing tables
 
@@ -364,7 +362,7 @@ Core dashboard implementation with role-based access.
 
 First stable release of LearnInk learning platform.
 
-#### Features
+#### Improvements
 - User authentication with Supabase
 - Module browsing and learning
 - Guided notes system

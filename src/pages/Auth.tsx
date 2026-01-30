@@ -167,12 +167,12 @@ export default function Auth() {
   // ============================================
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground font-sans p-4 relative overflow-hidden transition-colors duration-300">
+    <div className="h-screen overflow-hidden flex flex-col items-center justify-center bg-background text-foreground font-sans p-4 relative transition-colors duration-300">
       {/* Main Card */}
-      <main className="w-full max-w-5xl bg-card rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-xl border border-border z-10">
+      <main className="w-full max-w-5xl h-[85vh] bg-card rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-xl border border-border z-10">
 
         {/* Left Column - Visual */}
-        <section className="w-full md:w-1/2 relative p-12 flex flex-col items-center justify-center text-center overflow-hidden bg-primary/10 dark:bg-primary/5">
+        <section className="hidden md:flex w-full md:w-1/2 relative p-12 flex-col items-center justify-center text-center overflow-hidden bg-primary/10 dark:bg-primary/5">
           {/* Decorative blobs */}
           <div className="absolute inset-0 w-full h-full opacity-30 pointer-events-none">
             <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
@@ -207,7 +207,7 @@ export default function Auth() {
         </section>
 
         {/* Right Column - Form */}
-        <section className="w-full md:w-1/2 bg-card p-8 md:p-12 flex flex-col justify-center">
+        <section className="w-full md:w-1/2 bg-card p-8 md:p-12 flex flex-col justify-center overflow-y-auto">
           <div className="max-w-md mx-auto w-full">
             {/* Header */}
             <h1 className="text-2xl md:text-3xl font-semibold text-foreground mb-10">
@@ -230,6 +230,7 @@ export default function Auth() {
                           <FormControl>
                             <Input
                               type="email"
+                              autoComplete="username"
                               placeholder="you@example.com"
                               className="pl-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
@@ -261,6 +262,7 @@ export default function Auth() {
                           <FormControl>
                             <Input
                               type={showPassword ? "text" : "password"}
+                              autoComplete="current-password"
                               placeholder="••••••••"
                               className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
@@ -324,6 +326,7 @@ export default function Auth() {
                           <FormControl>
                             <Input
                               type="text"
+                              autoComplete="name"
                               placeholder="Your name"
                               className="pl-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
@@ -346,6 +349,7 @@ export default function Auth() {
                           <FormControl>
                             <Input
                               type="email"
+                              autoComplete="username"
                               placeholder="you@example.com"
                               className="pl-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
@@ -368,6 +372,7 @@ export default function Auth() {
                           <FormControl>
                             <Input
                               type={showPassword ? "text" : "password"}
+                              autoComplete="new-password"
                               placeholder="Minimal 6 characters"
                               className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
@@ -398,6 +403,7 @@ export default function Auth() {
                           <FormControl>
                             <Input
                               type={showConfirmPassword ? "text" : "password"}
+                              autoComplete="new-password"
                               placeholder="Repeat password"
                               className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}

@@ -471,7 +471,7 @@ export default function ContentApproval() {
                                 value={formData.title}
                                 onChange={e => setFormData({...formData, title: e.target.value})}
                                 required
-                                className="bg-white/5 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-white/10 transition-all duration-300"
+                                className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
                             />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -480,14 +480,14 @@ export default function ContentApproval() {
                                 <Textarea
                                     value={formData.summary}
                                     onChange={e => setFormData({...formData, summary: e.target.value})}
-                                    className="h-20 resize-none bg-white/5 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-white/10 transition-all duration-300"
+                                    className="h-20 resize-none bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
                                 />
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <Label>Kategori</Label>
                                     <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
-                                        <SelectTrigger className="bg-white/5 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-white/10 transition-all duration-300"><SelectValue /></SelectTrigger>
+                                        <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             {categories.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
                                         </SelectContent>
@@ -496,7 +496,7 @@ export default function ContentApproval() {
                                 <div className="space-y-2">
                                     <Label>Level</Label>
                                     <Select value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
-                                        <SelectTrigger className="bg-white/5 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-white/10 transition-all duration-300"><SelectValue /></SelectTrigger>
+                                        <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             {levels.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
                                         </SelectContent>
@@ -552,12 +552,12 @@ export default function ContentApproval() {
                                             <AutoResizeTextarea
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
-                                                className="font-mono text-sm min-h-[300px] bg-white/5 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-white/10 transition-all duration-300"
+                                                className="font-mono text-sm min-h-[300px] bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
                                                 placeholder="Tulis konten menggunakan format Markdown..."
                                             />
                                         </TabsContent>
                                         <TabsContent value="preview" className="mt-0">
-                                            <div className="border border-white/10 rounded-2xl p-4 min-h-[300px] bg-card/50 backdrop-blur-sm">
+                                            <div className="border border-white/10 rounded-2xl p-4 min-h-[300px] bg-black/20 backdrop-blur-sm">
                                                 <MarkdownRenderer content={formData.content} />
                                             </div>
                                         </TabsContent>

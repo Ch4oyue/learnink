@@ -98,20 +98,24 @@ export function MarkdownRenderer({
         );
     },
     pre: ({ children }) => <>{children}</>,
-    ul: ({ children }) => <ul className="my-4 space-y-2 list-disc pl-6">{children}</ul>,
-    ol: ({ children }) => <ol className="my-4 space-y-2 list-decimal pl-6">{children}</ol>,
-    li: ({ children }) => <li className="text-foreground/90 leading-relaxed pl-1 marker:text-foreground/50">{children}</li>,
+    ul: ({ children, ...props }) => <ul className="my-4 space-y-2 list-disc pl-6" {...props}>{children}</ul>,
+    ol: ({ children, ...props }) => <ol className="my-4 space-y-2 list-decimal pl-6" {...props}>{children}</ol>,
+    li: ({ children, ...props }) => <li className="text-foreground/90 leading-relaxed pl-1 marker:text-foreground/50" {...props}>{children}</li>,
     p: ({ children }) => <p className="my-5 text-foreground/90 leading-loose">{children}</p>,
     blockquote: ({ children }) => <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">{children}</blockquote>,
     hr: () => <hr className="my-6 border-border" />,
   };
 
   return (
-    <div className={cn("w-full max-w-none", variant === 'default' ? "space-y-6" : "space-y-0", className)}>
+    <div className={cn(
+        "w-full max-w-none prose prose-slate dark:prose-invert",
+        variant === 'default' ? "space-y-6" : "space-y-0",
+        variant === 'compact' && "prose-p:my-0 prose-li:my-0 prose-ul:my-0 prose-ol:my-0",
+        className
+    )}>
         <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={components}
-            className={cn("prose prose-slate dark:prose-invert max-w-none", variant === 'compact' && "prose-p:my-0 prose-li:my-0 prose-ul:my-0 prose-ol:my-0")}
         >
             {content}
         </ReactMarkdown>

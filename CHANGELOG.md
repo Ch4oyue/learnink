@@ -7,14 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.12] - January 30, 2026
+## [1.5.0] - January 30, 2026
 
-### Performance & Optimization
+### Mobile Experience & Analytics
 
-Optimized initialization of heavy runtime dependencies.
+Major mobile UI/UX overhaul, active learning analytics, and runtime performance optimizations.
 
-#### Improvements (1)
-- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction, using `requestIdleCallback` to prevent main thread blocking.
+#### Improvements (4)
+- **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection (mouse, scroll, visibility) stored via LocalStorage.
+- **Mobile Experience**: Major UI/UX overhaul for mobile devices, including Safe Area (Notch) support for sticky headers/footers in `ModuleLearn` and `DashboardLayout`.
+- **Landing Page Navigation**: Added a responsive Hamburger menu (Sheet) for better mobile accessibility on the Landing Page.
+- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction.
+
+#### Refactor (2)
+- **Module Architecture**: Extracted complex navigation and progress logic from `ModuleLearn.tsx` into a reusable `useModuleNavigation` hook, significantly improving code maintainability.
+- **Unit Testing**: Added robust unit tests for module parsing logic to ensure stability of content rendering.
 
 ## [1.4.11] - January 29, 2026
 
@@ -346,6 +353,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.5.0 | Jan 30, 2026 | Mobile Experience, Analytics & Refactoring |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |

@@ -19,9 +19,10 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { useDebouncedCallback } from "@/hooks/useDebounce";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { usePyodidePreload } from "@/hooks/usePyodidePreload";
+import { useModuleNavigation } from "@/hooks/useModuleNavigation";
+import { useActiveTimeTracker } from "@/hooks/useActiveTimeTracker";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/module/HybridSidebar";
@@ -34,8 +35,6 @@ import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
  * Layout: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
  * Premium Dark Mode: #0b0c0e background, purple accents
  */
-
-import { parseModuleSections, type SectionData } from "@/lib/moduleParser";
 
 // ============================================
 // MAIN COMPONENT
@@ -56,6 +55,9 @@ export default function ModuleLearn() {
 
   // Performance: Preload Pyodide if needed
   usePyodidePreload(module?.content);
+
+  // Analytics: Track active time
+  useActiveTimeTracker(moduleId, user?.id);
 
   // Access Control Check
   useEffect(() => {
@@ -93,7 +95,6 @@ export default function ModuleLearn() {
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
-  const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
 
   // Persist panel visibility to localStorage (memoized handlers)
   const handleSetShowTOC = useCallback((show: boolean) => {
@@ -110,74 +111,34 @@ export default function ModuleLearn() {
   const handleBack = useCallback(() => navigate("/dashboard"), [navigate]);
 
   // ============================================
-  // PROGRESS OPTIMIZATION
+  // LOGIC: Use Custom Hook
   // ============================================
+  const {
+    currentSectionId,
+    currentSection,
+    currentContent,
+    currentSectionIndex,
+    currentProgress,
+    sections,
+    order,
+    hasPrevious,
+    hasNext,
+    handlePrevious,
+    handleNext,
+    handleSectionClick,
+  } = useModuleNavigation({
+    moduleId,
+    userId: user?.id,
+    moduleContent: module?.content,
+    serverProgress: progress?.progress_percent || 0,
+    onUpdateProgress: updateProgress.mutate,
+  });
 
-  // Optimistic local progress to update UI immediately
-  const [localMaxProgress, setLocalMaxProgress] = useState(0);
-
-  // Sync with server progress on initial load (only if server is ahead)
-  useEffect(() => {
-    if (progress?.progress_percent) {
-      setLocalMaxProgress(prev => Math.max(prev, progress.progress_percent || 0));
-    }
-  }, [progress?.progress_percent]);
-
-  // Derived state for UI (use max of local and server)
-  const currentProgress = Math.max(localMaxProgress, progress?.progress_percent || 0);
-
-  // Track last saved progress to avoid redundant calls
-  const lastSavedProgressRef = useRef<number>(0);
-
-  // Define the actual API call
-  const saveProgress = useCallback((newProgress: number) => {
-    if (!user || !moduleId) return;
-
-    // Only save if progress increased and is new
-    if (newProgress > lastSavedProgressRef.current) {
-      lastSavedProgressRef.current = newProgress;
-      updateProgress.mutate({
-        userId: user.id,
-        moduleId: moduleId,
-        progressPercent: Math.min(newProgress, 100),
-        isCompleted: newProgress >= 100,
-      });
-    }
-  }, [user, moduleId, updateProgress]);
-
-  // Create a debounced version of the save function (3s delay) to prevent database spam
-  const debouncedSaveProgress = useDebouncedCallback(saveProgress, 3000);
-
-  // ============================================
-  // OPTIMIZED: Parse sections ONCE when content changes
-  // Returns { sections: Map, order: Array }
-  // ============================================
-  const { sections, order } = useMemo(() => {
-    if (!module?.content) return { sections: {}, order: [] };
-    return parseModuleSections(module.content);
-  }, [module?.content]);
-
-  // Get current section content via simple lookup (O(1))
-  const currentSection = currentSectionId && sections[currentSectionId]
-    ? sections[currentSectionId]
-    : (order.length > 0 ? sections[order[0]] : null);
-
-  const currentContent = currentSection?.content || module?.content || "";
-
-  // Calculate index efficiently for progress bar (O(N) but negligible for N < 100)
-  // We prioritize O(1) content lookup over index lookup
-  const currentSectionIndex = currentSectionId ? order.indexOf(currentSectionId) : 0;
-
-  // Navigation helpers
-  const hasPrevious = currentSectionIndex > 0;
-  const hasNext = currentSectionIndex < order.length - 1 && currentSectionIndex >= 0;
-
-  // Set initial section
-  useEffect(() => {
-    if (order.length > 0 && !currentSectionId) {
-      setCurrentSectionId(order[0]);
-    }
-  }, [order, currentSectionId]);
+  // UI Helper for clicking section (also closes menu)
+  const onSectionClick = useCallback((id: string) => {
+    handleSectionClick(id);
+    setMobileMenuOpen(false);
+  }, [handleSectionClick]);
 
   // Scroll to top when section changes
   useEffect(() => {
@@ -186,39 +147,6 @@ export default function ModuleLearn() {
       contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [currentSectionId]);
-
-  // Update progress when changing sections (Using debounced save)
-  useEffect(() => {
-    if (order.length === 0 || currentSectionIndex < 0) return;
-
-    const newProgress = Math.round(((currentSectionIndex + 1) / order.length) * 100);
-
-    // Update local optimistic state immediately if it's a new high
-    if (newProgress > localMaxProgress) {
-      setLocalMaxProgress(newProgress);
-
-      // Schedule DB update (debounced)
-      debouncedSaveProgress(newProgress);
-    }
-  }, [currentSectionIndex, order.length, localMaxProgress, debouncedSaveProgress]);
-
-  // Navigation handlers (Wrapped in useCallback)
-  const handlePrevious = useCallback(() => {
-    if (currentSectionIndex > 0) {
-      setCurrentSectionId(order[currentSectionIndex - 1]);
-    }
-  }, [currentSectionIndex, order]);
-
-  const handleNext = useCallback(() => {
-    if (currentSectionIndex < order.length - 1) {
-      setCurrentSectionId(order[currentSectionIndex + 1]);
-    }
-  }, [currentSectionIndex, order]);
-
-  const handleSectionClick = useCallback((sectionId: string) => {
-    setCurrentSectionId(sectionId);
-    setMobileMenuOpen(false);
-  }, []);
 
   // Note handlers (Wrapped in useCallback)
   const handleCreateNote = useCallback((content: string) => {
@@ -355,7 +283,7 @@ export default function ModuleLearn() {
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleSectionClick(item.id)}
+                      onClick={() => onSectionClick(item.id)}
                       className={cn(
                         "w-full text-left p-2.5 rounded-lg transition-all flex items-start gap-2 text-sm",
                         isActive
@@ -394,9 +322,9 @@ export default function ModuleLearn() {
       ============================================ */}
       <div className="w-full md:flex-1 flex flex-col md:overflow-hidden">
         {/* Mobile Header */}
-        <header className="md:hidden sticky top-0 z-50 h-14 flex items-center justify-between px-4 border-b border-border bg-card shrink-0">
+        <header className="md:hidden sticky top-0 z-50 min-h-14 h-auto pt-[env(safe-area-inset-top)] flex items-center justify-between px-4 border-b border-border bg-card shrink-0 transition-all">
           {/* Progress Bar */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-muted">
+          <div className="absolute top-0 left-0 w-full h-1 bg-muted z-10">
             <div
               className="h-full bg-primary transition-all duration-500"
               style={{ width: `${currentProgress}%` }}
@@ -425,7 +353,7 @@ export default function ModuleLearn() {
                       return (
                         <button
                           key={item.id}
-                          onClick={() => handleSectionClick(item.id)}
+                          onClick={() => onSectionClick(item.id)}
                           className={cn(
                             "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
                             isActive
@@ -488,7 +416,7 @@ export default function ModuleLearn() {
         </ErrorBoundary>
 
         {/* Navigation Buttons (Bottom Bar) */}
-        <div className="h-16 border-t border-border bg-card flex items-center justify-between px-6 shrink-0 sticky bottom-0 z-50 md:static">
+        <div className="min-h-16 h-auto pb-[env(safe-area-inset-bottom)] border-t border-border bg-card flex items-center justify-between px-6 py-3 shrink-0 sticky bottom-0 z-50 md:static transition-all">
           <Button
             variant="outline"
             onClick={handlePrevious}

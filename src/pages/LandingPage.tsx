@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Terminal, Moon, Sun, Heart, Github, BookOpen, LayoutDashboard } from "lucide-react";
+import { Terminal, Moon, Sun, Heart, Github, BookOpen, LayoutDashboard, Menu } from "lucide-react";
 import { Hero } from "@/components/landing/Hero";
 import { useTheme } from "@/contexts/ThemeContext";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
 import { lazy, Suspense } from "react";
@@ -26,7 +27,7 @@ export default function LandingPage() {
     return (
         <div className="bg-background text-foreground transition-colors duration-300 min-h-screen flex flex-col font-sans antialiased">
             {/* Header */}
-            <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border">
+            <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border pt-[env(safe-area-inset-top)] transition-all">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         {/* Logo */}
@@ -37,15 +38,15 @@ export default function LandingPage() {
                             <span className="font-bold text-xl tracking-tight text-foreground">LearnInk</span>
                         </Link>
 
-                        {/* Nav Links */}
-                        <div className="flex items-center gap-4">
+                        {/* Nav Links - Desktop */}
+                        <div className="hidden md:flex items-center gap-4">
                             <button
                                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors hidden sm:block"
+                                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                             >
                                 Features
                             </button>
-                            <div className="h-4 w-[1px] bg-border mx-2 hidden sm:block" />
+                            <div className="h-4 w-[1px] bg-border mx-2" />
                             {user ? (
                                 <Link
                                     to="/dashboard"
@@ -74,6 +75,69 @@ export default function LandingPage() {
                                     <Moon className="h-4 w-4" />
                                 )}
                             </Button>
+                        </div>
+
+                        {/* Mobile Menu */}
+                        <div className="flex md:hidden items-center gap-2">
+                             <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={toggleTheme}
+                                className="rounded-lg mr-1"
+                            >
+                                {resolvedTheme === "dark" ? (
+                                    <Sun className="h-4 w-4" />
+                                ) : (
+                                    <Moon className="h-4 w-4" />
+                                )}
+                            </Button>
+
+                            <Sheet>
+                                <SheetTrigger asChild>
+                                    <Button variant="ghost" size="icon">
+                                        <Menu className="h-5 w-5" />
+                                    </Button>
+                                </SheetTrigger>
+                                <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                                    <nav className="flex flex-col gap-4 mt-8">
+                                        {user ? (
+                                            <Link
+                                                to="/dashboard"
+                                                className="flex items-center gap-2 text-lg font-medium text-primary hover:text-primary/80 transition-colors"
+                                            >
+                                                <LayoutDashboard className="h-5 w-5" />
+                                                Dashboard
+                                            </Link>
+                                        ) : (
+                                            <Link
+                                                to="/auth"
+                                                className="text-lg font-medium text-foreground hover:text-primary transition-colors"
+                                            >
+                                                Log in
+                                            </Link>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                                                // Close sheet logic would require state, but native dismiss works on click away
+                                            }}
+                                            className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors text-left"
+                                        >
+                                            Features
+                                        </button>
+                                        <div className="h-[1px] bg-border my-2" />
+                                        <a
+                                            href="https://github.com/learnink"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 text-muted-foreground"
+                                        >
+                                            <Github className="h-5 w-5" />
+                                            GitHub
+                                        </a>
+                                    </nav>
+                                </SheetContent>
+                            </Sheet>
                         </div>
                     </div>
                 </div>

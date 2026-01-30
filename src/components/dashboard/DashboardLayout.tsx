@@ -575,7 +575,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                 </header>
                 {/* Mobile Header (Simplified) */}
-                <header className="md:hidden sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between gap-2 border-b border-white/5 glass-liquid px-4 backdrop-blur-xl">
+                <header className="md:hidden sticky top-0 z-40 flex min-h-14 h-auto pt-[env(safe-area-inset-top)] shrink-0 items-center justify-between gap-2 border-b border-white/5 glass-liquid px-4 backdrop-blur-xl transition-all">
                    <div className="flex items-center gap-2">
                       <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                         <Layers className="size-4" />

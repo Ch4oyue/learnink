@@ -7,7 +7,7 @@ import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
   BookOpen,
   ChevronLeft,
@@ -19,14 +19,17 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
-import { useDebouncedCallback } from "@/hooks/useDebounce";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import { usePyodidePreload } from "@/hooks/usePyodidePreload";
+import { useModuleNavigation } from "@/hooks/useModuleNavigation";
+import { useActiveTimeTracker } from "@/hooks/useActiveTimeTracker";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/module/HybridSidebar";
 import { HybridContentRenderer } from "@/components/module/HybridContentRenderer";
 import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
+import { GachaCompletionModal } from "@/components/module/GachaCompletionModal";
+import { RefreshCcw } from "lucide-react";
 
 /**
  * ModuleLearn - Hybrid View with 4-Panel Layout
@@ -34,8 +37,6 @@ import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
  * Layout: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
  * Premium Dark Mode: #0b0c0e background, purple accents
  */
-
-import { parseModuleSections, type SectionData } from "@/lib/moduleParser";
 
 // ============================================
 // MAIN COMPONENT
@@ -56,6 +57,9 @@ export default function ModuleLearn() {
 
   // Performance: Preload Pyodide if needed
   usePyodidePreload(module?.content);
+
+  // Analytics: Track active time
+  useActiveTimeTracker(moduleId, user?.id);
 
   // Access Control Check
   useEffect(() => {
@@ -93,7 +97,6 @@ export default function ModuleLearn() {
   });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileNotesOpen, setMobileNotesOpen] = useState(false);
-  const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
 
   // Persist panel visibility to localStorage (memoized handlers)
   const handleSetShowTOC = useCallback((show: boolean) => {
@@ -110,74 +113,66 @@ export default function ModuleLearn() {
   const handleBack = useCallback(() => navigate("/dashboard"), [navigate]);
 
   // ============================================
-  // PROGRESS OPTIMIZATION
+  // LOGIC: Use Custom Hook
   // ============================================
+  const {
+    currentSectionId,
+    currentSection,
+    currentContent,
+    currentSectionIndex,
+    currentProgress,
+    sections,
+    order,
+    hasPrevious,
+    hasNext,
+    handlePrevious,
+    handleNext,
+    handleSectionClick,
+    maxVisitedSectionIndex,
+    resetLocalProgress,
+  } = useModuleNavigation({
+    moduleId,
+    userId: user?.id,
+    moduleContent: module?.content,
+    serverProgress: progress?.progress_percent || 0,
+    onUpdateProgress: updateProgress.mutate,
+  });
 
-  // Optimistic local progress to update UI immediately
-  const [localMaxProgress, setLocalMaxProgress] = useState(0);
+  // UI Helper for clicking section (also closes menu)
+  const onSectionClick = useCallback((id: string) => {
+    handleSectionClick(id);
+    setMobileMenuOpen(false);
+  }, [handleSectionClick]);
 
-  // Sync with server progress on initial load (only if server is ahead)
+  // Gacha Logic
+  const [showGacha, setShowGacha] = useState(false);
+
   useEffect(() => {
-    if (progress?.progress_percent) {
-      setLocalMaxProgress(prev => Math.max(prev, progress.progress_percent || 0));
+    if (currentProgress >= 100 && moduleId) {
+      const key = `gacha_shown_${moduleId}`;
+      const shown = localStorage.getItem(key);
+      if (!shown) {
+        setShowGacha(true);
+        localStorage.setItem(key, "true");
+      }
     }
-  }, [progress?.progress_percent]);
+  }, [currentProgress, moduleId]);
 
-  // Derived state for UI (use max of local and server)
-  const currentProgress = Math.max(localMaxProgress, progress?.progress_percent || 0);
-
-  // Track last saved progress to avoid redundant calls
-  const lastSavedProgressRef = useRef<number>(0);
-
-  // Define the actual API call
-  const saveProgress = useCallback((newProgress: number) => {
-    if (!user || !moduleId) return;
-
-    // Only save if progress increased and is new
-    if (newProgress > lastSavedProgressRef.current) {
-      lastSavedProgressRef.current = newProgress;
-      updateProgress.mutate({
-        userId: user.id,
-        moduleId: moduleId,
-        progressPercent: Math.min(newProgress, 100),
-        isCompleted: newProgress >= 100,
-      });
+  const handleResetProgress = useCallback(() => {
+    if (window.confirm("Are you sure you want to reset your progress? You can earn XP again!")) {
+      if (moduleId && user) {
+        updateProgress.mutate({
+          userId: user.id,
+          moduleId: moduleId,
+          progressPercent: 0,
+          isCompleted: false
+        });
+        localStorage.removeItem(`gacha_shown_${moduleId}`);
+        resetLocalProgress();
+        toast({ title: "Progress reset!", description: "You can now re-learn this module." });
+      }
     }
-  }, [user, moduleId, updateProgress]);
-
-  // Create a debounced version of the save function (3s delay) to prevent database spam
-  const debouncedSaveProgress = useDebouncedCallback(saveProgress, 3000);
-
-  // ============================================
-  // OPTIMIZED: Parse sections ONCE when content changes
-  // Returns { sections: Map, order: Array }
-  // ============================================
-  const { sections, order } = useMemo(() => {
-    if (!module?.content) return { sections: {}, order: [] };
-    return parseModuleSections(module.content);
-  }, [module?.content]);
-
-  // Get current section content via simple lookup (O(1))
-  const currentSection = currentSectionId && sections[currentSectionId]
-    ? sections[currentSectionId]
-    : (order.length > 0 ? sections[order[0]] : null);
-
-  const currentContent = currentSection?.content || module?.content || "";
-
-  // Calculate index efficiently for progress bar (O(N) but negligible for N < 100)
-  // We prioritize O(1) content lookup over index lookup
-  const currentSectionIndex = currentSectionId ? order.indexOf(currentSectionId) : 0;
-
-  // Navigation helpers
-  const hasPrevious = currentSectionIndex > 0;
-  const hasNext = currentSectionIndex < order.length - 1 && currentSectionIndex >= 0;
-
-  // Set initial section
-  useEffect(() => {
-    if (order.length > 0 && !currentSectionId) {
-      setCurrentSectionId(order[0]);
-    }
-  }, [order, currentSectionId]);
+  }, [moduleId, user, updateProgress, resetLocalProgress, toast]);
 
   // Scroll to top when section changes
   useEffect(() => {
@@ -186,39 +181,6 @@ export default function ModuleLearn() {
       contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
     }
   }, [currentSectionId]);
-
-  // Update progress when changing sections (Using debounced save)
-  useEffect(() => {
-    if (order.length === 0 || currentSectionIndex < 0) return;
-
-    const newProgress = Math.round(((currentSectionIndex + 1) / order.length) * 100);
-
-    // Update local optimistic state immediately if it's a new high
-    if (newProgress > localMaxProgress) {
-      setLocalMaxProgress(newProgress);
-
-      // Schedule DB update (debounced)
-      debouncedSaveProgress(newProgress);
-    }
-  }, [currentSectionIndex, order.length, localMaxProgress, debouncedSaveProgress]);
-
-  // Navigation handlers (Wrapped in useCallback)
-  const handlePrevious = useCallback(() => {
-    if (currentSectionIndex > 0) {
-      setCurrentSectionId(order[currentSectionIndex - 1]);
-    }
-  }, [currentSectionIndex, order]);
-
-  const handleNext = useCallback(() => {
-    if (currentSectionIndex < order.length - 1) {
-      setCurrentSectionId(order[currentSectionIndex + 1]);
-    }
-  }, [currentSectionIndex, order]);
-
-  const handleSectionClick = useCallback((sectionId: string) => {
-    setCurrentSectionId(sectionId);
-    setMobileMenuOpen(false);
-  }, []);
 
   // Note handlers (Wrapped in useCallback)
   const handleCreateNote = useCallback((content: string) => {
@@ -348,14 +310,12 @@ export default function ModuleLearn() {
                   if (!item) return null; // Defensive check
 
                   const isActive = item.id === currentSectionId;
-                  const isCompleted = currentSectionId
-                    ? order.indexOf(currentSectionId) > index
-                    : false;
+                  const isCompleted = index < maxVisitedSectionIndex;
 
                   return (
                     <button
                       key={item.id}
-                      onClick={() => handleSectionClick(item.id)}
+                      onClick={() => onSectionClick(item.id)}
                       className={cn(
                         "w-full text-left p-2.5 rounded-lg transition-all flex items-start gap-2 text-sm",
                         isActive
@@ -394,9 +354,9 @@ export default function ModuleLearn() {
       ============================================ */}
       <div className="w-full md:flex-1 flex flex-col md:overflow-hidden">
         {/* Mobile Header */}
-        <header className="md:hidden sticky top-0 z-50 h-14 flex items-center justify-between px-4 border-b border-border bg-card shrink-0">
+        <header className="md:hidden sticky top-0 z-50 min-h-14 h-auto pt-[env(safe-area-inset-top)] flex items-center justify-between px-4 border-b border-border bg-card shrink-0 transition-all">
           {/* Progress Bar */}
-          <div className="absolute top-0 left-0 w-full h-1 bg-muted">
+          <div className="absolute top-0 left-0 w-full h-1 bg-muted z-10">
             <div
               className="h-full bg-primary transition-all duration-500"
               style={{ width: `${currentProgress}%` }}
@@ -413,7 +373,7 @@ export default function ModuleLearn() {
               </SheetTrigger>
               <SheetContent side="left" className="w-80 p-0 bg-sidebar border-border">
                 <div className="p-4 border-b border-border">
-                  <h2 className="font-bold text-foreground">Table of Contents</h2>
+                  <SheetTitle className="font-bold text-foreground">Table of Contents</SheetTitle>
                 </div>
                 <ScrollArea className="h-[calc(100vh-60px)] p-3">
                   <nav className="space-y-1">
@@ -422,24 +382,32 @@ export default function ModuleLearn() {
                       if (!item) return null; // Defensive check
 
                       const isActive = item.id === currentSectionId;
+                      const isCompleted = index < maxVisitedSectionIndex;
+
                       return (
                         <button
                           key={item.id}
-                          onClick={() => handleSectionClick(item.id)}
+                          onClick={() => onSectionClick(item.id)}
                           className={cn(
                             "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
                             isActive
                               ? "bg-primary/10 text-primary"
-                              : "text-foreground hover:bg-muted"
+                              : isCompleted
+                                ? "text-muted-foreground hover:bg-muted"
+                                : "text-foreground hover:bg-muted"
                           )}
                         >
                           <span className={cn(
-                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold",
-                            isActive ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                            "w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
+                            isActive
+                              ? "bg-primary text-primary-foreground"
+                              : isCompleted
+                                ? "bg-green-500/20 text-green-400"
+                                : "bg-muted text-muted-foreground"
                           )}>
-                            {index + 1}
+                            {isCompleted ? <Check className="h-3.5 w-3.5" /> : index + 1}
                           </span>
-                          {item.title}
+                          <span className="line-clamp-2">{item.title}</span>
                         </button>
                       );
                     })}
@@ -464,6 +432,7 @@ export default function ModuleLearn() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80 p-0 bg-sidebar border-border">
+              <SheetTitle className="hidden">Guided Notes</SheetTitle>
               <HybridGuidedNotes
                 notes={notes || []}
                 isLoading={notesLoading}
@@ -488,14 +457,14 @@ export default function ModuleLearn() {
         </ErrorBoundary>
 
         {/* Navigation Buttons (Bottom Bar) */}
-        <div className="h-16 border-t border-border bg-card flex items-center justify-between px-6 shrink-0 sticky bottom-0 z-50 md:static">
+        <div className="min-h-16 h-auto pb-[env(safe-area-inset-bottom)] border-t border-border bg-card flex items-center justify-between px-6 py-3 shrink-0 sticky bottom-0 z-50 md:static transition-all">
           <Button
             variant="outline"
+            size="icon"
             onClick={handlePrevious}
             disabled={!hasPrevious}
           >
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Previous
+            <ChevronLeft className="h-4 w-4" />
           </Button>
 
           <Badge variant="secondary">
@@ -503,18 +472,27 @@ export default function ModuleLearn() {
           </Badge>
 
           {hasNext ? (
-            <Button onClick={handleNext}>
-              Next Section
-              <ChevronRight className="h-4 w-4 ml-2" />
+            <Button size="icon" onClick={handleNext}>
+              <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button
-              onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
-              className="bg-green-600 hover:bg-green-500 text-white"
-            >
-              <Check className="h-4 w-4 mr-2" />
-              Complete
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleResetProgress}
+                title="Reset Progress"
+              >
+                <RefreshCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
+                className="bg-green-600 hover:bg-green-500 text-white"
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Complete
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -536,6 +514,12 @@ export default function ModuleLearn() {
           </ErrorBoundary>
         </div>
       )}
+
+      <GachaCompletionModal
+        isOpen={showGacha}
+        onClose={() => setShowGacha(false)}
+        moduleTitle={module.title}
+      />
     </div>
   );
 }

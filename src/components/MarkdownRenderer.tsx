@@ -1,7 +1,10 @@
 import { cn } from "@/lib/utils";
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { PythonCodeEditor } from "@/components/module/PythonCodeEditor";
-import DOMPurify from "dompurify";
-import { useMemo } from "react";
+import { Components } from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface MarkdownRendererProps {
   content: string;
@@ -10,140 +13,13 @@ interface MarkdownRendererProps {
   variant?: 'default' | 'compact';
 }
 
-const purifyConfig = {
-  ALLOWED_TAGS: [
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-    'p', 'br', 'hr',
-    'ul', 'ol', 'li',
-    'strong', 'em', 'b', 'i',
-    'code', 'pre',
-    'blockquote',
-    'a',
-    'span', 'div'
-  ],
-  ALLOWED_ATTR: ['class', 'href', 'target', 'rel', 'id'],
-  ALLOW_DATA_ATTR: false,
-};
-
-// Add hook to ensure all links have security attributes
-DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-  if (node instanceof HTMLAnchorElement && 'target' in node) {
-    node.setAttribute('target', '_blank');
-    node.setAttribute('rel', 'noopener nofollow noreferrer');
-  }
-});
-
-interface ParsedContent {
-  type: 'html' | 'python-code';
-  content: string;
-  key: string;
-}
-
-// Regex Constants
-const RE_SLUG_CHARS = /[^a-z0-9\s-]/g;
-const RE_SLUG_SPACES = /\s+/g;
-const RE_SLUG_DASHES = /-+/g;
-
-const RE_H3 = /^### (.*$)/gim;
-const RE_H2 = /^## (.*$)/gim;
-const RE_H1 = /^# (.*$)/gim;
-const RE_BOLD_ITALIC = /\*\*\*(.*?)\*\*\*/gim;
-const RE_BOLD = /\*\*(.*?)\*\*/gim;
-const RE_ITALIC = /\*(.*?)\*/gim;
-const RE_CODE_BLOCK = /```(\w+)?\n([\s\S]*?)```/gim;
-const RE_INLINE_CODE = /`([^`]+)`/gim;
-const RE_BLOCKQUOTE = /^> (.*$)/gim;
-const RE_UL_ITEM = /^\* (.*$)/gim;
-const RE_UL_ITEM_DASH = /^- (.*$)/gim;
-const RE_OL_ITEM = /^\d+\. (.*$)/gim;
-const RE_UL_GROUP = /(<li class="ml-6 list-disc.*?<\/li>\n?)+/gim;
-const RE_OL_GROUP = /(<li class="ml-6 list-decimal.*?<\/li>\n?)+/gim;
-const RE_HR = /^---$/gim;
-const RE_LINK = /\[([^\]]+)\]\(([^)]+)\)/gim;
-const RE_BR = /(?<!>)\n(?!<)/gim;
-
-const RE_PYTHON_CODE = /```python\n([\s\S]*?)```/gim;
-
 function slugify(text: string): string {
   return text
     .toLowerCase()
-    .replace(RE_SLUG_CHARS, '')
-    .replace(RE_SLUG_SPACES, '-')
-    .replace(RE_SLUG_DASHES, '-')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
     .trim();
-}
-
-function parseMarkdown(text: string): string {
-  let html = text;
-  const usedIds = new Map<string, number>();
-
-  const generateId = (headingText: string): string => {
-    const baseId = `heading-${slugify(headingText)}`;
-    const count = usedIds.get(baseId) || 0;
-    const id = count === 0 ? baseId : `${baseId}-${count}`;
-    usedIds.set(baseId, count + 1);
-    return id;
-  };
-
-  html = html.replace(RE_H3, (_, p1) => {
-    const id = generateId(p1);
-    return `<h3 id="${id}" class="text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24">${p1}</h3>`;
-  });
-  html = html.replace(RE_H2, (_, p1) => {
-    const id = generateId(p1);
-    return `<h2 id="${id}" class="text-2xl font-bold mt-12 mb-5 text-foreground scroll-mt-24">${p1}</h2>`;
-  });
-  html = html.replace(RE_H1, (_, p1) => {
-    const id = generateId(p1);
-    return `<h1 id="${id}" class="text-3xl font-bold mt-12 mb-6 text-foreground scroll-mt-24">${p1}</h1>`;
-  });
-
-  html = html.replace(RE_BOLD_ITALIC, '<strong class="font-bold"><em>$1</em></strong>');
-  html = html.replace(RE_BOLD, '<strong class="font-semibold text-foreground">$1</strong>');
-  html = html.replace(RE_ITALIC, '<em class="italic">$1</em>');
-
-  html = html.replace(RE_CODE_BLOCK,
-    '<pre class="bg-muted rounded-lg p-4 my-4 overflow-x-auto"><code class="text-sm font-mono text-foreground">$2</code></pre>');
-
-  html = html.replace(RE_INLINE_CODE,
-    '<code class="bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground">$1</code>');
-
-  html = html.replace(RE_BLOCKQUOTE,
-    '<blockquote class="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">$1</blockquote>');
-
-  html = html.replace(RE_UL_ITEM, '<li class="ml-6 list-disc text-foreground/90 leading-relaxed">$1</li>');
-  html = html.replace(RE_UL_ITEM_DASH, '<li class="ml-6 list-disc text-foreground/90 leading-relaxed">$1</li>');
-  html = html.replace(RE_OL_ITEM, '<li class="ml-6 list-decimal text-foreground/90 leading-relaxed">$1</li>');
-
-  html = html.replace(RE_UL_GROUP, (match) =>
-    `<ul class="my-4 space-y-2">${match}</ul>`);
-  html = html.replace(RE_OL_GROUP, (match) =>
-    `<ol class="my-4 space-y-2">${match}</ol>`);
-
-  html = html.replace(RE_HR, '<hr class="my-6 border-border" />');
-
-  // Handle links with external detection
-  html = html.replace(RE_LINK, (_, text, url) => {
-    const isExternal = url.startsWith('http://') || url.startsWith('https://');
-    if (isExternal) {
-      // External link: add icon (security attributes handled by DOMPurify hook)
-      return `<a href="${url}" class="text-primary hover:underline inline-flex items-center gap-1">${text}<svg class="inline-block w-3 h-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg></a>`;
-    } else {
-      // Internal link
-      return `<a href="${url}" class="text-primary hover:underline">${text}</a>`;
-    }
-  });
-
-  html = html.split('\n\n').map(paragraph => {
-    const trimmed = paragraph.trim();
-    if (!trimmed) return '';
-    if (trimmed.startsWith('<')) return trimmed;
-    return `<p class="my-5 text-foreground/90 leading-loose">${trimmed}</p>`;
-  }).join('\n');
-
-  html = html.replace(RE_BR, '<br />');
-
-  return html;
 }
 
 export function MarkdownRenderer({
@@ -153,88 +29,96 @@ export function MarkdownRenderer({
   variant = 'default',
 }: MarkdownRendererProps) {
 
-  const parsedContent = useMemo(() => {
-    const segments: ParsedContent[] = [];
-    let segmentIndex = 0;
+  const components: Components = {
+    h1: ({ children, ...props }) => {
+      const text = String(children);
+      const id = `heading-${slugify(text)}`;
+      return <h1 id={id} className="text-3xl font-bold mt-12 mb-6 text-foreground scroll-mt-24" {...props}>{children}</h1>;
+    },
+    h2: ({ children, ...props }) => {
+      const text = String(children);
+      const id = `heading-${slugify(text)}`;
+      return <h2 id={id} className="text-2xl font-bold mt-12 mb-5 text-foreground scroll-mt-24" {...props}>{children}</h2>;
+    },
+    h3: ({ children, ...props }) => {
+      const text = String(children);
+      const id = `heading-${slugify(text)}`;
+      return <h3 id={id} className="text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24" {...props}>{children}</h3>;
+    },
+    a: ({ href, children, ...props }) => {
+      const isExternal = href?.startsWith('http') ?? false;
+      return (
+        <a
+          href={href}
+          target={isExternal ? "_blank" : undefined}
+          rel={isExternal ? "noopener noreferrer" : undefined}
+          className={cn("text-primary hover:underline inline-flex items-center gap-1", isExternal && "items-baseline")}
+          {...props}
+        >
+          {children}
+          {isExternal && (
+            <svg className="inline-block w-3 h-3 opacity-60 ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          )}
+        </a>
+      );
+    },
+    code: ({ node, inline, className, children, ...props }: React.ComponentPropsWithoutRef<'code'> & { inline?: boolean, node?: object }) => {
+        const match = /language-(\w+)/.exec(className || '');
+        const language = match ? match[1] : '';
 
-    // Create a new regex instance to ensure state (lastIndex) is reset for each execution
-    const pythonCodeRegex = new RegExp(RE_PYTHON_CODE);
-    let lastIndex = 0;
-    let match;
-
-    while ((match = pythonCodeRegex.exec(content)) !== null) {
-      if (match.index > lastIndex) {
-        const textBefore = content.substring(lastIndex, match.index);
-        if (textBefore.trim()) {
-          segments.push({
-            type: 'html',
-            content: DOMPurify.sanitize(parseMarkdown(textBefore), purifyConfig),
-            key: `html-${segmentIndex++}`,
-          });
-        }
-      }
-
-      segments.push({
-        type: 'python-code',
-        content: match[1].trim(),
-        key: `python-${segmentIndex++}`,
-      });
-
-      lastIndex = match.index + match[0].length;
-    }
-
-    if (lastIndex < content.length) {
-      const remaining = content.substring(lastIndex);
-      if (remaining.trim()) {
-        segments.push({
-          type: 'html',
-          content: DOMPurify.sanitize(parseMarkdown(remaining), purifyConfig),
-          key: `html-${segmentIndex++}`,
-        });
-      }
-    }
-
-    if (segments.length === 0) {
-      segments.push({
-        type: 'html',
-        content: DOMPurify.sanitize(parseMarkdown(content), purifyConfig),
-        key: 'html-0',
-      });
-    }
-
-    return segments;
-  }, [content]);
-
-  return (
-    <div className={cn(variant === 'default' ? "space-y-6" : "space-y-0", className)}>
-      {parsedContent.map((segment) => {
-        if (segment.type === 'python-code') {
-          if (enableCodeEditor) {
+        if (!inline && language === 'python' && enableCodeEditor) {
             return (
-              <div key={segment.key} className="my-6">
-                <PythonCodeEditor initialCode={segment.content} />
-              </div>
+                <div className="my-6">
+                    <PythonCodeEditor initialCode={String(children).replace(/\n$/, '')} />
+                </div>
             );
-          }
-          // Fallback: render as static code block (safe from XSS)
-          return (
-            <pre key={segment.key} className="bg-muted rounded-lg p-4 my-4 overflow-x-auto">
-              <code className="text-sm font-mono text-foreground">{segment.content}</code>
-            </pre>
-          );
+        }
+
+        if (!inline && match) {
+             return (
+                <div className="rounded-lg overflow-hidden my-4">
+                    <SyntaxHighlighter
+                        style={vscDarkPlus}
+                        language={language}
+                        PreTag="div"
+                        {...props}
+                    >
+                        {String(children).replace(/\n$/, '')}
+                    </SyntaxHighlighter>
+                </div>
+            )
         }
 
         return (
-          <div
-            key={segment.key}
-            className={cn(
-              "prose prose-slate dark:prose-invert max-w-none",
-              variant === 'compact' && "prose-p:my-0 prose-li:my-0 prose-ul:my-0 prose-ol:my-0"
-            )}
-            dangerouslySetInnerHTML={{ __html: segment.content }}
-          />
+            <code className={cn("bg-muted px-1.5 py-0.5 rounded text-sm font-mono text-foreground", className)} {...props}>
+                {children}
+            </code>
         );
-      })}
+    },
+    pre: ({ children }) => <>{children}</>,
+    ul: ({ children, ...props }) => <ul className="my-4 space-y-2 list-disc pl-6" {...props}>{children}</ul>,
+    ol: ({ children, ...props }) => <ol className="my-4 space-y-2 list-decimal pl-6" {...props}>{children}</ol>,
+    li: ({ children, ...props }) => <li className="text-foreground/90 leading-relaxed pl-1 marker:text-foreground/50" {...props}>{children}</li>,
+    p: ({ children }) => <p className="my-5 text-foreground/90 leading-loose">{children}</p>,
+    blockquote: ({ children }) => <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">{children}</blockquote>,
+    hr: () => <hr className="my-6 border-border" />,
+  };
+
+  return (
+    <div className={cn(
+        "w-full max-w-none prose prose-slate dark:prose-invert",
+        variant === 'default' ? "space-y-6" : "space-y-0",
+        variant === 'compact' && "prose-p:my-0 prose-li:my-0 prose-ul:my-0 prose-ol:my-0",
+        className
+    )}>
+        <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={components}
+        >
+            {content}
+        </ReactMarkdown>
     </div>
   );
 }

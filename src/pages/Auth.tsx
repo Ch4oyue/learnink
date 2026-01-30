@@ -231,7 +231,7 @@ export default function Auth() {
                             <Input
                               type="email"
                               placeholder="you@example.com"
-                              className="pl-11 bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary rounded-lg py-2.5"
+                              className="pl-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />
                           </FormControl>
@@ -262,7 +262,7 @@ export default function Auth() {
                             <Input
                               type={showPassword ? "text" : "password"}
                               placeholder="••••••••"
-                              className="pl-11 pr-11 bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary rounded-lg py-2.5"
+                              className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />
                           </FormControl>
@@ -325,7 +325,7 @@ export default function Auth() {
                             <Input
                               type="text"
                               placeholder="Your name"
-                              className="pl-11 bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary rounded-lg py-2.5"
+                              className="pl-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />
                           </FormControl>
@@ -347,7 +347,7 @@ export default function Auth() {
                             <Input
                               type="email"
                               placeholder="you@example.com"
-                              className="pl-11 bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary rounded-lg py-2.5"
+                              className="pl-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />
                           </FormControl>
@@ -369,7 +369,7 @@ export default function Auth() {
                             <Input
                               type={showPassword ? "text" : "password"}
                               placeholder="Minimal 6 characters"
-                              className="pl-11 pr-11 bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary rounded-lg py-2.5"
+                              className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />
                           </FormControl>
@@ -399,7 +399,7 @@ export default function Auth() {
                             <Input
                               type={showConfirmPassword ? "text" : "password"}
                               placeholder="Repeat password"
-                              className="pl-11 pr-11 bg-muted border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary rounded-lg py-2.5"
+                              className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />
                           </FormControl>

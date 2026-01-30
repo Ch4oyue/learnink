@@ -7,14 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.12] - January 30, 2026
+## [1.5.3] - January 30, 2026
 
-### Performance & Optimization
+### Apple-Style UI, Gamification & Mobile Polish
 
-Optimized initialization of heavy runtime dependencies.
+A massive update consolidating three major releases. Aligned the UI with Apple's "Glass Liquid" design system, introduced "Gacha" XP rewards, and implemented comprehensive analytics and mobile experience upgrades.
 
-#### Improvements (1)
-- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction, using `requestIdleCallback` to prevent main thread blocking.
+#### Improvements (10)
+- **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons for a premium, responsive feel.
+- **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy) that works seamlessly on both desktop and mobile text selection.
+- **Gamification**: Added "Gacha XP" system with randomized rewards (simulated) and celebration modal upon module completion.
+- **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug by tracking maximum visited section index.
+- **Navigation UI**: Simplified "Previous" and "Next" buttons to be icon-only for a cleaner mobile interface.
+- **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection (mouse, scroll, visibility) stored via LocalStorage.
+- **Mobile Experience**: Major UI/UX overhaul for mobile devices, including Safe Area (Notch) support for sticky headers/footers in `ModuleLearn` and `DashboardLayout`.
+- **Landing Page Navigation**: Added a responsive Hamburger menu (Sheet) for better mobile accessibility on the Landing Page.
+- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction.
+- **Mobile Progress Visibility**: Enhanced Table of Contents sheet to ensure progress checkmarks are clearly visible on mobile devices.
+
+#### Fixes (4)
+- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
+- **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering and improve overall stability.
+- **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.
+- **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links and updated the GitHub repository URL.
+
+#### Refactor (2)
+- **Module Architecture**: Extracted complex navigation and progress logic from `ModuleLearn.tsx` into a reusable `useModuleNavigation` hook, significantly improving code maintainability.
+- **Unit Testing**: Added robust unit tests for module parsing logic to ensure stability of content rendering.
 
 ## [1.4.11] - January 29, 2026
 
@@ -346,6 +365,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.5.3 | Jan 30, 2026 | Apple-Style UI, Gamification & Mobile Polish |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |

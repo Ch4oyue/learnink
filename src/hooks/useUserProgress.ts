@@ -12,6 +12,7 @@ export interface UserProgress {
   is_completed: boolean | null;
   started_at: string | null;
   completed_at: string | null;
+  reward_claimed?: boolean | null;
 }
 
 export interface UserProgressWithModule extends UserProgress {

@@ -7,35 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.5.4] - January 30, 2026
+## [1.6.0] - January 30, 2026
 
-### Security Fixes, Apple-Style UI & Mobile Polish
+### Gacha Rewards, Security Hardening & Apple UI
 
-A massive update consolidating critical security patches and major UI upgrades. Implemented robust XSS protection, production-safe logging, and aligned the UI with Apple's "Glass Liquid" design system.
+A massive consolidated update merging gamification features with critical security patches. This release introduces the Gacha reward system, enforces strict XSS protection, and refines the mobile experience with "Glass Liquid" aesthetics.
 
-#### Improvements (10)
-- **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons for a premium, responsive feel.
-- **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy) that works seamlessly on both desktop and mobile text selection.
-- **Gamification**: Added "Gacha XP" system with randomized rewards (simulated) and celebration modal upon module completion.
-- **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug by tracking maximum visited section index.
+#### Improvements (14)
+- **Gacha Rewards**: Implemented a secure reward system where users earn randomized XP (50-150) upon completing a module.
+- **Secure Validation**: Created `award-xp` Edge Function to securely calculate and award XP, preventing client-side manipulation.
+- **Claim Persistence**: Added `reward_claimed` tracking to `user_progress` to ensure users can only claim rewards once per module.
+- **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons.
+- **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy).
+- **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug.
 - **Navigation UI**: Simplified "Previous" and "Next" buttons to be icon-only for a cleaner mobile interface.
-- **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection (mouse, scroll, visibility) stored via LocalStorage.
-- **Mobile Experience**: Major UI/UX overhaul for mobile devices, including Safe Area (Notch) support for sticky headers/footers in `ModuleLearn` and `DashboardLayout`.
-- **Landing Page Navigation**: Added a responsive Hamburger menu (Sheet) for better mobile accessibility on the Landing Page.
-- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction.
-- **Mobile Progress Visibility**: Enhanced Table of Contents sheet to ensure progress checkmarks are clearly visible on mobile devices.
+- **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection.
+- **Mobile Experience**: Major UI/UX overhaul for mobile devices, including Safe Area (Notch) support.
+- **Landing Page Navigation**: Added a responsive Hamburger menu (Sheet) for better mobile accessibility.
+- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn`.
+- **Mobile Progress Visibility**: Enhanced Table of Contents sheet visibility on mobile.
+- **XSS Protection**: Implemented strict sanitization for Markdown links in `MarkdownRenderer` using `DOMPurify` (Merged from Sentinel).
+- **Production Logging**: Replaced remaining `console.error` calls with the secure `logger` utility (Merged from Sentinel).
 
-#### Fixes (6)
-- **XSS Protection**: Implemented strict sanitization for Markdown links in `MarkdownRenderer`, blocking dangerous protocols (`javascript:`) and validating input with `DOMPurify` to prevent Stored XSS.
-- **Production Logging**: Replaced remaining `console.error` calls in `useActiveTimeTracker` with the secure `logger` utility to prevent production data leaks.
-- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
-- **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering and improve overall stability.
-- **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.
-- **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links and updated the GitHub repository URL.
+#### Fixes (7)
+- **Modal Design**: Refactored `GachaCompletionModal` to align with the "Premium Dark Mode" aesthetic.
+- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle`.
+- **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering.
+- **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog.
+- **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links.
+- **Security**: Blocked dangerous protocols (`javascript:`) in markdown links to prevent Stored XSS.
+- **Memory**: Fixed potential memory leaks in `useActiveTimeTracker` by cleaning up event listeners properly.
 
-#### Refactor (2)
-- **Module Architecture**: Extracted complex navigation and progress logic from `ModuleLearn.tsx` into a reusable `useModuleNavigation` hook, significantly improving code maintainability.
-- **Unit Testing**: Added robust unit tests for module parsing logic to ensure stability of content rendering.
+#### Patches (2)
+- **Module Architecture**: Extracted complex navigation logic into `useModuleNavigation` hook.
+- **Unit Testing**: Added robust unit tests for module parsing logic.
 
 ## [1.4.11] - January 29, 2026
 
@@ -80,7 +85,7 @@ Critical security patches for Edge Functions and mobile interface corrections.
 #### Fixes (4)
 - **Broken Access Control**: Fixed a critical vulnerability in `get-users` Edge Function where the Service Role key was used without proper role validation.
 - **User List Visibility**: Implemented `get-users` Edge Function fallback to bypass RLS limitations, ensuring Admins can see all users.
-- **Mobile Menu**: Filtered out redundant items from the mobile "Menu" sheet that are already present in the floating dock.
+- **Mobile Menu**: Filtered out redundant items from the mobile "Menu" sheet that are already present in the floating mobile dock.
 - **PWA Prompt**: Fixed `useEffect` dependency error in `DashboardProfile` and optimized PWA prompt logic.
 
 #### Patches (2)
@@ -168,7 +173,7 @@ Comprehensive security audit and resolution of data leakage vulnerabilities.
 
 <!-- -->
 
-#### Security (3)
+#### Fixes (3)
 - **PII Leakage Fix**: Resolved Personally Identifiable Information (PII) exposure in profile RLS policies.
 - **Console Audit**: Removed debug logs in production that leaked sensitive system information.
 - Hardened RLS rules for `profiles` table to prevent unauthorized data access.
@@ -257,12 +262,10 @@ Critical bug fixes and database schema improvements for production stability.
 - Fixed `DashboardProfile` to use `display_name` instead of non-existent profile fields
 - Added React Router v7 future flags (`v7_startTransition`, `v7_relativeSplatPath`)
 
-#### Database (3)
+#### Improvements (5)
 - Created `learning_sources` table with correct RLS policies
 - Created `integrations` table for API key management
 - Created `incoming_contents` table for n8n webhook integration
-
-#### Infrastructure (2)
 - Added Edge Function `generate-api-key` for integration API key generation
 - Created standalone SQL migration for missing tables
 
@@ -352,7 +355,7 @@ Core dashboard implementation with role-based access.
 
 First stable release of LearnInk learning platform.
 
-#### Features
+#### Improvements
 - User authentication with Supabase
 - Module browsing and learning
 - Guided notes system
@@ -367,7 +370,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.5.4 | Jan 30, 2026 | Security Fixes, Apple-Style UI & Mobile Polish |
+| 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |

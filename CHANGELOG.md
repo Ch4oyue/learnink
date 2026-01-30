@@ -9,34 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.6.0] - January 30, 2026
 
-### Gacha Rewards, Apple UI Polish & Mobile Experience
+### Gacha Rewards, Security Hardening & Apple UI
 
-A massive update consolidating the Gacha reward system, Apple-style UI improvements, and critical mobile experience upgrades.
+A massive consolidated update merging gamification features with critical security patches. This release introduces the Gacha reward system, enforces strict XSS protection, and refines the mobile experience with "Glass Liquid" aesthetics.
 
-#### Improvements (13)
+#### Improvements (14)
 - **Gacha Rewards**: Implemented a secure reward system where users earn randomized XP (50-150) upon completing a module.
 - **Secure Validation**: Created `award-xp` Edge Function to securely calculate and award XP, preventing client-side manipulation.
 - **Claim Persistence**: Added `reward_claimed` tracking to `user_progress` to ensure users can only claim rewards once per module.
-- **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons for a premium, responsive feel.
-- **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy) that works seamlessly on both desktop and mobile text selection.
-- **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug by tracking maximum visited section index.
+- **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons.
+- **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy).
+- **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug.
 - **Navigation UI**: Simplified "Previous" and "Next" buttons to be icon-only for a cleaner mobile interface.
-- **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection (mouse, scroll, visibility) stored via LocalStorage.
-- **Mobile Experience**: Major UI/UX overhaul for mobile devices, including Safe Area (Notch) support for sticky headers/footers in `ModuleLearn` and `DashboardLayout`.
-- **Landing Page Navigation**: Added a responsive Hamburger menu (Sheet) for better mobile accessibility on the Landing Page.
-- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction.
-- **Mobile Progress Visibility**: Enhanced Table of Contents sheet to ensure progress checkmarks are clearly visible on mobile devices.
+- **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection.
+- **Mobile Experience**: Major UI/UX overhaul for mobile devices, including Safe Area (Notch) support.
+- **Landing Page Navigation**: Added a responsive Hamburger menu (Sheet) for better mobile accessibility.
+- **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn`.
+- **Mobile Progress Visibility**: Enhanced Table of Contents sheet visibility on mobile.
+- **XSS Protection**: Implemented strict sanitization for Markdown links in `MarkdownRenderer` using `DOMPurify` (Merged from Sentinel).
+- **Production Logging**: Replaced remaining `console.error` calls with the secure `logger` utility (Merged from Sentinel).
 
-#### Fixes (5)
-- **Modal Design**: Refactored `GachaCompletionModal` to align with the "Premium Dark Mode" aesthetic and "Glass Liquid" design system.
-- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
-- **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering and improve overall stability.
-- **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.
-- **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links and updated the GitHub repository URL.
+#### Fixes (7)
+- **Modal Design**: Refactored `GachaCompletionModal` to align with the "Premium Dark Mode" aesthetic.
+- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle`.
+- **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering.
+- **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog.
+- **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links.
+- **Security**: Blocked dangerous protocols (`javascript:`) in markdown links to prevent Stored XSS.
+- **Memory**: Fixed potential memory leaks in `useActiveTimeTracker` by cleaning up event listeners properly.
 
 #### Patches (2)
-- **Module Architecture**: Extracted complex navigation and progress logic from `ModuleLearn.tsx` into a reusable `useModuleNavigation` hook, significantly improving code maintainability.
-- **Unit Testing**: Added robust unit tests for module parsing logic to ensure stability of content rendering.
+- **Module Architecture**: Extracted complex navigation logic into `useModuleNavigation` hook.
+- **Unit Testing**: Added robust unit tests for module parsing logic.
 
 ## [1.4.11] - January 29, 2026
 

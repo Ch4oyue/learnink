@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModule } from "@/hooks/useModules";
+import { supabase } from "@/integrations/supabase/client";
 import { useModuleProgress, useUpdateProgress } from "@/hooks/useUserProgress";
 import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "@/hooks/useLearningNotes";
 import { Button } from "@/components/ui/button";
@@ -29,7 +30,7 @@ import { HybridSidebar } from "@/components/module/HybridSidebar";
 import { HybridContentRenderer } from "@/components/module/HybridContentRenderer";
 import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
 import { GachaCompletionModal } from "@/components/module/GachaCompletionModal";
-import { RefreshCcw } from "lucide-react";
+import { RefreshCcw, Gift } from "lucide-react";
 
 /**
  * ModuleLearn - Hybrid View with 4-Panel Layout
@@ -146,17 +147,76 @@ export default function ModuleLearn() {
 
   // Gacha Logic
   const [showGacha, setShowGacha] = useState(false);
+  const [isClaiming, setIsClaiming] = useState(false);
+  const [xpEarned, setXpEarned] = useState<number | null>(null);
 
   useEffect(() => {
-    if (currentProgress >= 100 && moduleId) {
+    // Only show if completed AND not claimed yet
+    if (currentProgress >= 100 && moduleId && progress && !progress.reward_claimed) {
       const key = `gacha_shown_${moduleId}`;
       const shown = localStorage.getItem(key);
+
+      // If we haven't shown it locally, OR if we haven't claimed it (and it's not currently being claimed/shown)
+      // Actually, if it's not claimed, we definitely want to give them a chance if they just finished.
+      // But we don't want to spam them on every reload if they chose not to claim (though modal shouldn't be closable without claiming? No, user might close).
+      // Prompt says: "Modal ini HANYA boleh muncul ketika user mencapai progress 100% pada sebuah modul. Cek database... Jangan munculkan modal jika user sudah pernah klaim"
+
       if (!shown) {
         setShowGacha(true);
+        // We set local storage to avoid popup on refresh if they don't claim immediately?
+        // Or strictly strictly follows: 100% + !claimed.
+        // If I refresh, I still have 100% and !claimed. Should it show?
+        // Maybe yes, until they claim.
+        // But to avoid annoyance, maybe we keep the localStorage check for "session" logic,
+        // but if they explicitly finished just now, it shows.
         localStorage.setItem(key, "true");
       }
     }
-  }, [currentProgress, moduleId]);
+  }, [currentProgress, moduleId, progress]);
+
+  const handleClaimReward = async () => {
+    if (!moduleId || !user) return;
+
+    setIsClaiming(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('award-xp', {
+        body: { module_id: moduleId }
+      });
+
+      if (error) throw error;
+
+      if (data.success) {
+        setXpEarned(data.xp_gained);
+        toast({
+          title: "Reward Claimed!",
+          description: `You earned ${data.xp_gained} XP!`,
+        });
+        // Invalidate progress to update 'reward_claimed' status
+        updateProgress.mutate({
+           userId: user.id,
+           moduleId: moduleId,
+           progressPercent: 100, // Ensure it stays 100
+           isCompleted: true
+        });
+      } else {
+        throw new Error(data.error || "Failed to claim reward");
+      }
+    } catch (error) {
+      console.error("Claim Error:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Could not claim reward. Please try again.",
+        variant: "destructive",
+      });
+      // Allow trying again or close?
+      // If error is "already claimed", we should probably close.
+      if (error.message?.includes("already claimed")) {
+         setShowGacha(false);
+      }
+    } finally {
+      setIsClaiming(false);
+    }
+  };
 
   const handleResetProgress = useCallback(() => {
     if (window.confirm("Are you sure you want to reset your progress? You can earn XP again!")) {
@@ -485,13 +545,23 @@ export default function ModuleLearn() {
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
-              <Button
-                onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
-                className="bg-green-600 hover:bg-green-500 text-white"
-              >
-                <Check className="h-4 w-4 mr-2" />
-                Complete
-              </Button>
+              {!progress?.reward_claimed ? (
+                <Button
+                  onClick={() => setShowGacha(true)}
+                  className="bg-amber-500 hover:bg-amber-400 text-black font-bold shadow-lg animate-pulse"
+                >
+                  <Gift className="h-4 w-4 mr-2" />
+                  Claim XP
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
+                  className="bg-green-600 hover:bg-green-500 text-white"
+                >
+                  <Check className="h-4 w-4 mr-2" />
+                  Complete
+                </Button>
+              )}
             </div>
           )}
         </div>
@@ -517,8 +587,17 @@ export default function ModuleLearn() {
 
       <GachaCompletionModal
         isOpen={showGacha}
-        onClose={() => setShowGacha(false)}
+        onClose={() => {
+          setShowGacha(false);
+          // If they closed after earning, we can reset state for next time (though next time won't happen for this module)
+          if (xpEarned !== null) {
+             setXpEarned(null);
+          }
+        }}
         moduleTitle={module.title}
+        onClaim={handleClaimReward}
+        isClaiming={isClaiming}
+        xpEarned={xpEarned}
       />
     </div>
   );

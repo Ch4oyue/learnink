@@ -1,71 +1,98 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { Trophy, Sparkles } from "lucide-react";
+import { Trophy, Sparkles, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface GachaCompletionModalProps {
   isOpen: boolean;
   onClose: () => void;
   moduleTitle: string;
+  onClaim: () => void;
+  isClaiming: boolean;
+  xpEarned: number | null;
 }
 
-export function GachaCompletionModal({ isOpen, onClose, moduleTitle }: GachaCompletionModalProps) {
-  const [displayXp, setDisplayXp] = useState(0);
+export function GachaCompletionModal({
+  isOpen,
+  onClose,
+  moduleTitle,
+  onClaim,
+  isClaiming,
+  xpEarned
+}: GachaCompletionModalProps) {
 
-  useEffect(() => {
-    if (isOpen) {
-      // Random XP between 50 and 150
-      const rolledXp = Math.floor(Math.random() * 101) + 50;
-
-      // Save to local storage (Simulation)
-      const currentXp = parseInt(localStorage.getItem("user_xp") || "0");
-      localStorage.setItem("user_xp", (currentXp + rolledXp).toString());
-
-      // Animate number
-      let current = 0;
-      const interval = setInterval(() => {
-        current += Math.ceil(rolledXp / 20);
-        if (current >= rolledXp) {
-          current = rolledXp;
-          clearInterval(interval);
-        }
-        setDisplayXp(current);
-      }, 50);
-
-      return () => clearInterval(interval);
-    } else {
-      setDisplayXp(0);
-    }
-  }, [isOpen]);
+  // Handling state "claim success" vs "initial open"
+  const isSuccess = xpEarned !== null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md bg-zinc-950 border-zinc-800 text-center">
+    <Dialog open={isOpen} onOpenChange={(open) => {
+      if (!open && !isClaiming) onClose();
+    }}>
+      <DialogContent className="sm:max-w-md bg-card border-border text-center shadow-lg">
         <DialogHeader>
-          <div className="mx-auto bg-yellow-500/20 p-4 rounded-full mb-4 animate-bounce">
-            <Trophy className="h-10 w-10 text-yellow-500" />
+          <div className={cn(
+            "mx-auto p-4 rounded-full mb-4 animate-bounce",
+            isSuccess ? "bg-primary/20" : "bg-yellow-500/20"
+          )}>
+            <Trophy className={cn(
+              "h-10 w-10",
+              isSuccess ? "text-primary" : "text-yellow-500"
+            )} />
           </div>
-          <DialogTitle className="text-2xl font-bold text-center text-white">Module Completed!</DialogTitle>
-          <DialogDescription className="text-center text-zinc-400">
-            You've successfully finished "{moduleTitle}".
+          <DialogTitle className="text-2xl font-bold text-center text-foreground">
+            {isSuccess ? "Reward Claimed!" : "Module Completed!"}
+          </DialogTitle>
+          <DialogDescription className="text-center text-muted-foreground">
+            {isSuccess
+              ? `You've earned XP for completing "${moduleTitle}".`
+              : `You've successfully finished "${moduleTitle}". Claim your reward now!`
+            }
           </DialogDescription>
         </DialogHeader>
 
         <div className="py-6 flex flex-col items-center justify-center space-y-4">
-          <div className="text-zinc-500 text-sm font-medium uppercase tracking-wider">XP Gained</div>
-          <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center gap-2">
-            <Sparkles className="h-8 w-8 text-yellow-400 animate-spin" />
-            {displayXp} XP
-          </div>
-          <div className="text-xs text-zinc-600 italic">
-            (Luck based reward: 50 - 150 XP)
-          </div>
+          {isSuccess ? (
+            <>
+              <div className="text-muted-foreground text-sm font-medium uppercase tracking-wider">XP Gained</div>
+              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center gap-2 animate-in zoom-in duration-300">
+                <Sparkles className="h-8 w-8 text-yellow-400 animate-spin-slow" />
+                {xpEarned} XP
+              </div>
+            </>
+          ) : (
+             <div className="p-4 bg-muted/50 rounded-xl w-full">
+               <p className="text-sm text-muted-foreground">
+                 Click below to roll for your XP reward (50 - 150 XP)
+               </p>
+             </div>
+          )}
         </div>
 
-        <DialogFooter className="sm:justify-center">
-          <Button onClick={onClose} className="w-full bg-yellow-600 hover:bg-yellow-500 text-white font-bold">
-            Claim Reward
-          </Button>
+        <DialogFooter className="sm:justify-center flex-col gap-2 sm:gap-0">
+          {!isSuccess ? (
+            <Button
+              onClick={onClaim}
+              disabled={isClaiming}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold h-12 text-lg shadow-md transition-all active:scale-95"
+            >
+              {isClaiming ? (
+                <>
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                  Claiming...
+                </>
+              ) : (
+                "Claim Reward"
+              )}
+            </Button>
+          ) : (
+             <Button
+              onClick={onClose}
+              variant="outline"
+              className="w-full"
+            >
+              Close
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

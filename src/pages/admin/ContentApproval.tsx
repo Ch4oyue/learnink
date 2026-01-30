@@ -507,28 +507,28 @@ export default function ContentApproval() {
                         <div className="space-y-2 md:flex-1 md:flex md:flex-col md:min-h-0">
                             <Label>Konten</Label>
                             {/* Desktop: Split View, Mobile: Tabs */}
-                            <div className="hidden md:block flex-1 border rounded-lg overflow-hidden min-h-0">
-                                <ResizablePanelGroup direction="horizontal">
+                            <div className="hidden md:block flex-1 overflow-hidden min-h-0">
+                                <ResizablePanelGroup direction="horizontal" className="gap-4">
                                     <ResizablePanel defaultSize={50} minSize={30}>
-                                        <div className="h-full flex flex-col p-2 overflow-y-auto">
-                                            <span className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1 sticky top-0 bg-background/80 backdrop-blur z-10 p-1 rounded">
+                                        <div className="h-full flex flex-col p-4 overflow-y-auto bg-black/20 border border-white/10 rounded-2xl backdrop-blur-sm">
+                                            <span className="text-xs font-semibold text-muted-foreground mb-4 flex items-center gap-1 sticky top-0 bg-transparent z-10">
                                                 <FileText className="h-3 w-3" /> Editor
                                             </span>
                                             <AutoResizeTextarea
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
-                                                className="w-full font-mono text-sm border-none focus-visible:ring-0 p-2 min-h-[500px] bg-transparent resize-none"
+                                                className="w-full font-mono text-sm border-none focus-visible:ring-0 p-0 min-h-[500px] bg-transparent resize-none placeholder:text-muted-foreground/50"
                                                 placeholder="Tulis konten menggunakan format Markdown..."
                                             />
                                         </div>
                                     </ResizablePanel>
                                     <ResizableHandle withHandle />
                                     <ResizablePanel defaultSize={50} minSize={30}>
-                                        <div className="h-full flex flex-col p-2 bg-muted/30">
-                                            <span className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1">
+                                        <div className="h-full flex flex-col p-4 bg-black/20 border border-white/10 rounded-2xl backdrop-blur-sm">
+                                            <span className="text-xs font-semibold text-muted-foreground mb-4 flex items-center gap-1">
                                                 <Eye className="h-3 w-3" /> Live Preview
                                             </span>
-                                            <div className="flex-1 overflow-y-auto prose dark:prose-invert max-w-none p-2 bg-card rounded-md border shadow-sm">
+                                            <div className="flex-1 overflow-y-auto prose dark:prose-invert max-w-none">
                                                 {formData.content ? (
                                                     <MarkdownRenderer content={formData.content} />
                                                 ) : (

@@ -32,3 +32,9 @@
 - **Reasoning**: Pyodide is a heavy dependency. Previous implementation waited for user focus on the editor to load it, causing a delay.
 - **Implementation**: The new hook checks if the module content contains Python code blocks (` ```python `) and triggers a low-priority background load using `requestIdleCallback` (or `setTimeout` fallback).
 - **Result**: The Python environment is initialized during reading time, making the editor "instantly" ready when accessed.
+
+### [2026-02-14] Syntax Highlighter Optimization
+- **Action**: Refactored `MarkdownRenderer.tsx` to use `prism-light` and manual language registration.
+- **Reasoning**: The default `react-syntax-highlighter` import includes all languages, resulting in a ~756kB chunk.
+- **Implementation**: Switched to `react-syntax-highlighter/dist/esm/prism-light` and registered only used languages (python, js, ts, bash, json, css, html, markdown).
+- **Result**: `MarkdownRenderer` chunk size reduced from **756.57 kB** to **189.29 kB** (**75% reduction**).

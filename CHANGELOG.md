@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.2] - January 30, 2026
+
+### Gamification & UI Polish
+
+Introduced "Gacha" style XP rewards, persistent progress tracking, and critical UI/UX fixes for navigation and accessibility.
+
+#### Improvements (3)
+- **Gamification**: Added "Gacha XP" system with randomized rewards (simulated) and celebration modal upon module completion.
+- **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug by tracking maximum visited section index.
+- **Navigation UI**: Simplified "Previous" and "Next" buttons to be icon-only for a cleaner mobile interface.
+
+#### Fixes (1)
+- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
+
 ## [1.5.1] - January 30, 2026
 
 ### Mobile Experience, Analytics & Markdown Polish

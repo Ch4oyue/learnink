@@ -7,7 +7,7 @@ import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import {
   BookOpen,
   ChevronLeft,
@@ -28,6 +28,8 @@ import { useActiveTimeTracker } from "@/hooks/useActiveTimeTracker";
 import { HybridSidebar } from "@/components/module/HybridSidebar";
 import { HybridContentRenderer } from "@/components/module/HybridContentRenderer";
 import { HybridGuidedNotes } from "@/components/module/HybridGuidedNotes";
+import { GachaCompletionModal } from "@/components/module/GachaCompletionModal";
+import { RefreshCcw } from "lucide-react";
 
 /**
  * ModuleLearn - Hybrid View with 4-Panel Layout
@@ -126,6 +128,8 @@ export default function ModuleLearn() {
     handlePrevious,
     handleNext,
     handleSectionClick,
+    maxVisitedSectionIndex,
+    resetLocalProgress,
   } = useModuleNavigation({
     moduleId,
     userId: user?.id,
@@ -139,6 +143,36 @@ export default function ModuleLearn() {
     handleSectionClick(id);
     setMobileMenuOpen(false);
   }, [handleSectionClick]);
+
+  // Gacha Logic
+  const [showGacha, setShowGacha] = useState(false);
+
+  useEffect(() => {
+    if (currentProgress >= 100 && moduleId) {
+      const key = `gacha_shown_${moduleId}`;
+      const shown = localStorage.getItem(key);
+      if (!shown) {
+        setShowGacha(true);
+        localStorage.setItem(key, "true");
+      }
+    }
+  }, [currentProgress, moduleId]);
+
+  const handleResetProgress = useCallback(() => {
+    if (window.confirm("Are you sure you want to reset your progress? You can earn XP again!")) {
+      if (moduleId && user) {
+        updateProgress.mutate({
+          userId: user.id,
+          moduleId: moduleId,
+          progressPercent: 0,
+          isCompleted: false
+        });
+        localStorage.removeItem(`gacha_shown_${moduleId}`);
+        resetLocalProgress();
+        toast({ title: "Progress reset!", description: "You can now re-learn this module." });
+      }
+    }
+  }, [moduleId, user, updateProgress, resetLocalProgress, toast]);
 
   // Scroll to top when section changes
   useEffect(() => {
@@ -276,9 +310,7 @@ export default function ModuleLearn() {
                   if (!item) return null; // Defensive check
 
                   const isActive = item.id === currentSectionId;
-                  const isCompleted = currentSectionId
-                    ? order.indexOf(currentSectionId) > index
-                    : false;
+                  const isCompleted = index < maxVisitedSectionIndex;
 
                   return (
                     <button
@@ -341,7 +373,7 @@ export default function ModuleLearn() {
               </SheetTrigger>
               <SheetContent side="left" className="w-80 p-0 bg-sidebar border-border">
                 <div className="p-4 border-b border-border">
-                  <h2 className="font-bold text-foreground">Table of Contents</h2>
+                  <SheetTitle className="font-bold text-foreground">Table of Contents</SheetTitle>
                 </div>
                 <ScrollArea className="h-[calc(100vh-60px)] p-3">
                   <nav className="space-y-1">
@@ -392,6 +424,7 @@ export default function ModuleLearn() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-80 p-0 bg-sidebar border-border">
+              <SheetTitle className="hidden">Guided Notes</SheetTitle>
               <HybridGuidedNotes
                 notes={notes || []}
                 isLoading={notesLoading}
@@ -419,11 +452,11 @@ export default function ModuleLearn() {
         <div className="min-h-16 h-auto pb-[env(safe-area-inset-bottom)] border-t border-border bg-card flex items-center justify-between px-6 py-3 shrink-0 sticky bottom-0 z-50 md:static transition-all">
           <Button
             variant="outline"
+            size="icon"
             onClick={handlePrevious}
             disabled={!hasPrevious}
           >
-            <ChevronLeft className="h-4 w-4 mr-2" />
-            Previous
+            <ChevronLeft className="h-4 w-4" />
           </Button>
 
           <Badge variant="secondary">
@@ -431,18 +464,27 @@ export default function ModuleLearn() {
           </Badge>
 
           {hasNext ? (
-            <Button onClick={handleNext}>
-              Next Section
-              <ChevronRight className="h-4 w-4 ml-2" />
+            <Button size="icon" onClick={handleNext}>
+              <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button
-              onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
-              className="bg-green-600 hover:bg-green-500 text-white"
-            >
-              <Check className="h-4 w-4 mr-2" />
-              Complete
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleResetProgress}
+                title="Reset Progress"
+              >
+                <RefreshCcw className="h-4 w-4" />
+              </Button>
+              <Button
+                onClick={() => navigate(module?.track_id ? `/dashboard/course/${module.track_id}` : "/dashboard")}
+                className="bg-green-600 hover:bg-green-500 text-white"
+              >
+                <Check className="h-4 w-4 mr-2" />
+                Complete
+              </Button>
+            </div>
           )}
         </div>
       </div>
@@ -464,6 +506,12 @@ export default function ModuleLearn() {
           </ErrorBoundary>
         </div>
       )}
+
+      <GachaCompletionModal
+        isOpen={showGacha}
+        onClose={() => setShowGacha(false)}
+        moduleTitle={module.title}
+      />
     </div>
   );
 }

@@ -26,6 +26,7 @@ export function useModuleNavigation({
   // 2. Local State
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
   const [localMaxProgress, setLocalMaxProgress] = useState(0);
+  const [maxVisitedSectionIndex, setMaxVisitedSectionIndex] = useState(0);
 
   // Set initial section
   useEffect(() => {
@@ -38,8 +39,14 @@ export function useModuleNavigation({
   useEffect(() => {
     if (serverProgress) {
       setLocalMaxProgress((prev) => Math.max(prev, serverProgress));
+
+      // Calculate max visited index from server progress
+      if (order.length > 0) {
+        const estimatedIndex = Math.ceil((serverProgress / 100) * order.length) - 1;
+        setMaxVisitedSectionIndex((prev) => Math.max(prev, estimatedIndex));
+      }
     }
-  }, [serverProgress]);
+  }, [serverProgress, order.length]);
 
   // Derived Progress
   const currentProgress = Math.max(localMaxProgress, serverProgress || 0);
@@ -98,9 +105,18 @@ export function useModuleNavigation({
     setCurrentSectionId(sectionId);
   }, []);
 
+  const resetLocalProgress = useCallback(() => {
+    setLocalMaxProgress(0);
+    setMaxVisitedSectionIndex(0);
+    setCurrentSectionId(order.length > 0 ? order[0] : null);
+  }, [order]);
+
   // 7. Update Progress on Section Change
   useEffect(() => {
     if (order.length === 0 || currentSectionIndex < 0) return;
+
+    // Update max visited index
+    setMaxVisitedSectionIndex(prev => Math.max(prev, currentSectionIndex));
 
     const newProgress = Math.round(((currentSectionIndex + 1) / order.length) * 100);
 
@@ -124,5 +140,7 @@ export function useModuleNavigation({
     handlePrevious,
     handleNext,
     handleSectionClick,
+    maxVisitedSectionIndex,
+    resetLocalProgress,
   };
 }

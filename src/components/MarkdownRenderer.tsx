@@ -5,6 +5,7 @@ import { PythonCodeEditor } from "@/components/module/PythonCodeEditor";
 import { Components } from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import DOMPurify from 'dompurify';
 
 interface MarkdownRendererProps {
   content: string;
@@ -20,6 +21,29 @@ function slugify(text: string): string {
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();
+}
+
+function sanitizeUrl(url: string | undefined): string | undefined {
+  if (!url) return undefined;
+  const trimmed = url.trim();
+  const lower = trimmed.toLowerCase();
+
+  // Block dangerous protocols
+  if (lower.startsWith('javascript:') || lower.startsWith('vbscript:') || lower.startsWith('data:')) {
+    return undefined;
+  }
+
+  // Verify with DOMPurify (defense in depth)
+  try {
+    const dirty = `<a href="${trimmed}"></a>`;
+    const clean = DOMPurify.sanitize(dirty);
+    // If DOMPurify removed the href attribute, it considered it unsafe
+    if (!clean.includes('href')) return undefined;
+  } catch (e) {
+    // Ignore errors in environments without DOM (e.g. server-side rendering tests)
+  }
+
+  return trimmed;
 }
 
 export function MarkdownRenderer({
@@ -46,10 +70,16 @@ export function MarkdownRenderer({
       return <h3 id={id} className="text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24" {...props}>{children}</h3>;
     },
     a: ({ href, children, ...props }) => {
-      const isExternal = href?.startsWith('http') ?? false;
+      const safeHref = sanitizeUrl(href);
+      if (!safeHref) {
+        // Render as plain text or span if link is unsafe
+        return <span className="text-muted-foreground">{children}</span>;
+      }
+
+      const isExternal = safeHref.startsWith('http');
       return (
         <a
-          href={href}
+          href={safeHref}
           target={isExternal ? "_blank" : undefined}
           rel={isExternal ? "noopener noreferrer" : undefined}
           className={cn("text-primary hover:underline inline-flex items-center gap-1", isExternal && "items-baseline")}

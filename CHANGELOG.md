@@ -9,42 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.5.3] - January 30, 2026
 
-### Apple-Style UI & Notes Upgrade
+### Apple-Style UI, Gamification & Mobile Polish
 
-Major aesthetic polish to align with Apple's "Glass Liquid" design system and a significant upgrade to the note-taking experience with a new Floating Selection Menu.
+A massive update consolidating three major releases. Aligned the UI with Apple's "Glass Liquid" design system, introduced "Gacha" XP rewards, and implemented comprehensive analytics and mobile experience upgrades.
 
-#### Improvements (3)
+#### Improvements (10)
 - **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons for a premium, responsive feel.
 - **Floating Notes Menu**: Replaced the basic "Highlight" button with a context-aware Floating Menu (Add Note/Copy) that works seamlessly on both desktop and mobile text selection.
-- **Mobile Progress**: Fixed visibility issues with progress checkmarks on mobile devices by ensuring high-contrast styling in the Table of Contents sheet.
-
-## [1.5.2] - January 30, 2026
-
-### Gamification & UI Polish
-
-Introduced "Gacha" style XP rewards, persistent progress tracking, and critical UI/UX fixes for navigation and accessibility.
-
-#### Improvements (3)
 - **Gamification**: Added "Gacha XP" system with randomized rewards (simulated) and celebration modal upon module completion.
 - **Progress Persistence**: Implemented "Reset Progress" functionality and fixed disappearing ticks bug by tracking maximum visited section index.
 - **Navigation UI**: Simplified "Previous" and "Next" buttons to be icon-only for a cleaner mobile interface.
-
-#### Fixes (1)
-- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
-
-## [1.5.1] - January 30, 2026
-
-### Mobile Experience, Analytics & Markdown Polish
-
-Major mobile UI/UX overhaul, active learning analytics, runtime performance optimizations, and critical markdown rendering fixes.
-
-#### Improvements (4)
 - **Analytics Foundation**: Implemented active learning time tracking using intelligent activity detection (mouse, scroll, visibility) stored via LocalStorage.
 - **Mobile Experience**: Major UI/UX overhaul for mobile devices, including Safe Area (Notch) support for sticky headers/footers in `ModuleLearn` and `DashboardLayout`.
 - **Landing Page Navigation**: Added a responsive Hamburger menu (Sheet) for better mobile accessibility on the Landing Page.
 - **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction.
+- **Mobile Progress Visibility**: Enhanced Table of Contents sheet to ensure progress checkmarks are clearly visible on mobile devices.
 
-#### Fixes (3)
+#### Fixes (4)
+- **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
 - **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering and improve overall stability.
 - **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.
 - **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links and updated the GitHub repository URL.
@@ -383,7 +365,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.5.1 | Jan 30, 2026 | Mobile Experience, Analytics & Markdown Polish |
+| 1.5.3 | Jan 30, 2026 | Apple-Style UI, Gamification & Mobile Polish |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |

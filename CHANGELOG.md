@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.5.3] - January 30, 2026
+## [1.5.4] - January 30, 2026
 
-### Apple-Style UI, Gamification & Mobile Polish
+### Security Fixes, Apple-Style UI & Mobile Polish
 
-A massive update consolidating three major releases. Aligned the UI with Apple's "Glass Liquid" design system, introduced "Gacha" XP rewards, and implemented comprehensive analytics and mobile experience upgrades.
+A massive update consolidating critical security patches and major UI upgrades. Implemented robust XSS protection, production-safe logging, and aligned the UI with Apple's "Glass Liquid" design system.
 
 #### Improvements (10)
 - **Apple UI Polish**: Updated global border radius to `1rem` (16px) and added `active:scale-95` micro-interactions to all buttons for a premium, responsive feel.
@@ -25,7 +25,9 @@ A massive update consolidating three major releases. Aligned the UI with Apple's
 - **Pyodide Preloading**: Implemented smart preloading for the Python runtime in `ModuleLearn` to ensure the environment is ready before user interaction.
 - **Mobile Progress Visibility**: Enhanced Table of Contents sheet to ensure progress checkmarks are clearly visible on mobile devices.
 
-#### Fixes (4)
+#### Fixes (6)
+- **XSS Protection**: Implemented strict sanitization for Markdown links in `MarkdownRenderer`, blocking dangerous protocols (`javascript:`) and validating input with `DOMPurify` to prevent Stored XSS.
+- **Production Logging**: Replaced remaining `console.error` calls in `useActiveTimeTracker` with the secure `logger` utility to prevent production data leaks.
 - **Accessibility**: Resolved `DialogContent` accessibility warning by adding `SheetTitle` to sidebar sheets.
 - **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering and improve overall stability.
 - **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.

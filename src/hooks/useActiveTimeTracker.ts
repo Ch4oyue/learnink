@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { logger } from '@/lib/logger';
 
 const IDLE_TIMEOUT_MS = 60 * 1000; // 60 seconds
 const SYNC_INTERVAL_MS = 10 * 1000; // 10 seconds
@@ -31,7 +32,7 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
         }
       }
     } catch (e) {
-      console.error("Failed to load analytics", e);
+      logger.error("Failed to load analytics", e);
     }
   }, [moduleId, userId]);
 

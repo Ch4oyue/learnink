@@ -6,7 +6,7 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 
 // Lazy load heavy below-the-fold components
 const Features = lazy(() => import("@/components/landing/Features").then(module => ({ default: module.Features })));
@@ -16,6 +16,7 @@ const Footer = lazy(() => import("@/components/landing/Footer").then(module => (
 export default function LandingPage() {
     const { resolvedTheme, setTheme } = useTheme();
     const { user } = useAuth();
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Enable smooth scrolling for anchor links
     useSimpleSmoothScroll();
@@ -92,7 +93,7 @@ export default function LandingPage() {
                                 )}
                             </Button>
 
-                            <Sheet>
+                            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                                 <SheetTrigger asChild>
                                     <Button variant="ghost" size="icon">
                                         <Menu className="h-5 w-5" />
@@ -103,6 +104,7 @@ export default function LandingPage() {
                                         {user ? (
                                             <Link
                                                 to="/dashboard"
+                                                onClick={() => setIsMobileMenuOpen(false)}
                                                 className="flex items-center gap-2 text-lg font-medium text-primary hover:text-primary/80 transition-colors"
                                             >
                                                 <LayoutDashboard className="h-5 w-5" />
@@ -111,6 +113,7 @@ export default function LandingPage() {
                                         ) : (
                                             <Link
                                                 to="/auth"
+                                                onClick={() => setIsMobileMenuOpen(false)}
                                                 className="text-lg font-medium text-foreground hover:text-primary transition-colors"
                                             >
                                                 Log in
@@ -119,7 +122,7 @@ export default function LandingPage() {
                                         <button
                                             onClick={() => {
                                                 document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
-                                                // Close sheet logic would require state, but native dismiss works on click away
+                                                setIsMobileMenuOpen(false);
                                             }}
                                             className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors text-left"
                                         >
@@ -127,9 +130,10 @@ export default function LandingPage() {
                                         </button>
                                         <div className="h-[1px] bg-border my-2" />
                                         <a
-                                            href="https://github.com/learnink"
+                                            href="https://github.com/Abelion512/learnink"
                                             target="_blank"
                                             rel="noopener noreferrer"
+                                            onClick={() => setIsMobileMenuOpen(false)}
                                             className="flex items-center gap-2 text-muted-foreground"
                                         >
                                             <Github className="h-5 w-5" />

@@ -456,14 +456,14 @@ export default function ContentApproval() {
 
             {/* --- DIALOG: PUBLISH CONTENT --- */}
             <Dialog open={isPublishOpen} onOpenChange={setIsPublishOpen}>
-                <DialogContent className="max-w-7xl w-full h-[90vh] flex flex-col glass-liquid rounded-[24px] p-0 gap-0 overflow-hidden">
-                    <div className="p-6 pb-0">
+                <DialogContent className="max-w-7xl w-full max-h-[95vh] h-[95vh] flex flex-col glass-liquid rounded-[24px] p-0 gap-0 overflow-hidden">
+                    <div className="p-4 md:p-6 pb-0">
                         <DialogHeader>
                             <DialogTitle>Review & Publish</DialogTitle>
                             <DialogDescription>Edit konten sebelum publikasi.</DialogDescription>
                         </DialogHeader>
                     </div>
-                    <form onSubmit={handlePublishSubmit} className="flex-1 flex flex-col p-6 pt-4 gap-4 overflow-hidden">
+                    <form onSubmit={handlePublishSubmit} className="flex-1 flex flex-col p-4 md:p-6 gap-4 overflow-y-auto md:overflow-hidden">
                         <div className="space-y-2">
                             <Label>Judul</Label>
                             <Input value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} required />
@@ -494,7 +494,7 @@ export default function ContentApproval() {
                                 </div>
                             </div>
                         </div>
-                        <div className="space-y-2 flex-1 flex flex-col min-h-0">
+                        <div className="space-y-2 md:flex-1 md:flex md:flex-col md:min-h-0">
                             <Label>Konten</Label>
                             {/* Desktop: Split View, Mobile: Tabs */}
                             <div className="hidden md:block flex-1 border rounded-lg overflow-hidden min-h-0">
@@ -531,23 +531,23 @@ export default function ContentApproval() {
                             </div>
 
                             {/* Mobile View */}
-                            <div className="md:hidden flex-1 flex flex-col min-h-0">
-                                <Tabs defaultValue="edit" className="w-full flex-1 flex flex-col">
+                            <div className="md:hidden w-full">
+                                <Tabs defaultValue="edit" className="w-full">
                                     <TabsList className="grid w-full grid-cols-2">
                                         <TabsTrigger value="edit">Editor</TabsTrigger>
                                         <TabsTrigger value="preview">Preview</TabsTrigger>
                                     </TabsList>
-                                    <div className="flex-1 min-h-0 overflow-y-auto mt-2">
-                                        <TabsContent value="edit" className="h-full mt-0">
+                                    <div className="mt-2">
+                                        <TabsContent value="edit" className="mt-0">
                                             <Textarea
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
-                                                className="font-mono text-sm h-full min-h-[300px]"
+                                                className="font-mono text-sm min-h-[300px]"
                                                 placeholder="Tulis konten menggunakan format Markdown..."
                                             />
                                         </TabsContent>
-                                        <TabsContent value="preview" className="h-full mt-0">
-                                            <div className="border rounded-md p-4 h-full min-h-[300px] overflow-y-auto bg-card">
+                                        <TabsContent value="preview" className="mt-0">
+                                            <div className="border rounded-md p-4 min-h-[300px] bg-card">
                                                 <MarkdownRenderer content={formData.content} />
                                             </div>
                                         </TabsContent>
@@ -555,7 +555,7 @@ export default function ContentApproval() {
                                 </Tabs>
                             </div>
                         </div>
-                        <DialogFooter>
+                        <DialogFooter className="mt-auto">
                             <Button type="button" variant="ghost" onClick={() => setIsPublishOpen(false)}>Batal</Button>
                             <Button type="submit" disabled={publishMutation.isPending}>Publish</Button>
                         </DialogFooter>

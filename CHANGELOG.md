@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.5.1] - January 30, 2026
+
+### Markdown & Mobile Polish
+
+Resolved critical rendering issues for nested lists and polished mobile UI interactions.
+
+#### Fixes (3)
+- **Markdown Rendering**: Replaced custom regex parser with `react-markdown` to fix nested list numbering and improve overall stability.
+- **Content Approval UI**: Fixed mobile layout overflow in the "Review & Publish" dialog by enabling scroll on small screens.
+- **Landing Page UX**: Fixed mobile sidebar behavior to auto-close when clicking links and updated the GitHub repository URL.
+
 ## [1.5.0] - January 30, 2026
 
 ### Mobile Experience & Analytics
@@ -353,6 +364,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.5.1 | Jan 30, 2026 | Markdown Rendering & Mobile Polish |
 | 1.5.0 | Jan 30, 2026 | Mobile Experience, Analytics & Refactoring |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |

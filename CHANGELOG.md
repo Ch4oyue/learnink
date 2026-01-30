@@ -367,7 +367,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.5.3 | Jan 30, 2026 | Apple-Style UI, Gamification & Mobile Polish |
+| 1.5.4 | Jan 30, 2026 | Security Fixes, Apple-Style UI & Mobile Polish |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |
 | 1.4.8 | Jan 27, 2026 | Security Hardening & Mobile Fixes |

@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.0] - February 12, 2026
+
+### Gacha Reward System
+
+Integrated a gamified "Gacha" reward system for module completion, featuring secure server-side XP generation and database-persisted claim status.
+
+#### Improvements (3)
+- **Gacha Rewards**: Implemented a secure reward system where users earn randomized XP (50-150) upon completing a module.
+- **Secure Validation**: Created `award-xp` Edge Function to securely calculate and award XP, preventing client-side manipulation.
+- **Claim Persistence**: Added `reward_claimed` tracking to `user_progress` to ensure users can only claim rewards once per module.
+
+#### Fixes (1)
+- **Modal Design**: Refactored `GachaCompletionModal` to align with the "Premium Dark Mode" aesthetic and "Glass Liquid" design system.
+
 ## [1.5.3] - January 30, 2026
 
 ### Apple-Style UI, Gamification & Mobile Polish
@@ -365,6 +379,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.6.0 | Feb 12, 2026 | Gacha Reward System & Secure XP Validation |
 | 1.5.3 | Jan 30, 2026 | Apple-Style UI, Gamification & Mobile Polish |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |

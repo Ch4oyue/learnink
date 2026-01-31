@@ -18,8 +18,8 @@ export function useModuleNavigation({
   onUpdateProgress,
 }: UseModuleNavigationProps) {
   // 1. Parse Sections
-  const { sections, order } = useMemo(() => {
-    if (!moduleContent) return { sections: {}, order: [] };
+  const { sections, order, indexMap } = useMemo(() => {
+    if (!moduleContent) return { sections: {}, order: [], indexMap: new Map<string, number>() };
     return parseModuleSections(moduleContent);
   }, [moduleContent]);
 
@@ -83,7 +83,10 @@ export function useModuleNavigation({
       : null;
 
   const currentContent = currentSection?.content || moduleContent || "";
-  const currentSectionIndex = currentSectionId ? order.indexOf(currentSectionId) : 0;
+  // Optimized: Use Map lookup (O(1)) instead of indexOf (O(N))
+  const currentSectionIndex = currentSectionId && indexMap?.has(currentSectionId)
+    ? indexMap.get(currentSectionId)!
+    : 0;
 
   // 6. Navigation Helpers
   const hasPrevious = currentSectionIndex > 0;

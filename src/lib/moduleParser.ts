@@ -8,6 +8,7 @@ export interface SectionData {
 export interface ParsedModuleData {
   sections: Record<string, SectionData>;
   order: string[];
+  indexMap: Map<string, number>;
 }
 
 const headingRegex = /^(#{1,3})\s+(.+)$/;
@@ -17,7 +18,7 @@ const headingRegex = /^(#{1,3})\s+(.+)$/;
 // ============================================
 
 export function parseModuleSections(markdown: string): ParsedModuleData {
-  if (!markdown) return { sections: {}, order: [] };
+  if (!markdown) return { sections: {}, order: [], indexMap: new Map() };
 
   const lines = markdown.split("\n");
   const sections: Record<string, SectionData> = {};
@@ -62,5 +63,9 @@ export function parseModuleSections(markdown: string): ParsedModuleData {
   // Don't forget the last section
   saveCurrentSection();
 
-  return { sections, order };
+  // Create index map for O(1) lookups
+  const indexMap = new Map<string, number>();
+  order.forEach((id, index) => indexMap.set(id, index));
+
+  return { sections, order, indexMap };
 }

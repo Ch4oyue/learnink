@@ -88,15 +88,25 @@ serve(async (req) => {
 
     // 3. Update Transaction (XP + Flag)
 
-    // Update flag first
-    const { error: updateError } = await supabaseAdmin
+    // Update flag first - ATOMIC CHECK to prevent race conditions (double spending)
+    const { data: updatedRows, error: updateError } = await supabaseAdmin
         .from("user_progress")
         .update({ reward_claimed: true })
         .eq("user_id", user.id)
-        .eq("module_id", module_id);
+        .eq("module_id", module_id)
+        .eq("reward_claimed", false) // Ensure it wasn't already claimed in a parallel request
+        .select();
 
     if (updateError) {
         throw updateError;
+    }
+
+    // If 0 rows updated, it means condition failed (already claimed)
+    if (!updatedRows || updatedRows.length === 0) {
+         return new Response(JSON.stringify({ error: "Reward already claimed", claimed: true }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
     }
 
     // Get current XP

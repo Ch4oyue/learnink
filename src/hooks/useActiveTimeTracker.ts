@@ -36,70 +36,94 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
     }
   }, [moduleId, userId]);
 
-  // Activity listener
-  const handleActivity = useCallback(() => {
-    lastActivityRef.current = Date.now();
-  }, []);
+  import { supabase } from '@/integrations/supabase/client';
 
-  useEffect(() => {
-    if (!moduleId || !userId) return;
+  // ... existing code ...
 
-    const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
-    events.forEach(event => window.addEventListener(event, handleActivity));
+  const ACTIVITY_UPDATE_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
 
-    return () => {
-      events.forEach(event => window.removeEventListener(event, handleActivity));
-    };
-  }, [handleActivity, moduleId, userId]);
+  export function useActiveTimeTracker(moduleId: string | undefined, userId: string | undefined) {
+    const lastActivityRef = useRef<number>(Date.now());
+    const lastDbUpdateRef = useRef<number>(0); // Track last DB sync
+    // ... existing code ...
 
-  // Timer loop
-  useEffect(() => {
-    if (!moduleId || !userId) return;
-
-    const interval = setInterval(() => {
-      // Check idle status
+    // Activity listener with DB sync throttling
+    const handleActivity = useCallback(() => {
       const now = Date.now();
-      const timeSinceLastActivity = now - lastActivityRef.current;
-      const isIdle = timeSinceLastActivity > IDLE_TIMEOUT_MS;
-      const isHidden = document.hidden;
+      lastActivityRef.current = now;
 
-      if (!isIdle && !isHidden) {
-        setTotalTime(prev => prev + 1);
+      // Throttle DB updates to avoid spamming profile updates
+      if (userId && now - lastDbUpdateRef.current > ACTIVITY_UPDATE_THROTTLE_MS) {
+        lastDbUpdateRef.current = now;
+
+        // Fire and forget update
+        supabase.from('profiles').update({
+          last_activity_date: new Date().toISOString()
+        }).eq('id', userId).then(({ error }) => {
+          if (error) logger.error('Failed to update activity', error);
+        });
       }
-    }, 1000);
+    }, [userId]);
 
-    return () => clearInterval(interval);
-  }, [moduleId, userId]);
+    useEffect(() => {
+      if (!moduleId || !userId) return;
 
-  // Sync effect
-  useEffect(() => {
-    if (!moduleId || !userId) return;
+      const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
+      events.forEach(event => window.addEventListener(event, handleActivity));
 
-    // Save on unmount or visibility change or periodically
-    const key = `learnink_analytics_${userId}_${moduleId}`;
+      return () => {
+        events.forEach(event => window.removeEventListener(event, handleActivity));
+      };
+    }, [handleActivity, moduleId, userId]);
 
-    const save = () => {
-       localStorage.setItem(key, JSON.stringify({
-         timeSpent: totalTimeRef.current,
-         lastUpdated: new Date().toISOString()
-       }));
-    };
+    // Timer loop
+    useEffect(() => {
+      if (!moduleId || !userId) return;
 
-    // Auto save every SYNC_INTERVAL
-    const syncInterval = setInterval(save, SYNC_INTERVAL_MS);
+      const interval = setInterval(() => {
+        // Check idle status
+        const now = Date.now();
+        const timeSinceLastActivity = now - lastActivityRef.current;
+        const isIdle = timeSinceLastActivity > IDLE_TIMEOUT_MS;
+        const isHidden = document.hidden;
 
-    // Save on visibility change (leaving tab)
-    const handleVisibilityChange = () => {
-      if (document.hidden) save();
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+        if (!isIdle && !isHidden) {
+          setTotalTime(prev => prev + 1);
+        }
+      }, 1000);
 
-    return () => {
-      clearInterval(syncInterval);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      save(); // Save on unmount
-    };
-  }, [moduleId, userId]); // Dependencies stable, won't re-run every second
+      return () => clearInterval(interval);
+    }, [moduleId, userId]);
 
-  return { totalTime };
-}
+    // Sync effect
+    useEffect(() => {
+      if (!moduleId || !userId) return;
+
+      // Save on unmount or visibility change or periodically
+      const key = `learnink_analytics_${userId}_${moduleId}`;
+
+      const save = () => {
+        localStorage.setItem(key, JSON.stringify({
+          timeSpent: totalTimeRef.current,
+          lastUpdated: new Date().toISOString()
+        }));
+      };
+
+      // Auto save every SYNC_INTERVAL
+      const syncInterval = setInterval(save, SYNC_INTERVAL_MS);
+
+      // Save on visibility change (leaving tab)
+      const handleVisibilityChange = () => {
+        if (document.hidden) save();
+      };
+      document.addEventListener("visibilitychange", handleVisibilityChange);
+
+      return () => {
+        clearInterval(syncInterval);
+        document.removeEventListener("visibilitychange", handleVisibilityChange);
+        save(); // Save on unmount
+      };
+    }, [moduleId, userId]); // Dependencies stable, won't re-run every second
+
+    return { totalTime };
+  }

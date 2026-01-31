@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.6.1] - February 01, 2026
+
+### Gamification, SEO & Refactoring
+
+Implemented daily streaks to boost engagement, enhanced SEO architecture, and improved code maintainability through technical refactoring.
+
+#### Improvements (3)
+- **Daily Streaks**: Added generic streak tracking (database migration & frontend logic) to encourage consistent learning habits.
+- **SEO Architecture**: Integrated `react-helmet-async` and created a standardized `<SEO />` component for robust, dynamic metadata management.
+- **Technical Refactoring**: Extracted complex text selection logic from `HybridContentRenderer` into a reusable `useTextSelection` hook.
+
 ## [1.6.0] - January 30, 2026
 
 ### Gacha Rewards, Security Hardening & Apple UI
@@ -370,6 +381,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.6.1 | Feb 01, 2026 | Gamification, SEO & Refactoring |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |

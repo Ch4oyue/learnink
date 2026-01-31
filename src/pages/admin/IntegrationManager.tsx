@@ -2,7 +2,7 @@ import { logger } from "@/lib/logger";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Integration, IntegrationSource, CreateIntegrationInput } from "@/types/staging";
@@ -41,7 +41,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { MarkdownRenderer } from "@/components/shared/MarkdownRenderer";
 import { useToast } from "@/hooks/use-toast";
 import {
     Plug,

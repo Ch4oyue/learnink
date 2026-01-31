@@ -7,9 +7,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import ErrorBoundary from "@/components/ErrorBoundary";
-import { PWAInstallPrompt } from "@/components/pwa/PWAInstallPrompt";
+import { ProtectedRoute } from "@/components/features/auth/ProtectedRoute";
+import ErrorBoundary from "@/components/shared/ErrorBoundary";
+import { PWAInstallPrompt } from "@/components/features/pwa/PWAInstallPrompt";
 import { PWAProvider } from "@/contexts/PWAContext";
 
 // ============================================
@@ -17,27 +17,27 @@ import { PWAProvider } from "@/contexts/PWAContext";
 // ============================================
 
 // Public Pages
-const LandingPage = lazy(() => import("./pages/LandingPage"));
-const Auth = lazy(() => import("./pages/Auth"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Changelog = lazy(() => import("./pages/Changelog"));
-const Syllabus = lazy(() => import("./pages/Syllabus"));
+const LandingPage = lazy(() => import("./pages/public/LandingPage"));
+const Auth = lazy(() => import("./pages/auth/Auth"));
+const NotFound = lazy(() => import("./pages/public/NotFound"));
+const Changelog = lazy(() => import("./pages/public/Changelog"));
+const Syllabus = lazy(() => import("./pages/public/Syllabus"));
 
 // Dashboard Pages
-const DashboardHome = lazy(() => import("./pages/DashboardHome"));
-const DashboardProfile = lazy(() => import("./pages/DashboardProfile"));
-const DashboardSettings = lazy(() => import("./pages/DashboardSettings"));
-const DashboardUsers = lazy(() => import("./pages/DashboardUsers"));
-const DashboardCourses = lazy(() => import("./pages/DashboardCourses"));
-const DashboardModules = lazy(() => import("./pages/DashboardModules"));
-const DashboardNotifications = lazy(() => import("./pages/DashboardNotifications"));
-const DashboardRequests = lazy(() => import("./pages/DashboardRequests"));
-const CourseDetail = lazy(() => import("./pages/CourseDetail"));
-const ComingSoon = lazy(() => import("./pages/ComingSoon"));
-const SecondBrain = lazy(() => import("./pages/SecondBrain"));
+const DashboardHome = lazy(() => import("./pages/dashboard/DashboardHome"));
+const DashboardProfile = lazy(() => import("./pages/dashboard/DashboardProfile"));
+const DashboardSettings = lazy(() => import("./pages/dashboard/DashboardSettings"));
+const DashboardUsers = lazy(() => import("./pages/dashboard/DashboardUsers"));
+const DashboardCourses = lazy(() => import("./pages/dashboard/DashboardCourses"));
+const DashboardModules = lazy(() => import("./pages/dashboard/DashboardModules"));
+const DashboardNotifications = lazy(() => import("./pages/dashboard/DashboardNotifications"));
+const DashboardRequests = lazy(() => import("./pages/dashboard/DashboardRequests"));
+const CourseDetail = lazy(() => import("./pages/dashboard/CourseDetail"));
+const ComingSoon = lazy(() => import("./pages/dashboard/ComingSoon"));
+const SecondBrain = lazy(() => import("./pages/dashboard/SecondBrain"));
 
 // Learning Pages
-const ModuleLearn = lazy(() => import("./pages/ModuleLearn"));
+const ModuleLearn = lazy(() => import("./pages/learning/ModuleLearn"));
 
 // Admin Pages
 const ManageSources = lazy(() => import("./pages/admin/ManageSources"));

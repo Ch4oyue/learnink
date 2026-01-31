@@ -1,0 +1,8 @@
+{
+  "name": "Glass OS Dashboard",
+  "description": "A futuristic, glassmorphism-styled personal dashboard featuring a Gemini-powered AI assistant, media controls, and system widgets.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone"
+  ]
+}

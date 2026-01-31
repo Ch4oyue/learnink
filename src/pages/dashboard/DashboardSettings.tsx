@@ -1,0 +1,432 @@
+import { useState } from "react";
+import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
+import { useAuth } from "@/contexts/AuthContext";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  useModuleCategories,
+  useModuleLevels,
+  useCreateCategory,
+  useCreateLevel,
+  useDeleteCategory,
+  useDeleteLevel,
+  useUpdateCategory,
+  useUpdateLevel
+} from "@/hooks/useModuleSettings";
+import {
+  Folder,
+  Layers,
+  Plus,
+  Trash2,
+  Loader2,
+  Palette,
+  Sun,
+  Moon,
+  Monitor,
+  Edit,
+  Download,
+  CheckCircle2
+} from "lucide-react";
+import { usePWA } from "@/contexts/PWAContext";
+import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+export default function DashboardSettings() {
+  const { isAdmin } = useAuth();
+  const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
+  const { isInstalled, deferredPrompt, installApp } = usePWA();
+
+  // Categories
+  const { data: categories, isLoading: categoriesLoading } = useModuleCategories();
+  const createCategory = useCreateCategory();
+  const deleteCategory = useDeleteCategory();
+  const updateCategory = useUpdateCategory();
+
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryDesc, setNewCategoryDesc] = useState("");
+  const [newCategoryColor, setNewCategoryColor] = useState("#3B82F6");
+
+  // Levels
+  const { data: levels, isLoading: levelsLoading } = useModuleLevels();
+  const createLevel = useCreateLevel();
+  const deleteLevel = useDeleteLevel();
+  const updateLevel = useUpdateLevel();
+
+  const [newLevelName, setNewLevelName] = useState("");
+  const [newLevelDesc, setNewLevelDesc] = useState("");
+  const [newLevelColor, setNewLevelColor] = useState("#10B981");
+
+  // Edit State
+  const [editingItem, setEditingItem] = useState<{
+    type: 'category' | 'level';
+    id: string;
+    name: string;
+    description: string;
+    color: string;
+  } | null>(null);
+
+  // Theme options
+  const themeOptions = [
+    { value: "light" as const, label: "Light", icon: Sun, description: "Light background with dark text" },
+    { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background with light text" },
+    { value: "system" as const, label: "System", icon: Monitor, description: "Follows your device settings" },
+  ];
+
+  // Mobile Preferences State (Moved from BottomNavigation logic if needed, but handled here via localStorage)
+  const [transparentNav, setTransparentNav] = useState(() => localStorage.getItem("transparentMobileNav") === "true");
+
+  const toggleTransparentNav = () => {
+    const newVal = !transparentNav;
+    setTransparentNav(newVal);
+    localStorage.setItem("transparentMobileNav", String(newVal));
+    window.dispatchEvent(new Event("storage")); // Notify other components
+  };
+
+  if (!isAdmin) {
+    return (
+      <DashboardLayout>
+        <div className="space-y-6 max-w-3xl mx-auto">
+          <div>
+            <h1 className="text-2xl font-semibold">Settings</h1>
+            <p className="text-muted-foreground">Manage your preferences</p>
+          </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>Customize how LearnAI looks on your device</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {themeOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setTheme(option.value)}
+                    className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value ? "border-primary bg-primary/5" : "border-border hover:border-primary/50 hover:bg-muted/50"}`}
+                  >
+                    <option.icon className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"}`} />
+                    <div className="text-center">
+                      <span className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"}`}>{option.label}</span>
+                      <span className="text-xs text-muted-foreground mt-1 block">{option.description}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Mobile Preferences - Only visible on mobile/tablet */}
+              <div className="mt-8 border-t pt-6 md:hidden">
+                <h3 className="text-base font-medium mb-1">Mobile Preferences</h3>
+                <p className="text-sm text-muted-foreground mb-4">Adjust settings for mobile experience</p>
+                <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-md">
+                            <Layers className="h-5 w-5 text-primary" />
+                        </div>
+                        <div>
+                            <span className="font-medium block">Transparent Navigation</span>
+                            <span className="text-xs text-muted-foreground">Make bottom navigation bar glass-like</span>
+                        </div>
+                    </div>
+                    <Button variant={transparentNav ? "default" : "outline"} size="sm" onClick={toggleTransparentNav}>
+                        {transparentNav ? "Enabled" : "Disabled"}
+                    </Button>
+                </div>
+              </div>
+
+              {/* Install PWA Section */}
+              <div className="mt-8 border-t pt-6">
+                <h3 className="text-base font-medium mb-1">Install Application</h3>
+                <p className="text-sm text-muted-foreground mb-4">Install LearnAI to your device for better experience and fullscreen view.</p>
+                {isInstalled ? (
+                   <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
+                     <CheckCircle2 className="h-5 w-5 text-green-500" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium text-foreground">App Installed</span>
+                        <span className="text-xs font-normal">You are using the app version</span>
+                     </div>
+                   </Button>
+                ) : deferredPrompt ? (
+                   <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3">
+                     <Download className="h-5 w-5" />
+                     <div className="flex flex-col items-start">
+                        <span className="font-medium">Install App</span>
+                        <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
+                     </div>
+                   </Button>
+                ) : (
+                   <div className="bg-muted/50 rounded-lg p-4 border border-dashed">
+                     <p className="text-sm text-muted-foreground text-center">
+                       To install, use your browser's <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong> feature in the menu.
+                     </p>
+                   </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="py-4">
+              <a href="/changelog" className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <span>View Changelog & Version History</span>
+                <span className="text-xs">v1.4.0</span>
+              </a>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const handleAddCategory = () => {
+    if (!newCategoryName.trim()) return;
+    createCategory.mutate({
+      name: newCategoryName.trim(),
+      color: newCategoryColor,
+      description: newCategoryDesc.trim() || undefined
+    }, {
+      onSuccess: () => {
+        setNewCategoryName("");
+        setNewCategoryDesc("");
+        toast({ title: "Sukses", description: "Kategori berhasil ditambahkan" });
+      }
+    });
+  };
+
+  const handleAddLevel = () => {
+    if (!newLevelName.trim()) return;
+    createLevel.mutate({
+      name: newLevelName.trim(),
+      color: newLevelColor,
+      description: newLevelDesc.trim() || undefined
+    }, {
+      onSuccess: () => {
+        setNewLevelName("");
+        setNewLevelDesc("");
+        toast({ title: "Sukses", description: "Level berhasil ditambahkan" });
+      }
+    });
+  };
+
+  const handleUpdate = () => {
+    if (!editingItem) return;
+    const { id, type, name, color, description } = editingItem;
+
+    if (type === 'category') {
+      updateCategory.mutate({ id, name, color, description }, {
+        onSuccess: () => setEditingItem(null)
+      });
+    } else {
+      updateLevel.mutate({ id, name, color, description }, {
+        onSuccess: () => setEditingItem(null)
+      });
+    }
+  };
+
+  const handleDelete = (id: string, name: string, type: 'category' | 'level') => {
+    if (confirm(`Hapus ${type === 'category' ? 'kategori' : 'level'} "${name}"?`)) {
+      if (type === 'category') {
+        deleteCategory.mutate(id);
+      } else {
+        deleteLevel.mutate(id);
+      }
+    }
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold">Pengaturan</h1>
+          <p className="text-muted-foreground">Kelola kategori dan level modul pembelajaran</p>
+        </div>
+
+        <Tabs defaultValue="categories">
+          <TabsList>
+            <TabsTrigger value="categories" className="gap-2"><Folder className="h-4 w-4" /> Kategori</TabsTrigger>
+            <TabsTrigger value="levels" className="gap-2"><Layers className="h-4 w-4" /> Level</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="categories" className="space-y-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Tambah Kategori Baru</CardTitle>
+                <CardDescription>Kategori digunakan untuk mengelompokkan modul pembelajaran</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-4">
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-1 space-y-2">
+                        <Label>Nama Kategori</Label>
+                        <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Contoh: Web Development" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Warna</Label>
+                        <div className="flex items-center gap-2">
+                            <Input type="color" value={newCategoryColor} onChange={(e) => setNewCategoryColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
+                            <Palette className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 items-end">
+                      <div className="flex-1 space-y-2">
+                        <Label>Deskripsi (Opsional)</Label>
+                        <Input value={newCategoryDesc} onChange={(e) => setNewCategoryDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      </div>
+                      <Button onClick={handleAddCategory} disabled={createCategory.isPending || !newCategoryName.trim()}>
+                        {createCategory.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                      </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle className="text-lg">Daftar Kategori</CardTitle></CardHeader>
+              <CardContent>
+                {categoriesLoading ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : categories && categories.length > 0 ? (
+                  <div className="space-y-2">
+                    {categories.map((cat) => (
+                      <div key={cat.id} className="flex items-center justify-between p-3 rounded-lg border group hover:border-primary/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: cat.color }} />
+                          <span className="font-medium">{cat.name}</span>
+                          {cat.description && <span className="text-sm text-muted-foreground">- {cat.description}</span>}
+                        </div>
+                        <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => setEditingItem({ type: 'category', id: cat.id, name: cat.name, description: cat.description || '', color: cat.color })}>
+                                <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(cat.id, cat.name, 'category')}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-center text-muted-foreground py-8">Belum ada kategori</p>}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="levels" className="space-y-4 mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg">Tambah Level Baru</CardTitle>
+                <CardDescription>Level menunjukkan tingkat kesulitan modul</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col gap-4">
+                  <div className="flex gap-4 items-start">
+                    <div className="flex-1 space-y-2">
+                        <Label>Nama Level</Label>
+                        <Input value={newLevelName} onChange={(e) => setNewLevelName(e.target.value)} placeholder="Contoh: Expert" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Warna</Label>
+                        <div className="flex items-center gap-2">
+                            <Input type="color" value={newLevelColor} onChange={(e) => setNewLevelColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
+                            <Palette className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-4 items-end">
+                      <div className="flex-1 space-y-2">
+                        <Label>Deskripsi (Opsional)</Label>
+                        <Input value={newLevelDesc} onChange={(e) => setNewLevelDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      </div>
+                      <Button onClick={handleAddLevel} disabled={createLevel.isPending || !newLevelName.trim()}>
+                        {createLevel.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+                      </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader><CardTitle className="text-lg">Daftar Level</CardTitle></CardHeader>
+              <CardContent>
+                {levelsLoading ? (
+                  <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
+                ) : levels && levels.length > 0 ? (
+                  <div className="space-y-2">
+                    {levels.map((level) => (
+                      <div key={level.id} className="flex items-center justify-between p-3 rounded-lg border group hover:border-primary/50 transition-colors">
+                        <div className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full" style={{ backgroundColor: level.color }} />
+                          <span className="font-medium">{level.name}</span>
+                          {level.description && <span className="text-sm text-muted-foreground">- {level.description}</span>}
+                        </div>
+                        <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => setEditingItem({ type: 'level', id: level.id, name: level.name, description: level.description || '', color: level.color })}>
+                                <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(level.id, level.name, 'level')}>
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : <p className="text-center text-muted-foreground py-8">Belum ada level</p>}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Edit Dialog */}
+        <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
+            <DialogContent className="glass-liquid rounded-[24px]">
+                <DialogHeader>
+                    <DialogTitle>Edit {editingItem?.type === 'category' ? 'Kategori' : 'Level'}</DialogTitle>
+                    <DialogDescription>Ubah detail item di bawah ini.</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                        <Label>Nama</Label>
+                        <Input
+                            value={editingItem?.name || ''}
+                            onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, name: e.target.value }) : null)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Warna</Label>
+                        <div className="flex items-center gap-2">
+                            <Input
+                                type="color"
+                                value={editingItem?.color || '#000000'}
+                                onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, color: e.target.value }) : null)}
+                                className="w-12 h-10 p-1 cursor-pointer"
+                            />
+                            <span className="text-sm text-muted-foreground">{editingItem?.color}</span>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Deskripsi</Label>
+                        <Input
+                            value={editingItem?.description || ''}
+                            onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, description: e.target.value }) : null)}
+                        />
+                    </div>
+                </div>
+                <DialogFooter>
+                    <Button variant="ghost" onClick={() => setEditingItem(null)}>Batal</Button>
+                    <Button onClick={handleUpdate} disabled={updateCategory.isPending || updateLevel.isPending}>Simpan Perubahan</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+      </div>
+    </DashboardLayout>
+  );
+}

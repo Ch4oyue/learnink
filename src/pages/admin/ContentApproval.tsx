@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
-import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { IncomingContent, ContentStatus } from "@/types/staging";
@@ -14,7 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AutoResizeTextarea } from "@/components/ui/auto-resize-textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MarkdownRenderer } from "@/components/MarkdownRenderer";
+import { MarkdownRenderer } from "@/components/shared/MarkdownRenderer";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {

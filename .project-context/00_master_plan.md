@@ -36,7 +36,7 @@
 - [x] Gamifikasi (Achievements, Progress Tracking)
 - [x] Real-time Notifications
 - [ ] Advanced Analytics Dashboard
-- [x] Mobile-First PWA Optimization
+- [x] Mobile-First PWA Optimization (Low-End & Performance)
 
 ### 📍 Fase 3: Scale (Rencana)
 - [ ] Multi-tenant Support

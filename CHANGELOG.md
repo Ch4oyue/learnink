@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.0] - January 31, 2026
+
+### Mobile Performance & Low-End Optimization
+
+A comprehensive performance overhaul designed to make LearnInk run smoothly on low-to-mid range mobile devices. This release introduces intelligent hardware detection, aggressive caching, and UI responsiveness improvements.
+
+#### Improvements (6)
+- **Performance Engine**: Introduced `usePerformance` hook to detect low-end devices (RAM/CPU/Connection) and automatically scale down UI complexity.
+- **Lazy Execution**: Refactored `MarkdownRenderer` to lazy-load the heavy `PythonCodeEditor` only when needed.
+- **Aggressive Caching**: Enhanced PWA configuration with Workbox runtime caching for Google Fonts and static assets.
+- **Network Optimization**: Increased React Query `staleTime` to 10 minutes to significantly reduce redundant API calls and costs.
+- **Conservative Preloading**: Updated `usePyodidePreload` to skip preloading on low-end devices, saving data and memory.
+- **Parser Fast-Path**: Implemented an optimized heading check in `moduleParser.ts` to improve content ingestion speed.
+
+#### Fixes (3)
+- **Navigation Responsiveness**: Disabled `v7_startTransition` in React Router to fix the "stalled view" issue where the URL changed but the UI didn't update.
+- **Mobile Scroll**: Optimized section transitions in `ModuleLearn` to use `auto` scroll instead of `smooth` on low-end devices to prevent main-thread blocking.
+- **Environment Stability**: Resolved `bun test` environment failures by fixing dependency resolution and test mocks.
+
+#### Patches (1)
+- **Unified Design**: Integrated performance detection into `CustomCursor` and `useSmoothScroll` for a consistent lightweight experience.
+
 ## [1.6.0] - January 30, 2026
 
 ### Gacha Rewards, Security Hardening & Apple UI
@@ -370,6 +392,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.7.0 | Jan 31, 2026 | Mobile Performance & Low-End Optimization |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |

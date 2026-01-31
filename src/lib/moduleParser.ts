@@ -35,7 +35,8 @@ export function parseModuleSections(markdown: string): ParsedModuleData {
   };
 
   for (const line of lines) {
-    const match = headingRegex.exec(line);
+    // Fast path: headings must start with #
+    const match = line[0] === "#" ? headingRegex.exec(line) : null;
 
     if (match) {
       saveCurrentSection();

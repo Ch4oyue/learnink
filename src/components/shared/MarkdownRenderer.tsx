@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
+import { lazy, Suspense } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { PythonCodeEditor } from "@/components/features/module/PythonCodeEditor";
 import { Components } from 'react-markdown';
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/prism-light';
 import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
@@ -14,6 +14,9 @@ import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown
 import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import DOMPurify from 'dompurify';
+
+// Lazy load PythonCodeEditor as it is heavy and may not be needed
+const PythonCodeEditor = lazy(() => import("@/components/features/module/PythonCodeEditor").then(m => ({ default: m.PythonCodeEditor })));
 
 SyntaxHighlighter.registerLanguage('python', python);
 SyntaxHighlighter.registerLanguage('javascript', javascript);
@@ -117,8 +120,15 @@ export function MarkdownRenderer({
 
         if (!inline && language === 'python' && enableCodeEditor) {
             return (
-                <div className="my-6">
-                    <PythonCodeEditor initialCode={String(children).replace(/\n$/, '')} />
+                <div className="my-6 min-h-[200px]">
+                    <Suspense fallback={
+                        <div className="rounded-xl border border-border bg-card p-8 flex flex-col items-center justify-center gap-3">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                            <span className="text-sm text-muted-foreground">Loading Python Editor...</span>
+                        </div>
+                    }>
+                        <PythonCodeEditor initialCode={String(children).replace(/\n$/, '')} />
+                    </Suspense>
                 </div>
             );
         }

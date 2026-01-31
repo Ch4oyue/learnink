@@ -20,6 +20,11 @@ mock.module("react", () => ({
   }
 }));
 
+// Mock usePerformance
+mock.module("@/hooks/usePerformance", () => ({
+  isLowEndDevice: () => false
+}));
+
 import { usePyodidePreload } from "../../../src/hooks/usePyodidePreload";
 
 describe("usePyodidePreload", () => {

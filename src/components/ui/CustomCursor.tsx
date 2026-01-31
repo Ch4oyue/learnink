@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { motion, useSpring, useMotionValue } from "framer-motion";
+import { usePerformance } from "@/hooks/usePerformance";
 
 /**
  * CustomCursor - Premium animated cursor with spring physics
@@ -10,34 +11,14 @@ import { motion, useSpring, useMotionValue } from "framer-motion";
  * - Scales up on interactive elements
  * - Hidden on mobile/touch devices
  * - Respects prefers-reduced-motion
- * - Auto-disables on low-end devices (4GB RAM or less)
+ * - Auto-disables on low-end devices (Unified via usePerformance)
  */
-
-// Check if device is low-end (4GB RAM or less, slow CPU, or slow connection)
-function isLowEndDevice(): boolean {
-    if (typeof window === "undefined") return true;
-
-    // Check device memory (in GB) - available in Chromium browsers
-    const deviceMemory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
-    if (deviceMemory && deviceMemory <= 4) return true;
-
-    // Check hardware concurrency (CPU cores)
-    if (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) return true;
-
-    // Check for slow connection
-    const connection = (navigator as Navigator & { connection?: { effectiveType?: string; saveData?: boolean } }).connection;
-    if (connection) {
-        if (connection.saveData) return true;
-        if (connection.effectiveType === "slow-2g" || connection.effectiveType === "2g") return true;
-    }
-
-    return false;
-}
 
 // Cache for element cursor styles to avoid layout thrashing
 const cursorStyleCache = new WeakMap<HTMLElement, string>();
 
 export function CustomCursor() {
+    const { isLowEnd, prefersReducedMotion, isTouchDevice } = usePerformance();
     const [isVisible, setIsVisible] = useState(false);
     const [isHovering, setIsHovering] = useState(false);
     const [isPointer, setIsPointer] = useState(false);
@@ -50,42 +31,6 @@ export function CustomCursor() {
     const springConfig = { damping: 25, stiffness: 200, mass: 0.5 };
     const circleX = useSpring(cursorX, springConfig);
     const circleY = useSpring(cursorY, springConfig);
-
-    // Check if device supports hover (not touch-only)
-    const [isTouchDevice, setIsTouchDevice] = useState(true);
-
-    // Check for low-end device
-    const [isLowEnd, setIsLowEnd] = useState(true);
-
-    useEffect(() => {
-        // Detect if this is a touch-only device
-        const checkTouch = () => {
-            const hasHover = window.matchMedia("(hover: hover)").matches;
-            const hasPointer = window.matchMedia("(pointer: fine)").matches;
-            setIsTouchDevice(!hasHover || !hasPointer);
-        };
-
-        // Check low-end device
-        setIsLowEnd(isLowEndDevice());
-
-        checkTouch();
-        window.addEventListener("resize", checkTouch);
-
-        return () => window.removeEventListener("resize", checkTouch);
-    }, []);
-
-    // Check for reduced motion preference
-    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
-
-    useEffect(() => {
-        const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
-        setPrefersReducedMotion(mediaQuery.matches);
-
-        const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-        mediaQuery.addEventListener("change", handler);
-
-        return () => mediaQuery.removeEventListener("change", handler);
-    }, []);
 
     // Mouse move handler - throttled for performance
     const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -119,7 +64,10 @@ export function CustomCursor() {
 
     useEffect(() => {
         // Skip on touch devices, low-end devices, or reduced motion preference
-        if (isTouchDevice || prefersReducedMotion || isLowEnd) return;
+        if (isTouchDevice || prefersReducedMotion || isLowEnd) {
+            document.body.style.cursor = "";
+            return;
+        }
 
         // Hide default cursor globally
         document.body.style.cursor = "none";

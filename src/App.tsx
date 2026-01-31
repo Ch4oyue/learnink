@@ -51,8 +51,8 @@ const IntegrationManager = lazy(() => import("./pages/admin/IntegrationManager")
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
+      staleTime: 10 * 60 * 1000, // 10 minutes (increased to reduce cost/network)
+      gcTime: 30 * 60 * 1000, // 30 minutes
       retry: 1,
       refetchOnWindowFocus: false,
     },
@@ -104,7 +104,7 @@ const App = () => (
             <AuthProvider>
               <Toaster />
               <Sonner />
-              <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+              <BrowserRouter future={{ v7_startTransition: false, v7_relativeSplatPath: true }}>
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     {/* ============================

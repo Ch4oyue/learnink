@@ -24,6 +24,7 @@ import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { usePyodidePreload } from "@/hooks/usePyodidePreload";
 import { useModuleNavigation } from "@/hooks/useModuleNavigation";
 import { useActiveTimeTracker } from "@/hooks/useActiveTimeTracker";
+import { isLowEndDevice } from "@/hooks/usePerformance";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/features/module/HybridSidebar";
@@ -236,9 +237,10 @@ export default function ModuleLearn() {
 
   // Scroll to top when section changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const behavior = isLowEndDevice() ? "auto" : "smooth";
+    window.scrollTo({ top: 0, behavior });
     if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      contentRef.current.scrollTo({ top: 0, behavior });
     }
   }, [currentSectionId]);
 

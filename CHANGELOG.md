@@ -7,13 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [v1.8.0] - 2026-02-01
+## [1.8.0] - February 1, 2026
 
 ### Restoration, Design System & Stabilization
 
 A major consolidated release that restores lost features, implements the new "Glass/Liquid" design system, and stabilizes critical navigation bugs.
 
-### Added
+#### Improvements
 - **Design System**: Implemented "Glass/Liquid" design language across core views.
   - **Mobile Navigation**: "Floating Dock" style navigation with advanced glassmorphism and animations.
   - **Profile**: New "Glass Hero" layout featuring large avatar, floating glass stats, and dynamic gradients.
@@ -22,7 +22,7 @@ A major consolidated release that restores lost features, implements the new "Gl
 - **Gamification**: Restored Streak tracking functionality (Database Migration + Logic restoration).
 - **SEO**: Comprehensive dynamic metadata integration for Landing Page, Modules, and Dashboard.
 
-### Fixed
+#### Fixes
 - **Performance**: Restored `useTextSelection` hook with debounce logic to prevent UI freezing during text selection.
 - **Auth**: Restored optimized authentication data fetching strategy using separate queries to bypass missing RPC.
 - **Progress Persistence**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.
@@ -423,7 +423,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.8.0 | Feb 1, 2026 | Restoration, Design System & Stabilization |
+| 1.8.0 | February 1, 2026 | Restoration, Design System & Stabilization |
 | 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |

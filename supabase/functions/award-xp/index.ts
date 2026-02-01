@@ -45,36 +45,35 @@ serve(async (req) => {
       });
     }
 
-    // Use Service Role for DB operations to ensure security
+    // Use Service Role for DB operations
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Check Progress & Claim Status
-    const { data: progress, error: progressError } = await supabaseAdmin
-        .from("user_progress")
-        .select("is_completed, progress_percent, reward_claimed")
-        .eq("user_id", user.id)
-        .eq("module_id", module_id)
-        .single();
+    // 1. Detect APK status
+    const userAgent = req.headers.get("user-agent") || "";
+    const isApk = userAgent.includes("LearnInk-APK"); // Targeted detection for official APK
 
-    if (progressError || !progress) {
+    // 2. Fetch System Settings & User Profile
+    const [settingsRes, profileRes, progressRes] = await Promise.all([
+        supabaseAdmin.from("system_settings").select("key, value"),
+        supabaseAdmin.from("profiles").select("xp, points, labels, is_premium").eq("id", user.id).single(),
+        supabaseAdmin.from("user_progress").select("is_completed, progress_percent, reward_claimed").eq("user_id", user.id).eq("module_id", module_id).single()
+    ]);
+
+    if (progressRes.error || !progressRes.data) {
          return new Response(JSON.stringify({ error: "Progress not found" }), {
             status: 404,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
     }
 
-    if (progress.reward_claimed) {
+    if (progressRes.data.reward_claimed) {
         return new Response(JSON.stringify({ error: "Reward already claimed", claimed: true }), {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
     }
 
-    // Allow claim if completed OR progress >= 100
-    // Sometimes progress calculation might be slightly off (e.g. 99.9), but usually explicit completion is best.
-    // We check both for robustness.
-    const isEligible = progress.is_completed || (progress.progress_percent ?? 0) >= 100;
-
+    const isEligible = progressRes.data.is_completed || (progressRes.data.progress_percent ?? 0) >= 100;
     if (!isEligible) {
          return new Response(JSON.stringify({ error: "Module not completed yet" }), {
             status: 400,
@@ -82,55 +81,83 @@ serve(async (req) => {
         });
     }
 
-    // 2. Calculate Reward
-    // Random between 50 and 150
-    const xpReward = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
+    const settings = (settingsRes.data || []).reduce((acc, curr) => {
+        acc[curr.key] = curr.value;
+        return acc;
+    }, {} as Record<string, any>);
 
-    // 3. Update Transaction (XP + Flag)
+    const profile = profileRes.data;
+    const globalMultiplier = parseFloat(settings.global_xp_multiplier || "1.0");
+    const apkBonus = parseFloat(settings.apk_base_bonus || "0.0");
 
-    // Update flag first
+    // 3. Calculate Multipliers
+    let combinedMultiplier = globalMultiplier;
+
+    // APK Bonus
+    if (isApk) {
+        combinedMultiplier += apkBonus;
+    }
+
+    // Label Multipliers
+    const userLabels = profile?.labels || [];
+    if (userLabels.length > 0) {
+        const { data: labelConfigs } = await supabaseAdmin
+            .from("label_configs")
+            .select("multiplier")
+            .in("id", userLabels)
+            .eq("is_active", true);
+
+        if (labelConfigs && labelConfigs.length > 0) {
+            // Apply the highest multiplier found in labels
+            const maxLabelMultiplier = Math.max(...labelConfigs.map(l => parseFloat(l.multiplier as any)));
+            combinedMultiplier *= maxLabelMultiplier;
+        }
+    }
+
+    // 4. Calculate Final Reward
+    const baseReward = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
+    const xpReward = Math.floor(baseReward * combinedMultiplier);
+    const pointsReward = Math.floor(xpReward * 0.1); // 10% of XP becomes InkPoints
+
+    // 5. Update Database
+    // Mark as claimed
     const { error: updateError } = await supabaseAdmin
         .from("user_progress")
         .update({ reward_claimed: true })
         .eq("user_id", user.id)
         .eq("module_id", module_id);
 
-    if (updateError) {
-        throw updateError;
-    }
+    if (updateError) throw updateError;
 
-    // Get current XP
-    const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("xp")
-        .eq("id", user.id)
-        .single();
+    // Update Profile (XP + Points)
+    const newXp = (profile?.xp || 0) + xpReward;
+    const newPoints = (profile?.points || 0) + pointsReward;
 
-    const currentXp = profile?.xp || 0;
-    const newXp = currentXp + xpReward;
-
-    // Update XP
     const { error: profileError } = await supabaseAdmin
         .from("profiles")
-        .update({ xp: newXp })
+        .update({ xp: newXp, points: newPoints })
         .eq("id", user.id);
 
     if (profileError) {
-        // If this fails, we have a partial state: reward claimed but XP not given.
-        // In a production system, we would revert 'reward_claimed' or use a stored procedure (RPC).
-        // For this task, we will log it.
-        console.error("Failed to update XP after marking claimed:", profileError);
-        // We could try to revert:
+        // Revert claim flag if possible
         await supabaseAdmin
             .from("user_progress")
             .update({ reward_claimed: false })
             .eq("user_id", user.id)
             .eq("module_id", module_id);
-
-        throw new Error("Failed to update profile XP");
+        throw new Error("Failed to update profile data");
     }
 
-    return new Response(JSON.stringify({ success: true, xp_gained: xpReward }), {
+    return new Response(JSON.stringify({
+        success: true,
+        xp_gained: xpReward,
+        points_gained: pointsReward,
+        multipliers: {
+            global: globalMultiplier,
+            apk: isApk ? (1 + apkBonus) : 1,
+            labels: combinedMultiplier / (globalMultiplier * (isApk ? (1 + apkBonus) : 1))
+        }
+    }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

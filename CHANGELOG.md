@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.0] - February 14, 2026
+
+### Super Admin Upgrade, APK Loyalty & non-Cash Premium
+
+A major feature update introducing advanced administrative controls, specialized rewards for mobile users, and a sustainable loyalty economy using "InkPoints".
+
+#### Improvements
+- **Super Admin Console**: Launched "System Control" panel for top-level management.
+  - **Global Economy**: Real-time management of Global XP Multipliers and APK-specific bonuses.
+  - **Maintenance Mode**: One-click system lockdown for updates, ensuring data integrity during maintenance.
+  - **Broadcast System**: Integrated global announcement banner with dynamic content control.
+  - **Label Management**: CRUD interface for managing user labels (e.g., pioneer, loyal) and their associated XP multipliers.
+- **Loyalty & Premium System**:
+  - **non-Cash Store**: Introduced "LearnInk Elite" where users can exchange InkPoints (earned via learning) for Premium status.
+  - **Elite Status**: Premium members receive automated XP boosts, exclusive profile VFX, and glowing avatar borders.
+  - **Points Economy**: Automated "InkPoints" awarding logic integrated into the XP engine.
+- **Mobile & APK Experience**:
+  - **Automated Detection**: Intelligent APK detection via User-Agent to apply hardware-based loyalty bonuses.
+  - **Offline Mode**: Implemented background synchronization for learning progress, allowing seamless study without internet connectivity.
+  - **Label Multipliers**: Multi-tier multiplier system (up to 3x) based on user labels like 'sepuh' or 'early adopter'.
+
+#### Fixes
+- **Data Selection**: Optimized `useUsers` and `profiles` selection to include new gamification fields (`labels`, `points`) without performance regression.
+- **Visual Feedback**: Added `isPremium` support to core UI components for enhanced brand identity.
+
+#### Patches
+- **Database Schema**: Expanded `profiles` table and created `system_settings` / `label_configs` with robust RLS policies.
+
+---
+
 ## [1.8.0] - February 1, 2026
 
 ### Restoration, Design System & Stabilization
@@ -423,6 +453,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.9.0 | February 14, 2026 | Super Admin Console, APK Loyalty & Premium |
 | 1.8.0 | February 1, 2026 | Restoration, Design System & Stabilization |
 | 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |

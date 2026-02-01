@@ -45,6 +45,7 @@ const ModuleLearn = lazy(() => import("./pages/learning/ModuleLearn"));
 const ManageSources = lazy(() => import("./pages/admin/ManageSources"));
 const ContentApproval = lazy(() => import("./pages/admin/ContentApproval"));
 const IntegrationManager = lazy(() => import("./pages/admin/IntegrationManager"));
+const SystemControl = lazy(() => import("./pages/admin/SystemControl"));
 
 // ============================================
 // QUERY CLIENT CONFIG
@@ -130,6 +131,14 @@ const App = () => (
                             <ErrorBoundary>
                               <DashboardHome />
                             </ErrorBoundary>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard/admin/system"
+                        element={
+                          <ProtectedRoute>
+                            <SystemControl />
                           </ProtectedRoute>
                         }
                       />

@@ -35,7 +35,10 @@ import {
   MoreHorizontal,
   Menu,
   Crown,
-  Inbox
+  Inbox,
+  ShieldAlert,
+  Megaphone,
+  AlertTriangle
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -171,6 +174,7 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
         { href: "/dashboard/admin/approval", label: "Inbox", icon: Inbox },
         { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
         { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
+        { href: "/dashboard/admin/system", label: "System Control", icon: ShieldAlert },
         { href: "/dashboard/settings", label: "System Settings", icon: Settings },
       ],
     },
@@ -520,6 +524,24 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
     const { loading, role } = useAuth();
     const currentRole: AppRole = role ?? "user";
 
+    // Fetch System Settings (Broadcast & Maintenance)
+    const { data: systemSettings } = useQuery({
+        queryKey: ["system-settings-global"],
+        queryFn: async () => {
+          const { data, error } = await supabase.from("system_settings").select("*");
+          if (error) throw error;
+          return data.reduce((acc, curr) => {
+            acc[curr.key] = curr.value;
+            return acc;
+          }, {} as Record<string, any>);
+        },
+        refetchInterval: 60000, // Refresh every minute
+    });
+
+    const isMaintenance = systemSettings?.maintenance_mode === "true" || systemSettings?.maintenance_mode === true;
+    const broadcast = systemSettings?.broadcast_message;
+    const isAdminUser = role === 'admin' || role === 'superadmin';
+
     // Fetch pending approval count for admin - Lifted up to share between Sidebar and MobileNav
     const { data: pendingCount = 0 } = useQuery({
       queryKey: ["pending-approvals"],
@@ -600,7 +622,32 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
                 {/* Add bottom padding for mobile to account for floating nav */}
                 <main className="flex-1 p-4 md:p-8 pt-4 pb-32 md:pb-8">
-                    {children}
+                    {/* Broadcast Banner */}
+                    {broadcast?.active && (
+                      <div className="mb-6 p-4 glass-liquid border-amber-500/20 rounded-2xl flex items-start gap-4 animate-in fade-in slide-in-from-top-4 duration-500">
+                        <div className="p-2 bg-amber-500/10 rounded-xl">
+                          <Megaphone className="h-5 w-5 text-amber-500" />
+                        </div>
+                        <div>
+                          <h4 className="font-bold text-sm text-amber-500">{broadcast.title}</h4>
+                          <p className="text-sm text-muted-foreground">{broadcast.content}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {isMaintenance && !isAdminUser ? (
+                      <div className="h-[60vh] flex flex-col items-center justify-center text-center space-y-4">
+                        <div className="p-6 bg-red-500/10 rounded-full">
+                          <AlertTriangle className="h-12 w-12 text-red-500" />
+                        </div>
+                        <h2 className="text-2xl font-bold">Maintenance Mode</h2>
+                        <p className="text-muted-foreground max-w-md">
+                          LearnInk sedang dalam pemeliharaan rutin. Kami akan segera kembali!
+                        </p>
+                      </div>
+                    ) : (
+                      children
+                    )}
                 </main>
             </SidebarInset>
         </SidebarProvider>

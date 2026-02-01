@@ -15,6 +15,8 @@ export interface UserWithRole {
   avatar_url: string | null;
   created_at: string | null;
   role: AppRole;
+  labels?: string[];
+  points?: number;
 }
 
 export interface UsersResponse {
@@ -86,7 +88,7 @@ export function useUsers(page = 1, limit = 50, search = "") {
 
       let query = supabase
         .from('profiles')
-        .select('id, display_name, avatar_url, created_at', { count: 'exact' });
+        .select('id, display_name, avatar_url, created_at, labels, points', { count: 'exact' });
 
       if (search) {
         query = query.ilike('display_name', `%${search}%`);
@@ -115,6 +117,8 @@ export function useUsers(page = 1, limit = 50, search = "") {
         avatar_url: profile.avatar_url,
         created_at: profile.created_at,
         role: roleMap.get(profile.id) || 'user',
+        labels: (profile as any).labels || [],
+        points: (profile as any).points || 0,
       }));
 
       return {

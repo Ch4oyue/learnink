@@ -38,3 +38,9 @@
 - **Reasoning**: The default `react-syntax-highlighter` import includes all languages, resulting in a ~756kB chunk.
 - **Implementation**: Switched to `react-syntax-highlighter/dist/esm/prism-light` and registered only used languages (python, js, ts, bash, json, css, html, markdown).
 - **Result**: `MarkdownRenderer` chunk size reduced from **756.57 kB** to **189.29 kB** (**75% reduction**).
+
+### [2026-02-15] ModuleEditor Re-render Optimization
+- **Action**: Refactored `ModuleEditor.tsx` to eliminate excessive re-renders.
+- **Reasoning**: The previous implementation used a root-level `watch()` from `react-hook-form`, causing the entire editor (including settings inputs and the heavy icon grid) to re-render on every keystroke in the main content `Textarea`.
+- **Implementation**: Removed root-level `watch()`. Extracted dynamic UI sections into isolated components (`ModulePreviewCard` and `ModuleContentPreview`) that use `useWatch` internally. This isolates the re-render scope to only the components that actually need the data.
+- **Result**: Typing in the Markdown editor no longer triggers re-renders of the Settings Card or Icon Grid, significantly improving responsiveness on large modules.

@@ -7,11 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.8.0] - February 1, 2026
+## [1.8.1] - February 1, 2026
 
-### Restoration, Design System & Stabilization
+### Restoration, Design System & Stabilization (Consolidated)
 
-A major consolidated release that restores lost features, implements the new "Glass/Liquid" design system, and stabilizes critical navigation bugs.
+A major consolidated release that restores lost features, implements the new "Glass/Liquid" design system, stabilizes critical navigation bugs, and hardens gamification security.
 
 #### Improvements
 - **Design System**: Implemented "Glass/Liquid" design language across core views.
@@ -23,6 +23,8 @@ A major consolidated release that restores lost features, implements the new "Gl
 - **SEO**: Comprehensive dynamic metadata integration for Landing Page, Modules, and Dashboard.
 
 #### Fixes
+- **Security**: Refactored `award-xp` Edge Function to use atomic operations, preventing race conditions and XP grinding.
+- **Branding**: Synced legacy "LearnAI" instances to "LearnInk" in PWA manifest and SEO metadata.
 - **Performance**: Restored `useTextSelection` hook with debounce logic to prevent UI freezing during text selection.
 - **Auth**: Restored optimized authentication data fetching strategy using separate queries to bypass missing RPC.
 - **Progress Persistence**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.
@@ -423,7 +425,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.8.0 | February 1, 2026 | Restoration, Design System & Stabilization |
+| 1.8.1 | February 1, 2026 | Restoration, Design System & Security Hardening |
 | 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |

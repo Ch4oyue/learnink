@@ -90,6 +90,15 @@ export default defineConfig(({ mode }) => ({
             icons: [{ src: 'icon-192.png', sizes: '192x192' }]
           }
         ],
+        share_target: {
+          action: '/dashboard/share-target',
+          method: 'GET',
+          params: {
+            title: 'title',
+            text: 'text',
+            url: 'url'
+          }
+        },
         screenshots: [
           {
             src: 'https://ik.imagekit.io/focustimerin/learnink_landing?updatedAt=1757343104763',

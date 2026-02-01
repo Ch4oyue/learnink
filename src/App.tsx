@@ -37,6 +37,7 @@ const DashboardRequests = lazy(() => import("./pages/dashboard/DashboardRequests
 const CourseDetail = lazy(() => import("./pages/dashboard/CourseDetail"));
 const ComingSoon = lazy(() => import("./pages/dashboard/ComingSoon"));
 const SecondBrain = lazy(() => import("./pages/dashboard/SecondBrain"));
+const ShareTargetHandler = lazy(() => import("./pages/dashboard/ShareTargetHandler"));
 
 // Learning Pages
 const ModuleLearn = lazy(() => import("./pages/learning/ModuleLearn"));
@@ -131,6 +132,14 @@ const App = () => (
                             <ErrorBoundary>
                               <DashboardHome />
                             </ErrorBoundary>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard/share-target"
+                        element={
+                          <ProtectedRoute>
+                            <ShareTargetHandler />
                           </ProtectedRoute>
                         }
                       />

@@ -100,19 +100,21 @@ export default function DashboardRequests() {
   const [searchParams] = useSearchParams();
   const initialTab = (searchParams.get("tab") as RequestType) || "module";
   const initialTopic = searchParams.get("topic") || "";
+  const initialDescription = searchParams.get("description") || "";
+  const shouldOpenCreate = searchParams.get("openCreate") === "true";
 
   const [activeTab, setActiveTab] = useState<RequestType>(initialTab);
-  const [searchQuery, setSearchQuery] = useState(initialTopic);
+  const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [generateId, setGenerateId] = useState<string | null>(null);
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(shouldOpenCreate);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form State
   const [formData, setFormData] = useState({
     topic: initialTopic,
-    description: "",
+    description: initialDescription,
     category: "",
     priority: "medium",
     imageUrl: ""

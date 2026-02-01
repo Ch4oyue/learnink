@@ -23,26 +23,40 @@ export function useModuleNavigation({
     return parseModuleSections(moduleContent);
   }, [moduleContent]);
 
-  // 2. Local State
-  const [currentSectionId, setCurrentSectionId] = useState<string | null>(null);
+  // 2. Local State & Persistence
+  const [currentSectionId, setCurrentSectionId] = useState<string | null>(() => {
+    if (typeof window !== "undefined" && moduleId) {
+      return localStorage.getItem(`last_section_${moduleId}`);
+    }
+    return null;
+  });
+
   const [localMaxProgress, setLocalMaxProgress] = useState(0);
   const [maxVisitedSectionIndex, setMaxVisitedSectionIndex] = useState(0);
+  const isInitialMountRef = useRef(true);
 
-  // Set initial section
+  // Set initial section if none found in storage
   useEffect(() => {
     if (order.length > 0 && !currentSectionId) {
       setCurrentSectionId(order[0]);
     }
   }, [order, currentSectionId]);
 
+  // Save section to storage on change
+  useEffect(() => {
+    if (moduleId && currentSectionId) {
+      localStorage.setItem(`last_section_${moduleId}`, currentSectionId);
+    }
+  }, [moduleId, currentSectionId]);
+
   // 3. Sync with Server Progress
   useEffect(() => {
-    if (serverProgress) {
+    if (serverProgress !== undefined) {
       setLocalMaxProgress((prev) => Math.max(prev, serverProgress));
 
       // Calculate max visited index from server progress
       if (order.length > 0) {
-        const estimatedIndex = Math.ceil((serverProgress / 100) * order.length) - 1;
+        const estimatedIndex = Math.floor((serverProgress / 100) * order.length);
         setMaxVisitedSectionIndex((prev) => Math.max(prev, estimatedIndex));
       }
     }
@@ -58,8 +72,11 @@ export function useModuleNavigation({
     (newProgress: number) => {
       if (!userId || !moduleId) return;
 
-      // Only save if progress increased and is new
-      if (newProgress > lastSavedProgressRef.current) {
+      // CRITICAL: Only save if new progress is strictly greater than what's on server
+      // OR what we last saved. This prevents the "reset to 0 on refresh" bug.
+      const baseline = Math.max(serverProgress || 0, lastSavedProgressRef.current);
+
+      if (newProgress > baseline) {
         lastSavedProgressRef.current = newProgress;
         onUpdateProgress({
           userId,
@@ -69,7 +86,7 @@ export function useModuleNavigation({
         });
       }
     },
-    [userId, moduleId, onUpdateProgress]
+    [userId, moduleId, onUpdateProgress, serverProgress]
   );
 
   const debouncedSaveProgress = useDebouncedCallback(saveProgress, 3000);
@@ -115,16 +132,20 @@ export function useModuleNavigation({
   useEffect(() => {
     if (order.length === 0 || currentSectionIndex < 0) return;
 
+    // Don't auto-save if we haven't even loaded server progress yet
+    if (serverProgress === undefined) return;
+
     // Update max visited index
     setMaxVisitedSectionIndex(prev => Math.max(prev, currentSectionIndex));
 
     const newProgress = Math.round(((currentSectionIndex + 1) / order.length) * 100);
 
+    // Only update and trigger save if it's actual progress
     if (newProgress > localMaxProgress) {
       setLocalMaxProgress(newProgress);
       debouncedSaveProgress(newProgress);
     }
-  }, [currentSectionIndex, order.length, localMaxProgress, debouncedSaveProgress]);
+  }, [currentSectionIndex, order.length, localMaxProgress, debouncedSaveProgress, serverProgress]);
 
   return {
     currentSectionId,

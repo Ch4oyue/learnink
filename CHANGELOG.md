@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.3] - February 1, 2026
+
+### Progress Persistence & Navigation Stabilization
+
+Fixes critical bugs in the learning module where progress could reset on refresh and the last visited section was not remembered.
+
+#### Fixes (2)
+- **Progress Reset Bug**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.
+- **Section Persistence**: Implemented `localStorage` persistence for the current section index, ensuring users return to where they left off after a refresh.
+
 ## [1.7.2] - January 31, 2026
 
 ### Accessibility Compliance & Interaction Optimization
@@ -422,6 +432,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.7.3 | Feb 1, 2026 | Progress Persistence & Navigation Stabilization |
 | 1.7.2 | Jan 31, 2026 | Accessibility Compliance & Interaction Optimization |
 | 1.7.1 | Jan 31, 2026 | SEO, Navigation Feedback & Smart Prefetching |
 | 1.7.0 | Jan 31, 2026 | Mobile Performance & Low-End Optimization |

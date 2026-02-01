@@ -98,6 +98,11 @@ serve(async (req) => {
         combinedMultiplier += apkBonus;
     }
 
+    // Premium Multiplier (1.5x)
+    if (profile?.is_premium) {
+        combinedMultiplier *= 1.5;
+    }
+
     // Label Multipliers
     const userLabels = profile?.labels || [];
     if (userLabels.length > 0) {

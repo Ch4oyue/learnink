@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +19,10 @@ import {
   Plus,
   Trash2,
   Loader2,
-  AlertTriangle
+  AlertTriangle,
+  History,
+  Activity,
+  CheckCircle
 } from "lucide-react";
 import {
   Table,
@@ -28,6 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 
 interface SystemSetting {
   key: string;
@@ -40,6 +45,16 @@ interface LabelConfig {
   multiplier: number;
   description: string;
   is_active: boolean;
+}
+
+interface SecurityLog {
+  id: string;
+  event_type: string;
+  ip_address: string;
+  endpoint: string;
+  error_message: string;
+  created_at: string;
+  metadata: Record<string, unknown>;
 }
 
 export default function SystemControl() {
@@ -67,6 +82,19 @@ export default function SystemControl() {
       const { data, error } = await supabase.from("label_configs").select("*").order("id");
       if (error) throw error;
       return data as LabelConfig[];
+    }
+  });
+
+  const { data: securityLogs, isLoading: logsLoading } = useQuery({
+    queryKey: ["security-logs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("security_logs")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(10);
+      if (error) throw error;
+      return data as SecurityLog[];
     }
   });
 
@@ -124,7 +152,7 @@ export default function SystemControl() {
   // --- HELPERS ---
   const getSetting = (key: string) => settings?.find(s => s.key === key);
 
-  if (settingsLoading || labelsLoading) {
+  if (settingsLoading || labelsLoading || logsLoading) {
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center py-20">
@@ -276,6 +304,69 @@ export default function SystemControl() {
             </CardFooter>
           </Card>
         </div>
+
+        {/* Security Audit Trail (Quick View) */}
+        <Card className="glass-liquid border-white/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <History className="h-5 w-5 text-amber-500" />
+              Security Audit Trail
+            </CardTitle>
+            <CardDescription>
+              10 aktivitas keamanan terakhir yang tercatat di sistem.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Waktu</TableHead>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Endpoint</TableHead>
+                  <TableHead>IP Address</TableHead>
+                  <TableHead>Status</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {securityLogs?.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell className="text-xs text-muted-foreground">
+                      {new Date(log.created_at).toLocaleString('id-ID')}
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="capitalize">
+                        {log.event_type.replace(/_/g, ' ')}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-xs font-mono">{log.endpoint}</TableCell>
+                    <TableCell className="text-xs">{log.ip_address}</TableCell>
+                    <TableCell>
+                      {log.error_message ? (
+                        <span className="text-destructive text-xs">{log.error_message}</span>
+                      ) : (
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+                {securityLogs?.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
+                      Tidak ada log keamanan yang ditemukan.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter>
+            <Button variant="ghost" size="sm" className="w-full gap-2" asChild>
+               <Link to="/dashboard/admin/logs">
+                 <Activity className="h-4 w-4" /> Lihat Semua Log
+               </Link>
+            </Button>
+          </CardFooter>
+        </Card>
 
         {/* Label Configs Management */}
         <Card className="glass-liquid border-white/10">

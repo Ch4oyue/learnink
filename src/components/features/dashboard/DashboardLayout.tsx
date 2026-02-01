@@ -168,26 +168,33 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
   ],
   admin: [
     {
+      title: "Administration",
       items: [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/users", label: "Users", icon: Users },
         { href: "/dashboard/admin/approval", label: "Inbox", icon: Inbox },
         { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
         { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
-        { href: "/dashboard/admin/system", label: "System Control", icon: ShieldAlert },
-        { href: "/dashboard/settings", label: "System Settings", icon: Settings },
+        { href: "/dashboard/settings", label: "Admin Settings", icon: Settings },
       ],
     },
   ],
   superadmin: [
     {
+      title: "Administration",
       items: [
         { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
         { href: "/dashboard/users", label: "Users", icon: Users },
         { href: "/dashboard/admin/approval", label: "Inbox", icon: Inbox },
         { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
         { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
-        { href: "/dashboard/settings", label: "System Settings", icon: Settings },
+        { href: "/dashboard/settings", label: "Admin Settings", icon: Settings },
+      ],
+    },
+    {
+      title: "Super Control",
+      items: [
+        { href: "/dashboard/admin/system", label: "System Control", icon: ShieldAlert },
       ],
     },
   ],

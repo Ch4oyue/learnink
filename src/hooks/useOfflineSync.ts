@@ -51,7 +51,13 @@ export function useOfflineSync() {
 
     for (const item of pendingSyncs) {
       try {
-        const updateData: any = {
+        const updateData: {
+          user_id: string;
+          module_id: string;
+          progress_percent: number;
+          is_completed?: boolean;
+          completed_at?: string;
+        } = {
           user_id: item.userId,
           module_id: item.moduleId,
           progress_percent: item.progressPercent,

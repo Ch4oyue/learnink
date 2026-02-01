@@ -110,16 +110,19 @@ export function useUsers(page = 1, limit = 50, search = "") {
       const roleMap = new Map<string, AppRole>();
       roles?.forEach(r => roleMap.set(r.user_id, r.role as AppRole));
 
-      const users = (profiles || []).map(profile => ({
-        id: profile.id,
-        email: null,
-        display_name: profile.display_name,
-        avatar_url: profile.avatar_url,
-        created_at: profile.created_at,
-        role: roleMap.get(profile.id) || 'user',
-        labels: (profile as any).labels || [],
-        points: (profile as any).points || 0,
-      }));
+      const users = (profiles || []).map(profile => {
+        const p = profile as { id: string; display_name: string | null; avatar_url: string | null; created_at: string | null; labels?: string[]; points?: number };
+        return {
+          id: p.id,
+          email: null,
+          display_name: p.display_name,
+          avatar_url: p.avatar_url,
+          created_at: p.created_at,
+          role: roleMap.get(p.id) || 'user',
+          labels: p.labels || [],
+          points: p.points || 0,
+        };
+      });
 
       return {
         users,

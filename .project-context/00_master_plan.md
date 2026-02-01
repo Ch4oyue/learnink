@@ -32,11 +32,10 @@
 - [x] **v1.6.1**: Gamification (Streaks/XP), SEO Architecture. (Restored in v1.8.0)
 - [x] **v1.6.2**: Design System Overhaul (Glass/Liquid) - *Completed in v1.8.0*
 - [x] **v1.7.x**: Git Sync & Stability Fixes.
-- [x] **v1.8.1**: **Restoration & Consolidation** (Current)
+- [x] **v1.8.0**: **Restoration & Consolidation** (Current)
     - [x] Restore v1.6.1 Features (Streaks, SEO).
     - [x] Implement "Glass/Liquid" Design System (Mobile Nav, Profile, Cards).
-    - [x] Finalize "Second Brain" Deep Integration.
-    - [x] Security Hardening (Atomic XP Award).
+    - [x] Finalize "Second Brain" Deep Integration.AI
 
 ### 📍 Fase 2: Enhancement (Dalam Proses)
 - [ ] Quiz Generation dengan AI

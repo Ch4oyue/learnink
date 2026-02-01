@@ -25,7 +25,7 @@ serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Authorization required" }), {
+      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -84,7 +84,7 @@ serve(async (req) => {
     const settings = (settingsRes.data || []).reduce((acc, curr) => {
         acc[curr.key] = curr.value;
         return acc;
-    }, {} as Record<string, any>);
+    }, {} as Record<string, unknown>);
 
     const profile = profileRes.data;
     const globalMultiplier = parseFloat(settings.global_xp_multiplier || "1.0");
@@ -109,7 +109,7 @@ serve(async (req) => {
 
         if (labelConfigs && labelConfigs.length > 0) {
             // Apply the highest multiplier found in labels
-            const maxLabelMultiplier = Math.max(...labelConfigs.map(l => parseFloat(l.multiplier as any)));
+            const maxLabelMultiplier = Math.max(...labelConfigs.map(l => parseFloat(l.multiplier as unknown as string)));
             combinedMultiplier *= maxLabelMultiplier;
         }
     }

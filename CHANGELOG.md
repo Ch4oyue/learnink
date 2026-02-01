@@ -39,9 +39,9 @@ A major feature update introducing advanced administrative controls, specialized
 
 ## [1.8.0] - February 1, 2026
 
-### Restoration, Design System & Stabilization (Consolidated)
+### Restoration, Design System & Stabilization
 
-A major consolidated release that restores lost features, implements the new "Glass/Liquid" design system, stabilizes critical navigation bugs, and hardens gamification security.
+A major consolidated release that restores lost features, implements the new "Glass/Liquid" design system, and stabilizes critical navigation bugs.
 
 #### Improvements
 - **Design System**: Implemented "Glass/Liquid" design language across core views.
@@ -53,8 +53,6 @@ A major consolidated release that restores lost features, implements the new "Gl
 - **SEO**: Comprehensive dynamic metadata integration for Landing Page, Modules, and Dashboard.
 
 #### Fixes
-- **Security**: Refactored `award-xp` Edge Function to use atomic operations, preventing race conditions and XP grinding.
-- **Branding**: Synced legacy "LearnAI" instances to "LearnInk" in PWA manifest and SEO metadata.
 - **Performance**: Restored `useTextSelection` hook with debounce logic to prevent UI freezing during text selection.
 - **Auth**: Restored optimized authentication data fetching strategy using separate queries to bypass missing RPC.
 - **Progress Persistence**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.

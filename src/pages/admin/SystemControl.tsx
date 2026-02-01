@@ -31,7 +31,7 @@ import {
 
 interface SystemSetting {
   key: string;
-  value: any;
+  value: unknown;
   description: string;
 }
 
@@ -85,7 +85,7 @@ export default function SystemControl() {
 
   // --- MUTATIONS ---
   const updateSetting = useMutation({
-    mutationFn: async ({ key, value }: { key: string; value: any }) => {
+    mutationFn: async ({ key, value }: { key: string; value: unknown }) => {
       const { error } = await supabase
         .from("system_settings")
         .update({ value, updated_at: new Date().toISOString() })

@@ -533,7 +533,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
           return data.reduce((acc, curr) => {
             acc[curr.key] = curr.value;
             return acc;
-          }, {} as Record<string, any>);
+          }, {} as Record<string, unknown>);
         },
         refetchInterval: 60000, // Refresh every minute
     });

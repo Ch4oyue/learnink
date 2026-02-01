@@ -47,7 +47,7 @@ export function PremiumStore() {
       const baseDate = currentPremiumUntil > new Date() ? currentPremiumUntil : new Date();
       const newPremiumUntil = addDays(baseDate, days).toISOString();
 
-      const updateData: any = {
+      const updateData: { is_premium: boolean; premium_until: string; points?: number } = {
         is_premium: true,
         premium_until: newPremiumUntil,
       };

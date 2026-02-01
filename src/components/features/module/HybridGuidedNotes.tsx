@@ -24,9 +24,11 @@ interface HybridGuidedNotesProps {
     notes: LearningNote[];
     isLoading?: boolean;
     onCreateNote?: (content: string) => void;
+    onUpdateNote?: (id: string, content: string) => void;
     onDeleteNote?: (noteId: string) => void;
     onExportPdf?: () => void;
     isCreating?: boolean;
+    isUpdating?: boolean;
     isDeleting?: boolean;
 }
 
@@ -40,16 +42,24 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
     notes,
     isLoading,
     onCreateNote,
+    onUpdateNote,
     onDeleteNote,
     onExportPdf,
     isCreating,
+    isUpdating,
     isDeleting,
 }: HybridGuidedNotesProps) {
     const [newNoteText, setNewNoteText] = useState("");
+    const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
 
     const handleSubmit = () => {
-        if (newNoteText.trim() && onCreateNote) {
-            onCreateNote(newNoteText.trim());
+        if (newNoteText.trim()) {
+            if (editingNoteId && onUpdateNote) {
+                onUpdateNote(editingNoteId, newNoteText.trim());
+                setEditingNoteId(null);
+            } else if (onCreateNote) {
+                onCreateNote(newNoteText.trim());
+            }
             setNewNoteText("");
         }
     };
@@ -103,6 +113,11 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                                 key={note.id}
                                 note={note}
                                 onDelete={onDeleteNote}
+                                onEdit={(note) => {
+                                    setEditingNoteId(note.id);
+                                    setNewNoteText(note.content);
+                                }}
+                                isEditing={editingNoteId === note.id}
                                 isDeleting={isDeleting}
                             />
                         ))
@@ -120,14 +135,29 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                         value={newNoteText}
                         onChange={(e) => setNewNoteText(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder="Type '/' for commands"
-                        className="w-full bg-muted border-none shadow-subtle rounded-xl py-3.5 pl-12 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/20 resize-none min-h-[56px]"
+                        placeholder={editingNoteId ? "Edit catatan..." : "Type '/' for commands"}
+                        className={cn(
+                            "w-full bg-muted border-none shadow-subtle rounded-xl py-3.5 pl-12 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/20 resize-none min-h-[56px]",
+                            editingNoteId && "ring-2 ring-primary/30"
+                        )}
                     />
+                    {/* Cancel Edit Button */}
+                    {editingNoteId && (
+                         <button
+                            onClick={() => {
+                                setEditingNoteId(null);
+                                setNewNoteText("");
+                            }}
+                            className="absolute left-12 -top-2 bg-destructive text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm hover:scale-105 transition-transform"
+                         >
+                            Batal Edit
+                         </button>
+                    )}
                     {/* Submit Button */}
                     <Button
                         size="icon"
                         onClick={handleSubmit}
-                        disabled={!newNoteText.trim() || isCreating}
+                        disabled={!newNoteText.trim() || isCreating || isUpdating}
                         className={cn(
                             "absolute right-2 top-2 h-8 w-8 rounded-lg shadow-md transition-all",
                             newNoteText.trim()
@@ -135,7 +165,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                                 : "opacity-0 scale-90"
                         )}
                     >
-                        {isCreating ? (
+                        {isCreating || isUpdating ? (
                             <Loader2 className="h-4 w-4 animate-spin" />
                         ) : (
                             <ArrowUp className="h-4 w-4" />
@@ -145,7 +175,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                 <div className="flex justify-between items-center mt-3 px-1">
                     <div className="flex gap-3">
                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
-                            Markdown
+                            {editingNoteId ? "Editing Mode" : "Markdown"}
                         </span>
                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
                             Shortcuts
@@ -166,16 +196,19 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
 interface NoteCardProps {
     note: LearningNote;
     onDelete?: (noteId: string) => void;
+    onEdit?: (note: LearningNote) => void;
+    isEditing?: boolean;
     isDeleting?: boolean;
 }
 
-function NoteCard({ note, onDelete, isDeleting }: NoteCardProps) {
+function NoteCard({ note, onDelete, onEdit, isEditing, isDeleting }: NoteCardProps) {
     const isHighlightedNote = !!note.highlighted_text;
 
     return (
         <div
             className={cn(
                 "bg-card p-5 rounded-2xl border group transition-all duration-300 hover:shadow-md",
+                isEditing ? "border-primary ring-2 ring-primary/10 shadow-lg" :
                 isHighlightedNote
                     ? "border-transparent hover:border-primary/20"
                     : "border-dashed border-border hover:border-primary/50"
@@ -222,10 +255,16 @@ function NoteCard({ note, onDelete, isDeleting }: NoteCardProps) {
                 })}
             </div>
 
-            {/* Edit indicator for user notes */}
+            {/* Action buttons for user notes */}
             {!isHighlightedNote && (
-                <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Edit3 className="h-4 w-4 text-muted-foreground" />
+                <div className="absolute bottom-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                        onClick={() => onEdit?.(note)}
+                        className="p-1 hover:text-primary transition-colors"
+                        aria-label="Edit Catatan"
+                    >
+                        <Edit3 className="h-4 w-4 text-muted-foreground hover:text-primary" />
+                    </button>
                 </div>
             )}
         </div>

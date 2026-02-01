@@ -71,7 +71,7 @@ export function useLearningStats(userId?: string) {
             return fetchLearningStats(userId);
         },
         enabled: !!userId,
-        staleTime: 5 * 60 * 1000, // 5 minutes
+        // inheriting global staleTime from App.tsx (10 min)
         retry: 1,
     });
 }

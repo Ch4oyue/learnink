@@ -3,6 +3,8 @@ import { lazy, Suspense, useMemo, memo } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Components } from 'react-markdown';
+import { Link2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/prism-light';
 import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
 import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
@@ -80,22 +82,63 @@ export const MarkdownRenderer = memo(({
   enableCodeEditor = true,
   variant = 'default',
 }: MarkdownRendererProps) => {
+  const { toast } = useToast();
+
+  const copyLink = (id: string) => {
+    const url = new URL(window.location.href);
+    url.hash = id;
+    navigator.clipboard.writeText(url.toString());
+    toast({ title: "Link bagian disalin!" });
+  };
 
   const components: Components = useMemo(() => ({
     h1: ({ children, ...props }) => {
       const text = String(children);
       const id = `heading-${slugify(text)}`;
-      return <h1 id={id} className="text-3xl font-bold mt-12 mb-6 text-foreground scroll-mt-24" {...props}>{children}</h1>;
+      return (
+        <h1 id={id} className="group/h text-3xl font-bold mt-12 mb-6 text-foreground scroll-mt-24 flex items-center gap-2" {...props}>
+          {children}
+          <button
+            onClick={() => copyLink(id)}
+            className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
+            aria-label="Copy link to this section"
+          >
+            <Link2 className="h-4 w-4" />
+          </button>
+        </h1>
+      );
     },
     h2: ({ children, ...props }) => {
       const text = String(children);
       const id = `heading-${slugify(text)}`;
-      return <h2 id={id} className="text-2xl font-bold mt-12 mb-5 text-foreground scroll-mt-24" {...props}>{children}</h2>;
+      return (
+        <h2 id={id} className="group/h text-2xl font-bold mt-12 mb-5 text-foreground scroll-mt-24 flex items-center gap-2" {...props}>
+          {children}
+          <button
+            onClick={() => copyLink(id)}
+            className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
+            aria-label="Copy link to this section"
+          >
+            <Link2 className="h-4 w-4" />
+          </button>
+        </h2>
+      );
     },
     h3: ({ children, ...props }) => {
       const text = String(children);
       const id = `heading-${slugify(text)}`;
-      return <h3 id={id} className="text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24" {...props}>{children}</h3>;
+      return (
+        <h3 id={id} className="group/h text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24 flex items-center gap-2" {...props}>
+          {children}
+          <button
+            onClick={() => copyLink(id)}
+            className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
+            aria-label="Copy link to this section"
+          >
+            <Link2 className="h-4 w-4" />
+          </button>
+        </h3>
+      );
     },
     a: ({ href, children, ...props }) => {
       const safeHref = sanitizeUrl(href);

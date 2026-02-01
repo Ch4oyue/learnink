@@ -105,7 +105,7 @@ export default function DashboardSettings() {
           <Card>
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
-              <CardDescription>Customize how LearnAI looks on your device</CardDescription>
+              <CardDescription>Customize how LearnInk looks on your device</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -147,7 +147,7 @@ export default function DashboardSettings() {
               {/* Install PWA Section */}
               <div className="mt-8 border-t pt-6">
                 <h3 className="text-base font-medium mb-1">Install Application</h3>
-                <p className="text-sm text-muted-foreground mb-4">Install LearnAI to your device for better experience and fullscreen view.</p>
+                <p className="text-sm text-muted-foreground mb-4">Install LearnInk to your device for better experience and fullscreen view.</p>
                 {isInstalled ? (
                    <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
                      <CheckCircle2 className="h-5 w-5 text-green-500" />

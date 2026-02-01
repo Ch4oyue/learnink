@@ -732,7 +732,7 @@ export default function DashboardProfile() {
             <Card>
               <CardHeader>
                 <CardTitle>Install Application</CardTitle>
-                <CardDescription>Install LearnAI for a better experience</CardDescription>
+                <CardDescription>Install LearnInk for a better experience</CardDescription>
               </CardHeader>
               <CardContent>
                 {isInstalled ? (

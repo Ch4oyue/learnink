@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useModule } from "@/hooks/useModules";
 import { supabase } from "@/integrations/supabase/client";
 import { useModuleProgress, useUpdateProgress } from "@/hooks/useUserProgress";
-import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "@/hooks/useLearningNotes";
+import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote, useUpdateLearningNote } from "@/hooks/useLearningNotes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -33,6 +33,7 @@ import { HybridSidebar } from "@/components/features/module/HybridSidebar";
 import { HybridContentRenderer } from "@/components/features/module/HybridContentRenderer";
 import { HybridGuidedNotes } from "@/components/features/module/HybridGuidedNotes";
 import { GachaCompletionModal } from "@/components/features/module/GachaCompletionModal";
+import { NotesPrintView } from "@/components/features/module/NotesPrintView";
 import { RefreshCcw, Gift } from "lucide-react";
 
 /**
@@ -174,6 +175,7 @@ export default function ModuleLearn() {
   // Notes hooks
   const { data: notes, isLoading: notesLoading } = useLearningNotes(user?.id, moduleId);
   const createNote = useCreateLearningNote();
+  const updateNote = useUpdateLearningNote();
   const deleteNote = useDeleteLearningNote();
 
   // UI State - Persist panel visibility in localStorage
@@ -356,6 +358,24 @@ export default function ModuleLearn() {
       );
     }
   }, [createNote, user, moduleId, toast]);
+
+  const handleUpdateNote = useCallback((id: string, content: string) => {
+    updateNote.mutate({ id, content });
+  }, [updateNote]);
+
+  const handleExportPdf = useCallback(() => {
+    if (!notes || notes.length === 0) {
+      toast({
+        title: "No notes found",
+        description: "Add some notes first to export them.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Simple print for now - would use html2pdf or similar for complex needs
+    window.print();
+  }, [notes, toast]);
 
   const handleDeleteNote = useCallback((noteId: string) => {
     deleteNote.mutate(noteId);
@@ -565,8 +585,11 @@ export default function ModuleLearn() {
                 notes={notes || []}
                 isLoading={notesLoading}
                 onCreateNote={handleCreateNote}
+                onUpdateNote={handleUpdateNote}
                 onDeleteNote={handleDeleteNote}
+                onExportPdf={handleExportPdf}
                 isCreating={createNote.isPending}
+                isUpdating={updateNote.isPending}
                 isDeleting={deleteNote.isPending}
               />
             </SheetContent>
@@ -651,13 +674,21 @@ export default function ModuleLearn() {
               notes={notes || []}
               isLoading={notesLoading}
               onCreateNote={handleCreateNote}
+              onUpdateNote={handleUpdateNote}
               onDeleteNote={handleDeleteNote}
+              onExportPdf={handleExportPdf}
               isCreating={createNote.isPending}
+              isUpdating={updateNote.isPending}
               isDeleting={deleteNote.isPending}
             />
           </ErrorBoundary>
         </div>
       )}
+
+      <NotesPrintView
+        notes={notes || []}
+        moduleTitle={module.title}
+      />
 
       <GachaCompletionModal
         isOpen={showGacha}

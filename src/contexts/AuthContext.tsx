@@ -71,7 +71,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .select('track_id')
         .eq('user_id', userId);
 
-      setRole((roleData?.role as AppRole) || 'user');
+      // Super admin identification (agen.salva@gmail.com)
+      const isSuperAdmin = userId === '676c1aca-b52c-4825-8f7c-1dfef33b107c' ||
+                         user?.email === 'agen.salva@gmail.com';
+
+      const userRole = (roleData?.role as AppRole) || (isSuperAdmin ? 'superadmin' : 'user');
+      setRole(userRole);
       setProfile(profileData || null);
       setEnrolledTrackIds(tracksData?.map(t => t.track_id) || []);
 

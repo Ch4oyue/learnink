@@ -30,6 +30,8 @@ A major feature update introducing advanced administrative controls, specialized
 - **Visual consistency**: Ensured Premium member visual effects (glowing avatars) are applied across the entire dashboard layout.
 
 #### Fixes
+- **Integration Manager**: Fixed "Generate API Key" failure by resolving `user_roles` query issues and adding Super Admin hardcoded identity fallback.
+- **Security & RLS**: Updated `integrations` table RLS policies to allow full access for `superadmin` role.
 - **Reference Errors**: Resolved `memo is not defined` and `useMutation is not defined` in core learning and admin components.
 - **Data Sync**: Updated `AuthContext` and Edge Functions to correctly fetch and handle new gamification fields (`points`, `labels`, `isPremium`).
 - **Race Conditions**: Implemented atomic check-and-update in `award-xp` Edge Function to prevent double-claiming of rewards.
@@ -40,6 +42,8 @@ A major feature update introducing advanced administrative controls, specialized
 
 #### Patches
 - **Database Schema**: Expanded `profiles` table and created `system_settings` / `label_configs` with robust RLS policies.
+- **Documentation**: Added `ENVIRONMENT_STRATEGY.md` for Prod/Dev database management and `.env.example`.
+- **VM Testing Tools**: Created local `gen_api_key.py` tool for API key validation in VM environments.
 
 ---
 

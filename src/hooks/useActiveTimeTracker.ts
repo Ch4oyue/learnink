@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+import { supabase } from '@/integrations/supabase/client';
 
 const IDLE_TIMEOUT_MS = 60 * 1000; // 60 seconds
 const SYNC_INTERVAL_MS = 10 * 1000; // 10 seconds
+const ACTIVITY_UPDATE_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
 
 export function useActiveTimeTracker(moduleId: string | undefined, userId: string | undefined) {
   const lastActivityRef = useRef<number>(Date.now());
+  const lastDbUpdateRef = useRef<number>(0); // Track last DB sync
   const startTimeRef = useRef<number>(Date.now());
   const [totalTime, setTotalTime] = useState(0); // Exposed for UI if needed
 
@@ -38,8 +41,21 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
 
   // Activity listener
   const handleActivity = useCallback(() => {
-    lastActivityRef.current = Date.now();
-  }, []);
+    const now = Date.now();
+    lastActivityRef.current = now;
+
+    // Throttle DB updates to avoid spamming profile updates
+    if (userId && now - lastDbUpdateRef.current > ACTIVITY_UPDATE_THROTTLE_MS) {
+      lastDbUpdateRef.current = now;
+
+      // Fire and forget update
+      supabase.from('profiles').update({
+        last_activity_date: new Date().toISOString()
+      }).eq('id', userId).then(({ error }) => {
+        if (error) logger.error('Failed to update activity', error);
+      });
+    }
+  }, [userId]);
 
   useEffect(() => {
     if (!moduleId || !userId) return;
@@ -79,10 +95,10 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
     const key = `learnink_analytics_${userId}_${moduleId}`;
 
     const save = () => {
-       localStorage.setItem(key, JSON.stringify({
-         timeSpent: totalTimeRef.current,
-         lastUpdated: new Date().toISOString()
-       }));
+      localStorage.setItem(key, JSON.stringify({
+        timeSpent: totalTimeRef.current,
+        lastUpdated: new Date().toISOString()
+      }));
     };
 
     // Auto save every SYNC_INTERVAL

@@ -12,6 +12,9 @@ export interface Profile {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
+  current_streak?: number;
+  longest_streak?: number;
+  last_activity_date?: string;
 }
 
 interface AuthContextType {

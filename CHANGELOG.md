@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.4] - February 01, 2026
+
+### Context Synchronization & Feature Restoration
+
+Stabilized the project state after merging performance updates. Restored lost gamification features and refactored core interaction modules for better maintainability.
+
+#### Improvements (3)
+- **Daily Streaks (Restored)**: Re-implemented streak tracking logic in `types.ts` and `useActiveTimeTracker`, including the `update_user_streak` database migration.
+- **Improved Selection Hook**: Refactored `HybridContentRenderer` to use a new `useTextSelection` hook that incorporates debounced performance optimizations from v1.7.2.
+- **Agent Context Sync**: Updated `Master Plan`, `README`, and `.jules` logs to ensure all AI agents are aligned on the current development roadmap.
+
+#### Fixes (1)
+- **Type Mismatches**: Resolved `AuthContext` and profile type errors by accurately mapping new streak columns in the Supabase schema.
+
 ## [1.7.3] - February 1, 2026
 
 ### Progress Persistence & Navigation Stabilization
@@ -432,6 +446,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.7.4 | Feb 1, 2026 | Context Sync & Feature Restoration |
 | 1.7.3 | Feb 1, 2026 | Progress Persistence & Navigation Stabilization |
 | 1.7.2 | Jan 31, 2026 | Accessibility Compliance & Interaction Optimization |
 | 1.7.1 | Jan 31, 2026 | SEO, Navigation Feedback & Smart Prefetching |

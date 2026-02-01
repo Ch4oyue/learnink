@@ -10,6 +10,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { FloatingSelectionMenu } from "./FloatingSelectionMenu";
+import { useTextSelection } from "@/hooks/useTextSelection";
 
 // ============================================
 // TYPES
@@ -39,63 +40,8 @@ interface HybridContentRendererProps {
 export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentRendererProps>(
     ({ content, metadata, onAddToNotes, onCopyCode, isLoading }, ref) => {
         const { resolvedTheme } = useTheme();
-        const [selection, setSelection] = useState<{ text: string; top: number; left: number } | null>(null);
+        const { selection, clearSelection } = useTextSelection();
 
-        useEffect(() => {
-            let timeoutId: number | null = null;
-
-            const handleSelection = () => {
-                if (timeoutId) window.clearTimeout(timeoutId);
-
-                timeoutId = window.setTimeout(() => {
-                    const sel = window.getSelection();
-                    if (!sel || sel.isCollapsed || !sel.toString().trim()) {
-                        setSelection(null);
-                        return;
-                    }
-
-                    // Check if selection is within the reading content
-                    const contentElement = document.querySelector('.reading-content');
-                    if (contentElement && !contentElement.contains(sel.anchorNode)) {
-                        setSelection(null);
-                        return;
-                    }
-
-                    try {
-                        const range = sel.getRangeAt(0);
-                        const rect = range.getBoundingClientRect();
-
-                        // Show popover above the selection
-                        setSelection({
-                            text: sel.toString().trim(),
-                            top: rect.top - 50,
-                            left: rect.left + (rect.width / 2)
-                        });
-                    } catch (e) {
-                        // Range might be invalid
-                        setSelection(null);
-                    }
-                }, 100); // 100ms debounce
-            };
-
-            const handleSelectionChange = () => {
-                 const sel = window.getSelection();
-                 if (!sel || sel.isCollapsed) {
-                     setSelection(null);
-                 }
-            };
-
-            document.addEventListener('mouseup', handleSelection);
-            document.addEventListener('keyup', handleSelection);
-            document.addEventListener('selectionchange', handleSelectionChange);
-
-            return () => {
-                if (timeoutId) window.clearTimeout(timeoutId);
-                document.removeEventListener('mouseup', handleSelection);
-                document.removeEventListener('keyup', handleSelection);
-                document.removeEventListener('selectionchange', handleSelectionChange);
-            };
-        }, []);
 
         if (isLoading) {
             return (
@@ -125,10 +71,9 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                         onAddNote={(text, comment) => {
                             const noteContent = comment ? `${text}\n\nNote: ${comment}` : text;
                             onAddToNotes?.(noteContent);
-                            window.getSelection()?.removeAllRanges();
-                            setSelection(null);
+                            clearSelection();
                         }}
-                        onClose={() => setSelection(null)}
+                        onClose={clearSelection}
                     />
                 )}
 

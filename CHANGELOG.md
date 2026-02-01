@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.2] - February 1, 2026
+
+### Hotfix Post-Integration & Error Resilience
+
+Critical hotfix to resolve runtime crashes and improve database error resilience during migration transitions.
+
+#### Fixes
+- **TypeError Resilience**: Resolved `Cannot read properties of null (reading 'top')` crash in `ModuleLearn` by adding strict null-checks for the Floating Selection Menu.
+- **Database Resilience**: Implemented automated fallback in `AuthContext` and `useUsers` to handle missing gamification/streak columns (400 Bad Request), ensuring core authentication and user management remain functional during database updates.
+- **Selection Logic**: Improved `useTextSelection` reliability by wrapping rendering in parent component guards.
+
 ## [1.9.1] - February 1, 2026
 
 ### Super Admin Upgrade, APK Loyalty & non-Cash Premium (Consolidated)
@@ -449,6 +460,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.9.2 | February 1, 2026 | Hotfix Post-Integration & Error Resilience |
 | 1.9.1 | February 1, 2026 | Super Admin Upgrade + Stability Hotfixes |
 | 1.8.0 | February 1, 2026 | Restoration, Design System & Stabilization |
 | 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |

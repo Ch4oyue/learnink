@@ -58,12 +58,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('user_id', userId)
         .single();
 
-      // Fetch profile
-      const { data: profileData } = await supabase
+      // Fetch profile (with fallback for missing columns during migration transitions)
+      let profileData = null;
+      const { data: fullProfile, error: fullProfileError } = await supabase
         .from('profiles')
         .select('id, display_name, avatar_url, current_streak, longest_streak, last_activity_date, points, labels, is_premium, premium_until')
         .eq('id', userId)
         .single();
+
+      if (fullProfileError) {
+        logger.warn('Failed to fetch full profile, falling back to basic fields', fullProfileError);
+        const { data: basicProfile } = await supabase
+          .from('profiles')
+          .select('id, display_name, avatar_url')
+          .eq('id', userId)
+          .single();
+        profileData = basicProfile;
+      } else {
+        profileData = fullProfile;
+      }
 
       // Fetch enrolled tracks
       const { data: tracksData } = await supabase

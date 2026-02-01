@@ -83,11 +83,28 @@ serve(async (req) => {
       query = query.ilike("display_name", `%${search}%`);
     }
 
-    const { data: profiles, error: profilesError, count } = await query
+    const { data: initialProfiles, error: profilesError, count: initialCount } = await query
       .range(offset, offset + limit - 1)
       .order("created_at", { ascending: false });
 
-    if (profilesError) throw profilesError;
+    let profiles = initialProfiles;
+    let count = initialCount;
+
+    if (profilesError) {
+      console.warn("Failed to fetch full profiles in edge function, falling back to basic fields", profilesError);
+      // Fallback to basic fields
+      const basicQuery = supabaseAdmin
+        .from("profiles")
+        .select("id, display_name, avatar_url, created_at", { count: "exact" });
+
+      const { data: basicData, error: basicError, count: basicCount } = await basicQuery
+        .range(offset, offset + limit - 1)
+        .order("created_at", { ascending: false });
+
+      if (basicError) throw basicError;
+      profiles = basicData;
+      count = basicCount;
+    }
 
     // Fetch all roles
     const { data: roles, error: rolesError } = await supabaseAdmin

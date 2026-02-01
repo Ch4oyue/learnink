@@ -95,11 +95,28 @@ export function useUsers(page = 1, limit = 50, search = "") {
         query = query.ilike('display_name', `%${search}%`);
       }
 
-      const { data: profiles, error: profilesError, count } = await query
+      const { data: initialProfiles, error: profilesError, count: initialCount } = await query
         .order('created_at', { ascending: false })
         .range(from, to);
 
-      if (profilesError) throw profilesError;
+      let profiles = initialProfiles;
+      let count = initialCount;
+
+      if (profilesError) {
+        logger.warn('Failed to fetch full profiles, falling back to basic fields', profilesError);
+        // Fallback to basic fields if labels/points are missing
+        const basicQuery = supabase
+          .from('profiles')
+          .select('id, display_name, avatar_url, created_at', { count: 'exact' });
+
+        const { data: basicData, error: basicError, count: basicCount } = await basicQuery
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (basicError) throw basicError;
+        profiles = basicData;
+        count = basicCount;
+      }
 
       // Get roles
       const userIds = profiles?.map(p => p.id) || [];

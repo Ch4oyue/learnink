@@ -25,7 +25,7 @@ serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
+      return new Response(JSON.stringify({ error: "Authorization required" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -48,35 +48,25 @@ serve(async (req) => {
     // Use Service Role for DB operations to ensure security
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // 1. Check Progress & Claim Status
-    const { data: progress, error: progressError } = await supabaseAdmin
+    // SECURITY IMPLEMENTATION: Atomic check-and-update to prevent race conditions (XP grinding)
+    // We only update reward_claimed to true IF it was false AND module is completed
+    const { data: updatedProgress, error: updateError } = await supabaseAdmin
         .from("user_progress")
-        .select("is_completed, progress_percent, reward_claimed")
+        .update({ reward_claimed: true })
         .eq("user_id", user.id)
         .eq("module_id", module_id)
+        .eq("reward_claimed", false)
+        // Eligibility: must be completed OR have 100% progress
+        .or("is_completed.eq.true,progress_percent.gte.100")
+        .select()
         .single();
 
-    if (progressError || !progress) {
-         return new Response(JSON.stringify({ error: "Progress not found" }), {
-            status: 404,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-    }
-
-    if (progress.reward_claimed) {
-        return new Response(JSON.stringify({ error: "Reward already claimed", claimed: true }), {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-    }
-
-    // Allow claim if completed OR progress >= 100
-    // Sometimes progress calculation might be slightly off (e.g. 99.9), but usually explicit completion is best.
-    // We check both for robustness.
-    const isEligible = progress.is_completed || (progress.progress_percent ?? 0) >= 100;
-
-    if (!isEligible) {
-         return new Response(JSON.stringify({ error: "Module not completed yet" }), {
+    if (updateError || !updatedProgress) {
+        console.error("Claim eligibility error or already claimed:", updateError);
+        return new Response(JSON.stringify({
+            error: "Reward already claimed or module not completed yet",
+            claimed: true
+        }), {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -86,51 +76,52 @@ serve(async (req) => {
     // Random between 50 and 150
     const xpReward = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
 
-    // 3. Update Transaction (XP + Flag)
+    // 3. Update Profile XP (Atomic increment using RPC if possible, or careful update)
+    let finalXp;
+    const { data: xpData, error: xpError } = await supabaseAdmin
+        .rpc('increment_user_xp', {
+            target_user_id: user.id,
+            xp_to_add: xpReward
+        });
 
-    // Update flag first
-    const { error: updateError } = await supabaseAdmin
-        .from("user_progress")
-        .update({ reward_claimed: true })
-        .eq("user_id", user.id)
-        .eq("module_id", module_id);
+    if (xpError) {
+        console.warn("RPC increment_user_xp failed, falling back to manual update:", xpError);
 
-    if (updateError) {
-        throw updateError;
+        // Fallback: Get current XP and update
+        const { data: profile } = await supabaseAdmin
+            .from("profiles")
+            .select("xp")
+            .eq("id", user.id)
+            .single();
+
+        const currentXp = profile?.xp || 0;
+        finalXp = currentXp + xpReward;
+
+        const { error: profileError } = await supabaseAdmin
+            .from("profiles")
+            .update({ xp: finalXp })
+            .eq("id", user.id);
+
+        if (profileError) {
+            console.error("Critical: Failed to update XP after marking claimed:", profileError);
+            // Revert reward_claimed to allow retry
+            await supabaseAdmin
+                .from("user_progress")
+                .update({ reward_claimed: false })
+                .eq("user_id", user.id)
+                .eq("module_id", module_id);
+
+            throw new Error("Failed to update profile XP");
+        }
+    } else {
+        finalXp = xpData;
     }
 
-    // Get current XP
-    const { data: profile } = await supabaseAdmin
-        .from("profiles")
-        .select("xp")
-        .eq("id", user.id)
-        .single();
-
-    const currentXp = profile?.xp || 0;
-    const newXp = currentXp + xpReward;
-
-    // Update XP
-    const { error: profileError } = await supabaseAdmin
-        .from("profiles")
-        .update({ xp: newXp })
-        .eq("id", user.id);
-
-    if (profileError) {
-        // If this fails, we have a partial state: reward claimed but XP not given.
-        // In a production system, we would revert 'reward_claimed' or use a stored procedure (RPC).
-        // For this task, we will log it.
-        console.error("Failed to update XP after marking claimed:", profileError);
-        // We could try to revert:
-        await supabaseAdmin
-            .from("user_progress")
-            .update({ reward_claimed: false })
-            .eq("user_id", user.id)
-            .eq("module_id", module_id);
-
-        throw new Error("Failed to update profile XP");
-    }
-
-    return new Response(JSON.stringify({ success: true, xp_gained: xpReward }), {
+    return new Response(JSON.stringify({
+        success: true,
+        xp_gained: xpReward,
+        new_total_xp: finalXp
+    }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

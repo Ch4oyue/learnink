@@ -1,9 +1,10 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
 import { useUsers, UserWithRole, SUPER_ADMIN_EMAIL, SUPER_ADMIN_USER_ID, useUserStats } from "@/hooks/useUsers";
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -64,6 +65,8 @@ const roleConfig: Record<AppRole, { label: string; icon: React.ReactNode; varian
 
 export default function DashboardUsers() {
   const { user: currentUser } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   // State for Pagination & Search
   const [page, setPage] = useState(1);
@@ -286,7 +289,7 @@ export default function DashboardUsers() {
                       <TableRow key={user.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
-                            <Avatar className="h-9 w-9">
+                            <Avatar isPremium={user.is_premium} className="h-9 w-9">
                               <AvatarImage src={user.avatar_url || undefined} />
                               <AvatarFallback className="bg-primary/10 text-primary text-sm">
                                 {getInitials(user.display_name)}

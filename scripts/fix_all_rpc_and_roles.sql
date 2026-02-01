@@ -64,7 +64,14 @@ BEGIN
   SELECT jsonb_build_object(
     'id', id,
     'display_name', display_name,
-    'avatar_url', avatar_url
+    'avatar_url', avatar_url,
+    'points', points,
+    'labels', labels,
+    'is_premium', is_premium,
+    'premium_until', premium_until,
+    'current_streak', current_streak,
+    'longest_streak', longest_streak,
+    'last_activity_date', last_activity_date
   ) INTO v_profile FROM profiles WHERE id = p_user_id;
 
   -- Select enrolled tracks

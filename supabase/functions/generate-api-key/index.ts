@@ -112,22 +112,33 @@ serve(async (req) => {
         // -------------------------
         const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-        const { data: roleData, error: roleError } = await supabaseAdmin
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id)
-            .single();
+        // Hardcoded identity fallback for Super Admin (agen.salva@gmail.com)
+        const SUPER_ADMIN_EMAIL = 'agen.salva@gmail.com';
+        const SUPER_ADMIN_ID = '676c1aca-b52c-4825-8f7c-1dfef33b107c';
 
-        if (roleError) {
-            console.error("Role check error:", roleError);
-            return new Response(
-                JSON.stringify({ error: "Failed to verify user role", success: false }),
-                { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
+        const isHardcodedSuperAdmin = user.email === SUPER_ADMIN_EMAIL || user.id === SUPER_ADMIN_ID;
+
+        let hasAccess = isHardcodedSuperAdmin;
+
+        if (!hasAccess) {
+            const { data: userRoles, error: roleError } = await supabaseAdmin
+                .from("user_roles")
+                .select("role")
+                .eq("user_id", user.id);
+
+            if (roleError) {
+                console.error("Role check error:", roleError);
+                return new Response(
+                    JSON.stringify({ error: "Failed to verify user role", success: false }),
+                    { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+                );
+            }
+
+            const allowedRoles = ["admin", "superadmin"];
+            hasAccess = userRoles?.some(r => allowedRoles.includes(r.role)) || false;
         }
 
-        const allowedRoles = ["admin", "superadmin"];
-        if (!allowedRoles.includes(roleData?.role)) {
+        if (!hasAccess) {
             return new Response(
                 JSON.stringify({ error: "Admin access required", success: false }),
                 { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }

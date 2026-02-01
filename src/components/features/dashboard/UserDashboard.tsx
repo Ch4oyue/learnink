@@ -161,7 +161,7 @@ export function UserDashboardContent() {
   const { data: enrolledTracks, isLoading: tracksLoading } = useUserTracks(user?.id);
 
   const displayName =
-    profile?.full_name || user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
+    profile?.display_name || user?.user_metadata?.display_name || user?.email?.split("@")[0] || "User";
 
   // Get current date
   const today = new Date();

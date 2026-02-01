@@ -17,6 +17,7 @@ export interface UserWithRole {
   role: AppRole;
   labels?: string[];
   points?: number;
+  is_premium?: boolean;
 }
 
 export interface UsersResponse {
@@ -94,11 +95,28 @@ export function useUsers(page = 1, limit = 50, search = "") {
         query = query.ilike('display_name', `%${search}%`);
       }
 
-      const { data: profiles, error: profilesError, count } = await query
+      const { data: initialProfiles, error: profilesError, count: initialCount } = await query
         .order('created_at', { ascending: false })
         .range(from, to);
 
-      if (profilesError) throw profilesError;
+      let profiles = initialProfiles;
+      let count = initialCount;
+
+      if (profilesError) {
+        logger.warn('Failed to fetch full profiles, falling back to basic fields', profilesError);
+        // Fallback to basic fields if labels/points are missing
+        const basicQuery = supabase
+          .from('profiles')
+          .select('id, display_name, avatar_url, created_at', { count: 'exact' });
+
+        const { data: basicData, error: basicError, count: basicCount } = await basicQuery
+          .order('created_at', { ascending: false })
+          .range(from, to);
+
+        if (basicError) throw basicError;
+        profiles = basicData;
+        count = basicCount;
+      }
 
       // Get roles
       const userIds = profiles?.map(p => p.id) || [];
@@ -111,7 +129,15 @@ export function useUsers(page = 1, limit = 50, search = "") {
       roles?.forEach(r => roleMap.set(r.user_id, r.role as AppRole));
 
       const users = (profiles || []).map(profile => {
-        const p = profile as { id: string; display_name: string | null; avatar_url: string | null; created_at: string | null; labels?: string[]; points?: number };
+        const p = profile as {
+          id: string;
+          display_name: string | null;
+          avatar_url: string | null;
+          created_at: string | null;
+          labels?: string[];
+          points?: number;
+          is_premium?: boolean;
+        };
         return {
           id: p.id,
           email: null,
@@ -121,6 +147,7 @@ export function useUsers(page = 1, limit = 50, search = "") {
           role: roleMap.get(p.id) || 'user',
           labels: p.labels || [],
           points: p.points || 0,
+          is_premium: p.is_premium || false,
         };
       });
 

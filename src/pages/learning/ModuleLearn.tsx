@@ -25,6 +25,7 @@ import { usePyodidePreload } from "@/hooks/usePyodidePreload";
 import { useModuleNavigation } from "@/hooks/useModuleNavigation";
 import { useActiveTimeTracker } from "@/hooks/useActiveTimeTracker";
 import { isLowEndDevice } from "@/hooks/usePerformance";
+import { SEO } from "@/components/shared/SEO";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/features/module/HybridSidebar";
@@ -333,6 +334,10 @@ export default function ModuleLearn() {
 
   return (
     <div className="flex bg-background min-h-screen md:h-screen md:overflow-hidden">
+      <SEO
+        title={module.title}
+        description={module.summary || `Pelajari ${module.title} di LearnInk.`}
+      />
       {/* ============================================
           PANEL 1: Icon Rail (72px) - Desktop Only
       ============================================ */}

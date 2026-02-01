@@ -1,6 +1,7 @@
 import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SEO } from "@/components/shared/SEO";
 
 // Lazy import dashboard content components for code splitting
 import { UserDashboardContent } from "@/components/features/dashboard/UserDashboard";
@@ -83,5 +84,10 @@ export default function DashboardHome() {
         }
     };
 
-    return <DashboardLayout>{renderContent()}</DashboardLayout>;
+    return (
+        <DashboardLayout>
+            <SEO title="Dashboard" />
+            {renderContent()}
+        </DashboardLayout>
+    );
 }

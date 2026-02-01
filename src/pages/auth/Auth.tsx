@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { SEO } from "@/components/shared/SEO";
 import {
   Form,
   FormControl,
@@ -168,6 +169,10 @@ export default function Auth() {
 
   return (
     <div className="h-screen overflow-hidden flex flex-col items-center justify-center bg-background text-foreground font-sans p-4 relative transition-colors duration-300">
+      <SEO
+        title={isLogin ? "Sign In" : "Create Account"}
+        description="Masuk ke akun LearnInk Anda untuk melanjutkan perjalanan belajar teknologi Anda."
+      />
       {/* Main Card */}
       <main className="w-full max-w-5xl h-[85vh] bg-card rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-xl border border-border z-10">
 

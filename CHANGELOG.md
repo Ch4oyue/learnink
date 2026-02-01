@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.1] - January 31, 2026
+
+### SEO, Navigation Feedback & Component Prefetching
+
+An enhancement release focused on "Premium Feel" and perceived performance. This update adds SEO meta tags for all critical pages, visual navigation feedback via a top progress bar, and hardware-aware prefetching for faster route transitions.
+
+#### Improvements (3)
+- **SEO & Meta Tags**: Integrated `react-helmet-async` and created a reusable `SEO` component to manage meta tags, improving social sharing and search visibility.
+- **Top Loading Bar**: Added a subtle `TopProgressBar` that appears during lazy route transitions, providing immediate visual feedback to the user.
+- **Smart Prefetching**: Implemented hardware-aware prefetching that preloads lazy components on hover, but only for capable devices with fast connections.
+
+#### Patches (1)
+- **Index Cleanup**: Optimized `index.html` with better font preloads and corrected branding meta tags.
+
 ## [1.7.0] - January 31, 2026
 
 ### Mobile Performance & Low-End Optimization
@@ -392,6 +406,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.7.1 | Jan 31, 2026 | SEO, Navigation Feedback & Smart Prefetching |
 | 1.7.0 | Jan 31, 2026 | Mobile Performance & Low-End Optimization |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |

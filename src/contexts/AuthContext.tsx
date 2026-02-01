@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   // Combined fetch using separate queries (RPC not available)
-  const fetchAuthData = async (userId: string) => {
+  const fetchAuthData = useCallback(async (userId: string, userEmail?: string | null) => {
     try {
       // Fetch role
       const { data: roleData } = await supabase
@@ -73,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Super admin identification (agen.salva@gmail.com)
       const isSuperAdmin = userId === '676c1aca-b52c-4825-8f7c-1dfef33b107c' ||
-                         user?.email === 'agen.salva@gmail.com';
+                         userEmail === 'agen.salva@gmail.com';
 
       const userRole = (roleData?.role as AppRole) || (isSuperAdmin ? 'superadmin' : 'user');
       setRole(userRole);
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       setEnrolledTrackIds([]);
     }
-  };
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -109,7 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           // Optimized: Single RPC call instead of 3 separate requests
-          await fetchAuthData(session.user.id);
+          await fetchAuthData(session.user.id, session.user.email);
         }
 
         if (mounted) {
@@ -137,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Defer Supabase calls with setTimeout to avoid deadlock
           setTimeout(() => {
             if (mounted) {
-              fetchAuthData(session.user.id);
+              fetchAuthData(session.user.id, session.user.email);
             }
           }, 0);
         } else {
@@ -154,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [fetchAuthData]);
 
   const signIn = async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
@@ -213,7 +213,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshProfile = async () => {
     if (user) {
       // Optimized: Reuse the single RPC call
-      await fetchAuthData(user.id);
+      await fetchAuthData(user.id, user.email);
     }
   };
 

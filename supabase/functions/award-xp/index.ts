@@ -125,14 +125,24 @@ serve(async (req) => {
     const pointsReward = Math.floor(xpReward * 0.1); // 10% of XP becomes InkPoints
 
     // 5. Update Database
-    // Mark as claimed
-    const { error: updateError } = await supabaseAdmin
+    // Mark as claimed (ATOMICALLY)
+    const { data: updatedRows, error: updateError } = await supabaseAdmin
         .from("user_progress")
         .update({ reward_claimed: true })
         .eq("user_id", user.id)
-        .eq("module_id", module_id);
+        .eq("module_id", module_id)
+        .eq("reward_claimed", false) // Ensure it wasn't already claimed
+        .select();
 
     if (updateError) throw updateError;
+
+    // Check if the update actually happened
+    if (!updatedRows || updatedRows.length === 0) {
+        return new Response(JSON.stringify({ error: "Reward already claimed (Race Condition Prevented)" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+    }
 
     // Update Profile (XP + Points)
     const newXp = (profile?.xp || 0) + xpReward;

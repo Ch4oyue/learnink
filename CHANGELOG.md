@@ -9,25 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.9.1] - February 1, 2026
 
-### Stability & Hotfixes
+### Super Admin Upgrade, APK Loyalty & non-Cash Premium (Consolidated)
 
-Critical fixes for reference errors and data synchronization issues found in 1.9.0.
-
-#### Fixes
-- **Reference Errors**: Resolved `memo is not defined` and `useMutation is not defined` in core learning and admin components.
-- **Data Sync**: Updated `AuthContext` and Edge Functions to correctly fetch and handle new gamification fields (`points`, `labels`, `isPremium`).
-- **Race Conditions**: Implemented atomic check-and-update in `award-xp` Edge Function to prevent double-claiming of rewards.
-- **Legacy Fields**: Fixed regression in `UserDashboard` where removed fields were being accessed.
-
-#### Improvements
-- **Visual consistency**: Ensured Premium member visual effects (glowing avatars) are applied across the entire dashboard layout.
-- **Robustness**: Added defensive error handling for system settings and profile data fetching.
-
-## [1.9.0] - February 1, 2026
-
-### Super Admin Upgrade, APK Loyalty & non-Cash Premium
-
-A major feature update introducing advanced administrative controls, specialized rewards for mobile users, and a sustainable loyalty economy using "InkPoints".
+A major feature update introducing advanced administrative controls, specialized rewards for mobile users, and a sustainable loyalty economy using "InkPoints". This consolidated release includes critical hotfixes for stability and data synchronization.
 
 #### Improvements
 - **Super Admin Console**: Launched "System Control" panel for top-level management.
@@ -43,10 +27,16 @@ A major feature update introducing advanced administrative controls, specialized
   - **Automated Detection**: Intelligent APK detection via User-Agent to apply hardware-based loyalty bonuses.
   - **Offline Mode**: Implemented background synchronization for learning progress, allowing seamless study without internet connectivity.
   - **Label Multipliers**: Multi-tier multiplier system (up to 3x) based on user labels like 'sepuh' or 'early adopter'.
+- **Visual consistency**: Ensured Premium member visual effects (glowing avatars) are applied across the entire dashboard layout.
 
 #### Fixes
+- **Reference Errors**: Resolved `memo is not defined` and `useMutation is not defined` in core learning and admin components.
+- **Data Sync**: Updated `AuthContext` and Edge Functions to correctly fetch and handle new gamification fields (`points`, `labels`, `isPremium`).
+- **Race Conditions**: Implemented atomic check-and-update in `award-xp` Edge Function to prevent double-claiming of rewards.
+- **Legacy Fields**: Fixed regression in `UserDashboard` where removed fields were being accessed.
 - **Data Selection**: Optimized `useUsers` and `profiles` selection to include new gamification fields (`labels`, `points`) without performance regression.
 - **Visual Feedback**: Added `isPremium` support to core UI components for enhanced brand identity.
+- **Robustness**: Added defensive error handling for system settings and profile data fetching.
 
 #### Patches
 - **Database Schema**: Expanded `profiles` table and created `system_settings` / `label_configs` with robust RLS policies.
@@ -179,8 +169,6 @@ Comprehensive security audit, performance verification, and environment stabiliz
 
 Critical security patches for Edge Functions and mobile interface corrections.
 
-<!-- -->
-
 #### Fixes (4)
 - **Broken Access Control**: Fixed a critical vulnerability in `get-users` Edge Function where the Service Role key was used without proper role validation.
 - **User List Visibility**: Implemented `get-users` Edge Function fallback to bypass RLS limitations, ensuring Admins can see all users.
@@ -197,8 +185,6 @@ Critical security patches for Edge Functions and mobile interface corrections.
 
 Major improvements to the admin interface and Notion synchronization capabilities.
 
-<!-- -->
-
 #### Improvements (3)
 - **Review Split View**: Implemented a responsive Split-View (Editor + Live Preview) for content approval, using `ResizablePanel` on desktop.
 - **Notion Sync Upgrade**: Upgraded `sync-notion-page` Edge Function to recursively fetch nested blocks (toggles, lists) and support `Category` (case-sensitive), `Slug`, and `Cover` fields.
@@ -209,8 +195,6 @@ Major improvements to the admin interface and Notion synchronization capabilitie
 ### PWA & Security Hardening
 
 Official introduction of PWA support and critical security hardening for administrative roles.
-
-<!-- -->
 
 #### Improvements (2)
 - Added Progressive Web App (PWA) support with standalone mode and custom installation prompt.
@@ -230,8 +214,6 @@ Official introduction of PWA support and critical security hardening for adminis
 
 Fixed a critical crash in the Admin Dashboard for Super Admin users and resolved missing backend function errors.
 
-<!-- -->
-
 #### Fixes (3)
 - Fixed React crash in Admin Dashboard by adding missing `superadmin` role mapping for icons and labels.
 - Restored missing `get_popular_modules` database function to resolve 404 errors.
@@ -248,8 +230,6 @@ Fixed a critical crash in the Admin Dashboard for Super Admin users and resolved
 ### Premium Design & Performance
 
 Major overhaul of the visual system and critical performance optimizations for the learning environment.
-
-<!-- -->
 
 #### Improvements (3)
 - **Dark Mode Premium**: Implemented Glassmorphism, improved typography, and added mobile-friendly navigation tabs.
@@ -270,8 +250,6 @@ Major overhaul of the visual system and critical performance optimizations for t
 
 Comprehensive security audit and resolution of data leakage vulnerabilities.
 
-<!-- -->
-
 #### Fixes (3)
 - **PII Leakage Fix**: Resolved Personally Identifiable Information (PII) exposure in profile RLS policies.
 - **Console Audit**: Removed debug logs in production that leaked sensitive system information.
@@ -282,8 +260,6 @@ Comprehensive security audit and resolution of data leakage vulnerabilities.
 ### Performance & Code Quality
 
 Optimization of module fetching and resolution of type safety issues.
-
-<!-- -->
 
 #### Improvements (2)
 - Optimized module fetching logic by request ID for faster navigation.
@@ -469,8 +445,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.9.1 | February 1, 2026 | Stability, Reference Fixes & Data Sync |
-| 1.9.0 | February 1, 2026 | Super Admin Console, APK Loyalty & Premium |
+| 1.9.1 | February 1, 2026 | Super Admin Upgrade + Stability Hotfixes |
 | 1.8.0 | February 1, 2026 | Restoration, Design System & Stabilization |
 | 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |

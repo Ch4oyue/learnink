@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.1] - February 15, 2026
+
+### Stability & Hotfixes
+
+Critical fixes for reference errors and data synchronization issues found in 1.9.0.
+
+#### Fixes
+- **Reference Errors**: Resolved `memo is not defined` and `useMutation is not defined` in core learning and admin components.
+- **Data Sync**: Updated `AuthContext` and Edge Functions to correctly fetch and handle new gamification fields (`points`, `labels`, `isPremium`).
+- **Race Conditions**: Implemented atomic check-and-update in `award-xp` Edge Function to prevent double-claiming of rewards.
+- **Legacy Fields**: Fixed regression in `UserDashboard` where removed fields were being accessed.
+
+#### Improvements
+- **Visual consistency**: Ensured Premium member visual effects (glowing avatars) are applied across the entire dashboard layout.
+- **Robustness**: Added defensive error handling for system settings and profile data fetching.
+
 ## [1.9.0] - February 14, 2026
 
 ### Super Admin Upgrade, APK Loyalty & non-Cash Premium
@@ -453,6 +469,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.9.1 | February 15, 2026 | Stability, Reference Fixes & Data Sync |
 | 1.9.0 | February 14, 2026 | Super Admin Console, APK Loyalty & Premium |
 | 1.8.0 | February 1, 2026 | Restoration, Design System & Stabilization |
 | 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |

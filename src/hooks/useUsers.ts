@@ -17,6 +17,7 @@ export interface UserWithRole {
   role: AppRole;
   labels?: string[];
   points?: number;
+  is_premium?: boolean;
 }
 
 export interface UsersResponse {
@@ -111,7 +112,15 @@ export function useUsers(page = 1, limit = 50, search = "") {
       roles?.forEach(r => roleMap.set(r.user_id, r.role as AppRole));
 
       const users = (profiles || []).map(profile => {
-        const p = profile as { id: string; display_name: string | null; avatar_url: string | null; created_at: string | null; labels?: string[]; points?: number };
+        const p = profile as {
+          id: string;
+          display_name: string | null;
+          avatar_url: string | null;
+          created_at: string | null;
+          labels?: string[];
+          points?: number;
+          is_premium?: boolean;
+        };
         return {
           id: p.id,
           email: null,
@@ -121,6 +130,7 @@ export function useUsers(page = 1, limit = 50, search = "") {
           role: roleMap.get(p.id) || 'user',
           labels: p.labels || [],
           points: p.points || 0,
+          is_premium: p.is_premium || false,
         };
       });
 

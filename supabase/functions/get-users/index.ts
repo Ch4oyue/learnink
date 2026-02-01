@@ -77,7 +77,7 @@ serve(async (req) => {
     // Fetch profiles with pagination and search
     let query = supabaseAdmin
       .from("profiles")
-      .select("id, display_name, avatar_url, created_at", { count: "exact" });
+      .select("id, display_name, avatar_url, created_at, labels, points, is_premium, premium_until", { count: "exact" });
 
     if (search) {
       query = query.ilike("display_name", `%${search}%`);

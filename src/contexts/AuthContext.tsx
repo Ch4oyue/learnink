@@ -15,6 +15,10 @@ export interface Profile {
   current_streak?: number | null;
   longest_streak?: number | null;
   last_activity_date?: string | null;
+  points?: number;
+  labels?: string[];
+  is_premium?: boolean;
+  premium_until?: string | null;
 }
 
 interface AuthContextType {
@@ -57,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Fetch profile
       const { data: profileData } = await supabase
         .from('profiles')
-        .select('id, display_name, avatar_url, current_streak, longest_streak, last_activity_date')
+        .select('id, display_name, avatar_url, current_streak, longest_streak, last_activity_date, points, labels, is_premium, premium_until')
         .eq('id', userId)
         .single();
 

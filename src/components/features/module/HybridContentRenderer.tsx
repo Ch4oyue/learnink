@@ -63,17 +63,19 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                 className="md:flex-1 md:overflow-y-auto overflow-visible bg-background relative scroll-smooth"
                 style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted)) transparent" }}
             >
-                {/* Floating Selection Menu */}
-                <FloatingSelectionMenu
-                    selection={selection}
-                    onAddNote={(text, comment) => {
-                        const noteContent = comment ? `${text}\n\nNote: ${comment}` : text;
-                        onAddToNotes?.(noteContent);
-                        window.getSelection()?.removeAllRanges();
-                        clearSelection();
-                    }}
-                    onClose={() => clearSelection()}
-                />
+                {/* Floating Selection Menu - Only render if selection is active to avoid null ref errors */}
+                {selection && (
+                    <FloatingSelectionMenu
+                        selection={selection}
+                        onAddNote={(text, comment) => {
+                            const noteContent = comment ? `${text}\n\nNote: ${comment}` : text;
+                            onAddToNotes?.(noteContent);
+                            window.getSelection()?.removeAllRanges();
+                            clearSelection();
+                        }}
+                        onClose={() => clearSelection()}
+                    />
+                )}
 
                 {/* Focus Container - 800px max like variant_2 */}
                 <div className="max-w-[800px] mx-auto py-16 px-10 flex flex-col gap-10">

@@ -154,8 +154,8 @@ export default function DashboardProfile() {
   const completedModules = progress?.filter((p) => p.is_completed).length || 0;
   const totalModules = progress?.length || 0;
 
-  // Calculate streak from profile
-  const streak = profile?.current_streak || 0;
+  // Calculate streak from stats
+  const streak = stats?.currentStreak || 0;
 
   // Get user initials
   const userName = profile?.display_name || displayName || user?.email?.split("@")[0] || "User";

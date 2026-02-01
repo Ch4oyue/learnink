@@ -36,14 +36,53 @@ interface HybridContentRendererProps {
 // Colors from dark_mode (#0b0c0e bg, zinc text, purple accents)
 // ============================================
 
-import { useTextSelection } from "@/hooks/useTextSelection";
-
-// ... existing imports ...
-
 export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentRendererProps>(
     ({ content, metadata, onAddToNotes, onCopyCode, isLoading }, ref) => {
         const { resolvedTheme } = useTheme();
-        const { selection, clearSelection } = useTextSelection();
+        const [selection, setSelection] = useState<{ text: string; top: number; left: number } | null>(null);
+
+        useEffect(() => {
+            const handleSelection = () => {
+                const sel = window.getSelection();
+                if (!sel || sel.isCollapsed || !sel.toString().trim()) {
+                    setSelection(null);
+                    return;
+                }
+
+                // Check if selection is within the reading content
+                const contentElement = document.querySelector('.reading-content');
+                if (contentElement && !contentElement.contains(sel.anchorNode)) {
+                    setSelection(null);
+                    return;
+                }
+
+                const range = sel.getRangeAt(0);
+                const rect = range.getBoundingClientRect();
+
+                // Show popover above the selection
+                setSelection({
+                    text: sel.toString().trim(),
+                    top: rect.top - 50,
+                    left: rect.left + (rect.width / 2)
+                });
+            };
+
+            document.addEventListener('mouseup', handleSelection);
+            document.addEventListener('keyup', handleSelection);
+            document.addEventListener('selectionchange', () => {
+                 // Clear selection if it becomes empty
+                 const sel = window.getSelection();
+                 if (!sel || sel.isCollapsed) {
+                     setSelection(null);
+                 }
+            });
+
+            return () => {
+                document.removeEventListener('mouseup', handleSelection);
+                document.removeEventListener('keyup', handleSelection);
+                document.removeEventListener('selectionchange', handleSelection);
+            };
+        }, []);
 
         if (isLoading) {
             return (
@@ -73,9 +112,10 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                         onAddNote={(text, comment) => {
                             const noteContent = comment ? `${text}\n\nNote: ${comment}` : text;
                             onAddToNotes?.(noteContent);
-                            clearSelection(); // Use hook's clear function
+                            window.getSelection()?.removeAllRanges();
+                            setSelection(null);
                         }}
-                        onClose={clearSelection}
+                        onClose={() => setSelection(null)}
                     />
                 )}
 

@@ -7,7 +7,6 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
 import { lazy, Suspense, useState } from "react";
-import SEO from "@/components/shared/SEO";
 
 // Lazy load heavy below-the-fold components
 const Features = lazy(() => import("@/components/features/landing/Features").then(module => ({ default: module.Features })));
@@ -28,10 +27,6 @@ export default function LandingPage() {
 
     return (
         <div className="bg-background text-foreground transition-colors duration-300 min-h-screen flex flex-col font-sans antialiased">
-            <SEO
-                title="Platform Belajar AI Automation"
-                description="Kuasai AI Automation tanpa perlu coding. Belajar workflow otomatisasi untuk produktivitas."
-            />
             {/* Header */}
             <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border pt-[env(safe-area-inset-top)] transition-all">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -85,7 +80,7 @@ export default function LandingPage() {
 
                         {/* Mobile Menu */}
                         <div className="flex md:hidden items-center gap-2">
-                            <Button
+                             <Button
                                 variant="outline"
                                 size="icon"
                                 onClick={toggleTheme}

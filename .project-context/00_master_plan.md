@@ -33,9 +33,8 @@
 ### 📍 Fase 2: Enhancement (Dalam Proses)
 - [ ] Quiz Generation dengan AI
 - [x] Time-Based Quiz Anti-Cheat
-- [x] Gamifikasi (Daily Streaks, Achievements, XP)
+- [x] Gamifikasi (Achievements, Progress Tracking)
 - [x] Real-time Notifications
-- [x] SEO Architecture (Dynamic Metadata)
 - [ ] Advanced Analytics Dashboard
 - [x] Mobile-First PWA Optimization (Low-End & Performance)
 

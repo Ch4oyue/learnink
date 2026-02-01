@@ -12,9 +12,6 @@ export interface Profile {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
-  current_streak?: number;
-  longest_streak?: number;
-  last_activity_date?: string | null;
 }
 
 interface AuthContextType {
@@ -44,32 +41,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
 
-  // Combined fetch using separate queries (RPC not available)
+  // Combined fetch using RPC for performance
   const fetchAuthData = async (userId: string) => {
     try {
-      // Fetch role
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
+      const { data, error } = await supabase.rpc('get_user_auth_data', { p_user_id: userId });
 
-      // Fetch profile
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url, current_streak, longest_streak, last_activity_date')
-        .eq('id', userId)
-        .single();
+      if (error) {
+        logger.error('Error fetching auth data:', error);
+        // Fallback or default states on error
+        setRole('user');
+        setProfile(null);
+        setEnrolledTrackIds([]);
+        return;
+      }
 
-      // Fetch enrolled tracks
-      const { data: tracksData } = await supabase
-        .from('user_tracks')
-        .select('track_id')
-        .eq('user_id', userId);
+      // Parse the response
+      // Expected structure: { role, profile, enrolled_tracks }
+      // We use a temporary type definition for the RPC response
+      type AuthDataResponse = {
+        role: AppRole;
+        profile: Profile;
+        enrolled_tracks: string[];
+      };
 
-      setRole((roleData?.role as AppRole) || 'user');
-      setProfile(profileData || null);
-      setEnrolledTrackIds(tracksData?.map(t => t.track_id) || []);
+      const result = data as unknown as AuthDataResponse;
+
+      setRole(result?.role || 'user');
+      setProfile(result?.profile || null);
+      setEnrolledTrackIds(result?.enrolled_tracks || []);
 
     } catch (error) {
       logger.error('Error fetching auth data:', error);

@@ -84,7 +84,7 @@ export function useSmoothScroll(
             duration: customDuration ?? duration,
             ease,
         });
-    }, [enabled, duration, ease, offset]);
+    }, [isDisabled, duration, ease, offset]);
 
     /**
      * Create fade-in animation for elements when they enter viewport
@@ -123,7 +123,7 @@ export function useSmoothScroll(
         });
 
         scrollTriggerInstances.current.push(...(Array.isArray(trigger) ? trigger : [trigger]));
-    }, [enabled]);
+    }, [isDisabled]);
 
     /**
      * Create parallax effect for an element
@@ -146,7 +146,7 @@ export function useSmoothScroll(
         });
 
         scrollTriggerInstances.current.push(trigger);
-    }, [enabled]);
+    }, [isDisabled]);
 
     // Handle anchor link clicks
     useEffect(() => {
@@ -170,7 +170,7 @@ export function useSmoothScroll(
         return () => {
             document.removeEventListener("click", handleAnchorClick);
         };
-    }, [enabled, scrollTo]);
+    }, [isDisabled, scrollTo]);
 
     // Cleanup ScrollTrigger instances on unmount
     useEffect(() => {

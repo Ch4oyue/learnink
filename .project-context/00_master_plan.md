@@ -29,16 +29,21 @@
 - [x] Row Level Security (RLS) Implementation
 - [x] Rate Limiting & Security Audit Trail
 - [x] Environment Stabilization & System Audit
+- [x] **v1.6.1**: Gamification (Streaks/XP), SEO Architecture. (Restored in v1.8.0)
+- [x] **v1.6.2**: Design System Overhaul (Glass/Liquid) - *Completed in v1.8.0*
+- [x] **v1.7.x**: Git Sync & Stability Fixes.
+- [x] **v1.8.0**: **Restoration & Consolidation** (Current)
+    - [x] Restore v1.6.1 Features (Streaks, SEO).
+    - [x] Implement "Glass/Liquid" Design System (Mobile Nav, Profile, Cards).
+    - [x] Finalize "Second Brain" Deep Integration.AI
 
 ### 📍 Fase 2: Enhancement (Dalam Proses)
 - [ ] Quiz Generation dengan AI
 - [x] Time-Based Quiz Anti-Cheat
-- [x] Gamifikasi (Daily Streaks, Achievements, XP)
+- [x] Gamifikasi (Achievements, Progress Tracking)
 - [x] Real-time Notifications
-- [x] SEO Architecture (Dynamic Metadata)
-- [x] Performance Engine (Low-End & Mobile Optimization)
 - [ ] Advanced Analytics Dashboard
-- [ ] Design System Overhaul (v1.7.5 - Planned)
+- [x] Mobile-First PWA Optimization (Low-End & Performance)
 
 ### 📍 Fase 3: Scale (Rencana)
 - [ ] Multi-tenant Support

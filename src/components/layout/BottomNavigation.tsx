@@ -164,19 +164,19 @@ export function BottomNavigation() {
 
   return (
     <nav className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 border-t md:hidden safe-area-bottom transition-all duration-300",
-      // Apple Liquid Glass - Ultra Subtle
+      "fixed bottom-4 left-4 right-4 z-50 md:hidden safe-area-bottom transition-all duration-300",
+      "rounded-2xl border shadow-lg",
+      // Apple Liquid Glass - Floating Dock
       isTransparent
         ? [
-          "bg-white/20 dark:bg-white/[0.06]",
-          "backdrop-blur-[20px] backdrop-saturate-[120%]",
-          "border-t-[0.5px] border-white/40 dark:border-white/10",
-          "shadow-[inset_0_0.5px_0_rgba(255,255,255,0.7)]",
-          "dark:shadow-[inset_0_0.5px_0_rgba(255,255,255,0.08)]"
+          "bg-white/40 dark:bg-black/40", // More transparent
+          "backdrop-blur-2xl backdrop-saturate-150", // Heavier blur
+          "border-white/20 dark:border-white/10",
+          "shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]",
         ].join(" ")
-        : "bg-card/95 border-t backdrop-blur-md"
+        : "bg-background/95 border-border backdrop-blur-md"
     )}>
-      <div className="flex items-center justify-around h-16 px-2">
+      <div className="flex items-center justify-between h-16 px-4">
         {filteredItems.map((item) => {
           const active = isActive(item.href);
           return (
@@ -184,24 +184,30 @@ export function BottomNavigation() {
               key={item.href}
               to={item.href}
               className={cn(
-                "flex flex-col items-center justify-center flex-1 h-full gap-0.5 transition-colors relative",
-                active ? "text-primary" : "text-muted-foreground"
+                "flex flex-col items-center justify-center h-12 w-12 rounded-xl transition-all relative",
+                active
+                  ? "text-primary-foreground bg-primary shadow-md scale-110"
+                  : "text-muted-foreground hover:bg-white/10 dark:hover:bg-white/5"
               )}
             >
               <div className="relative">
-                <item.icon className={cn("h-5 w-5", active && "text-primary")} />
+                <item.icon className={cn("h-5 w-5", active && "text-primary-foreground")} />
                 {item.badge !== undefined && item.badge > 0 && (
-                  <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center shadow-sm z-10 animate-in zoom-in duration-300">
+                  <span className={cn(
+                    "absolute -top-2 -right-2 h-4 w-4 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm z-10 animate-in zoom-in duration-300",
+                    active ? "bg-white text-primary" : "bg-red-600 text-white"
+                  )}>
                     {item.badge > 99 ? "99+" : item.badge}
                   </span>
                 )}
               </div>
-              <span className={cn("text-[10px] font-medium", active && "text-primary")}>
+              {/* Label is hidden in floating dock for cleaner look, or maybe show on active? 
+                  Let's hide labels for a pure dock feel to save space, standard in floating docks.
+                  Or show only if active? No, usually icons only for docks this small.
+              */}
+              {/* <span className={cn("text-[10px] font-medium", active && "text-primary")}>
                 {item.label}
-              </span>
-              {active && (
-                <span className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-primary rounded-full" />
-              )}
+              </span> */}
             </Link>
           );
         })}

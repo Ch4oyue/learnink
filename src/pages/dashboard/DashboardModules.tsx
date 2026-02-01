@@ -178,20 +178,20 @@ export default function DashboardModules() {
               {loadingMy ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <Card key={i} className="animate-pulse">
+                    <Card key={i} className="animate-pulse glass-panel border-white/10 opacity-50">
                       <CardContent className="h-16" />
                     </Card>
                   ))}
                 </div>
               ) : myFilteredModules.length === 0 ? (
-                <Card>
+                <Card className="glass-panel border-dashed border-white/20">
                   <CardContent className="py-12 text-center">
                     <BookOpen className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <h3 className="font-medium mb-2">Belum ada modul</h3>
+                    <h3 className="font-bold mb-2 text-lg">Belum ada modul</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Mulai buat modul pembelajaran pertama Anda
                     </p>
-                    <Button asChild>
+                    <Button asChild className="glass-button-primary">
                       <Link to="/dashboard/modules/create">
                         <Plus className="h-4 w-4 mr-2" />
                         Buat Modul
@@ -200,28 +200,28 @@ export default function DashboardModules() {
                   </CardContent>
                 </Card>
               ) : (
-                <Card>
+                <Card className="glass-panel border-white/20 dark:border-white/5 overflow-hidden">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>Modul</TableHead>
-                        <TableHead>Kategori</TableHead>
-                        <TableHead>Level</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Dibuat</TableHead>
+                      <TableRow className="hover:bg-transparent border-b border-white/10">
+                        <TableHead className="font-bold text-foreground/80">Modul</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Kategori</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Level</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Status</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Dibuat</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {myFilteredModules.map((module) => (
-                        <TableRow key={module.id}>
+                        <TableRow key={module.id} className="hover:bg-white/5 border-b border-white/5 transition-colors">
                           <TableCell>
                             <div className="flex items-center gap-3">
-                              <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                                <BookOpen className="h-4 w-4 text-primary" />
+                              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                                <BookOpen className="h-5 w-5 text-primary" />
                               </div>
                               <div>
-                                <p className="font-medium">{module.title}</p>
+                                <p className="font-bold text-foreground">{module.title}</p>
                                 <p className="text-xs text-muted-foreground line-clamp-1">
                                   {module.summary}
                                 </p>
@@ -229,21 +229,21 @@ export default function DashboardModules() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary">{module.category}</Badge>
+                            <Badge variant="secondary" className="glass-button text-xs font-normal">{module.category}</Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline">{module.level}</Badge>
+                            <Badge variant="outline" className="border-white/20 text-xs">{module.level}</Badge>
                           </TableCell>
                           <TableCell>
                             {module.is_published ? (
-                              <Badge className="bg-success/10 text-success border-success/20">
+                              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 shadow-none">
                                 Published
                               </Badge>
                             ) : (
-                              <Badge variant="secondary">Draft</Badge>
+                              <Badge variant="secondary" className="opacity-70">Draft</Badge>
                             )}
                           </TableCell>
-                          <TableCell className="text-muted-foreground text-sm">
+                          <TableCell className="text-muted-foreground text-xs font-mono">
                             {module.created_at &&
                               format(new Date(module.created_at), "dd MMM yyyy", {
                                 locale: localeId,
@@ -252,13 +252,14 @@ export default function DashboardModules() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" aria-label="Opsi Modul">
+                                <Button variant="ghost" size="icon" aria-label="Opsi Modul" className="hover:bg-white/10 rounded-full">
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
+                              <DropdownMenuContent align="end" className="glass-liquid border-white/10">
                                 <DropdownMenuItem
                                   onClick={() => navigate(`/module/${module.id}`)}
+                                  className="focus:bg-white/10 cursor-pointer"
                                 >
                                   <Eye className="h-4 w-4 mr-2" />
                                   Lihat
@@ -267,14 +268,15 @@ export default function DashboardModules() {
                                   onClick={() =>
                                     navigate(`/dashboard/modules/edit/${module.id}`)
                                   }
+                                  className="focus:bg-white/10 cursor-pointer"
                                 >
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit
                                 </DropdownMenuItem>
-                                <DropdownMenuSeparator />
+                                <DropdownMenuSeparator className="bg-white/10" />
                                 <DropdownMenuItem
                                   onClick={() => setDeleteId(module.id)}
-                                  className="text-destructive"
+                                  className="text-destructive focus:bg-destructive/10 cursor-pointer"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Hapus
@@ -296,25 +298,25 @@ export default function DashboardModules() {
             {loadingAll ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <Card key={i} className="animate-pulse">
+                  <Card key={i} className="animate-pulse glass-panel border-white/10 opacity-50">
                     <CardContent className="h-40" />
                   </Card>
                 ))}
               </div>
             ) : publishedModules.length === 0 ? (
-              <Card>
+              <Card className="glass-panel border-dashed border-white/20">
                 <CardContent className="py-12 text-center">
-                  <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                  <h3 className="font-medium mb-2">
+                  <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4 animate-pulse" />
+                  <h3 className="font-bold mb-2 text-lg">
                     {searchQuery ? `Tidak ditemukan modul "${searchQuery}"` : "Belum ada modul tersedia"}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
                     {searchQuery
                       ? "Mungkin belum ada yang membuatnya. Jadilah yang pertama merequest!"
                       : "Modul akan muncul di sini ketika sudah dipublikasikan"}
                     {!isTutorOrAdmin && " (Hanya menampilkan modul sesuai Track Anda)"}
                   </p>
-                  <Button asChild variant="outline">
+                  <Button asChild variant="outline" className="glass-button">
                     <Link to={`/dashboard/requests?tab=module&topic=${encodeURIComponent(searchQuery)}`}>
                       Request Modul Ini
                     </Link>
@@ -322,40 +324,45 @@ export default function DashboardModules() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {publishedModules.map((module) => {
                   const moduleProgress = getProgressForModule(module.id);
                   return (
-                    <Link to={`/module/${module.id}`} key={module.id}>
-                      <Card className="group hover:shadow-medium transition-all duration-300 h-full">
-                        <CardContent className="p-5">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                              <BookOpen className="h-5 w-5 text-primary" />
+                    <Link to={`/module/${module.id}`} key={module.id} className="group">
+                      <Card className="glass-panel border-white/10 dark:border-white/5 h-full transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-glow group-hover:bg-white/10 dark:group-hover:bg-white/5 overflow-hidden relative">
+                        {/* Hover Gradient Effect */}
+                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        <CardContent className="p-6 relative z-10">
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-white/10 shadow-sm group-hover:shadow-md transition-shadow">
+                              <BookOpen className="h-6 w-6 text-primary" />
                             </div>
                             {moduleProgress?.is_completed ? (
-                              <Badge className="bg-success/10 text-success border-success/20 gap-1">
+                              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-1 shadow-none backdrop-blur-sm">
                                 <CheckCircle2 className="h-3 w-3" />
                                 Selesai
                               </Badge>
                             ) : moduleProgress ? (
-                              <Badge variant="secondary" className="gap-1">
+                              <Badge variant="secondary" className="gap-1 glass-button text-xs">
                                 <Clock className="h-3 w-3" />
                                 {moduleProgress.progress_percent}%
                               </Badge>
                             ) : null}
                           </div>
-                          <h3 className="font-semibold mb-1 group-hover:text-primary transition-colors">
+
+                          <h3 className="text-xl font-bold mb-2 text-foreground group-hover:text-primary transition-colors line-clamp-1">
                             {module.title}
                           </h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                          <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
                             {module.summary}
                           </p>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <Badge variant="secondary" className="text-xs">
+
+                          <div className="flex items-center gap-2 flex-wrap mt-auto">
+                            <Badge variant="secondary" className="glass-button text-xs font-normal">
                               {module.category}
                             </Badge>
-                            <Badge variant="outline" className="text-xs">
+                            <Badge variant="outline" className="border-white/20 text-xs text-muted-foreground">
                               {module.level}
                             </Badge>
                             {/* Module Status Badge (Creator Confidence) */}
@@ -363,7 +370,7 @@ export default function DashboardModules() {
                               const config = STATUS_CONFIG[module.status as keyof typeof STATUS_CONFIG];
                               const StatusIcon = config.icon;
                               return (
-                                <Badge className={`text-xs gap-1 ${config.className}`}>
+                                <Badge className={`text-xs gap-1 border-0 shadow-none ${config.className}`}>
                                   <StatusIcon className={`h-3 w-3 ${module.status === 'exploring' ? 'animate-spin' : ''}`} />
                                   {config.label}
                                 </Badge>

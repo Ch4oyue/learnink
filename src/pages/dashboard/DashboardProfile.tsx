@@ -246,98 +246,80 @@ export default function DashboardProfile() {
         {/* Profile Tab Content */}
         {activeTab === "profile" && (
           <>
-            {/* Profile Header Card */}
-            <Card className="relative overflow-hidden">
-              {/* Decorative blur */}
-              <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
+            {/* Glass Hero Profile Header */}
+            <div className="relative rounded-3xl overflow-hidden glass-panel border border-white/20 dark:border-white/5 shadow-2xl">
+              {/* Background Gradient Blob */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-purple-500/10 dark:from-primary/10 dark:to-purple-900/20 blur-3xl opacity-50" />
 
-              <CardContent className="p-6 sm:p-8 relative z-10">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                  <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 w-full md:w-auto">
-                    {/* Avatar with streak badge */}
-                    <div className="relative group">
-                      <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
-                        <AvatarImage src={profile?.avatar_url || undefined} alt={userName} />
-                        <AvatarFallback className="text-3xl font-bold bg-primary/10 text-primary">
-                          {userInitials}
-                        </AvatarFallback>
-                      </Avatar>
+              <div className="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center md:items-start gap-8">
+                {/* Glass Avatar Container */}
+                <div className="relative group shrink-0">
+                  <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <Avatar className="h-40 w-40 border-4 border-white/50 dark:border-white/10 shadow-xl ring-4 ring-white/20 dark:ring-black/20 backdrop-blur-md">
+                    <AvatarImage src={profile?.avatar_url || undefined} alt={userName} className="object-cover" />
+                    <AvatarFallback className="text-5xl font-extrabold bg-gradient-to-br from-primary/20 to-primary/5 text-primary backdrop-blur-md">
+                      {userInitials}
+                    </AvatarFallback>
+                  </Avatar>
 
-                      {/* Streak Badge */}
-                      <div
-                        className="absolute -top-2 -right-2 flex flex-col items-center justify-center h-14 w-14 rounded-full bg-orange-50 dark:bg-orange-900/40 border-2 border-background shadow-md z-20"
-                        title={`${streak}-Day Streak!`}
-                      >
-                        <Flame className="h-6 w-6 text-orange-500 fill-orange-500" />
-                        <span className="text-[10px] font-bold text-orange-600 dark:text-orange-400 leading-none -mt-0.5">
-                          {streak}
-                        </span>
-                      </div>
+                  {/* Glass Streak Badge */}
+                  <div
+                    className="absolute -bottom-2 -right-2 flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-lg z-20 transition-transform hover:scale-105"
+                    title={`${streak}-Day Streak!`}
+                  >
+                    <Flame className="h-6 w-6 text-orange-500 fill-orange-500 animate-pulse-slow" />
+                    <span className="text-xs font-bold text-foreground mt-1">
+                      {streak} Days
+                    </span>
+                  </div>
 
-                      {/* Change Avatar Button */}
-                      <button
-                        className="absolute bottom-1 right-1 h-9 w-9 rounded-full bg-card shadow-md flex items-center justify-center text-muted-foreground hover:text-primary transition-colors border border-border z-10"
-                        aria-label="Change Avatar"
-                      >
-                        <Camera className="h-4 w-4" />
-                      </button>
-                    </div>
+                  {/* Glass Camera Button */}
+                  <button
+                    className="absolute top-2 right-2 h-10 w-10 rounded-full bg-white/20 dark:bg-black/40 backdrop-blur-md flex items-center justify-center text-foreground hover:bg-primary hover:text-white transition-all border border-white/20 shadow-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300"
+                    aria-label="Change Avatar"
+                  >
+                    <Camera className="h-5 w-5" />
+                  </button>
+                </div>
 
-                    {/* User Info */}
-                    <div className="text-center sm:text-left pt-2">
-                      <h1 className="text-3xl font-extrabold text-foreground tracking-tight mb-2">
-                        {userName}
-                      </h1>
-                      <p className="text-muted-foreground text-lg max-w-md leading-relaxed">
-                        Lifelong learner exploring new skills.
-                      </p>
-                      <div className="mt-4 flex flex-wrap justify-center sm:justify-start gap-3">
-                        {role === 'superadmin' ? (
-                          <Badge
-                            variant="outline"
-                            className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800"
-                          >
-                            <Crown className="h-3 w-3 mr-1" />
-                            Super Admin
-                          </Badge>
-                        ) : role ? (
-                          <Badge
-                            variant="outline"
-                            className="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800"
-                          >
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            {roleLabels[role] || "Member"}
-                          </Badge>
-                        ) : null}
-                        <Badge variant="secondary" className="text-muted-foreground">
-                          <MapPin className="h-3 w-3 mr-1" />
-                          Earth
+                {/* Profile Info */}
+                <div className="flex-1 text-center md:text-left space-y-4">
+                  <div>
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                      {userName}
+                    </h1>
+                    <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
+                      {role === 'superadmin' ? (
+                        <Badge variant="outline" className="glass-button border-amber-500/30 text-amber-600 dark:text-amber-400">
+                          <Crown className="h-3 w-3 mr-1" /> Super Admin
                         </Badge>
-                      </div>
+                      ) : role ? (
+                        <Badge variant="outline" className="glass-button border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                          <CheckCircle className="h-3 w-3 mr-1" /> {roleLabels[role] || "Member"}
+                        </Badge>
+                      ) : null}
+                      <Badge variant="outline" className="glass-button">
+                        <MapPin className="h-3 w-3 mr-1" /> Earth
+                      </Badge>
                     </div>
                   </div>
 
+                  <p className="text-lg text-muted-foreground/80 max-w-xl font-medium leading-relaxed">
+                    "Lifelong learner exploring new skills and building the future."
+                  </p>
+
                   {/* Action Buttons */}
-                  <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-                    <Button
-                      onClick={() => setIsEditing(true)}
-                      className="px-6 py-3 rounded-xl font-bold shadow-lg shadow-primary/25"
-                    >
-                      <Edit className="h-5 w-5 mr-2" />
-                      Edit Profile
+                  <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
+                    <Button onClick={() => setIsEditing(true)} className="glass-button-primary h-12 px-8 rounded-2xl shadow-lg hover:shadow-primary/20">
+                      <Edit className="h-4 w-4 mr-2" /> Edit Profile
                     </Button>
-                    <Button
-                      variant="outline"
-                      onClick={handleSignOut}
-                      className="px-6 py-3 rounded-xl font-bold text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <LogOut className="h-5 w-5 mr-2" />
-                      Logout
+                    <Button variant="ghost" onClick={handleSignOut} className="h-12 px-6 rounded-2xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+                      <LogOut className="h-4 w-4 mr-2" /> Logout
                     </Button>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Learning Activity Card - Hidden during edit mode for focus */}
             {!isEditing && (

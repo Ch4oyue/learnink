@@ -27,14 +27,6 @@
     - **Utils**: Isolated `zod` and `date-fns` into `vendor-utils` (107 kB) to enable better caching.
 - **Key Takeaway**: Allowing Vite to handle UI component splitting naturally (instead of forcing a vendor chunk) significantly improves the critical path size.
 
-### [2026-02-01] Context Synchronization & Feature Restoration (v1.7.4)
-- **Action**: Restored Daily Streaks, synchronized `types.ts`, and refactored selection logic into an improved hook.
-- **Reasoning**: Merged upstream performance changes (v1.7.0-1.7.3) with missing gamification features.
-- **Key Changes**:
-    - **Streaks**: Restored DB logic and throttled frontend sync.
-    - **Architecture**: Unified selection logic into `useTextSelection` with the debouncing optimization from upstream.
-- **Next**: Proceed with Design System Overhaul (v1.7.5).
-
 ### [2026-02-01] Pyodide Initialization Optimization
 - **Action**: Implemented `usePyodidePreload` hook in `ModuleLearn.tsx`.
 - **Reasoning**: Pyodide is a heavy dependency. Previous implementation waited for user focus on the editor to load it, causing a delay.

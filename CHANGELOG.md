@@ -7,67 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.7.4] - February 01, 2026
+## [v1.8.0] - 2026-02-01
 
-### Context Synchronization & Feature Restoration
+### Restoration, Design System & Stabilization
 
-Stabilized the project state after merging performance updates. Restored lost gamification features and refactored core interaction modules for better maintainability.
+A major consolidated release that restores lost features, implements the new "Glass/Liquid" design system, and stabilizes critical navigation bugs.
 
-#### Improvements (3)
-- **Daily Streaks (Restored)**: Re-implemented streak tracking logic in `types.ts` and `useActiveTimeTracker`, including the `update_user_streak` database migration.
-- **Improved Selection Hook**: Refactored `HybridContentRenderer` to use a new `useTextSelection` hook that incorporates debounced performance optimizations from v1.7.2.
-- **Agent Context Sync**: Updated `Master Plan`, `README`, and `.jules` logs to ensure all AI agents are aligned on the current development roadmap.
+### Added
+- **Design System**: Implemented "Glass/Liquid" design language across core views.
+  - **Mobile Navigation**: "Floating Dock" style navigation with advanced glassmorphism and animations.
+  - **Profile**: New "Glass Hero" layout featuring large avatar, floating glass stats, and dynamic gradients.
+  - **Settings**: Modernized configuration cards with glass panel transparency and updated controls.
+  - **Modules**: Redesigned grid layout with floating glass cards, improved hover states, and modernized badges.
+- **Gamification**: Restored Streak tracking functionality (Database Migration + Logic restoration).
+- **SEO**: Comprehensive dynamic metadata integration for Landing Page, Modules, and Dashboard.
 
-#### Fixes (1)
-- **Type Mismatches**: Resolved `AuthContext` and profile type errors by accurately mapping new streak columns in the Supabase schema.
-
-## [1.7.3] - February 1, 2026
-
-### Progress Persistence & Navigation Stabilization
-
-Fixes critical bugs in the learning module where progress could reset on refresh and the last visited section was not remembered.
-
-#### Fixes (2)
-- **Progress Reset Bug**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.
+### Fixed
+- **Performance**: Restored `useTextSelection` hook with debounce logic to prevent UI freezing during text selection.
+- **Auth**: Restored optimized authentication data fetching strategy using separate queries to bypass missing RPC.
+- **Progress Persistence**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.
 - **Section Persistence**: Implemented `localStorage` persistence for the current section index, ensuring users return to where they left off after a refresh.
 
 ## [1.7.2] - January 31, 2026
 
-### Accessibility Compliance & Interaction Optimization
+### Accessibility, SEO & Mobile Performance Overhaul
 
-A performance and accessibility focused update that resolves critical UI bottlenecks and ensures WCAG 2.1 compliance. This release fixes a significant interaction delay in learning modules and enhances screen reader support across the entire platform.
+A massive consolidated release focused on "Premium Feel", Accessibility compliance, and performance optimization for all device tiers. This update merges accessibility improvements, SEO integration, and a low-end device performance engine.
 
-#### Improvements (4)
+#### Improvements (13)
 - **A11y Overhaul**: Added `aria-label` to all icon-only buttons, implemented proper `main` landmarks for all pages, and restored user-scaling for better mobile readability.
 - **TOC Optimization**: Memoized Table of Contents items in `ModuleLearn`, reducing re-render costs for large modules by ~80%.
 - **Selection Performance**: Fixed a memory leak in text selection handling and implemented debouncing, reducing main-thread blocking during reading.
 - **Slug Caching**: Implemented results caching for markdown heading IDs to avoid repeated regex operations.
-
-#### Fixes (2)
-- **Input Delay**: Resolved the ~600ms input delay when interacting with module headings by fixing redundant event listeners.
-- **Branding Sync**: Updated all remaining "LearnAI" instances to "LearnInk" for brand consistency.
-
-## [1.7.1] - January 31, 2026
-
-### SEO, Navigation Feedback & Component Prefetching
-
-An enhancement release focused on "Premium Feel" and perceived performance. This update adds SEO meta tags for all critical pages, visual navigation feedback via a top progress bar, and hardware-aware prefetching for faster route transitions.
-
-#### Improvements (3)
 - **SEO & Meta Tags**: Integrated `react-helmet-async` and created a reusable `SEO` component to manage meta tags, improving social sharing and search visibility.
 - **Top Loading Bar**: Added a subtle `TopProgressBar` that appears during lazy route transitions, providing immediate visual feedback to the user.
 - **Smart Prefetching**: Implemented hardware-aware prefetching that preloads lazy components on hover, but only for capable devices with fast connections.
-
-#### Patches (1)
-- **Index Cleanup**: Optimized `index.html` with better font preloads and corrected branding meta tags.
-
-## [1.7.0] - January 31, 2026
-
-### Mobile Performance & Low-End Optimization
-
-A comprehensive performance overhaul designed to make LearnInk run smoothly on low-to-mid range mobile devices. This release introduces intelligent hardware detection, aggressive caching, and UI responsiveness improvements.
-
-#### Improvements (6)
 - **Performance Engine**: Introduced `usePerformance` hook to detect low-end devices (RAM/CPU/Connection) and automatically scale down UI complexity.
 - **Lazy Execution**: Refactored `MarkdownRenderer` to lazy-load the heavy `PythonCodeEditor` only when needed.
 - **Aggressive Caching**: Enhanced PWA configuration with Workbox runtime caching for Google Fonts and static assets.
@@ -75,12 +49,15 @@ A comprehensive performance overhaul designed to make LearnInk run smoothly on l
 - **Conservative Preloading**: Updated `usePyodidePreload` to skip preloading on low-end devices, saving data and memory.
 - **Parser Fast-Path**: Implemented an optimized heading check in `moduleParser.ts` to improve content ingestion speed.
 
-#### Fixes (3)
+#### Fixes (5)
+- **Input Delay**: Resolved the ~600ms input delay when interacting with module headings by fixing redundant event listeners.
+- **Branding Sync**: Updated all remaining "LearnAI" instances to "LearnInk" for brand consistency.
 - **Navigation Responsiveness**: Disabled `v7_startTransition` in React Router to fix the "stalled view" issue where the URL changed but the UI didn't update.
 - **Mobile Scroll**: Optimized section transitions in `ModuleLearn` to use `auto` scroll instead of `smooth` on low-end devices to prevent main-thread blocking.
 - **Environment Stability**: Resolved `bun test` environment failures by fixing dependency resolution and test mocks.
 
-#### Patches (1)
+#### Patches (2)
+- **Index Cleanup**: Optimized `index.html` with better font preloads and corrected branding meta tags.
 - **Unified Design**: Integrated performance detection into `CustomCursor` and `useSmoothScroll` for a consistent lightweight experience.
 
 ## [1.6.0] - January 30, 2026
@@ -446,11 +423,8 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.7.4 | Feb 1, 2026 | Context Sync & Feature Restoration |
-| 1.7.3 | Feb 1, 2026 | Progress Persistence & Navigation Stabilization |
-| 1.7.2 | Jan 31, 2026 | Accessibility Compliance & Interaction Optimization |
-| 1.7.1 | Jan 31, 2026 | SEO, Navigation Feedback & Smart Prefetching |
-| 1.7.0 | Jan 31, 2026 | Mobile Performance & Low-End Optimization |
+| 1.8.0 | Feb 1, 2026 | Restoration, Design System & Stabilization |
+| 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
+
 import { supabase } from '@/integrations/supabase/client';
 
 const IDLE_TIMEOUT_MS = 60 * 1000; // 60 seconds
@@ -39,7 +40,7 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
     }
   }, [moduleId, userId]);
 
-  // Activity listener
+  // Activity listener with DB sync throttling
   const handleActivity = useCallback(() => {
     const now = Date.now();
     lastActivityRef.current = now;

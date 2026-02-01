@@ -86,19 +86,28 @@ LearnInk is a modern, high-performance Learning Management System (LMS) designed
 ```
 src/
 ├── components/     # Reusable UI components (Glass Liquid style)
-├── contexts/       # React Contexts (Auth, Theme)
-├── hooks/          # Custom hooks (useLearningStats, useDebounce)
+│   ├── features/   # Specific business logic components (Admin, Quiz, Module)
+│   ├── layout/     # Global layout components (Navbar, Sidebar)
+│   ├── shared/     # Common utilities (ErrorBoundary, MarkdownRenderer)
+│   └── ui/         # Base UI components (shadcn/ui atoms)
+├── contexts/       # React Contexts (Auth, Theme, PWA)
+├── hooks/          # Custom hooks (useLearningStats, useQuiz)
 ├── integrations/   # Supabase client and types
-├── lib/            # Utilities & Workers
-│   ├── pyodide.worker.ts  # Python execution worker
-│   └── ...
-├── pages/          # Application routes (Dashboard, Modules)
+├── lib/            # Utilities & Workers (Parser, Logger, GSAP)
+├── pages/          # Application routes grouped by function
+│   ├── admin/      # Admin-only management pages
+│   ├── auth/       # Authentication (Login/Register)
+│   ├── dashboard/  # User & Tutor dashboards
+│   ├── learning/   # Module & Learning interface
+│   └── public/     # Public static pages (Landing, Syllabus)
 ├── types/          # Global TypeScript definitions
 └── App.tsx         # Main entry with routing
 supabase/
 ├── migrations/     # Database schema & RPC functions
 └── functions/      # Edge Functions (ingest-content, etc.)
-tests/              # Benchmarks and integration tests
+docs/
+├── designs/        # Reference design assets and mockups
+└── references/     # Third-party reference projects/codebases
 ```
 
 ## 🤝 Contributing

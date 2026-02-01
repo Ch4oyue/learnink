@@ -33,8 +33,16 @@
 - **Implementation**: The new hook checks if the module content contains Python code blocks (` ```python `) and triggers a low-priority background load using `requestIdleCallback` (or `setTimeout` fallback).
 - **Result**: The Python environment is initialized during reading time, making the editor "instantly" ready when accessed.
 
-### [2026-02-14] Syntax Highlighter Optimization
-- **Action**: Refactored `MarkdownRenderer.tsx` to use `prism-light` and manual language registration.
-- **Reasoning**: The default `react-syntax-highlighter` import includes all languages, resulting in a ~756kB chunk.
-- **Implementation**: Switched to `react-syntax-highlighter/dist/esm/prism-light` and registered only used languages (python, js, ts, bash, json, css, html, markdown).
-- **Result**: `MarkdownRenderer` chunk size reduced from **756.57 kB** to **189.29 kB** (**75% reduction**).
+### [2026-01-31] SEO, Streaks & Code Refactoring (v1.6.1)
+- **Action**: Implemented Daily Streaks, integrated `react-helmet-async` for SEO, and refactored `HybridContentRenderer`.
+- **Reasoning**: To improve engagement, search visibility, and codebase maintainability.
+- **Key Changes**:
+    - **SEO**: Created a central `<SEO />` component.
+    - **Streaks**: Added DB trigger and throttled frontend activity tracking.
+    - **Refactor**: Extracted text selection logic into `useTextSelection.ts` hook.
+- **Results**: Cleaner component logic and automated engagement tracking. Ready for Design System v1.6.2.
+
+### [2026-02-05] Section Lookup Optimization
+- **Benchmark Result (Before):** O(N) Array.indexOf lookup in `useModuleNavigation`.
+- **Change Implemented:** Implemented `indexMap` (Map<string, number>) in `parseModuleSections` and `useModuleNavigation` for O(1) lookups.
+- **Benchmark Result (After):** ~95% faster lookups for 500 items (O(1) vs O(N)). Verified via `tests/performance/array_lookup_benchmark.test.ts`.

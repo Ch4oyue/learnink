@@ -194,10 +194,10 @@ export default function ModuleLearn() {
         });
         // Invalidate progress to update 'reward_claimed' status
         updateProgress.mutate({
-           userId: user.id,
-           moduleId: moduleId,
-           progressPercent: 100, // Ensure it stays 100
-           isCompleted: true
+          userId: user.id,
+          moduleId: moduleId,
+          progressPercent: 100, // Ensure it stays 100
+          isCompleted: true
         });
       } else {
         throw new Error(data.error || "Failed to claim reward");
@@ -212,7 +212,7 @@ export default function ModuleLearn() {
       // Allow trying again or close?
       // If error is "already claimed", we should probably close.
       if (error.message?.includes("already claimed")) {
-         setShowGacha(false);
+        setShowGacha(false);
       }
     } finally {
       setIsClaiming(false);
@@ -333,6 +333,10 @@ export default function ModuleLearn() {
 
   return (
     <div className="flex bg-background min-h-screen md:h-screen md:overflow-hidden">
+      <SEO
+        title={module?.title || "Loading Module..."}
+        description={module?.summary}
+      />
       {/* ============================================
           PANEL 1: Icon Rail (72px) - Desktop Only
       ============================================ */}
@@ -593,7 +597,7 @@ export default function ModuleLearn() {
           setShowGacha(false);
           // If they closed after earning, we can reset state for next time (though next time won't happen for this module)
           if (xpEarned !== null) {
-             setXpEarned(null);
+            setXpEarned(null);
           }
         }}
         moduleTitle={module.title}

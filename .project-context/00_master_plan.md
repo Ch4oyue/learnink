@@ -32,11 +32,15 @@
 - [x] **v1.6.1**: Gamification (Streaks/XP), SEO Architecture. (Restored in v1.8.0)
 - [x] **v1.6.2**: Design System Overhaul (Glass/Liquid) - *Completed in v1.8.0*
 - [x] **v1.7.x**: Git Sync & Stability Fixes.
-- [x] **v1.8.1**: **Restoration & Consolidation** (Current)
+- [x] **v1.8.0**: **Restoration & Consolidation** (Current)
     - [x] Restore v1.6.1 Features (Streaks, SEO).
     - [x] Implement "Glass/Liquid" Design System (Mobile Nav, Profile, Cards).
-    - [x] Finalize "Second Brain" Deep Integration.
-    - [x] Security Hardening (Atomic XP Award).
+    - [x] Finalize "Second Brain" Deep Integration AI.
+    - [x] **v1.9.0**: Super Admin & APK Loyalty Upgrade
+        - [x] Super Admin System Control (Global Economy, Maintenance Mode, Broadcast).
+        - [x] APK Loyalty System (Double XP Multiplier, Offline Sync).
+        - [x] LearnInk Elite Premium System (Loyalty-based status).
+        - [x] PWA "Store Ready" (Share Target, Shortcuts, Desktop Window Controls).
 
 ### 📍 Fase 2: Enhancement (Dalam Proses)
 - [ ] Quiz Generation dengan AI
@@ -44,7 +48,6 @@
 - [x] Gamifikasi (Achievements, Progress Tracking)
 - [x] Real-time Notifications
 - [ ] Advanced Analytics Dashboard
-- [x] Mobile-First PWA Optimization (Low-End & Performance)
 
 ### 📍 Fase 3: Scale (Rencana)
 - [ ] Multi-tenant Support

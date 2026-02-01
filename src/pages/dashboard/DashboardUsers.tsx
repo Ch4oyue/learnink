@@ -3,6 +3,7 @@ import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout
 import { useUsers, UserWithRole, SUPER_ADMIN_EMAIL, SUPER_ADMIN_USER_ID, useUserStats } from "@/hooks/useUsers";
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,7 @@ import {
   Loader2,
   AlertCircle,
   Crown,
+  Plus,
 } from "lucide-react";
 import { format } from "date-fns";
 import { id } from "date-fns/locale";
@@ -131,6 +133,30 @@ export default function DashboardUsers() {
     tutorCount: 0,
     userCount: 0,
   };
+
+  const { data: labelConfigs } = useQuery({
+    queryKey: ["label-configs"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("label_configs").select("*");
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!currentUser
+  });
+
+  const updateLabels = useMutation({
+    mutationFn: async ({ userId, labels }: { userId: string; labels: string[] }) => {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ labels })
+        .eq("id", userId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast({ title: "Label diperbarui" });
+    }
+  });
 
   if (error) {
     // Determine the error type for user-friendly messages
@@ -240,6 +266,7 @@ export default function DashboardUsers() {
                     <TableHead>Pengguna</TableHead>
                     <TableHead>Role</TableHead>
                     <TableHead className="hidden md:table-cell">Bergabung</TableHead>
+                    <TableHead>Label</TableHead>
                     <TableHead>Ubah Role</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -294,6 +321,42 @@ export default function DashboardUsers() {
                             ? format(new Date(user.created_at), "d MMM yyyy", { locale: id })
                             : "-"
                           }
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1 max-w-[200px]">
+                            {user.labels?.map(l => (
+                              <Badge key={l} variant="secondary" className="text-[10px] px-1 h-5">
+                                {l}
+                                {(currentUser?.id === SUPER_ADMIN_USER_ID || currentUser?.email === SUPER_ADMIN_EMAIL) && (
+                                  <button
+                                    className="ml-1 hover:text-destructive"
+                                    onClick={() => {
+                                      const newLabels = user.labels?.filter(label => label !== l) || [];
+                                      updateLabels.mutate({ userId: user.id, labels: newLabels });
+                                    }}
+                                  >
+                                    ×
+                                  </button>
+                                )}
+                              </Badge>
+                            ))}
+                            {(currentUser?.id === SUPER_ADMIN_USER_ID || currentUser?.email === SUPER_ADMIN_EMAIL) && (
+                              <Select onValueChange={(val) => {
+                                if (user.labels?.includes(val)) return;
+                                const newLabels = [...(user.labels || []), val];
+                                updateLabels.mutate({ userId: user.id, labels: newLabels });
+                              }}>
+                                <SelectTrigger className="h-5 w-8 p-0 border-dashed">
+                                  <Plus className="h-3 w-3" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {labelConfigs?.map(lc => (
+                                    <SelectItem key={lc.id} value={lc.id}>{lc.id}</SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           {isProtected ? (

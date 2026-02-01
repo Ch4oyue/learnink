@@ -491,3 +491,18 @@
     caret-color: white !important;
     transition: background-color 5000s ease-in-out 0s;
 }
+
+/* ======================================
+   WINDOW CONTROLS OVERLAY (Desktop PWA)
+   ====================================== */
+@media (display-mode: window-controls-overlay) {
+    .pwa-draggable {
+        -webkit-app-region: drag;
+        app-region: drag;
+    }
+
+    .pwa-no-drag {
+        -webkit-app-region: no-drag;
+        app-region: no-drag;
+    }
+}

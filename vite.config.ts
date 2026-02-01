@@ -14,7 +14,9 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
+      injectRegister: 'auto',
+      strategies: 'generateSW',
       includeAssets: ['favicon.ico', 'placeholder.svg', 'apple-touch-icon.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
@@ -52,20 +54,72 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: 'LearnInk',
         short_name: 'LearnInk',
-        description: 'Platform Belajar AI Automation',
+        description: 'Platform Belajar AI & Automation Terdepan',
         theme_color: '#09090b',
         background_color: '#09090b',
         display: 'standalone',
+        display_override: ['window-controls-overlay', 'standalone'],
+        orientation: 'portrait',
+        categories: ['education', 'productivity'],
         icons: [
           {
             src: 'icon-192.png',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
           },
           {
             src: 'icon-512.png',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ],
+        shortcuts: [
+          {
+            name: 'Materi Saya',
+            short_name: 'Materi',
+            description: 'Lanjutkan belajar modul Anda',
+            url: '/dashboard/courses',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }]
+          },
+          {
+            name: 'Request Materi',
+            short_name: 'Request',
+            description: 'Ajukan topik materi baru',
+            url: '/dashboard/requests',
+            icons: [{ src: 'icon-192.png', sizes: '192x192' }]
+          }
+        ],
+        share_target: {
+          action: '/dashboard/share-target',
+          method: 'GET',
+          params: {
+            title: 'title',
+            text: 'text',
+            url: 'url'
+          }
+        },
+        protocol_handlers: [
+          {
+            protocol: 'web+learnink',
+            url: '/learn/%s'
+          }
+        ],
+        screenshots: [
+          {
+            src: 'https://ik.imagekit.io/focustimerin/learnink_landing?updatedAt=1757343104763',
+            sizes: '1280x720',
+            type: 'image/png',
+            form_factor: 'wide',
+            label: 'LearnInk Landing Page'
+          },
+          {
+            src: 'https://ik.imagekit.io/focustimerin/learnink_mobile?updatedAt=1757343104763',
+            sizes: '390x844',
+            type: 'image/png',
+            form_factor: 'narrow',
+            label: 'LearnInk Mobile Interface'
           }
         ]
       }

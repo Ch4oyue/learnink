@@ -17,6 +17,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { id as localeId } from "date-fns/locale";
+import { PremiumStore } from "@/components/features/premium/PremiumStore";
 import {
   ArrowLeft,
   Camera,
@@ -225,11 +226,11 @@ export default function DashboardProfile() {
         {/* Tab Navigation */}
         <div className="border-b border-border">
           <div className="flex gap-8 overflow-x-auto no-scrollbar">
-            {["profile", "notes", "settings"].map((tab) => (
+            {["profile", "premium", "notes", "settings"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`relative pb-4 text-sm font-medium transition-colors capitalize ${activeTab === tab
+                className={`relative pb-4 text-sm font-medium transition-colors capitalize whitespace-nowrap ${activeTab === tab
                   ? "text-primary font-bold"
                   : "text-muted-foreground hover:text-foreground"
                   }`}
@@ -255,7 +256,10 @@ export default function DashboardProfile() {
                 {/* Glass Avatar Container */}
                 <div className="relative group shrink-0">
                   <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  <Avatar className="h-40 w-40 border-4 border-white/50 dark:border-white/10 shadow-xl ring-4 ring-white/20 dark:ring-black/20 backdrop-blur-md">
+                  <Avatar
+                    isPremium={profile?.is_premium}
+                    className="h-40 w-40 border-4 border-white/50 dark:border-white/10 shadow-xl ring-4 ring-white/20 dark:ring-black/20 backdrop-blur-md"
+                  >
                     <AvatarImage src={profile?.avatar_url || undefined} alt={userName} className="object-cover" />
                     <AvatarFallback className="text-5xl font-extrabold bg-gradient-to-br from-primary/20 to-primary/5 text-primary backdrop-blur-md">
                       {userInitials}
@@ -597,6 +601,11 @@ export default function DashboardProfile() {
               </div>
             )}
           </>
+        )}
+
+        {/* Premium Tab Content */}
+        {activeTab === "premium" && (
+          <PremiumStore />
         )}
 
         {/* My Notes Tab - Redirect to Second Brain */}

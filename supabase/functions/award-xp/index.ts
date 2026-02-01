@@ -25,7 +25,7 @@ serve(async (req) => {
 
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Authorization required" }), {
+      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -45,82 +45,123 @@ serve(async (req) => {
       });
     }
 
-    // Use Service Role for DB operations to ensure security
+    // Use Service Role for DB operations
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
 
-    // SECURITY IMPLEMENTATION: Atomic check-and-update to prevent race conditions (XP grinding)
-    // We only update reward_claimed to true IF it was false AND module is completed
-    const { data: updatedProgress, error: updateError } = await supabaseAdmin
-        .from("user_progress")
-        .update({ reward_claimed: true })
-        .eq("user_id", user.id)
-        .eq("module_id", module_id)
-        .eq("reward_claimed", false)
-        // Eligibility: must be completed OR have 100% progress
-        .or("is_completed.eq.true,progress_percent.gte.100")
-        .select()
-        .single();
+    // 1. Detect APK status
+    const userAgent = req.headers.get("user-agent") || "";
+    const isApk = userAgent.includes("LearnInk-APK"); // Targeted detection for official APK
 
-    if (updateError || !updatedProgress) {
-        console.error("Claim eligibility error or already claimed:", updateError);
-        return new Response(JSON.stringify({
-            error: "Reward already claimed or module not completed yet",
-            claimed: true
-        }), {
+    // 2. Fetch System Settings & User Profile
+    const [settingsRes, profileRes, progressRes] = await Promise.all([
+        supabaseAdmin.from("system_settings").select("key, value"),
+        supabaseAdmin.from("profiles").select("xp, points, labels, is_premium").eq("id", user.id).single(),
+        supabaseAdmin.from("user_progress").select("is_completed, progress_percent, reward_claimed").eq("user_id", user.id).eq("module_id", module_id).single()
+    ]);
+
+    if (progressRes.error || !progressRes.data) {
+         return new Response(JSON.stringify({ error: "Progress not found" }), {
+            status: 404,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+    }
+
+    if (progressRes.data.reward_claimed) {
+        return new Response(JSON.stringify({ error: "Reward already claimed", claimed: true }), {
             status: 400,
             headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
     }
 
-    // 2. Calculate Reward
-    // Random between 50 and 150
-    const xpReward = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
-
-    // 3. Update Profile XP (Atomic increment using RPC if possible, or careful update)
-    let finalXp;
-    const { data: xpData, error: xpError } = await supabaseAdmin
-        .rpc('increment_user_xp', {
-            target_user_id: user.id,
-            xp_to_add: xpReward
+    const isEligible = progressRes.data.is_completed || (progressRes.data.progress_percent ?? 0) >= 100;
+    if (!isEligible) {
+         return new Response(JSON.stringify({ error: "Module not completed yet" }), {
+            status: 400,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
+    }
 
-    if (xpError) {
-        console.warn("RPC increment_user_xp failed, falling back to manual update:", xpError);
+    const settings = (settingsRes.data || []).reduce((acc, curr) => {
+        acc[curr.key] = curr.value;
+        return acc;
+    }, {} as Record<string, unknown>);
 
-        // Fallback: Get current XP and update
-        const { data: profile } = await supabaseAdmin
-            .from("profiles")
-            .select("xp")
-            .eq("id", user.id)
-            .single();
+    const profile = profileRes.data;
+    const globalMultiplier = parseFloat(settings.global_xp_multiplier || "1.0");
+    const apkBonus = parseFloat(settings.apk_base_bonus || "0.0");
 
-        const currentXp = profile?.xp || 0;
-        finalXp = currentXp + xpReward;
+    // 3. Calculate Multipliers
+    let combinedMultiplier = globalMultiplier;
 
-        const { error: profileError } = await supabaseAdmin
-            .from("profiles")
-            .update({ xp: finalXp })
-            .eq("id", user.id);
+    // APK Bonus
+    if (isApk) {
+        combinedMultiplier += apkBonus;
+    }
 
-        if (profileError) {
-            console.error("Critical: Failed to update XP after marking claimed:", profileError);
-            // Revert reward_claimed to allow retry
-            await supabaseAdmin
-                .from("user_progress")
-                .update({ reward_claimed: false })
-                .eq("user_id", user.id)
-                .eq("module_id", module_id);
+    // Premium Multiplier (1.5x)
+    if (profile?.is_premium) {
+        combinedMultiplier *= 1.5;
+    }
 
-            throw new Error("Failed to update profile XP");
+    // Label Multipliers
+    const userLabels = profile?.labels || [];
+    if (userLabels.length > 0) {
+        const { data: labelConfigs } = await supabaseAdmin
+            .from("label_configs")
+            .select("multiplier")
+            .in("id", userLabels)
+            .eq("is_active", true);
+
+        if (labelConfigs && labelConfigs.length > 0) {
+            // Apply the highest multiplier found in labels
+            const maxLabelMultiplier = Math.max(...labelConfigs.map(l => parseFloat(l.multiplier as unknown as string)));
+            combinedMultiplier *= maxLabelMultiplier;
         }
-    } else {
-        finalXp = xpData;
+    }
+
+    // 4. Calculate Final Reward
+    const baseReward = Math.floor(Math.random() * (150 - 50 + 1)) + 50;
+    const xpReward = Math.floor(baseReward * combinedMultiplier);
+    const pointsReward = Math.floor(xpReward * 0.1); // 10% of XP becomes InkPoints
+
+    // 5. Update Database
+    // Mark as claimed
+    const { error: updateError } = await supabaseAdmin
+        .from("user_progress")
+        .update({ reward_claimed: true })
+        .eq("user_id", user.id)
+        .eq("module_id", module_id);
+
+    if (updateError) throw updateError;
+
+    // Update Profile (XP + Points)
+    const newXp = (profile?.xp || 0) + xpReward;
+    const newPoints = (profile?.points || 0) + pointsReward;
+
+    const { error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .update({ xp: newXp, points: newPoints })
+        .eq("id", user.id);
+
+    if (profileError) {
+        // Revert claim flag if possible
+        await supabaseAdmin
+            .from("user_progress")
+            .update({ reward_claimed: false })
+            .eq("user_id", user.id)
+            .eq("module_id", module_id);
+        throw new Error("Failed to update profile data");
     }
 
     return new Response(JSON.stringify({
         success: true,
         xp_gained: xpReward,
-        new_total_xp: finalXp
+        points_gained: pointsReward,
+        multipliers: {
+            global: globalMultiplier,
+            apk: isApk ? (1 + apkBonus) : 1,
+            labels: combinedMultiplier / (globalMultiplier * (isApk ? (1 + apkBonus) : 1))
+        }
     }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

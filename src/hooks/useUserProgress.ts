@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useMemo } from "react";
+import { useOfflineSync } from "./useOfflineSync";
 
 export interface UserProgress {
   id: string;
@@ -133,6 +134,7 @@ export function useTotalStudents() {
 export function useUpdateProgress() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { isOnline, saveToOfflineQueue } = useOfflineSync();
 
   return useMutation({
     mutationFn: async ({
@@ -146,6 +148,18 @@ export function useUpdateProgress() {
       progressPercent: number;
       isCompleted?: boolean;
     }) => {
+      // Offline handling
+      if (!isOnline) {
+        saveToOfflineQueue({
+          userId,
+          moduleId,
+          progressPercent,
+          isCompleted,
+          timestamp: new Date().toISOString()
+        });
+        return { offline: true };
+      }
+
       const updateData: Record<string, unknown> = {
         progress_percent: progressPercent,
       };
@@ -172,7 +186,11 @@ export function useUpdateProgress() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: (data, variables) => {
+      if (data && 'offline' in data) {
+        // Silently return for offline save
+        return;
+      }
       // Silently invalidate cache - no toast for automatic progress saves
       queryClient.invalidateQueries({ queryKey: ['user-progress', variables.userId] });
     },

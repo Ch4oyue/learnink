@@ -35,7 +35,29 @@ Modul perlu status pembelajaran (Mastered/Exploring) dan link ke Track.
     *   *Default*: `'queue'`.
 *   Add `source_url`: TEXT (Link ke Notion/Sumber Asli jika ada).
 
-### C. Request System (On-Demand)
+### C. Super Admin & Economy (v1.9.0)
+
+**New Table: `system_settings`**
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `key` | TEXT | PK (e.g., 'maintenance_mode', 'global_xp_multiplier') |
+| `value` | JSONB | Nilai konfigurasi |
+| `description` | TEXT | Penjelasan kegunaan |
+| `updated_at` | TIMESTAMPTZ | Waktu update terakhir |
+
+**New Table: `label_configs`**
+| Column | Type | Description |
+| :--- | :--- | :--- |
+| `label` | TEXT | PK (e.g., 'Senior', 'Contributor') |
+| `xp_multiplier` | NUMERIC | Pengali XP untuk label ini |
+
+**Alter Table: `profiles`**
+*   Add `labels`: TEXT[] - Daftar label user.
+*   Add `points`: INT - Mata uang internal (InkPoints).
+*   Add `is_premium`: BOOLEAN - Status premium/elite.
+*   Add `premium_until`: TIMESTAMPTZ - Masa berlaku premium.
+
+### D. Request System (On-Demand)
 Menampung permintaan materi dari Pengunjung.
 
 **New Table: `material_requests`**

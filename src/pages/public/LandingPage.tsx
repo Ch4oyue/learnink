@@ -7,7 +7,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
 import { lazy, Suspense, useState } from "react";
-import SEO from "@/components/shared/SEO";
+import { SEO } from "@/components/shared/SEO";
+import { usePrefetch } from "@/hooks/usePrefetch";
 
 // Lazy load heavy below-the-fold components
 const Features = lazy(() => import("@/components/features/landing/Features").then(module => ({ default: module.Features })));
@@ -18,6 +19,7 @@ export default function LandingPage() {
     const { resolvedTheme, setTheme } = useTheme();
     const { user } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const prefetch = usePrefetch();
 
     // Enable smooth scrolling for anchor links
     useSimpleSmoothScroll();
@@ -29,8 +31,8 @@ export default function LandingPage() {
     return (
         <div className="bg-background text-foreground transition-colors duration-300 min-h-screen flex flex-col font-sans antialiased">
             <SEO
-                title="Platform Belajar AI Automation"
-                description="Kuasai AI Automation tanpa perlu coding. Belajar workflow otomatisasi untuk produktivitas."
+                title="LearnInk - Master Tech Skills The Lazy Way"
+                description="Hentikan menonton tutorial tanpa akhir. Bangun proyek nyata dengan Guided Notes yang melacak kemajuan Anda secara otomatis."
             />
             {/* Header */}
             <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border pt-[env(safe-area-inset-top)] transition-all">
@@ -56,6 +58,7 @@ export default function LandingPage() {
                             {user ? (
                                 <Link
                                     to="/dashboard"
+                                    onMouseEnter={() => prefetch(() => import("@/pages/dashboard/DashboardHome"))}
                                     className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
                                 >
                                     <LayoutDashboard className="h-4 w-4" />
@@ -64,6 +67,7 @@ export default function LandingPage() {
                             ) : (
                                 <Link
                                     to="/auth"
+                                    onMouseEnter={() => prefetch(() => import("@/pages/auth/Auth"))}
                                     className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                                 >
                                     Log in
@@ -74,6 +78,7 @@ export default function LandingPage() {
                                 size="icon"
                                 onClick={toggleTheme}
                                 className="rounded-lg"
+                                aria-label="Ganti Tema"
                             >
                                 {resolvedTheme === "dark" ? (
                                     <Sun className="h-4 w-4" />
@@ -85,11 +90,12 @@ export default function LandingPage() {
 
                         {/* Mobile Menu */}
                         <div className="flex md:hidden items-center gap-2">
-                            <Button
+                             <Button
                                 variant="outline"
                                 size="icon"
                                 onClick={toggleTheme}
                                 className="rounded-lg mr-1"
+                                aria-label="Ganti Tema"
                             >
                                 {resolvedTheme === "dark" ? (
                                     <Sun className="h-4 w-4" />
@@ -100,7 +106,11 @@ export default function LandingPage() {
 
                             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                                 <SheetTrigger asChild>
-                                    <Button variant="ghost" size="icon">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        aria-label="Menu Utama"
+                                    >
                                         <Menu className="h-5 w-5" />
                                     </Button>
                                 </SheetTrigger>

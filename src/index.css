@@ -130,6 +130,35 @@
 }
 
 /* ======================================
+   PRINT STYLES (PDF Export)
+   ====================================== */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    /* Target specific components to print */
+    #print-notes-container,
+    #print-notes-container * {
+        visibility: visible;
+    }
+
+    #print-notes-container {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        color: black !important;
+        padding: 2rem;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* ======================================
    BASE STYLES
    ====================================== */
 @layer base {

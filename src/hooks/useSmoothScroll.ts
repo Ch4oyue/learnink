@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { usePerformance } from "@/hooks/usePerformance";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
@@ -32,6 +33,8 @@ export function useSmoothScroll(
     containerRef: React.RefObject<HTMLElement>,
     options: UseSmoothScrollOptions = {}
 ) {
+    const { isLowEnd, prefersReducedMotion: prefersReducedMotionVal } = usePerformance();
+
     const {
         enabled = true,
         duration = 0.8,
@@ -41,11 +44,8 @@ export function useSmoothScroll(
 
     const scrollTriggerInstances = useRef<ScrollTrigger[]>([]);
 
-    // Check for reduced motion preference
-    const prefersReducedMotion = useRef(
-        typeof window !== "undefined" &&
-        window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    );
+    // Use current value or fallback to ref if needed (but hook is better)
+    const isDisabled = !enabled || prefersReducedMotionVal || isLowEnd;
 
     /**
      * Smooth scroll to a specific element or position
@@ -54,8 +54,8 @@ export function useSmoothScroll(
         target: HTMLElement | number | string,
         customDuration?: number
     ) => {
-        if (prefersReducedMotion.current || !enabled) {
-            // Fallback to native scroll for reduced motion
+        if (isDisabled) {
+            // Fallback to native scroll for reduced motion or low-end
             if (typeof target === "number") {
                 window.scrollTo({ top: target, behavior: "auto" });
             } else if (typeof target === "string") {
@@ -84,7 +84,7 @@ export function useSmoothScroll(
             duration: customDuration ?? duration,
             ease,
         });
-    }, [enabled, duration, ease, offset]);
+    }, [isDisabled, duration, ease, offset]);
 
     /**
      * Create fade-in animation for elements when they enter viewport
@@ -97,7 +97,7 @@ export function useSmoothScroll(
             y?: number;
         }
     ) => {
-        if (prefersReducedMotion.current || !enabled) return;
+        if (isDisabled) return;
 
         const elements = document.querySelectorAll(selector);
         if (elements.length === 0) return;
@@ -123,7 +123,7 @@ export function useSmoothScroll(
         });
 
         scrollTriggerInstances.current.push(...(Array.isArray(trigger) ? trigger : [trigger]));
-    }, [enabled]);
+    }, [isDisabled]);
 
     /**
      * Create parallax effect for an element
@@ -132,7 +132,7 @@ export function useSmoothScroll(
         element: HTMLElement,
         speed: number = 0.5
     ) => {
-        if (prefersReducedMotion.current || !enabled) return;
+        if (isDisabled) return;
 
         const trigger = ScrollTrigger.create({
             trigger: element,
@@ -146,11 +146,11 @@ export function useSmoothScroll(
         });
 
         scrollTriggerInstances.current.push(trigger);
-    }, [enabled]);
+    }, [isDisabled]);
 
     // Handle anchor link clicks
     useEffect(() => {
-        if (!enabled || prefersReducedMotion.current) return;
+        if (isDisabled) return;
 
         const handleAnchorClick = (e: MouseEvent) => {
             const target = e.target as HTMLElement;
@@ -170,7 +170,7 @@ export function useSmoothScroll(
         return () => {
             document.removeEventListener("click", handleAnchorClick);
         };
-    }, [enabled, scrollTo]);
+    }, [isDisabled, scrollTo]);
 
     // Cleanup ScrollTrigger instances on unmount
     useEffect(() => {

@@ -105,7 +105,7 @@ export default function DashboardSettings() {
           <Card>
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
-              <CardDescription>Customize how LearnAI looks on your device</CardDescription>
+              <CardDescription>Customize how LearnInk looks on your device</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -147,7 +147,7 @@ export default function DashboardSettings() {
               {/* Install PWA Section */}
               <div className="mt-8 border-t pt-6">
                 <h3 className="text-base font-medium mb-1">Install Application</h3>
-                <p className="text-sm text-muted-foreground mb-4">Install LearnAI to your device for better experience and fullscreen view.</p>
+                <p className="text-sm text-muted-foreground mb-4">Install LearnInk to your device for better experience and fullscreen view.</p>
                 {isInstalled ? (
                    <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3">
                      <CheckCircle2 className="h-5 w-5 text-green-500" />
@@ -305,10 +305,21 @@ export default function DashboardSettings() {
                           {cat.description && <span className="text-sm text-muted-foreground">- {cat.description}</span>}
                         </div>
                         <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => setEditingItem({ type: 'category', id: cat.id, name: cat.name, description: cat.description || '', color: cat.color })}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setEditingItem({ type: 'category', id: cat.id, name: cat.name, description: cat.description || '', color: cat.color })}
+                              aria-label={`Edit kategori ${cat.name}`}
+                            >
                                 <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(cat.id, cat.name, 'category')}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDelete(cat.id, cat.name, 'category')}
+                              aria-label={`Hapus kategori ${cat.name}`}
+                            >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </div>
@@ -369,10 +380,21 @@ export default function DashboardSettings() {
                           {level.description && <span className="text-sm text-muted-foreground">- {level.description}</span>}
                         </div>
                         <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => setEditingItem({ type: 'level', id: level.id, name: level.name, description: level.description || '', color: level.color })}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => setEditingItem({ type: 'level', id: level.id, name: level.name, description: level.description || '', color: level.color })}
+                              aria-label={`Edit level ${level.name}`}
+                            >
                                 <Edit className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" onClick={() => handleDelete(level.id, level.name, 'level')}>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDelete(level.id, level.name, 'level')}
+                              aria-label={`Hapus level ${level.name}`}
+                            >
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </div>

@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useModule } from "@/hooks/useModules";
 import { supabase } from "@/integrations/supabase/client";
 import { useModuleProgress, useUpdateProgress } from "@/hooks/useUserProgress";
-import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote } from "@/hooks/useLearningNotes";
+import { useLearningNotes, useCreateLearningNote, useDeleteLearningNote, useUpdateLearningNote } from "@/hooks/useLearningNotes";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -24,13 +24,16 @@ import ErrorBoundary from "@/components/shared/ErrorBoundary";
 import { usePyodidePreload } from "@/hooks/usePyodidePreload";
 import { useModuleNavigation } from "@/hooks/useModuleNavigation";
 import { useActiveTimeTracker } from "@/hooks/useActiveTimeTracker";
-import SEO from "@/components/shared/SEO";
+import { isLowEndDevice } from "@/hooks/usePerformance";
+import { SEO } from "@/components/shared/SEO";
+import { SectionData } from "@/lib/moduleParser";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/features/module/HybridSidebar";
 import { HybridContentRenderer } from "@/components/features/module/HybridContentRenderer";
 import { HybridGuidedNotes } from "@/components/features/module/HybridGuidedNotes";
 import { GachaCompletionModal } from "@/components/features/module/GachaCompletionModal";
+import { NotesPrintView } from "@/components/features/module/NotesPrintView";
 import { RefreshCcw, Gift } from "lucide-react";
 
 /**
@@ -39,6 +42,98 @@ import { RefreshCcw, Gift } from "lucide-react";
  * Layout: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
  * Premium Dark Mode: #0b0c0e background, purple accents
  */
+
+// ============================================
+// SUB-COMPONENTS
+// ============================================
+
+const TOCItem = memo(({
+  item,
+  isActive,
+  isCompleted,
+  index,
+  onClick
+}: {
+  item: SectionData;
+  isActive: boolean;
+  isCompleted: boolean;
+  index: number;
+  onClick: (id: string) => void;
+}) => {
+  return (
+    <button
+      onClick={() => onClick(item.id)}
+      className={cn(
+        "w-full text-left p-2.5 rounded-lg transition-all flex items-start gap-2 text-sm",
+        isActive
+          ? "bg-primary/10 text-primary border-l-2 border-primary"
+          : isCompleted
+            ? "text-muted-foreground hover:bg-muted"
+            : "text-foreground hover:bg-muted",
+        item.level === 2 && "pl-4",
+        item.level === 3 && "pl-6"
+      )}
+    >
+      <span
+        className={cn(
+          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
+          isActive
+            ? "bg-primary text-primary-foreground"
+            : isCompleted
+              ? "bg-green-500/20 text-green-400"
+              : "bg-muted text-muted-foreground"
+        )}
+      >
+        {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
+      </span>
+      <span className="line-clamp-2">{item.title}</span>
+    </button>
+  );
+});
+
+TOCItem.displayName = "TOCItem";
+
+const MobileTOCItem = memo(({
+    item,
+    isActive,
+    isCompleted,
+    index,
+    onClick
+  }: {
+    item: SectionData;
+    isActive: boolean;
+    isCompleted: boolean;
+    index: number;
+    onClick: (id: string) => void;
+  }) => {
+    return (
+        <button
+        onClick={() => onClick(item.id)}
+        className={cn(
+          "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
+          isActive
+            ? "bg-primary/10 text-primary"
+            : isCompleted
+              ? "text-muted-foreground hover:bg-muted"
+              : "text-foreground hover:bg-muted"
+        )}
+      >
+        <span className={cn(
+          "w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
+          isActive
+            ? "bg-primary text-primary-foreground"
+            : isCompleted
+              ? "bg-green-500/20 text-green-400"
+              : "bg-muted text-muted-foreground"
+        )}>
+          {isCompleted ? <Check className="h-3.5 w-3.5" /> : index + 1}
+        </span>
+        <span className="line-clamp-2">{item.title}</span>
+      </button>
+    );
+});
+
+MobileTOCItem.displayName = "MobileTOCItem";
 
 // ============================================
 // MAIN COMPONENT
@@ -80,6 +175,7 @@ export default function ModuleLearn() {
   // Notes hooks
   const { data: notes, isLoading: notesLoading } = useLearningNotes(user?.id, moduleId);
   const createNote = useCreateLearningNote();
+  const updateNote = useUpdateLearningNote();
   const deleteNote = useDeleteLearningNote();
 
   // UI State - Persist panel visibility in localStorage
@@ -194,10 +290,10 @@ export default function ModuleLearn() {
         });
         // Invalidate progress to update 'reward_claimed' status
         updateProgress.mutate({
-          userId: user.id,
-          moduleId: moduleId,
-          progressPercent: 100, // Ensure it stays 100
-          isCompleted: true
+           userId: user.id,
+           moduleId: moduleId,
+           progressPercent: 100, // Ensure it stays 100
+           isCompleted: true
         });
       } else {
         throw new Error(data.error || "Failed to claim reward");
@@ -212,7 +308,7 @@ export default function ModuleLearn() {
       // Allow trying again or close?
       // If error is "already claimed", we should probably close.
       if (error.message?.includes("already claimed")) {
-        setShowGacha(false);
+         setShowGacha(false);
       }
     } finally {
       setIsClaiming(false);
@@ -237,9 +333,10 @@ export default function ModuleLearn() {
 
   // Scroll to top when section changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const behavior = isLowEndDevice() ? "auto" : "smooth";
+    window.scrollTo({ top: 0, behavior });
     if (contentRef.current) {
-      contentRef.current.scrollTo({ top: 0, behavior: "smooth" });
+      contentRef.current.scrollTo({ top: 0, behavior });
     }
   }, [currentSectionId]);
 
@@ -261,6 +358,24 @@ export default function ModuleLearn() {
       );
     }
   }, [createNote, user, moduleId, toast]);
+
+  const handleUpdateNote = useCallback((id: string, content: string) => {
+    updateNote.mutate({ id, content });
+  }, [updateNote]);
+
+  const handleExportPdf = useCallback(() => {
+    if (!notes || notes.length === 0) {
+      toast({
+        title: "No notes found",
+        description: "Add some notes first to export them.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Simple print for now - would use html2pdf or similar for complex needs
+    window.print();
+  }, [notes, toast]);
 
   const handleDeleteNote = useCallback((noteId: string) => {
     deleteNote.mutate(noteId);
@@ -333,8 +448,8 @@ export default function ModuleLearn() {
   return (
     <div className="flex bg-background min-h-screen md:h-screen md:overflow-hidden">
       <SEO
-        title={module?.title || "Loading Module..."}
-        description={module?.summary}
+        title={module.title}
+        description={module.summary || `Pelajari ${module.title} di LearnInk.`}
       />
       {/* ============================================
           PANEL 1: Icon Rail (72px) - Desktop Only
@@ -372,40 +487,17 @@ export default function ModuleLearn() {
               ) : (
                 order.map((sectionId, index) => {
                   const item = sections[sectionId];
-                  if (!item) return null; // Defensive check
-
-                  const isActive = item.id === currentSectionId;
-                  const isCompleted = index < maxVisitedSectionIndex;
+                  if (!item) return null;
 
                   return (
-                    <button
+                    <TOCItem
                       key={item.id}
-                      onClick={() => onSectionClick(item.id)}
-                      className={cn(
-                        "w-full text-left p-2.5 rounded-lg transition-all flex items-start gap-2 text-sm",
-                        isActive
-                          ? "bg-primary/10 text-primary border-l-2 border-primary"
-                          : isCompleted
-                            ? "text-muted-foreground hover:bg-muted"
-                            : "text-foreground hover:bg-muted",
-                        item.level === 2 && "pl-4",
-                        item.level === 3 && "pl-6"
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
-                          isActive
-                            ? "bg-primary text-primary-foreground"
-                            : isCompleted
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-muted text-muted-foreground"
-                        )}
-                      >
-                        {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
-                      </span>
-                      <span className="line-clamp-2">{item.title}</span>
-                    </button>
+                      item={item}
+                      isActive={item.id === currentSectionId}
+                      isCompleted={index < maxVisitedSectionIndex}
+                      index={index}
+                      onClick={onSectionClick}
+                    />
                   );
                 })
               )}
@@ -432,7 +524,12 @@ export default function ModuleLearn() {
           <div className="flex items-center gap-3">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground"
+                  aria-label="Buka Daftar Isi"
+                >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -444,36 +541,17 @@ export default function ModuleLearn() {
                   <nav className="space-y-1">
                     {Array.isArray(order) && order.map((sectionId, index) => {
                       const item = sections[sectionId];
-                      if (!item) return null; // Defensive check
-
-                      const isActive = item.id === currentSectionId;
-                      const isCompleted = index < maxVisitedSectionIndex;
+                      if (!item) return null;
 
                       return (
-                        <button
+                        <MobileTOCItem
                           key={item.id}
-                          onClick={() => onSectionClick(item.id)}
-                          className={cn(
-                            "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
-                            isActive
-                              ? "bg-primary/10 text-primary"
-                              : isCompleted
-                                ? "text-muted-foreground hover:bg-muted"
-                                : "text-foreground hover:bg-muted"
-                          )}
-                        >
-                          <span className={cn(
-                            "w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
-                            isActive
-                              ? "bg-primary text-primary-foreground"
-                              : isCompleted
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-muted text-muted-foreground"
-                          )}>
-                            {isCompleted ? <Check className="h-3.5 w-3.5" /> : index + 1}
-                          </span>
-                          <span className="line-clamp-2">{item.title}</span>
-                        </button>
+                          item={item}
+                          isActive={item.id === currentSectionId}
+                          isCompleted={index < maxVisitedSectionIndex}
+                          index={index}
+                          onClick={onSectionClick}
+                        />
                       );
                     })}
                   </nav>
@@ -492,7 +570,12 @@ export default function ModuleLearn() {
           {/* Right: Notes Toggle */}
           <Sheet open={mobileNotesOpen} onOpenChange={setMobileNotesOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Buka Catatan"
+              >
                 <StickyNote className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -502,8 +585,11 @@ export default function ModuleLearn() {
                 notes={notes || []}
                 isLoading={notesLoading}
                 onCreateNote={handleCreateNote}
+                onUpdateNote={handleUpdateNote}
                 onDeleteNote={handleDeleteNote}
+                onExportPdf={handleExportPdf}
                 isCreating={createNote.isPending}
+                isUpdating={updateNote.isPending}
                 isDeleting={deleteNote.isPending}
               />
             </SheetContent>
@@ -522,12 +608,13 @@ export default function ModuleLearn() {
         </ErrorBoundary>
 
         {/* Navigation Buttons (Bottom Bar) */}
-        <div className="min-h-16 h-auto pb-[env(safe-area-inset-bottom)] border-t border-border bg-card flex items-center justify-between px-6 py-3 shrink-0 sticky bottom-0 z-50 md:static transition-all">
+        <footer className="min-h-16 h-auto pb-[env(safe-area-inset-bottom)] border-t border-border bg-card flex items-center justify-between px-6 py-3 shrink-0 sticky bottom-0 z-50 md:static transition-all">
           <Button
             variant="outline"
             size="icon"
             onClick={handlePrevious}
             disabled={!hasPrevious}
+            aria-label="Halaman Sebelumnya"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -537,7 +624,11 @@ export default function ModuleLearn() {
           </Badge>
 
           {hasNext ? (
-            <Button size="icon" onClick={handleNext}>
+            <Button
+              size="icon"
+              onClick={handleNext}
+              aria-label="Halaman Berikutnya"
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -547,6 +638,7 @@ export default function ModuleLearn() {
                 size="icon"
                 onClick={handleResetProgress}
                 title="Reset Progress"
+                aria-label="Ulangi Progres"
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
@@ -569,7 +661,7 @@ export default function ModuleLearn() {
               )}
             </div>
           )}
-        </div>
+        </footer>
       </div>
 
       {/* ============================================
@@ -582,13 +674,21 @@ export default function ModuleLearn() {
               notes={notes || []}
               isLoading={notesLoading}
               onCreateNote={handleCreateNote}
+              onUpdateNote={handleUpdateNote}
               onDeleteNote={handleDeleteNote}
+              onExportPdf={handleExportPdf}
               isCreating={createNote.isPending}
+              isUpdating={updateNote.isPending}
               isDeleting={deleteNote.isPending}
             />
           </ErrorBoundary>
         </div>
       )}
+
+      <NotesPrintView
+        notes={notes || []}
+        moduleTitle={module.title}
+      />
 
       <GachaCompletionModal
         isOpen={showGacha}
@@ -596,7 +696,7 @@ export default function ModuleLearn() {
           setShowGacha(false);
           // If they closed after earning, we can reset state for next time (though next time won't happen for this module)
           if (xpEarned !== null) {
-            setXpEarned(null);
+             setXpEarned(null);
           }
         }}
         moduleTitle={module.title}

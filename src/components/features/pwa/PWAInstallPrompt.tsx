@@ -43,7 +43,7 @@ export function PWAInstallPrompt() {
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
-            <DrawerTitle>Install Aplikasi LearnAI</DrawerTitle>
+            <DrawerTitle>Install Aplikasi LearnInk</DrawerTitle>
             <DrawerDescription>
               Tambahkan ke Home Screen untuk pengalaman full screen yang lebih baik.
             </DrawerDescription>

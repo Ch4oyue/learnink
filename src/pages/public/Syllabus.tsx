@@ -8,7 +8,6 @@ import { Progress } from "@/components/ui/progress";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress } from "@/hooks/useUserProgress";
-import { useMemo } from "react";
 import {
   Bot,
   Cpu,
@@ -143,6 +142,7 @@ export default function Syllabus() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
+      <main>
       {/* Hero Section */}
       <section className="pt-24 pb-12 px-4">
         <div className="max-w-6xl mx-auto">
@@ -342,6 +342,8 @@ export default function Syllabus() {
           </div>
         </section>
       )}
+
+      </main>
 
       <Footer />
     </div>

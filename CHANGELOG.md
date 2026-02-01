@@ -7,16 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.6.1] - February 01, 2026
+## [1.7.3] - February 1, 2026
 
-### Gamification, SEO & Refactoring
+### Progress Persistence & Navigation Stabilization
 
-Implemented daily streaks to boost engagement, enhanced SEO architecture, and improved code maintainability through technical refactoring.
+Fixes critical bugs in the learning module where progress could reset on refresh and the last visited section was not remembered.
+
+#### Fixes (2)
+- **Progress Reset Bug**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.
+- **Section Persistence**: Implemented `localStorage` persistence for the current section index, ensuring users return to where they left off after a refresh.
+
+## [1.7.2] - January 31, 2026
+
+### Accessibility Compliance & Interaction Optimization
+
+A performance and accessibility focused update that resolves critical UI bottlenecks and ensures WCAG 2.1 compliance. This release fixes a significant interaction delay in learning modules and enhances screen reader support across the entire platform.
+
+#### Improvements (4)
+- **A11y Overhaul**: Added `aria-label` to all icon-only buttons, implemented proper `main` landmarks for all pages, and restored user-scaling for better mobile readability.
+- **TOC Optimization**: Memoized Table of Contents items in `ModuleLearn`, reducing re-render costs for large modules by ~80%.
+- **Selection Performance**: Fixed a memory leak in text selection handling and implemented debouncing, reducing main-thread blocking during reading.
+- **Slug Caching**: Implemented results caching for markdown heading IDs to avoid repeated regex operations.
+
+#### Fixes (2)
+- **Input Delay**: Resolved the ~600ms input delay when interacting with module headings by fixing redundant event listeners.
+- **Branding Sync**: Updated all remaining "LearnAI" instances to "LearnInk" for brand consistency.
+
+## [1.7.1] - January 31, 2026
+
+### SEO, Navigation Feedback & Component Prefetching
+
+An enhancement release focused on "Premium Feel" and perceived performance. This update adds SEO meta tags for all critical pages, visual navigation feedback via a top progress bar, and hardware-aware prefetching for faster route transitions.
 
 #### Improvements (3)
-- **Daily Streaks**: Added generic streak tracking (database migration & frontend logic) to encourage consistent learning habits.
-- **SEO Architecture**: Integrated `react-helmet-async` and created a standardized `<SEO />` component for robust, dynamic metadata management.
-- **Technical Refactoring**: Extracted complex text selection logic from `HybridContentRenderer` into a reusable `useTextSelection` hook.
+- **SEO & Meta Tags**: Integrated `react-helmet-async` and created a reusable `SEO` component to manage meta tags, improving social sharing and search visibility.
+- **Top Loading Bar**: Added a subtle `TopProgressBar` that appears during lazy route transitions, providing immediate visual feedback to the user.
+- **Smart Prefetching**: Implemented hardware-aware prefetching that preloads lazy components on hover, but only for capable devices with fast connections.
+
+#### Patches (1)
+- **Index Cleanup**: Optimized `index.html` with better font preloads and corrected branding meta tags.
+
+## [1.7.0] - January 31, 2026
+
+### Mobile Performance & Low-End Optimization
+
+A comprehensive performance overhaul designed to make LearnInk run smoothly on low-to-mid range mobile devices. This release introduces intelligent hardware detection, aggressive caching, and UI responsiveness improvements.
+
+#### Improvements (6)
+- **Performance Engine**: Introduced `usePerformance` hook to detect low-end devices (RAM/CPU/Connection) and automatically scale down UI complexity.
+- **Lazy Execution**: Refactored `MarkdownRenderer` to lazy-load the heavy `PythonCodeEditor` only when needed.
+- **Aggressive Caching**: Enhanced PWA configuration with Workbox runtime caching for Google Fonts and static assets.
+- **Network Optimization**: Increased React Query `staleTime` to 10 minutes to significantly reduce redundant API calls and costs.
+- **Conservative Preloading**: Updated `usePyodidePreload` to skip preloading on low-end devices, saving data and memory.
+- **Parser Fast-Path**: Implemented an optimized heading check in `moduleParser.ts` to improve content ingestion speed.
+
+#### Fixes (3)
+- **Navigation Responsiveness**: Disabled `v7_startTransition` in React Router to fix the "stalled view" issue where the URL changed but the UI didn't update.
+- **Mobile Scroll**: Optimized section transitions in `ModuleLearn` to use `auto` scroll instead of `smooth` on low-end devices to prevent main-thread blocking.
+- **Environment Stability**: Resolved `bun test` environment failures by fixing dependency resolution and test mocks.
+
+#### Patches (1)
+- **Unified Design**: Integrated performance detection into `CustomCursor` and `useSmoothScroll` for a consistent lightweight experience.
 
 ## [1.6.0] - January 30, 2026
 
@@ -381,7 +432,10 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.6.1 | Feb 01, 2026 | Gamification, SEO & Refactoring |
+| 1.7.3 | Feb 1, 2026 | Progress Persistence & Navigation Stabilization |
+| 1.7.2 | Jan 31, 2026 | Accessibility Compliance & Interaction Optimization |
+| 1.7.1 | Jan 31, 2026 | SEO, Navigation Feedback & Smart Prefetching |
+| 1.7.0 | Jan 31, 2026 | Mobile Performance & Low-End Optimization |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |
 | 1.4.9 | Jan 28, 2026 | Audit & Stability (Environment Fix) |

@@ -1,12 +1,17 @@
 import { useEffect } from "react";
 import { pyodideManager } from "@/lib/pyodide-manager";
+import { isLowEndDevice } from "./usePerformance";
 
 /**
  * Smartly preloads Pyodide runtime if the content contains Python code blocks.
  * Uses requestIdleCallback to avoid blocking the main thread during initial render.
+ * Skips preloading on low-end devices to save network and memory.
  */
 export function usePyodidePreload(content?: string) {
   useEffect(() => {
+    // Skip preloading on low-end devices
+    if (isLowEndDevice()) return;
+
     const timeoutId = setTimeout(() => {
       if (content?.includes('```python')) {
         const preload = () => {

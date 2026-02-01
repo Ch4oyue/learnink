@@ -1,8 +1,10 @@
 import { cn } from "@/lib/utils";
+import { lazy, Suspense, useMemo, memo, useCallback } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { PythonCodeEditor } from "@/components/features/module/PythonCodeEditor";
 import { Components } from 'react-markdown';
+import { Link2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 import SyntaxHighlighter from 'react-syntax-highlighter/dist/esm/prism-light';
 import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
 import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
@@ -14,6 +16,9 @@ import markdown from 'react-syntax-highlighter/dist/esm/languages/prism/markdown
 import markup from 'react-syntax-highlighter/dist/esm/languages/prism/markup';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import DOMPurify from 'dompurify';
+
+// Lazy load PythonCodeEditor as it is heavy and may not be needed
+const PythonCodeEditor = lazy(() => import("@/components/features/module/PythonCodeEditor").then(m => ({ default: m.PythonCodeEditor })));
 
 SyntaxHighlighter.registerLanguage('python', python);
 SyntaxHighlighter.registerLanguage('javascript', javascript);
@@ -31,13 +36,21 @@ interface MarkdownRendererProps {
   variant?: 'default' | 'compact';
 }
 
+// Cache for slugify results to avoid repeated calculations
+const slugCache = new Map<string, string>();
+
 function slugify(text: string): string {
-  return text
+  if (slugCache.has(text)) return slugCache.get(text)!;
+
+  const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();
+
+  slugCache.set(text, slug);
+  return slug;
 }
 
 function sanitizeUrl(url: string | undefined): string | undefined {
@@ -63,28 +76,69 @@ function sanitizeUrl(url: string | undefined): string | undefined {
   return trimmed;
 }
 
-export function MarkdownRenderer({
+export const MarkdownRenderer = memo(({
   content,
   className,
   enableCodeEditor = true,
   variant = 'default',
-}: MarkdownRendererProps) {
+}: MarkdownRendererProps) => {
+  const { toast } = useToast();
 
-  const components: Components = {
+  const copyLink = useCallback((id: string) => {
+    const url = new URL(window.location.href);
+    url.hash = id;
+    navigator.clipboard.writeText(url.toString());
+    toast({ title: "Link bagian disalin!" });
+  }, [toast]);
+
+  const components: Components = useMemo(() => ({
     h1: ({ children, ...props }) => {
       const text = String(children);
       const id = `heading-${slugify(text)}`;
-      return <h1 id={id} className="text-3xl font-bold mt-12 mb-6 text-foreground scroll-mt-24" {...props}>{children}</h1>;
+      return (
+        <h1 id={id} className="group/h text-3xl font-bold mt-12 mb-6 text-foreground scroll-mt-24 flex items-center gap-2" {...props}>
+          {children}
+          <button
+            onClick={() => copyLink(id)}
+            className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
+            aria-label="Salin link bagian"
+          >
+            <Link2 className="h-4 w-4" />
+          </button>
+        </h1>
+      );
     },
     h2: ({ children, ...props }) => {
       const text = String(children);
       const id = `heading-${slugify(text)}`;
-      return <h2 id={id} className="text-2xl font-bold mt-12 mb-5 text-foreground scroll-mt-24" {...props}>{children}</h2>;
+      return (
+        <h2 id={id} className="group/h text-2xl font-bold mt-12 mb-5 text-foreground scroll-mt-24 flex items-center gap-2" {...props}>
+          {children}
+          <button
+            onClick={() => copyLink(id)}
+            className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
+            aria-label="Salin link bagian"
+          >
+            <Link2 className="h-4 w-4" />
+          </button>
+        </h2>
+      );
     },
     h3: ({ children, ...props }) => {
       const text = String(children);
       const id = `heading-${slugify(text)}`;
-      return <h3 id={id} className="text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24" {...props}>{children}</h3>;
+      return (
+        <h3 id={id} className="group/h text-xl font-semibold mt-10 mb-4 text-foreground scroll-mt-24 flex items-center gap-2" {...props}>
+          {children}
+          <button
+            onClick={() => copyLink(id)}
+            className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
+            aria-label="Salin link bagian"
+          >
+            <Link2 className="h-4 w-4" />
+          </button>
+        </h3>
+      );
     },
     a: ({ href, children, ...props }) => {
       const safeHref = sanitizeUrl(href);
@@ -117,8 +171,15 @@ export function MarkdownRenderer({
 
         if (!inline && language === 'python' && enableCodeEditor) {
             return (
-                <div className="my-6">
-                    <PythonCodeEditor initialCode={String(children).replace(/\n$/, '')} />
+                <div className="my-6 min-h-[200px]">
+                    <Suspense fallback={
+                        <div className="rounded-xl border border-border bg-card p-8 flex flex-col items-center justify-center gap-3">
+                            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary" />
+                            <span className="text-sm text-muted-foreground">Loading Python Editor...</span>
+                        </div>
+                    }>
+                        <PythonCodeEditor initialCode={String(children).replace(/\n$/, '')} />
+                    </Suspense>
                 </div>
             );
         }
@@ -151,7 +212,7 @@ export function MarkdownRenderer({
     p: ({ children }) => <p className="my-5 text-foreground/90 leading-loose">{children}</p>,
     blockquote: ({ children }) => <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">{children}</blockquote>,
     hr: () => <hr className="my-6 border-border" />,
-  };
+  }), [enableCodeEditor, copyLink]);
 
   return (
     <div className={cn(
@@ -168,4 +229,6 @@ export function MarkdownRenderer({
         </ReactMarkdown>
     </div>
   );
-}
+});
+
+MarkdownRenderer.displayName = 'MarkdownRenderer';

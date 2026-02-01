@@ -168,6 +168,7 @@ export default function Changelog() {
                             <Button
                                 variant="ghost"
                                 size="icon"
+                                aria-label="Kembali"
                                 onClick={() => {
                                     if (window.history.state && window.history.state.idx > 0) {
                                         navigate(-1);
@@ -193,7 +194,7 @@ export default function Changelog() {
             </div>
 
             {/* Content */}
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <main className="max-w-4xl mx-auto px-4 py-8">
                 {/* Version Header */}
                 <div className="flex items-center gap-4 mb-8 text-sm text-muted-foreground">
                     <span className="font-medium">Version</span>
@@ -332,7 +333,7 @@ export default function Changelog() {
                         </Link>
                     </p>
                 </motion.div>
-            </div>
+            </main>
         </div>
     );
 }

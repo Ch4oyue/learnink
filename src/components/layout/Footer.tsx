@@ -99,7 +99,7 @@ export const Footer = () => {
         <div className="border-t border-background/10 pt-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-background/50 text-sm flex flex-col md:flex-row items-center gap-1 md:gap-2">
-              <span>© {currentYear} LearnAI. All rights reserved.</span>
+              <span>© {currentYear} LearnInk. All rights reserved.</span>
               <span className="hidden md:inline text-background/30">•</span>
               <span className="flex items-center gap-1">
                 Powered by

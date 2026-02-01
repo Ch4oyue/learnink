@@ -28,7 +28,6 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useCreateModule, useUpdateModule, Module } from "@/hooks/useModules";
 import { useAuth } from "@/contexts/AuthContext";
-import { MarkdownRenderer } from "@/components/shared/MarkdownRenderer";
 import {
   Bot,
   Cpu,
@@ -45,12 +44,14 @@ import {
   ArrowLeft,
   Loader2,
 } from "lucide-react";
+import { ModulePreviewCard } from "./ModulePreviewCard";
+import { ModuleContentPreview } from "./ModuleContentPreview";
 
 // ============================================
 // CONSTANTS
 // ============================================
 
-const icons = [
+export const icons = [
   { name: "Bot", icon: Bot },
   { name: "Cpu", icon: Cpu },
   { name: "Workflow", icon: Workflow },
@@ -67,7 +68,7 @@ const categories = ["AI Dasar", "Automation", "AI Tools", "Advanced", "Prompt En
 const levels = ["Pemula", "Menengah", "Lanjutan"] as const;
 
 // ============================================
-// ZOD SCHEMA - Proper validation at last!
+// ZOD SCHEMA
 // ============================================
 
 const moduleSchema = z.object({
@@ -80,7 +81,7 @@ const moduleSchema = z.object({
   is_published: z.boolean(),
 });
 
-type ModuleFormData = z.infer<typeof moduleSchema>;
+export type ModuleFormData = z.infer<typeof moduleSchema>;
 
 // ============================================
 // COMPONENT
@@ -100,8 +101,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
 
   const [activeTab, setActiveTab] = useState("edit");
 
-  // react-hook-form with zod validation and proper defaultValues
-  // No more anti-pattern useEffect sync!
+  // react-hook-form with zod validation
   const form = useForm<ModuleFormData>({
     resolver: zodResolver(moduleSchema),
     defaultValues: {
@@ -115,10 +115,12 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
     },
   });
 
-  const { watch, control, handleSubmit, formState: { isSubmitting } } = form;
+  const { control, handleSubmit, formState: { isSubmitting } } = form;
 
-  // Watch values for preview
-  const watchedValues = watch();
+  // OPTIMIZATION: Removed global watch() that caused re-renders on every keystroke.
+  // Instead, we use specific field watching or isolated components.
+  const selectedIconName = form.watch("icon_name");
+  const SelectedIcon = icons.find((i) => i.name === selectedIconName)?.icon || Bot;
 
   const onSubmit = async (data: ModuleFormData) => {
     try {
@@ -159,7 +161,6 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
     }
   };
 
-  const SelectedIcon = icons.find((i) => i.name === watchedValues.icon_name)?.icon || Bot;
   const isPending = createModule.isPending || updateModule.isPending || isSubmitting;
 
   return (
@@ -326,25 +327,9 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 )}
               />
 
-              {/* Preview Card */}
-              <div className="pt-4 border-t">
-                <span className="text-muted-foreground text-xs">Preview Card</span>
-                <div className="mt-2 p-4 rounded-xl border bg-card">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <SelectedIcon className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-sm">
-                        {watchedValues.title || "Judul Modul"}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {watchedValues.category} • {watchedValues.level}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Isolated Preview Card */}
+              <ModulePreviewCard control={control} />
+
             </CardContent>
           </Card>
 
@@ -398,15 +383,8 @@ print('Hello World')
                   />
                 </TabsContent>
                 <TabsContent value="preview" className="mt-0">
-                  <div className="min-h-[500px] p-4 rounded-lg border bg-muted/30 overflow-auto">
-                    {watchedValues.content ? (
-                      <MarkdownRenderer content={watchedValues.content} />
-                    ) : (
-                      <p className="text-muted-foreground text-center py-10">
-                        Belum ada konten untuk di-preview
-                      </p>
-                    )}
-                  </div>
+                  {/* Isolated Content Preview */}
+                  <ModuleContentPreview control={control} />
                 </TabsContent>
               </Tabs>
             </CardContent>

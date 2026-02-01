@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.3] - February 15, 2026
+
+### Performance Optimization
+
+Focus on reducing main-thread blocking and excessive re-renders in the administrative interface.
+
+#### Improvements
+- **ModuleEditor Performance**: Refactored the module editor to eliminate root-level `watch()` calls. Isolated "Preview Card" and "Content Preview" into separate components with `useWatch`, preventing the entire form from re-rendering on every keystroke.
+
 ## [1.9.2] - February 1, 2026
 
 ### The "Sovereign" Update: Design, Loyalty & Resilience

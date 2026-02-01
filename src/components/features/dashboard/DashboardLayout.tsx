@@ -585,6 +585,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
 
     return (
         <SidebarProvider>
+            {/* Desktop PWA Draggable Area */}
+            <div className="fixed top-0 left-0 right-0 h-8 pwa-draggable z-[100] pointer-events-none md:block hidden" />
+
             <AppSidebar pendingCount={pendingCount} />
             <MobileBottomNav pendingCount={pendingCount} />
             <SidebarInset className="min-h-[100dvh] w-full max-w-[100vw] overflow-x-hidden bg-transparent relative z-10">

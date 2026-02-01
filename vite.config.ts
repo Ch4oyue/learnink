@@ -58,6 +58,7 @@ export default defineConfig(({ mode }) => ({
         theme_color: '#09090b',
         background_color: '#09090b',
         display: 'standalone',
+        display_override: ['window-controls-overlay', 'standalone'],
         orientation: 'portrait',
         categories: ['education', 'productivity'],
         icons: [
@@ -99,6 +100,12 @@ export default defineConfig(({ mode }) => ({
             url: 'url'
           }
         },
+        protocol_handlers: [
+          {
+            protocol: 'web+learnink',
+            url: '/learn/%s'
+          }
+        ],
         screenshots: [
           {
             src: 'https://ik.imagekit.io/focustimerin/learnink_landing?updatedAt=1757343104763',

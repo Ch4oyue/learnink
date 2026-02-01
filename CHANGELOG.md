@@ -9,75 +9,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.9.2] - February 1, 2026
 
-### Hotfix Post-Integration & Error Resilience
+### The "Sovereign" Update: Design, Loyalty & Resilience
 
-Critical hotfix to resolve runtime crashes and improve database error resilience during migration transitions.
-
-#### Fixes
-- **TypeError Resilience**: Resolved `Cannot read properties of null (reading 'top')` crash in `ModuleLearn` by adding strict null-checks for the Floating Selection Menu.
-- **Database Resilience**: Implemented automated fallback in `AuthContext` and `useUsers` to handle missing gamification/streak columns (400 Bad Request), ensuring core authentication and user management remain functional during database updates.
-- **Selection Logic**: Improved `useTextSelection` reliability by wrapping rendering in parent component guards.
-
-## [1.9.1] - February 1, 2026
-
-### Super Admin Upgrade, APK Loyalty & non-Cash Premium (Consolidated)
-
-A major feature update introducing advanced administrative controls, specialized rewards for mobile users, and a sustainable loyalty economy using "InkPoints". This consolidated release includes critical hotfixes for stability and data synchronization.
+A massive consolidated release and the current platform flagship. This update merges the "Glass/Liquid" design system overhaul, the new Loyalty Economy (InkPoints/Elite), Super Admin control systems, and critical technical restorations into a single, highly resilient version.
 
 #### Improvements
-- **Super Admin Console**: Launched "System Control" panel for top-level management.
-  - **Global Economy**: Real-time management of Global XP Multipliers and APK-specific bonuses.
-  - **Maintenance Mode**: One-click system lockdown for updates, ensuring data integrity during maintenance.
-  - **Broadcast System**: Integrated global announcement banner with dynamic content control.
-  - **Label Management**: CRUD interface for managing user labels (e.g., pioneer, loyal) and their associated XP multipliers.
-- **Loyalty & Premium System**:
-  - **non-Cash Store**: Introduced "LearnInk Elite" where users can exchange InkPoints (earned via learning) for Premium status.
-  - **Elite Status**: Premium members receive automated XP boosts, exclusive profile VFX, and glowing avatar borders.
-  - **Points Economy**: Automated "InkPoints" awarding logic integrated into the XP engine.
-- **Mobile & APK Experience**:
-  - **Automated Detection**: Intelligent APK detection via User-Agent to apply hardware-based loyalty bonuses.
-  - **Offline Mode**: Implemented background synchronization for learning progress, allowing seamless study without internet connectivity.
-  - **Label Multipliers**: Multi-tier multiplier system (up to 3x) based on user labels like 'sepuh' or 'early adopter'.
-- **Visual consistency**: Ensured Premium member visual effects (glowing avatars) are applied across the entire dashboard layout.
+- **Design System Overhaul (Glass/Liquid)**:
+  - **Floating Dock**: Transformed mobile navigation into a modern, melayang glass dock with heavy backdrop blur and pill interactions.
+  - **Glass Hero Profile**: New profile layout with floating stats cards, overlapping avatars, and dynamic gradient effects.
+  - **Modernized Content Cards**: Redesigned module cards with scaled hover states, glow effects, and glass panel transparency.
+- **Loyalty & Economy (InkPoints)**:
+  - **InkPoints Store**: Introduced a non-cash economy where active learning earns "InkPoints" to unlock "Elite" (Premium) status.
+  - **Elite Status**: Automated XP boosts (up to 3x), exclusive visual effects (glowing avatar borders), and brand identity badges.
+  - **APK Loyalty Bonuses**: Automated detection of APK installs via hardware signatures to apply specialized study multipliers.
+- **Super Admin System Control**:
+  - **Sovereign Console**: New control panel for global management of XP multipliers, maintenance modes, and system announcements.
+  - **Broadcast System**: Integrated real-time global announcement channel with priority level control.
+- **Gamification & SEO Restoration**:
+  - **Streak Recovery**: Restored daily learning streaks logic and database synchronization.
+  - **SEO architecture**: Verified and integrated dynamic metadata for modules and public landing pages.
+- **Infrastructure & Mobile**:
+  - **Offline Synchronization**: Implemented local persistence for progress, allowing study to continue without stable internet.
+  - **Multi-tier Multipliers**: Dynamic XP engine based on user labels (`sepuh`, `pioneer`, `loyal`).
 
 #### Fixes
-- **Integration Manager**: Fixed "Generate API Key" failure by resolving `user_roles` query issues and adding Super Admin hardcoded identity fallback.
-- **Security & RLS**: Updated `integrations` table RLS policies to allow full access for `superadmin` role.
-- **Reference Errors**: Resolved `memo is not defined` and `useMutation is not defined` in core learning and admin components.
-- **Data Sync**: Updated `AuthContext` and Edge Functions to correctly fetch and handle new gamification fields (`points`, `labels`, `isPremium`).
-- **Race Conditions**: Implemented atomic check-and-update in `award-xp` Edge Function to prevent double-claiming of rewards.
-- **Legacy Fields**: Fixed regression in `UserDashboard` where removed fields were being accessed.
-- **Data Selection**: Optimized `useUsers` and `profiles` selection to include new gamification fields (`labels`, `points`) without performance regression.
-- **Visual Feedback**: Added `isPremium` support to core UI components for enhanced brand identity.
-- **Robustness**: Added defensive error handling for system settings and profile data fetching.
+- **Database Resilience**: Implemented automated fallback in `AuthContext` to handle missing columns gracefully, ensuring core stability during migrations.
+- **Runtime Stability**: Resolved `TypeError` crashes in `ModuleLearn` for the selection menu and `memo` definition errors.
+- **Progress Persistence**: Fixed race conditions where local state could overwrite server progress during page refresh.
+- **Security & RLS**: Hardened `integrations` and `system_settings` tables with strict Super Admin primary access roles.
+- **Auth Strategy**: Optimized data fetching to bypass missing RPC functions using optimized individual queries.
 
 #### Patches
-- **Database Schema**: Expanded `profiles` table and created `system_settings` / `label_configs` with robust RLS policies.
-- **Documentation**: Added `ENVIRONMENT_STRATEGY.md` for Prod/Dev database management and `.env.example`.
-- **VM Testing Tools**: Created local `gen_api_key.py` tool for API key validation in VM environments.
-
----
-
-## [1.8.0] - February 1, 2026
-
-### Restoration, Design System & Stabilization
-
-A major consolidated release that restores lost features, implements the new "Glass/Liquid" design system, and stabilizes critical navigation bugs.
-
-#### Improvements
-- **Design System**: Implemented "Glass/Liquid" design language across core views.
-  - **Mobile Navigation**: "Floating Dock" style navigation with advanced glassmorphism and animations.
-  - **Profile**: New "Glass Hero" layout featuring large avatar, floating glass stats, and dynamic gradients.
-  - **Settings**: Modernized configuration cards with glass panel transparency and updated controls.
-  - **Modules**: Redesigned grid layout with floating glass cards, improved hover states, and modernized badges.
-- **Gamification**: Restored Streak tracking functionality (Database Migration + Logic restoration).
-- **SEO**: Comprehensive dynamic metadata integration for Landing Page, Modules, and Dashboard.
-
-#### Fixes
-- **Performance**: Restored `useTextSelection` hook with debounce logic to prevent UI freezing during text selection.
-- **Auth**: Restored optimized authentication data fetching strategy using separate queries to bypass missing RPC.
-- **Progress Persistence**: Resolved a race condition in `useModuleNavigation.ts` where server progress could be overwritten by initial local state on refresh.
-- **Section Persistence**: Implemented `localStorage` persistence for the current section index, ensuring users return to where they left off after a refresh.
+- **Database Schema**: Expanded `profiles` for gamification fields and created `system_settings` for global configuration.
+- **Architecture**: Separated mission-critical navigation logic into dedicated hooks for better maintainability.
+- **Tools**: Created local `gen_api_key.py` for VM environment API management.
 
 ## [1.7.2] - January 31, 2026
 
@@ -460,9 +425,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
-| 1.9.2 | February 1, 2026 | Hotfix Post-Integration & Error Resilience |
-| 1.9.1 | February 1, 2026 | Super Admin Upgrade + Stability Hotfixes |
-| 1.8.0 | February 1, 2026 | Restoration, Design System & Stabilization |
+| 1.9.2 | February 1, 2026 | The "Sovereign" Update: Design, Loyalty & Resilience |
 | 1.7.2 | Jan 31, 2026 | Accessibility, SEO & Mobile Performance Overhaul |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |
 | 1.4.11 | Jan 29, 2026 | Notifications, Testing, Security & Type Safety |

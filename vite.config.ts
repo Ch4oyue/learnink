@@ -50,8 +50,8 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       manifest: {
-        name: 'LearnAI',
-        short_name: 'LearnAI',
+        name: 'LearnInk',
+        short_name: 'LearnInk',
         description: 'Platform Belajar AI Automation',
         theme_color: '#09090b',
         background_color: '#09090b',

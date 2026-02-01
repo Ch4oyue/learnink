@@ -93,6 +93,7 @@ export function CustomCursor() {
         <>
             {/* Cursor dot - follows exactly */}
             <motion.div
+                aria-hidden="true"
                 className="fixed top-0 left-0 z-[9999] pointer-events-none mix-blend-difference"
                 style={{
                     x: cursorX,
@@ -111,6 +112,7 @@ export function CustomCursor() {
 
             {/* Cursor circle - follows with spring delay */}
             <motion.div
+                aria-hidden="true"
                 className="fixed top-0 left-0 z-[9998] pointer-events-none"
                 style={{
                     x: circleX,

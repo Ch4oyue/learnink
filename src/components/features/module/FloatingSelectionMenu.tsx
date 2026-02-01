@@ -87,6 +87,7 @@ export function FloatingSelectionMenu({ selection, onAddNote, onClose }: Floatin
                             size="icon"
                             className="h-6 w-6 rounded-full bg-primary text-primary-foreground"
                             onClick={handleAddNote}
+                            aria-label="Simpan Catatan"
                         >
                             <Check className="h-3 w-3" />
                         </Button>
@@ -95,6 +96,7 @@ export function FloatingSelectionMenu({ selection, onAddNote, onClose }: Floatin
                             size="icon"
                             className="h-6 w-6 rounded-full text-muted-foreground hover:text-destructive"
                             onClick={() => setMode("menu")}
+                            aria-label="Batalkan"
                         >
                             <X className="h-3 w-3" />
                         </Button>

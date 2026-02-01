@@ -152,6 +152,7 @@ export function PythonCodeEditor({
             className="h-8 w-8"
             onClick={handleCopy}
             title="Salin kode"
+            aria-label="Salin kode"
           >
             {copied ? (
               <Check className="h-4 w-4 text-green-500" />
@@ -165,6 +166,7 @@ export function PythonCodeEditor({
             className="h-8 w-8"
             onClick={handleReset}
             title="Reset"
+            aria-label="Reset kode"
           >
             <RotateCcw className="h-4 w-4" />
           </Button>

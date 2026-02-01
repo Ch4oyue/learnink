@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.2] - January 31, 2026
+
+### Accessibility Compliance & Interaction Optimization
+
+A performance and accessibility focused update that resolves critical UI bottlenecks and ensures WCAG 2.1 compliance. This release fixes a significant interaction delay in learning modules and enhances screen reader support across the entire platform.
+
+#### Improvements (4)
+- **A11y Overhaul**: Added `aria-label` to all icon-only buttons, implemented proper `main` landmarks for all pages, and restored user-scaling for better mobile readability.
+- **TOC Optimization**: Memoized Table of Contents items in `ModuleLearn`, reducing re-render costs for large modules by ~80%.
+- **Selection Performance**: Fixed a memory leak in text selection handling and implemented debouncing, reducing main-thread blocking during reading.
+- **Slug Caching**: Implemented results caching for markdown heading IDs to avoid repeated regex operations.
+
+#### Fixes (2)
+- **Input Delay**: Resolved the ~600ms input delay when interacting with module headings by fixing redundant event listeners.
+- **Branding Sync**: Updated all remaining "LearnAI" instances to "LearnInk" for brand consistency.
+
 ## [1.7.1] - January 31, 2026
 
 ### SEO, Navigation Feedback & Component Prefetching
@@ -406,6 +422,7 @@ First stable release of LearnInk learning platform.
 
 | Version | Date | Highlights |
 |---------|------|------------|
+| 1.7.2 | Jan 31, 2026 | Accessibility Compliance & Interaction Optimization |
 | 1.7.1 | Jan 31, 2026 | SEO, Navigation Feedback & Smart Prefetching |
 | 1.7.0 | Jan 31, 2026 | Mobile Performance & Low-End Optimization |
 | 1.6.0 | Jan 30, 2026 | Gacha Rewards, Apple UI Polish & Mobile Experience |

@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useMemo, memo } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Components } from 'react-markdown';
@@ -34,13 +34,21 @@ interface MarkdownRendererProps {
   variant?: 'default' | 'compact';
 }
 
+// Cache for slugify results to avoid repeated calculations
+const slugCache = new Map<string, string>();
+
 function slugify(text: string): string {
-  return text
+  if (slugCache.has(text)) return slugCache.get(text)!;
+
+  const slug = text
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
     .trim();
+
+  slugCache.set(text, slug);
+  return slug;
 }
 
 function sanitizeUrl(url: string | undefined): string | undefined {
@@ -66,14 +74,14 @@ function sanitizeUrl(url: string | undefined): string | undefined {
   return trimmed;
 }
 
-export function MarkdownRenderer({
+export const MarkdownRenderer = memo(({
   content,
   className,
   enableCodeEditor = true,
   variant = 'default',
-}: MarkdownRendererProps) {
+}: MarkdownRendererProps) => {
 
-  const components: Components = {
+  const components: Components = useMemo(() => ({
     h1: ({ children, ...props }) => {
       const text = String(children);
       const id = `heading-${slugify(text)}`;
@@ -161,7 +169,7 @@ export function MarkdownRenderer({
     p: ({ children }) => <p className="my-5 text-foreground/90 leading-loose">{children}</p>,
     blockquote: ({ children }) => <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">{children}</blockquote>,
     hr: () => <hr className="my-6 border-border" />,
-  };
+  }), [enableCodeEditor]);
 
   return (
     <div className={cn(
@@ -178,4 +186,6 @@ export function MarkdownRenderer({
         </ReactMarkdown>
     </div>
   );
-}
+});
+
+MarkdownRenderer.displayName = 'MarkdownRenderer';

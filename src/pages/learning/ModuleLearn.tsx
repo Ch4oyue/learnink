@@ -26,6 +26,7 @@ import { useModuleNavigation } from "@/hooks/useModuleNavigation";
 import { useActiveTimeTracker } from "@/hooks/useActiveTimeTracker";
 import { isLowEndDevice } from "@/hooks/usePerformance";
 import { SEO } from "@/components/shared/SEO";
+import { SectionData } from "@/lib/moduleParser";
 
 // Hybrid Components
 import { HybridSidebar } from "@/components/features/module/HybridSidebar";
@@ -40,6 +41,98 @@ import { RefreshCcw, Gift } from "lucide-react";
  * Layout: Rail (72px) + TOC (240px) + Content (flex) + Notes (360px)
  * Premium Dark Mode: #0b0c0e background, purple accents
  */
+
+// ============================================
+// SUB-COMPONENTS
+// ============================================
+
+const TOCItem = memo(({
+  item,
+  isActive,
+  isCompleted,
+  index,
+  onClick
+}: {
+  item: SectionData;
+  isActive: boolean;
+  isCompleted: boolean;
+  index: number;
+  onClick: (id: string) => void;
+}) => {
+  return (
+    <button
+      onClick={() => onClick(item.id)}
+      className={cn(
+        "w-full text-left p-2.5 rounded-lg transition-all flex items-start gap-2 text-sm",
+        isActive
+          ? "bg-primary/10 text-primary border-l-2 border-primary"
+          : isCompleted
+            ? "text-muted-foreground hover:bg-muted"
+            : "text-foreground hover:bg-muted",
+        item.level === 2 && "pl-4",
+        item.level === 3 && "pl-6"
+      )}
+    >
+      <span
+        className={cn(
+          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
+          isActive
+            ? "bg-primary text-primary-foreground"
+            : isCompleted
+              ? "bg-green-500/20 text-green-400"
+              : "bg-muted text-muted-foreground"
+        )}
+      >
+        {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
+      </span>
+      <span className="line-clamp-2">{item.title}</span>
+    </button>
+  );
+});
+
+TOCItem.displayName = "TOCItem";
+
+const MobileTOCItem = memo(({
+    item,
+    isActive,
+    isCompleted,
+    index,
+    onClick
+  }: {
+    item: SectionData;
+    isActive: boolean;
+    isCompleted: boolean;
+    index: number;
+    onClick: (id: string) => void;
+  }) => {
+    return (
+        <button
+        onClick={() => onClick(item.id)}
+        className={cn(
+          "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
+          isActive
+            ? "bg-primary/10 text-primary"
+            : isCompleted
+              ? "text-muted-foreground hover:bg-muted"
+              : "text-foreground hover:bg-muted"
+        )}
+      >
+        <span className={cn(
+          "w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
+          isActive
+            ? "bg-primary text-primary-foreground"
+            : isCompleted
+              ? "bg-green-500/20 text-green-400"
+              : "bg-muted text-muted-foreground"
+        )}>
+          {isCompleted ? <Check className="h-3.5 w-3.5" /> : index + 1}
+        </span>
+        <span className="line-clamp-2">{item.title}</span>
+      </button>
+    );
+});
+
+MobileTOCItem.displayName = "MobileTOCItem";
 
 // ============================================
 // MAIN COMPONENT
@@ -374,40 +467,17 @@ export default function ModuleLearn() {
               ) : (
                 order.map((sectionId, index) => {
                   const item = sections[sectionId];
-                  if (!item) return null; // Defensive check
-
-                  const isActive = item.id === currentSectionId;
-                  const isCompleted = index < maxVisitedSectionIndex;
+                  if (!item) return null;
 
                   return (
-                    <button
+                    <TOCItem
                       key={item.id}
-                      onClick={() => onSectionClick(item.id)}
-                      className={cn(
-                        "w-full text-left p-2.5 rounded-lg transition-all flex items-start gap-2 text-sm",
-                        isActive
-                          ? "bg-primary/10 text-primary border-l-2 border-primary"
-                          : isCompleted
-                            ? "text-muted-foreground hover:bg-muted"
-                            : "text-foreground hover:bg-muted",
-                        item.level === 2 && "pl-4",
-                        item.level === 3 && "pl-6"
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
-                          isActive
-                            ? "bg-primary text-primary-foreground"
-                            : isCompleted
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-muted text-muted-foreground"
-                        )}
-                      >
-                        {isCompleted ? <Check className="h-3 w-3" /> : index + 1}
-                      </span>
-                      <span className="line-clamp-2">{item.title}</span>
-                    </button>
+                      item={item}
+                      isActive={item.id === currentSectionId}
+                      isCompleted={index < maxVisitedSectionIndex}
+                      index={index}
+                      onClick={onSectionClick}
+                    />
                   );
                 })
               )}
@@ -434,7 +504,12 @@ export default function ModuleLearn() {
           <div className="flex items-center gap-3">
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-foreground"
+                  aria-label="Buka Daftar Isi"
+                >
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
@@ -446,36 +521,17 @@ export default function ModuleLearn() {
                   <nav className="space-y-1">
                     {Array.isArray(order) && order.map((sectionId, index) => {
                       const item = sections[sectionId];
-                      if (!item) return null; // Defensive check
-
-                      const isActive = item.id === currentSectionId;
-                      const isCompleted = index < maxVisitedSectionIndex;
+                      if (!item) return null;
 
                       return (
-                        <button
+                        <MobileTOCItem
                           key={item.id}
-                          onClick={() => onSectionClick(item.id)}
-                          className={cn(
-                            "w-full text-left p-3 rounded-lg flex items-center gap-3 text-sm",
-                            isActive
-                              ? "bg-primary/10 text-primary"
-                              : isCompleted
-                                ? "text-muted-foreground hover:bg-muted"
-                                : "text-foreground hover:bg-muted"
-                          )}
-                        >
-                          <span className={cn(
-                            "w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs font-bold",
-                            isActive
-                              ? "bg-primary text-primary-foreground"
-                              : isCompleted
-                                ? "bg-green-500/20 text-green-400"
-                                : "bg-muted text-muted-foreground"
-                          )}>
-                            {isCompleted ? <Check className="h-3.5 w-3.5" /> : index + 1}
-                          </span>
-                          <span className="line-clamp-2">{item.title}</span>
-                        </button>
+                          item={item}
+                          isActive={item.id === currentSectionId}
+                          isCompleted={index < maxVisitedSectionIndex}
+                          index={index}
+                          onClick={onSectionClick}
+                        />
                       );
                     })}
                   </nav>
@@ -494,7 +550,12 @@ export default function ModuleLearn() {
           {/* Right: Notes Toggle */}
           <Sheet open={mobileNotesOpen} onOpenChange={setMobileNotesOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Buka Catatan"
+              >
                 <StickyNote className="h-5 w-5" />
               </Button>
             </SheetTrigger>
@@ -524,12 +585,13 @@ export default function ModuleLearn() {
         </ErrorBoundary>
 
         {/* Navigation Buttons (Bottom Bar) */}
-        <div className="min-h-16 h-auto pb-[env(safe-area-inset-bottom)] border-t border-border bg-card flex items-center justify-between px-6 py-3 shrink-0 sticky bottom-0 z-50 md:static transition-all">
+        <footer className="min-h-16 h-auto pb-[env(safe-area-inset-bottom)] border-t border-border bg-card flex items-center justify-between px-6 py-3 shrink-0 sticky bottom-0 z-50 md:static transition-all">
           <Button
             variant="outline"
             size="icon"
             onClick={handlePrevious}
             disabled={!hasPrevious}
+            aria-label="Halaman Sebelumnya"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -539,7 +601,11 @@ export default function ModuleLearn() {
           </Badge>
 
           {hasNext ? (
-            <Button size="icon" onClick={handleNext}>
+            <Button
+              size="icon"
+              onClick={handleNext}
+              aria-label="Halaman Berikutnya"
+            >
               <ChevronRight className="h-4 w-4" />
             </Button>
           ) : (
@@ -549,6 +615,7 @@ export default function ModuleLearn() {
                 size="icon"
                 onClick={handleResetProgress}
                 title="Reset Progress"
+                aria-label="Ulangi Progres"
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
@@ -571,7 +638,7 @@ export default function ModuleLearn() {
               )}
             </div>
           )}
-        </div>
+        </footer>
       </div>
 
       {/* ============================================

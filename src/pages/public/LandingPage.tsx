@@ -78,6 +78,7 @@ export default function LandingPage() {
                                 size="icon"
                                 onClick={toggleTheme}
                                 className="rounded-lg"
+                                aria-label="Ganti Tema"
                             >
                                 {resolvedTheme === "dark" ? (
                                     <Sun className="h-4 w-4" />
@@ -94,6 +95,7 @@ export default function LandingPage() {
                                 size="icon"
                                 onClick={toggleTheme}
                                 className="rounded-lg mr-1"
+                                aria-label="Ganti Tema"
                             >
                                 {resolvedTheme === "dark" ? (
                                     <Sun className="h-4 w-4" />
@@ -104,7 +106,11 @@ export default function LandingPage() {
 
                             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                                 <SheetTrigger asChild>
-                                    <Button variant="ghost" size="icon">
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        aria-label="Menu Utama"
+                                    >
                                         <Menu className="h-5 w-5" />
                                     </Button>
                                 </SheetTrigger>

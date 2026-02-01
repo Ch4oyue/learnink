@@ -81,7 +81,7 @@ export function Navbar() {
             to="/"
             className="text-xl font-semibold tracking-tight text-foreground transition-opacity hover:opacity-80"
           >
-            Learn<span className="text-primary">AI</span>
+            Learn<span className="text-primary">Ink</span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -115,7 +115,7 @@ export function Navbar() {
               size="icon"
               onClick={toggleTheme}
               className="text-muted-foreground hover:text-foreground"
-              aria-label="Toggle theme"
+              aria-label="Ganti Tema"
             >
               {resolvedTheme === "dark" ? (
                 <Sun className="h-5 w-5" />

@@ -407,6 +407,7 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
               <li key={item.href}>
                 <Link
                   to={item.href}
+                  aria-label={item.label}
                   className={cn(
                     "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300",
                     isActive
@@ -432,6 +433,7 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
                 <button
+                  aria-label="Menu"
                   className={cn(
                     "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 text-muted-foreground hover:bg-white/5 active:scale-95"
                   )}
@@ -597,9 +599,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                 </header>
 
                 {/* Add bottom padding for mobile to account for floating nav */}
-                <div className="flex-1 p-4 md:p-8 pt-4 pb-32 md:pb-8">
+                <main className="flex-1 p-4 md:p-8 pt-4 pb-32 md:pb-8">
                     {children}
-                </div>
+                </main>
             </SidebarInset>
         </SidebarProvider>
     );

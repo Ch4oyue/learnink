@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { lazy, Suspense, useMemo, memo } from "react";
+import { lazy, Suspense, useMemo, memo, useCallback } from "react";
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Components } from 'react-markdown';
@@ -84,12 +84,12 @@ export const MarkdownRenderer = memo(({
 }: MarkdownRendererProps) => {
   const { toast } = useToast();
 
-  const copyLink = (id: string) => {
+  const copyLink = useCallback((id: string) => {
     const url = new URL(window.location.href);
     url.hash = id;
     navigator.clipboard.writeText(url.toString());
     toast({ title: "Link bagian disalin!" });
-  };
+  }, [toast]);
 
   const components: Components = useMemo(() => ({
     h1: ({ children, ...props }) => {
@@ -101,7 +101,7 @@ export const MarkdownRenderer = memo(({
           <button
             onClick={() => copyLink(id)}
             className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
-            aria-label="Copy link to this section"
+            aria-label="Salin link bagian"
           >
             <Link2 className="h-4 w-4" />
           </button>
@@ -117,7 +117,7 @@ export const MarkdownRenderer = memo(({
           <button
             onClick={() => copyLink(id)}
             className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
-            aria-label="Copy link to this section"
+            aria-label="Salin link bagian"
           >
             <Link2 className="h-4 w-4" />
           </button>
@@ -133,7 +133,7 @@ export const MarkdownRenderer = memo(({
           <button
             onClick={() => copyLink(id)}
             className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
-            aria-label="Copy link to this section"
+            aria-label="Salin link bagian"
           >
             <Link2 className="h-4 w-4" />
           </button>
@@ -212,7 +212,7 @@ export const MarkdownRenderer = memo(({
     p: ({ children }) => <p className="my-5 text-foreground/90 leading-loose">{children}</p>,
     blockquote: ({ children }) => <blockquote className="border-l-4 border-primary pl-4 my-4 italic text-muted-foreground">{children}</blockquote>,
     hr: () => <hr className="my-6 border-border" />,
-  }), [enableCodeEditor]);
+  }), [enableCodeEditor, copyLink]);
 
   return (
     <div className={cn(

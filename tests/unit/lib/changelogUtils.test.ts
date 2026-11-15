@@ -1,6 +1,6 @@
 
 import { describe, expect, test } from "bun:test";
-import { extractListItems } from "./changelogUtils";
+import { extractListItems } from "../../../src/lib/changelogUtils";
 
 describe("changelogParser", () => {
   describe("extractListItems", () => {

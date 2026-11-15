@@ -11,7 +11,7 @@ import { validatePayload, ValidationError } from "./validation.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// Legacy secret for backward compatibility (optional)
+// Legacy shared secret for backward compatibility (optional)
 const INGEST_SECRET = Deno.env.get("INGEST_SECRET");
 
 // Rate limiting configuration
@@ -106,15 +106,6 @@ async function validateApiKey(
     supabase: ReturnType<typeof createClient>,
     token: string
 ): Promise<ValidatedIntegration | null> {
-    // Check if it's the service role key (backward compatibility)
-    if (token === SUPABASE_SERVICE_ROLE_KEY) {
-        return {
-            id: "service-role",
-            name: "Service Role (Legacy)",
-            source: "system",
-        };
-    }
-
     // Check legacy INGEST_SECRET
     if (INGEST_SECRET && token === INGEST_SECRET) {
         return {
@@ -173,8 +164,8 @@ async function updateIntegrationStats(
     supabase: ReturnType<typeof createClient>,
     integrationId: string
 ): Promise<void> {
-    // Skip for legacy auth methods
-    if (integrationId === "service-role" || integrationId === "ingest-secret") {
+    // Skip for the legacy shared secret
+    if (integrationId === "ingest-secret") {
         return;
     }
 
@@ -273,9 +264,8 @@ serve(async (req) => {
 
         if (!integration) {
             console.error("Invalid API key provided");
-            await logSecurityEvent(supabase, "invalid_api_key", req, 403, "Invalid API key", {
-                token_preview: token.substring(0, 10) + "...",
-            });
+            // Never persist any fragment of the presented token, not even a prefix.
+            await logSecurityEvent(supabase, "invalid_api_key", req, 403, "Invalid API key");
             return new Response(
                 JSON.stringify({ error: "Unauthorized - Invalid API key", success: false }),
                 { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -305,8 +295,8 @@ serve(async (req) => {
             status: "pending",
         };
 
-        // Link to integration if it's not a legacy auth method
-        if (integration.id !== "service-role" && integration.id !== "ingest-secret") {
+        // Link to integration if it's not the legacy shared secret
+        if (integration.id !== "ingest-secret") {
             insertData.integration_id = integration.id;
         }
 

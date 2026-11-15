@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { NotionToMarkdown } from "./notion-to-md.ts";
+import { authenticate, getUserRoles, hasRole, ADMIN_ROLES } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,15 +44,43 @@ serve(async (req) => {
   }
 
   try {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Authentication + Authorization.
+    // This function writes with the service role and forwards a caller-supplied
+    // Notion token, so it must never be reachable by anonymous users.
+    const { userId, error: authError } = await authenticate(req);
+    if (!userId) {
+      return new Response(
+        JSON.stringify({ error: authError ?? "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const roles = await getUserRoles(userId);
+    if (!hasRole(roles, ADMIN_ROLES)) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden: admin access required" }),
+        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const { pageId, notionApiKey } = await req.json();
 
     if (!pageId || !notionApiKey) {
       throw new Error("Missing pageId or notionApiKey");
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    // pageId is interpolated into the Notion API URL, so constrain its shape.
+    // Notion page ids are 32 hex characters, with or without dashes.
+    if (!/^[0-9a-f]{32}$/i.test(String(pageId).replace(/-/g, ""))) {
+      return new Response(
+        JSON.stringify({ error: "Invalid pageId" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const converter = new NotionToMarkdown(notionApiKey);
 

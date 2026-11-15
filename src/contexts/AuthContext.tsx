@@ -84,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .select('id, display_name, avatar_url')
           .eq('id', userId)
           .single();
-        profileData = basicProfile;
+        profileData = basicProfile ?? null;
       } else {
         profileData = fullProfileResult.data;
       }

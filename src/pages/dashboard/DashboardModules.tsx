@@ -276,7 +276,7 @@ export default function DashboardModules() {
                                 <DropdownMenuSeparator className="bg-white/10" />
                                 <DropdownMenuItem
                                   onClick={() => setDeleteId(module.id)}
-                                  className="text-destructive focus:bg-destructive/10 cursor-pointer"
+                                  className="text-destructive-text focus:bg-destructive/10 cursor-pointer"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Hapus

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { usePerformance } from "@/hooks/usePerformance";
+import { getPerformanceTier, usePerformance } from "@/hooks/usePerformance";
 
 // Register GSAP plugins
 gsap.registerPlugin(ScrollTrigger);
@@ -202,6 +202,10 @@ export function useSmoothScroll(
 export function useSimpleSmoothScroll(enabled: boolean = true) {
     useEffect(() => {
         if (!enabled) return;
+
+        // Smooth scrolling is a compositor cost on constrained hardware; the low
+        // tier keeps native, instant scrolling.
+        if (getPerformanceTier() === "low") return;
 
         const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
         if (prefersReducedMotion) return;

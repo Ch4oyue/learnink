@@ -52,7 +52,7 @@ export default function LandingPage() {
                                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
                                 className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                             >
-                                Features
+                                Fitur
                             </button>
                             <div className="h-4 w-[1px] bg-border mx-2" />
                             {user ? (
@@ -70,7 +70,7 @@ export default function LandingPage() {
                                     onMouseEnter={() => prefetch(() => import("@/pages/auth/Auth"))}
                                     className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
                                 >
-                                    Log in
+                                    Masuk
                                 </Link>
                             )}
                             <Button
@@ -131,7 +131,7 @@ export default function LandingPage() {
                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                 className="text-lg font-medium text-foreground hover:text-primary transition-colors"
                                             >
-                                                Log in
+                                                Masuk
                                             </Link>
                                         )}
                                         <button
@@ -141,7 +141,7 @@ export default function LandingPage() {
                                             }}
                                             className="text-lg font-medium text-muted-foreground hover:text-primary transition-colors text-left"
                                         >
-                                            Features
+                                            Fitur
                                         </button>
                                         <div className="h-[1px] bg-border my-2" />
                                         <a
@@ -171,32 +171,32 @@ export default function LandingPage() {
                 </Suspense>
 
                 {/* Open Source & Free Section */}
-                <section className="py-28 sm:py-32 bg-muted/30 border-t border-border">
+                <section className="py-28 sm:py-32 bg-muted/30 border-t border-border cv-auto">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-8">
                             <Heart className="h-8 w-8 text-primary" />
                         </div>
                         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-6 leading-tight">
-                            Open Source & Forever Free
+                            Open Source & Selamanya Gratis
                         </h2>
                         <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-                            We believe education should be accessible to everyone. LearnInk is completely free—no premium tiers, no hidden costs.
-                            Just pure, transparent learning materials built for the community, by the community.
+                            Kami percaya edukasi harus bisa diakses siapa saja. LearnInk sepenuhnya gratis — tanpa tier premium, tanpa biaya tersembunyi.
+                            Materi belajar yang transparan, dibangun komunitas untuk komunitas.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Github className="h-5 w-5" />
-                                <span>Open Source Codebase</span>
+                                <Github className="h-5 w-5" aria-hidden="true" />
+                                <span>Kode Open Source</span>
                             </div>
                             <div className="hidden sm:block w-1 h-1 rounded-full bg-muted-foreground" />
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <BookOpen className="h-5 w-5" />
-                                <span>Free Learning Materials</span>
+                                <BookOpen className="h-5 w-5" aria-hidden="true" />
+                                <span>Materi Gratis</span>
                             </div>
                             <div className="hidden sm:block w-1 h-1 rounded-full bg-muted-foreground" />
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <Heart className="h-5 w-5" />
-                                <span>Community Driven</span>
+                                <Heart className="h-5 w-5" aria-hidden="true" />
+                                <span>Digerakkan Komunitas</span>
                             </div>
                         </div>
                     </div>

@@ -385,7 +385,7 @@ export default function ContentApproval() {
                                         <Button size="sm" onClick={() => openPublishDialog(content)} className="flex-1 gap-1">
                                             <CheckCircle className="h-4 w-4" /> Review
                                         </Button>
-                                        <Button size="sm" variant="outline" onClick={() => setRejectContent(content)} className="text-destructive hover:bg-destructive/10">
+                                        <Button size="sm" variant="outline" onClick={() => setRejectContent(content)} className="text-destructive-text hover:bg-destructive/10">
                                             <XCircle className="h-4 w-4" />
                                         </Button>
                                     </CardFooter>
@@ -423,7 +423,7 @@ export default function ContentApproval() {
                                                     </p>
                                                 </div>
                                             </div>
-                                            <Badge variant="outline" className="uppercase text-[10px]">{req.priority || "medium"}</Badge>
+                                            <Badge variant="outline" className="uppercase text-[13px]">{req.priority || "medium"}</Badge>
                                         </div>
                                     </CardHeader>
                                     <CardContent className="pb-3">

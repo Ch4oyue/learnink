@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback, useMemo } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -51,23 +51,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Combined fetch using separate queries (RPC not available)
   const fetchAuthData = useCallback(async (userId: string, userEmail?: string | null) => {
     try {
-      // Fetch role
-      const { data: roleData } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .single();
+      // Role, profile and enrolled tracks are independent lookups: run them in
+      // parallel so auth data costs one round trip instead of three sequential ones.
+      const [roleResult, fullProfileResult, tracksResult] = await Promise.all([
+        supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .single(),
+        supabase
+          .from('profiles')
+          .select('id, display_name, avatar_url, current_streak, longest_streak, last_activity_date, points, labels, is_premium, premium_until')
+          .eq('id', userId)
+          .single()
+          // These columns are ahead of the generated schema types.
+          .overrideTypes<Profile, { merge: false }>(),
+        supabase
+          .from('user_tracks')
+          .select('track_id')
+          .eq('user_id', userId),
+      ]);
 
-      // Fetch profile (with fallback for missing columns during migration transitions)
-      let profileData = null;
-      const { data: fullProfile, error: fullProfileError } = await supabase
-        .from('profiles')
-        .select('id, display_name, avatar_url, current_streak, longest_streak, last_activity_date, points, labels, is_premium, premium_until')
-        .eq('id', userId)
-        .single();
+      const roleData = roleResult.data;
+      const tracksData = tracksResult.data;
 
-      if (fullProfileError) {
-        logger.warn('Failed to fetch full profile, falling back to basic fields', fullProfileError);
+      // Profile columns may lag the deployed schema: fall back to the basic fields.
+      let profileData: Profile | null = null;
+      if (fullProfileResult.error) {
+        logger.warn('Failed to fetch full profile, falling back to basic fields', fullProfileResult.error);
         const { data: basicProfile } = await supabase
           .from('profiles')
           .select('id, display_name, avatar_url')
@@ -75,14 +86,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .single();
         profileData = basicProfile;
       } else {
-        profileData = fullProfile;
+        profileData = fullProfileResult.data;
       }
-
-      // Fetch enrolled tracks
-      const { data: tracksData } = await supabase
-        .from('user_tracks')
-        .select('track_id')
-        .eq('user_id', userId);
 
       // Super admin identification (agen.salva@gmail.com)
       const isSuperAdmin = userId === '676c1aca-b52c-4825-8f7c-1dfef33b107c' ||
@@ -90,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const userRole = (roleData?.role as AppRole) || (isSuperAdmin ? 'superadmin' : 'user');
       setRole(userRole);
-      setProfile(profileData || null);
+      setProfile(profileData);
       setEnrolledTrackIds(tracksData?.map(t => t.track_id) || []);
 
     } catch (error) {
@@ -169,15 +174,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [fetchAuthData]);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     return { error };
-  };
+  }, []);
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
+  const signUp = useCallback(async (email: string, password: string, displayName?: string) => {
     const redirectUrl = `${window.location.origin}/`;
 
     const { data, error } = await supabase.auth.signUp({
@@ -207,9 +212,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return { error };
-  };
+  }, []);
 
-  const signOut = async () => {
+  const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
       toast({
@@ -220,40 +225,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     setRole(null);
     setProfile(null);
-  };
+  }, [toast]);
 
   // Utility to manually refresh profile
-  const refreshProfile = async () => {
+  const refreshProfile = useCallback(async () => {
     if (user) {
       // Optimized: Reuse the single RPC call
       await fetchAuthData(user.id, user.email);
     }
-  };
+  }, [user, fetchAuthData]);
 
   const isAdmin = role === 'admin' || role === 'superadmin';
   const isTutor = role === 'tutor' || role === 'admin' || role === 'superadmin';
 
-  const canAccessTrack = (trackId: string) => {
+  const canAccessTrack = useCallback((trackId: string) => {
     if (isAdmin || isTutor) return true;
     return enrolledTrackIds.includes(trackId);
-  };
+  }, [isAdmin, isTutor, enrolledTrackIds]);
+
+  // Memoize the context value: without this, every AuthProvider state change (loading,
+  // profile refresh, etc.) creates a new object and re-renders every consumer in the app.
+  const value = useMemo<AuthContextType>(() => ({
+    user,
+    session,
+    role,
+    profile,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    isAdmin,
+    isTutor,
+    refreshProfile,
+    enrolledTrackIds,
+    canAccessTrack
+  }), [
+    user, session, role, profile, loading,
+    signIn, signUp, signOut, isAdmin, isTutor,
+    refreshProfile, enrolledTrackIds, canAccessTrack
+  ]);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      role,
-      profile,
-      loading,
-      signIn,
-      signUp,
-      signOut,
-      isAdmin,
-      isTutor,
-      refreshProfile,
-      enrolledTrackIds,
-      canAccessTrack
-    }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

@@ -162,7 +162,7 @@ export const RequestSection = () => {
                     {...register("topic")}
                   />
                   {errors.topic && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
+                    <p className="text-sm text-destructive-text flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
                       {errors.topic.message}
                     </p>
@@ -247,7 +247,7 @@ export const RequestSection = () => {
                     {...register("description")}
                   />
                   {errors.description && (
-                    <p className="text-sm text-destructive flex items-center gap-1">
+                    <p className="text-sm text-destructive-text flex items-center gap-1">
                       <AlertCircle className="w-3 h-3" />
                       {errors.description.message}
                     </p>

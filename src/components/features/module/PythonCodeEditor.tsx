@@ -235,7 +235,7 @@ export function PythonCodeEditor({
               <pre className="text-foreground whitespace-pre-wrap">{output}</pre>
             )}
             {(error || pyodideError) && (
-              <pre className="text-destructive whitespace-pre-wrap">
+              <pre className="text-destructive-text whitespace-pre-wrap">
                 {error || pyodideError}
               </pre>
             )}

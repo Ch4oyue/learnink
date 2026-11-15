@@ -142,7 +142,7 @@ export function PremiumStore() {
               offer.popular && "border-primary shadow-glow scale-105 z-10"
             )}>
               {offer.popular && (
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[10px] font-bold px-2 py-1 rounded-bl-lg">
+                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[13px] font-bold px-2 py-1 rounded-bl-lg">
                   POPULAR
                 </div>
               )}

@@ -166,8 +166,16 @@ export default defineConfig(({ mode }) => ({
             }
 
             // 6. Common Utilities
-            // Separated so they don't bloat the UI chunks.
-            if (id.includes("date-fns") || id.includes("zod") || id.includes("react-hook-form") || id.includes("clsx") || id.includes("tailwind-merge")) {
+            // Only tiny helpers shared by the entry chunk live here. Dates, validation and
+            // forms are grouped separately: the entry imports `cn()` (clsx + tailwind-merge),
+            // so bundling them together forced date-fns/zod/react-hook-form onto the critical path.
+            if (id.includes("date-fns")) {
+              return "vendor-dates";
+            }
+            if (id.includes("zod") || id.includes("react-hook-form") || id.includes("@hookform")) {
+              return "vendor-forms";
+            }
+            if (id.includes("clsx") || id.includes("tailwind-merge")) {
               return "vendor-utils";
             }
 

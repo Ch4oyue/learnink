@@ -20,9 +20,10 @@ mock.module("react", () => ({
   }
 }));
 
-// Mock usePerformance
+// Mock usePerformance (mirror the real module's exports)
 mock.module("@/hooks/usePerformance", () => ({
-  isLowEndDevice: () => false
+  isLowEndDevice: () => false,
+  getPerformanceTier: () => "high",
 }));
 
 import { usePyodidePreload } from "../../../src/hooks/usePyodidePreload";

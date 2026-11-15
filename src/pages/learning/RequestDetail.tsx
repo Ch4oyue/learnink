@@ -40,7 +40,7 @@ const statusConfig = {
   },
   rejected: {
     label: 'Ditolak',
-    color: 'bg-destructive/10 text-destructive',
+    color: 'bg-destructive/10 text-destructive-text',
     icon: XCircle,
     description: 'Request Anda tidak dapat diproses. Lihat catatan admin untuk detail.',
   },

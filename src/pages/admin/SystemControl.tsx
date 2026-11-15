@@ -342,7 +342,7 @@ export default function SystemControl() {
                     <TableCell className="text-xs">{log.ip_address}</TableCell>
                     <TableCell>
                       {log.error_message ? (
-                        <span className="text-destructive text-xs">{log.error_message}</span>
+                        <span className="text-destructive-text text-xs">{log.error_message}</span>
                       ) : (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       )}
@@ -427,7 +427,7 @@ export default function SystemControl() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-destructive"
+                        className="text-destructive-text"
                         onClick={() => {
                           if (confirm(`Hapus label ${label.id}?`)) deleteLabel.mutate(label.id);
                         }}
@@ -446,7 +446,7 @@ export default function SystemControl() {
         <div className="pt-6">
            <Card className="border-destructive/20 bg-destructive/5">
              <CardHeader>
-               <CardTitle className="text-destructive flex items-center gap-2">
+               <CardTitle className="text-destructive-text flex items-center gap-2">
                  <AlertTriangle className="h-5 w-5" />
                  Danger Zone
                </CardTitle>

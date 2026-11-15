@@ -71,7 +71,7 @@ const statusColors: Record<string, string> = {
   pending: "bg-warning/10 text-warning border-warning/20",
   reviewing: "bg-primary/10 text-primary border-primary/20",
   completed: "bg-success/10 text-success border-success/20",
-  rejected: "bg-destructive/10 text-destructive border-destructive/20",
+  rejected: "bg-destructive/10 text-destructive-text border-destructive/20",
 };
 
 const statusLabels: Record<string, string> = {
@@ -212,7 +212,7 @@ export default function DashboardRequests() {
 
   const getPriorityColor = (priority: string | null) => {
     switch (priority) {
-      case 'high': return "border-destructive/50 text-destructive";
+      case 'high': return "border-destructive/50 text-destructive-text";
       case 'medium': return "border-warning/50 text-warning";
       case 'low': return "border-success/50 text-success";
       default: return "";

@@ -158,7 +158,7 @@ export function Navbar() {
                       Dashboard
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive">
+                    <DropdownMenuItem onClick={handleSignOut} className="text-destructive-text">
                       <LogOut className="h-4 w-4 mr-2" />
                       Keluar
                     </DropdownMenuItem>
@@ -270,7 +270,7 @@ export function Navbar() {
                   <Button
                     variant="ghost"
                     onClick={handleSignOut}
-                    className="justify-start text-base font-medium text-destructive hover:text-destructive hover:bg-transparent px-0 gap-2"
+                    className="justify-start text-base font-medium text-destructive-text hover:text-destructive-text hover:bg-transparent px-0 gap-2"
                   >
                     <LogOut className="h-4 w-4" />
                     Keluar

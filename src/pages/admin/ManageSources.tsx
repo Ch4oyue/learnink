@@ -348,7 +348,7 @@ export default function ManageSources() {
                                                 <Button
                                                     size="sm"
                                                     variant="ghost"
-                                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                    className="text-destructive-text hover:text-destructive-text hover:bg-destructive/10"
                                                     onClick={() => setDeleteSource(source)}
                                                 >
                                                     <Trash2 className="h-4 w-4" />

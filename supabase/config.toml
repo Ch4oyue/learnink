@@ -12,5 +12,11 @@ verify_jwt = true
 [functions.validate-quiz-answers]
 verify_jwt = true
 
+[functions.ingest-content]
+# Self-authenticating: it validates per-integration sk_live_… keys and
+# INGEST_SECRET itself. Those bearer tokens are not JWTs, so the gateway check
+# must be off or every documented n8n/Make/Zapier client gets a 401.
+verify_jwt = false
+
 # [auth]
 # pwned_password_protection_enabled = true  # Requires newer CLI version

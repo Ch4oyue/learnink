@@ -135,12 +135,6 @@ serve(async (req) => {
         .select();
 
     if (updateError) throw updateError;
-    if (!updateData || updateData.length === 0) {
-        return new Response(JSON.stringify({ error: "Reward already claimed or not found" }), {
-            status: 400,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-    }
 
     // Check if the update actually happened
     if (!updatedRows || updatedRows.length === 0) {

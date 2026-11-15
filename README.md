@@ -91,17 +91,26 @@ src/
 ├── contexts/       # React Contexts (Auth, Theme)
 ├── hooks/          # Custom hooks (useLearningStats, useDebounce)
 ├── integrations/   # Supabase client and types
-├── lib/            # Utilities & Workers
-│   ├── pyodide.worker.ts  # Python execution worker
-│   └── ...
-├── pages/          # Application routes (Dashboard, Modules)
+├── lib/            # Utilities & Workers (pyodide.worker.ts, ...)
+├── pages/          # Application routes (Dashboard, Modules, Admin)
 ├── types/          # Global TypeScript definitions
 └── App.tsx         # Main entry with routing
 supabase/
-├── migrations/     # Database schema & RPC functions
-└── functions/      # Edge Functions (ingest-content, etc.)
-tests/              # Benchmarks and integration tests
+├── migrations/     # Database schema & RPC functions (single source of truth)
+├── functions/      # Edge Functions
+│   └── _shared/    # Shared auth/role helpers for Edge Functions
+└── archive/        # Superseded ad-hoc SQL, reference only (never applied)
+tests/              # Unit tests, guardrails and performance benchmarks
+docs/               # Design references and security notes
+scripts/            # Local maintenance scripts
 ```
+
+Conventions:
+- Unit tests live under `tests/`, mirroring the `src/` path (`tests/unit/lib/x.test.ts`).
+- Every schema change goes in a new timestamped file in `supabase/migrations/`.
+- Secrets never belong in the repository: `.env` is ignored, `.env.example` holds placeholders only.
+
+See [docs/SECURITY.md](docs/SECURITY.md) for the security review and its open actions.
 
 ## 🤝 Contributing
 

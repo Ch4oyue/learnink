@@ -12,6 +12,15 @@ dist
 dist-ssr
 *.local
 
+# Test / tooling output (generated, never commit)
+test-results
+playwright-report
+coverage
+
+# Supabase CLI local state
+supabase/.temp
+supabase/.branches
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -33,3 +42,4 @@ dist-ssr
 .env.production
 .env.production.local
 .env*.local
+!.env.example

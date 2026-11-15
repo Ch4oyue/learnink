@@ -23,6 +23,10 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
   useEffect(() => {
     if (!moduleId || !userId) return;
 
+    totalTimeRef.current = 0;
+    lastActivityRef.current = Date.now();
+    lastDbUpdateRef.current = 0;
+
     const key = `learnink_analytics_${userId}_${moduleId}`;
     try {
       const saved = localStorage.getItem(key);

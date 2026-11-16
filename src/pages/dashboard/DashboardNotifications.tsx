@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { supabase } from "@/integrations/supabase/client";
+import { uniqueChannelTopic } from "@/lib/realtime";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   useNotifications,
@@ -63,7 +64,7 @@ export default function DashboardNotifications() {
     if (!user?.id) return;
 
     const channel = supabase
-      .channel("notifications-realtime")
+      .channel(uniqueChannelTopic("notifications-realtime"))
       .on(
         "postgres_changes",
         {

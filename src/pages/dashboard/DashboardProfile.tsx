@@ -317,7 +317,7 @@ export default function DashboardProfile() {
                     <Button onClick={() => setIsEditing(true)} className="glass-button-primary h-12 px-8 rounded-2xl shadow-lg hover:shadow-primary/20">
                       <Edit className="h-4 w-4 mr-2" /> Edit Profile
                     </Button>
-                    <Button variant="ghost" onClick={handleSignOut} className="h-12 px-6 rounded-2xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
+                    <Button variant="ghost" onClick={handleSignOut} className="h-12 px-6 rounded-2xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive-text transition-colors">
                       <LogOut className="h-4 w-4 mr-2" /> Logout
                     </Button>
                   </div>
@@ -358,7 +358,7 @@ export default function DashboardProfile() {
                             style={{ height: `${item.height}%` }}
                           >
                             <div
-                              className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-[10px] py-1 px-2 rounded transition-opacity whitespace-nowrap z-10 ${item.isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                              className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-[13px] py-1 px-2 rounded transition-opacity whitespace-nowrap z-10 ${item.isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"
                                 }`}
                             >
                               {formatMinutes(item.minutes)}

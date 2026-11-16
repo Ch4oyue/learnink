@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { pyodideManager } from "@/lib/pyodide-manager";
-import { isLowEndDevice } from "./usePerformance";
+import { getPerformanceTier } from "./usePerformance";
 
 /**
  * Smartly preloads Pyodide runtime if the content contains Python code blocks.
@@ -9,8 +9,9 @@ import { isLowEndDevice } from "./usePerformance";
  */
 export function usePyodidePreload(content?: string) {
   useEffect(() => {
-    // Skip preloading on low-end devices
-    if (isLowEndDevice()) return;
+    // The runtime is multi-megabyte: only preload it on high-tier devices, where
+    // it will not compete with the module payload. Everyone else loads it on demand.
+    if (getPerformanceTier() !== "high") return;
 
     const timeoutId = setTimeout(() => {
       if (content?.includes('```python')) {

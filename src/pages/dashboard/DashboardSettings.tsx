@@ -316,7 +316,7 @@ export default function DashboardSettings() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-destructive hover:text-destructive"
+                            className="text-destructive-text hover:text-destructive-text"
                             onClick={() => handleDelete(cat.id, cat.name, 'category')}
                             aria-label={`Hapus kategori ${cat.name}`}
                           >
@@ -391,7 +391,7 @@ export default function DashboardSettings() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-destructive hover:text-destructive"
+                            className="text-destructive-text hover:text-destructive-text"
                             onClick={() => handleDelete(level.id, level.name, 'level')}
                             aria-label={`Hapus level ${level.name}`}
                           >

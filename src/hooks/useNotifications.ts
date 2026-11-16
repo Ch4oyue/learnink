@@ -51,7 +51,9 @@ export function useUnreadNotificationCount(userId?: string) {
       return count || 0;
     },
     enabled: !!userId,
-    refetchInterval: 30000, // Refetch every 30 seconds
+    // Realtime subscriptions already invalidate this cache on insert; this is only
+    // a safety net, so a slow cadence is enough and avoids a request per user per 30s.
+    refetchInterval: 5 * 60 * 1000,
   });
 }
 

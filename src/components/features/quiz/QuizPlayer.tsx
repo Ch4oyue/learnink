@@ -120,7 +120,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             {results.passed ? (
               <Check className="h-8 w-8 text-green-500" />
             ) : (
-              <X className="h-8 w-8 text-destructive" />
+              <X className="h-8 w-8 text-destructive-text" />
             )}
           </div>
           <CardTitle className="text-2xl">
@@ -203,7 +203,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           <Badge variant="secondary">{quiz.title}</Badge>
           <div
             className={`flex items-center gap-2 px-3 py-1 rounded-full ${
-              timeLeft < 60 ? "bg-destructive/10 text-destructive" : "bg-muted"
+              timeLeft < 60 ? "bg-destructive/10 text-destructive-text" : "bg-muted"
             }`}
           >
             <Clock className="h-4 w-4" />

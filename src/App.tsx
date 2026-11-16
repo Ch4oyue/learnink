@@ -1,8 +1,8 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { CustomCursor } from "@/components/ui/CustomCursor";
+import { isLowEndDevice } from "@/hooks/usePerformance";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
@@ -17,6 +17,12 @@ import { HelmetProvider } from "react-helmet-async";
 // ============================================
 // LAZY LOADED PAGES
 // ============================================
+
+// Decorative cursor - lazy loaded so framer-motion stays off the critical path.
+// It is also pointless on touch devices and discouraged on low-end hardware.
+const CustomCursor = lazy(() =>
+  import("./components/ui/CustomCursor").then((m) => ({ default: m.CustomCursor }))
+);
 
 // Public Pages
 const LandingPage = lazy(() => import("./pages/public/LandingPage"));
@@ -78,6 +84,40 @@ const PageLoader = () => (
 );
 
 // ============================================
+// CURSOR LAYER (loads after first paint, only where it makes sense)
+// ============================================
+
+const CursorLayer = () => {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    // Same conditions CustomCursor disables itself on - checked here so the
+    // framer-motion chunk is never downloaded on those devices at all.
+    if (isLowEndDevice()) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+    const enable = () => setEnabled(true);
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(enable, { timeout: 2000 });
+      return () => window.cancelIdleCallback(idleId);
+    }
+
+    const timeoutId = window.setTimeout(enable, 300);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  if (!enabled) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <CustomCursor />
+    </Suspense>
+  );
+};
+
+// ============================================
 // SMART LANDING (No redirect - show landing to everyone)
 // ============================================
 
@@ -103,7 +143,7 @@ const App = () => (
     <HelmetProvider>
       <ThemeProvider>
         <PWAProvider>
-          <CustomCursor />
+          <CursorLayer />
           <PWAInstallPrompt />
           <QueryClientProvider client={queryClient}>
             <TooltipProvider>

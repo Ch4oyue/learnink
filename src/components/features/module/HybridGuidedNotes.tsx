@@ -87,7 +87,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                     variant="outline"
                     size="sm"
                     onClick={onExportPdf}
-                    className="text-[11px] font-bold text-primary px-3 py-1.5 rounded-full border-primary/30 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
+                    className="text-[13px] font-bold text-primary px-3 py-1.5 rounded-full border-primary/30 hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all"
                 >
                     Export PDF
                 </Button>
@@ -148,7 +148,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                                 setEditingNoteId(null);
                                 setNewNoteText("");
                             }}
-                            className="absolute left-12 -top-2 bg-destructive text-white text-[10px] px-2 py-0.5 rounded-full shadow-sm hover:scale-105 transition-transform"
+                            className="absolute left-12 -top-2 bg-destructive text-white text-[13px] px-2 py-0.5 rounded-full shadow-sm hover:scale-105 transition-transform"
                          >
                             Batal Edit
                          </button>
@@ -174,10 +174,10 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                 </div>
                 <div className="flex justify-between items-center mt-3 px-1">
                     <div className="flex gap-3">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
+                        <span className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
                             {editingNoteId ? "Editing Mode" : "Markdown"}
                         </span>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
+                        <span className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider hover:text-foreground cursor-pointer">
                             Shortcuts
                         </span>
                     </div>
@@ -217,18 +217,18 @@ function NoteCard({ note, onDelete, onEdit, isEditing, isDeleting }: NoteCardPro
             {/* Header with badge and delete button */}
             <div className="flex justify-between items-start mb-3">
                 {isHighlightedNote ? (
-                    <span className="bg-green-900/20 text-green-400 text-[10px] font-extrabold tracking-wider px-2 py-1 rounded-md flex items-center gap-1">
+                    <span className="bg-green-900/20 text-green-400 text-[13px] font-extrabold tracking-wider px-2 py-1 rounded-md flex items-center gap-1">
                         SAVED <Check className="h-3 w-3" />
                     </span>
                 ) : (
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                    <span className="text-[13px] font-bold text-muted-foreground uppercase tracking-wider">
                         NOTE
                     </span>
                 )}
                 <button
                     onClick={() => onDelete?.(note.id)}
                     disabled={isDeleting}
-                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-colors"
+                    className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive-text transition-colors"
                 >
                     {isDeleting ? (
                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -240,7 +240,7 @@ function NoteCard({ note, onDelete, onEdit, isEditing, isDeleting }: NoteCardPro
 
             {/* Highlighted text (if from selection) */}
             {note.highlighted_text && (
-                <div className="bg-muted/50 rounded-lg p-3 font-mono text-[11px] text-muted-foreground border border-border leading-relaxed mb-3">
+                <div className="bg-muted/50 rounded-lg p-3 font-mono text-[13px] text-muted-foreground border border-border leading-relaxed mb-3">
                     "{note.highlighted_text}"
                 </div>
             )}
@@ -249,7 +249,7 @@ function NoteCard({ note, onDelete, onEdit, isEditing, isDeleting }: NoteCardPro
             <p className="text-sm text-foreground leading-relaxed">{note.content}</p>
 
             {/* Timestamp */}
-            <div className="mt-3 text-[10px] text-muted-foreground/60">
+            <div className="mt-3 text-[13px] text-muted-foreground/60">
                 {format(new Date(note.created_at), "dd MMM yyyy, HH:mm", {
                     locale: localeId,
                 })}

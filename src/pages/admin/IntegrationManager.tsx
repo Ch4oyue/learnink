@@ -478,7 +478,7 @@ export default function IntegrationManager() {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                            className="text-destructive-text hover:text-destructive-text hover:bg-destructive/10"
                                             onClick={() => setDeleteIntegration(integration)}
                                         >
                                             <Trash2 className="h-3.5 w-3.5" />

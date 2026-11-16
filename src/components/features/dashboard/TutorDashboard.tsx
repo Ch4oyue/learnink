@@ -47,7 +47,7 @@ const statusColors: Record<RequestStatus, string> = {
   pending: 'bg-amber-500/10 text-amber-600',
   reviewing: 'bg-primary/10 text-primary',
   completed: 'bg-green-500/10 text-green-600',
-  rejected: 'bg-destructive/10 text-destructive',
+  rejected: 'bg-destructive/10 text-destructive-text',
 };
 
 export function TutorDashboardContent() {

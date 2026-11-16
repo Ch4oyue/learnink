@@ -114,7 +114,7 @@ export function NotificationBadge() {
         >
           <Bell className="h-5 w-5 text-muted-foreground" />
           {(unreadCount || 0) > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-[10px] font-medium flex items-center justify-center badge-pulse">
+            <span className="absolute -top-0.5 -right-0.5 h-5 w-5 rounded-full bg-destructive text-destructive-foreground text-[13px] font-medium flex items-center justify-center badge-pulse">
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
@@ -191,7 +191,7 @@ export function NotificationBadge() {
                         <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
                           {notification.message}
                         </p>
-                        <p className="text-[10px] text-muted-foreground/60 mt-1">
+                        <p className="text-[13px] text-muted-foreground/60 mt-1">
                           {formatDistanceToNow(new Date(notification.created_at), {
                             addSuffix: true,
                             locale: idLocale,

@@ -94,7 +94,7 @@ export function FloatingSelectionMenu({ selection, onAddNote, onClose }: Floatin
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-6 w-6 rounded-full text-muted-foreground hover:text-destructive"
+                            className="h-6 w-6 rounded-full text-muted-foreground hover:text-destructive-text"
                             onClick={() => setMode("menu")}
                             aria-label="Batalkan"
                         >

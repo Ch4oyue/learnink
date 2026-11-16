@@ -31,7 +31,7 @@ const iconMap: Record<string, React.ElementType> = {
 const levelColors: Record<string, string> = {
   Pemula: "bg-success/10 text-success",
   Menengah: "bg-warning/10 text-warning",
-  Lanjutan: "bg-destructive/10 text-destructive",
+  Lanjutan: "bg-destructive/10 text-destructive-text",
 };
 
 // Categories focused on AI & Automation
@@ -167,7 +167,7 @@ export const ModulesSection = () => {
                     </span>
                     {category && (
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${categoryColors[category] || categoryColors["Umum"]}`}
+                        className={`px-2 py-0.5 rounded-full text-[13px] font-medium ${categoryColors[category] || categoryColors["Umum"]}`}
                       >
                         {category}
                       </span>

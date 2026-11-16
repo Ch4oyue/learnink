@@ -4,6 +4,16 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
+// ============================================
+// PRECACHE
+// Install cost is paid on the first visit, so the precache holds the app shell
+// only; everything else (route chunks, vendors, images) is runtime-cached on
+// demand. `scripts/check-precache-budget.mjs` runs after the build and fails it
+// if the shell grows past its budget or non-shell files sneak back in.
+// ============================================
+
+const PRECACHE_MAX_FILE_KB = Number(process.env.PRECACHE_MAX_FILE_KB ?? 512);
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
@@ -17,10 +27,48 @@ export default defineConfig(({ mode }) => ({
       registerType: 'prompt',
       injectRegister: 'auto',
       strategies: 'generateSW',
-      includeAssets: ['favicon.ico', 'placeholder.svg', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.ico'],
+      // The OS fetches manifest icons when installing the app; they do not
+      // belong in the install payload of the page.
+      includeManifestIcons: false,
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        // App shell only: the HTML, the entry JS/CSS and the small public icons.
+        // Route chunks, vendor bundles and images are cached on demand below.
+        globPatterns: ['index.html', 'manifest.webmanifest', 'assets/index-*.js', 'assets/index-*.css', 'favicon.ico'],
+        // Safety net for anything the globs above accidentally pick up.
+        maximumFileSizeToCacheInBytes: PRECACHE_MAX_FILE_KB * 1024,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
+          {
+            // Hashed build output is immutable, so first use fills the cache and
+            // repeat visits (including offline) are served from it.
+            urlPattern: /\/assets\/.*\.(?:js|css)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'build-assets-cache',
+              expiration: {
+                maxEntries: 160,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg|webp|avif|ico)$/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'image-cache',
+              expiration: {
+                maxEntries: 60,
+                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -123,7 +171,7 @@ export default defineConfig(({ mode }) => ({
           }
         ]
       }
-    })
+    }),
   ].filter(Boolean),
   resolve: {
     alias: {
@@ -166,8 +214,16 @@ export default defineConfig(({ mode }) => ({
             }
 
             // 6. Common Utilities
-            // Separated so they don't bloat the UI chunks.
-            if (id.includes("date-fns") || id.includes("zod") || id.includes("react-hook-form") || id.includes("clsx") || id.includes("tailwind-merge")) {
+            // Only tiny helpers shared by the entry chunk live here. Dates, validation and
+            // forms are grouped separately: the entry imports `cn()` (clsx + tailwind-merge),
+            // so bundling them together forced date-fns/zod/react-hook-form onto the critical path.
+            if (id.includes("date-fns")) {
+              return "vendor-dates";
+            }
+            if (id.includes("zod") || id.includes("react-hook-form") || id.includes("@hookform")) {
+              return "vendor-forms";
+            }
+            if (id.includes("clsx") || id.includes("tailwind-merge")) {
               return "vendor-utils";
             }
 

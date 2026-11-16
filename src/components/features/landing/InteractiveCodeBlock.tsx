@@ -123,15 +123,19 @@ export function InteractiveCodeBlock({
     const fullCode = CODE_SNIPPETS[language];
     const displayFilename = filename || FILENAMES[language];
 
+    // Respect the OS Reduce Motion setting: show the finished snippet instead of typing it out.
+    const reduceMotion = typeof window !== "undefined"
+        && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const [displayedCode, setDisplayedCode] = useState(
-        showTypingAnimation ? "" : fullCode
+        showTypingAnimation && !reduceMotion ? "" : fullCode
     );
-    const [isTyping, setIsTyping] = useState(showTypingAnimation);
+    const [isTyping, setIsTyping] = useState(showTypingAnimation && !reduceMotion);
     const [currentLine, setCurrentLine] = useState(0);
 
     // Typing animation effect
     useEffect(() => {
-        if (!showTypingAnimation) return;
+        if (!showTypingAnimation || reduceMotion) return;
 
         let charIndex = 0;
         const lines = fullCode.split('\n');
@@ -154,7 +158,7 @@ export function InteractiveCodeBlock({
         }, typingSpeed);
 
         return () => clearInterval(timer);
-    }, [fullCode, showTypingAnimation, typingSpeed]);
+    }, [fullCode, showTypingAnimation, typingSpeed, reduceMotion]);
 
     // Custom line number renderer
     const lineNumbers = displayedCode.split('\n').length;

@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
+import { usePerformance } from "@/hooks/usePerformance";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
@@ -286,7 +287,7 @@ function AppSidebar({ pendingCount = 0 }: SidebarProps) {
                         </Link>
                       </SidebarMenuButton>
                       {state === 'collapsed' && !isMobile && item.badge && (
-                        <div className="absolute -top-1 right-0 z-50 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#f03e3e] px-1 text-[10px] font-bold text-white shadow-sm ring-1 ring-background pointer-events-none">
+                        <div className="absolute -top-1 right-0 z-50 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-[#f03e3e] px-1 text-[13px] font-bold text-white shadow-sm ring-1 ring-background pointer-events-none">
                             {formatBadgeCount(item.badge)}
                         </div>
                       )}
@@ -357,7 +358,7 @@ function AppSidebar({ pendingCount = 0 }: SidebarProps) {
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleSignOut} className="text-destructive focus:text-destructive focus:bg-destructive/10">
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive-text focus:text-destructive-text focus:bg-destructive/10">
                   <LogOut className="mr-2 h-4 w-4" />
                   Log out
                 </DropdownMenuItem>
@@ -429,7 +430,7 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
                   <div className="relative">
                     <Icon className="w-5 h-5" />
                     {item.badge && (
-                      <Badge className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-destructive text-destructive-foreground p-0 flex items-center justify-center text-[10px] pointer-events-none">
+                      <Badge className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-destructive text-destructive-foreground p-0 flex items-center justify-center text-[13px] pointer-events-none">
                         {formatBadgeCount(item.badge)}
                       </Badge>
                     )}
@@ -507,7 +508,7 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
                         <User className="w-5 h-5" />
                         <span className="font-medium">Profile</span>
                       </Link>
-                      <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive transition-colors text-left">
+                      <button onClick={handleSignOut} className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-destructive/10 text-destructive-text transition-colors text-left">
                         <LogOut className="w-5 h-5" />
                         <span className="font-medium">Log out</span>
                       </button>
@@ -529,6 +530,8 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
     const { loading, role } = useAuth();
+    const { tier } = usePerformance();
+    const slowPolling = tier === "low";
     const currentRole: AppRole = role ?? "user";
 
     // Fetch System Settings (Broadcast & Maintenance)
@@ -542,7 +545,8 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             return acc;
           }, {} as Record<string, unknown>);
         },
-        refetchInterval: 60000, // Refresh every minute
+        // Polling is a background cost: slow it down on constrained devices.
+        refetchInterval: slowPolling ? 5 * 60 * 1000 : 60000,
     });
 
     const isMaintenance = systemSettings?.maintenance_mode === "true" || systemSettings?.maintenance_mode === true;
@@ -572,7 +576,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         return (contentCount || 0) + (requestCount || 0);
       },
       enabled: currentRole === "admin" || currentRole === "superadmin",
-      refetchInterval: 30000,
+      refetchInterval: slowPolling ? 5 * 60 * 1000 : 30000,
     });
 
     if (loading) {
@@ -597,7 +601,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                         <Badge
                             variant="outline"
                             className={cn(
-                                "text-[10px] font-bold uppercase tracking-wider",
+                                "text-[13px] font-bold uppercase tracking-wider",
                                 roleBadgeColors[currentRole]
                             )}
                         >
@@ -621,7 +625,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                      <Badge
                         variant="outline"
                         className={cn(
-                            "text-[10px] font-bold uppercase tracking-wider",
+                            "text-[13px] font-bold uppercase tracking-wider",
                             roleBadgeColors[currentRole]
                         )}
                     >

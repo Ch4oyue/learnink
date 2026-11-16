@@ -1,14 +1,21 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import { ArrowRight, PlayCircle, Check } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { useRef, useState, lazy, Suspense } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePerformance } from "@/hooks/usePerformance";
 
 // Lazy load the heavy code block component
 const InteractiveCodeBlock = lazy(() => import("./InteractiveCodeBlock"));
 
 export function Hero() {
+    const { user } = useAuth();
+    const { tier } = usePerformance();
+    // Low-tier devices get the finished result immediately: no entrance animation,
+    // no typing loop competing with first paint.
+    const reducedEffects = tier === "low";
     const mockupRef = useRef(null);
     const isInView = useInView(mockupRef, { once: true, amount: 0.3 });
     const [selectedLanguage, setSelectedLanguage] = useState<"javascript" | "python" | "typescript">("javascript");
@@ -25,26 +32,24 @@ export function Hero() {
                 {/* Version Badge */}
                 <Badge
                     variant="outline"
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border-primary/30 text-primary text-xs font-medium mb-10 backdrop-blur-sm"
+                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border-primary/30 text-primary text-sm font-medium mb-10"
                 >
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                    V2.0 IS LIVE
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse motion-reduce:animate-none" />
+                    V2.0 TELAH RILIS
                 </Badge>
 
                 {/* Main Heading */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.1]">
-                    Master Tech Skills,
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.1] text-balance">
+                    Kuasai Skill Teknis,
                     <br className="hidden sm:block" />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-blue-500 to-cyan-400">
-                        The Lazy Way.
-                    </span>
+                    <span className="text-primary">Dengan Cara Malas.</span>
                 </h1>
 
                 {/* Subtitle */}
                 <p className="max-w-2xl mx-auto text-lg sm:text-xl text-muted-foreground mb-12 leading-relaxed">
-                    Stop watching endless tutorials. Build real projects with auto-generated{" "}
+                    Berhenti menonton tutorial tanpa akhir. Bangun proyek nyata dengan{" "}
                     <strong className="text-foreground font-semibold">Guided Notes</strong>{" "}
-                    that track your progress for you.
+                    yang mencatat progres Anda otomatis.
                 </p>
 
                 {/* CTA Buttons */}
@@ -55,8 +60,8 @@ export function Hero() {
                         className="w-full sm:w-auto px-8 py-3.5 shadow-glow group"
                     >
                         <Link to="/auth">
-                            Start Learning Now
-                            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                            Mulai Belajar Sekarang
+                            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                         </Link>
                     </Button>
                     <Button
@@ -65,28 +70,35 @@ export function Hero() {
                         asChild
                         className="w-full sm:w-auto px-8 py-3.5"
                     >
-                        <Link to="/dashboard">
-                            <PlayCircle className="mr-2 h-5 w-5" />
-                            View Demo
+                        {/* The label says what actually happens next. */}
+                        <Link to={user ? "/dashboard" : "/auth"}>
+                            <PlayCircle className="mr-2 h-5 w-5" aria-hidden="true" />
+                            {user ? "Buka Dashboard" : "Masuk untuk Mencoba"}
                         </Link>
                     </Button>
                 </div>
 
                 {/* Language Selector Pills */}
                 <div className="flex items-center justify-center gap-2 mb-8">
-                    {languageOptions.map((option) => (
-                        <button
-                            key={option.key}
-                            onClick={() => setSelectedLanguage(option.key)}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${selectedLanguage === option.key
-                                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30"
-                                : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
-                                }`}
-                        >
-                            <span className="mr-1.5">{option.icon}</span>
-                            {option.label}
-                        </button>
-                    ))}
+                    {languageOptions.map((option) => {
+                        const isSelected = selectedLanguage === option.key;
+                        return (
+                            <button
+                                key={option.key}
+                                type="button"
+                                aria-pressed={isSelected}
+                                onClick={() => setSelectedLanguage(option.key)}
+                                className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isSelected
+                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/40 ring-offset-2 ring-offset-background"
+                                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                                    }`}
+                            >
+                                <span className="mr-1.5" aria-hidden="true">{option.icon}</span>
+                                {option.label}
+                                {isSelected && <Check className="ml-1.5 h-4 w-4" aria-hidden="true" />}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Interactive Code Editor with 3D Scroll Animation */}
@@ -94,46 +106,22 @@ export function Hero() {
                     ref={mockupRef}
                     className="relative mx-auto max-w-4xl"
                     style={{ perspective: 1200 }}
-                    initial={{ rotateX: 15, scale: 0.95, opacity: 0, y: 40 }}
-                    animate={isInView ? { rotateX: 0, scale: 1, opacity: 1, y: 0 } : { rotateX: 15, scale: 0.95, opacity: 0, y: 40 }}
+                    initial={reducedEffects ? false : { rotateX: 15, scale: 0.95, opacity: 0, y: 40 }}
+                    animate={reducedEffects || isInView ? { rotateX: 0, scale: 1, opacity: 1, y: 0 } : { rotateX: 15, scale: 0.95, opacity: 0, y: 40 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                 >
-                    {/* Glow Effect */}
-                    <div className="absolute -inset-8 bg-gradient-to-r from-primary/20 via-purple-500/15 to-cyan-400/20 rounded-3xl blur-3xl opacity-60 dark:opacity-30 pointer-events-none" />
-
                     {/* Interactive Code Block */}
                     <Suspense fallback={
                         <div className="w-full h-[400px] bg-[#1e1e1e] rounded-xl border border-zinc-800/60 shadow-2xl animate-pulse flex items-center justify-center">
-                            <span className="text-zinc-500 font-mono">Loading Editor...</span>
+                            <span className="text-zinc-400 font-mono">Memuat editor…</span>
                         </div>
                     }>
                         <InteractiveCodeBlock
                             language={selectedLanguage}
-                            showTypingAnimation={true}
+                            showTypingAnimation={!reducedEffects}
                             typingSpeed={12}
                         />
                     </Suspense>
-                </motion.div>
-
-                {/* Feature highlights below code block */}
-                <motion.div
-                    className="flex flex-wrap items-center justify-center gap-6 mt-12 text-sm text-muted-foreground"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-                    transition={{ duration: 0.6, delay: 0.4 }}
-                >
-                    <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        Syntax Highlighting
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                        Auto-Generated Notes
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
-                        Progress Tracking
-                    </div>
                 </motion.div>
             </div>
         </section>

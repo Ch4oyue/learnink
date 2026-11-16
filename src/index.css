@@ -35,6 +35,14 @@
 
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
+        /* Text variants, all >= 4.5:1 on --background (WCAG AA) */
+        --destructive-text: 0 72% 45%;
+        --success: 160 84% 24%;
+        --success-foreground: 0 0% 100%;
+        --warning: 32 95% 32%;
+        --warning-foreground: 0 0% 100%;
+        --info: 221 83% 45%;
+        --info-foreground: 0 0% 100%;
 
         --border: 240 5.9% 90%;
         --input: 240 5.9% 90%;
@@ -75,6 +83,14 @@
 
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 85.7% 97.3%;
+        /* Text variants, all >= 4.5:1 on --background (WCAG AA) */
+        --destructive-text: 0 72% 62%;
+        --success: 152 60% 50%;
+        --success-foreground: 240 10% 3.9%;
+        --warning: 38 92% 50%;
+        --warning-foreground: 240 10% 3.9%;
+        --info: 213 94% 68%;
+        --info-foreground: 240 10% 3.9%;
 
         --border: 240 3.7% 15.9%;
         --input: 240 3.7% 15.9%;
@@ -104,10 +120,10 @@
             /* Light Mode - Ultra transparent */
             --background: 220 14% 97%;
             /* Very light gray */
-            --card: 0 0% 100% / 0.25;
-            /* 25% opacity - very transparent */
+            /* Content surfaces stay opaque: glass belongs to the functional layer */
+            --card: 0 0% 100%;
             --popover: 0 0% 100% / 0.35;
-            --muted: 220 14% 96% / 0.2;
+            --muted: 220 14% 96%;
             --sidebar: 0 0% 100% / 0.2;
             --border: 0 0% 100% / 0.4;
             /* Slightly visible border */
@@ -118,10 +134,10 @@
             /* Dark Mode - Ultra subtle dark glass */
             --background: 225 10% 5%;
             /* Very dark */
-            --card: 0 0% 100% / 0.08;
-            /* Very subtle white tint */
+            /* Content surfaces stay opaque: glass belongs to the functional layer */
+            --card: 225 10% 8%;
             --popover: 0 0% 100% / 0.12;
-            --muted: 0 0% 100% / 0.05;
+            --muted: 225 10% 11%;
             --sidebar: 0 0% 100% / 0.06;
             --border: 0 0% 100% / 0.12;
             --input: 0 0% 100% / 0.08;
@@ -166,6 +182,10 @@
         @apply border-border;
     }
 
+    html[data-perf="low"] {
+        scroll-behavior: auto;
+    }
+
     html {
         scroll-behavior: smooth;
         transition: background-color 0.3s ease, color 0.3s ease;
@@ -191,21 +211,12 @@
     @media (max-width: 768px) {
 
         /* Base glass for all elements */
-        .transparent-mode .bg-card,
+        /* Functional layer only: popovers and nav rails take the material.
+           Cards, muted fills and badges are content and stay opaque. */
         .transparent-mode .bg-popover,
-        .transparent-mode .bg-sidebar,
-        .transparent-mode .bg-muted {
+        .transparent-mode .bg-sidebar {
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-        }
-
-        /* Cards - Subtle floating glass */
-        .transparent-mode .bg-card {
-            background: rgba(255, 255, 255, 0.25);
-            border: 0.5px solid rgba(255, 255, 255, 0.5);
-            box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.8);
-            /* Top inner highlight */
-            border-radius: 24px;
         }
 
         /* Buttons - Pill glass with inner glow */
@@ -246,29 +257,14 @@
             border-radius: 16px;
         }
 
-        /* Badges - Minimal pill glass */
-        .transparent-mode .badge,
-        .transparent-mode [class*="Badge"] {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-
         /* ======================================
            LIQUID GLASS EFFECTS - Dark Mode
            Very subtle white tint on dark background
            ====================================== */
-        .transparent-mode.dark .bg-card,
         .transparent-mode.dark .bg-popover,
-        .transparent-mode.dark .bg-sidebar,
-        .transparent-mode.dark .bg-muted {
+        .transparent-mode.dark .bg-sidebar {
             backdrop-filter: blur(20px) saturate(120%);
             -webkit-backdrop-filter: blur(20px) saturate(120%);
-        }
-
-        .transparent-mode.dark .bg-card {
-            background: rgba(255, 255, 255, 0.06);
-            border: 0.5px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
         }
 
         .transparent-mode.dark input,
@@ -403,6 +399,62 @@
                 -webkit-backdrop-filter: blur(20px) saturate(120%);
                 box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.08);
                 border: 0.5px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* ======================================
+           DEVICE TIERS (data-perf on <html>)
+           low: phones/mini PCs -> no blur, no glow, no looping motion
+           mid: mainstream phones/laptops -> lighter blur, keep one-shot motion
+           high: everything on
+           ====================================== */
+        [data-perf="low"] .glass-liquid,
+        [data-perf="low"] .glass {
+            background: hsl(var(--card));
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            box-shadow: none;
+        }
+
+        [data-perf="mid"] .glass-liquid {
+            backdrop-filter: blur(14px) saturate(130%);
+            -webkit-backdrop-filter: blur(14px) saturate(130%);
+        }
+
+        [data-perf="low"] .shadow-glow {
+            box-shadow: none;
+        }
+
+        [data-perf="low"] .animate-marquee-seamless,
+        [data-perf="low"] .animate-pulse {
+            animation: none;
+        }
+
+        /* Below-the-fold sections skip layout/paint until they are near the viewport. */
+        .cv-auto {
+            content-visibility: auto;
+            contain-intrinsic-size: auto 600px;
+        }
+
+        /* Accessibility: opaque fallback when transparency is reduced, and
+           stronger separation when contrast is increased. */
+        @media (prefers-reduced-transparency: reduce) {
+            .glass-liquid,
+            .glass,
+            .transparent-mode .bg-popover,
+            .transparent-mode .bg-sidebar,
+            .transparent-mode.dark .bg-popover,
+            .transparent-mode.dark .bg-sidebar {
+                background: hsl(var(--card));
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+            }
+        }
+
+        @media (prefers-contrast: more) {
+            .glass-liquid,
+            .glass {
+                box-shadow: inset 0 0 0 1.5px hsl(var(--foreground) / 0.4);
             }
         }
 

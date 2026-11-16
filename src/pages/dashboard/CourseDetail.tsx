@@ -152,7 +152,7 @@ export default function CourseDetail() {
                            <div>
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-xs font-mono text-muted-foreground">MODUL {index + 1}</span>
-                                <Badge variant="outline" className="text-[10px] h-5">{module.level || 'Umum'}</Badge>
+                                <Badge variant="outline" className="text-[13px] h-5">{module.level || 'Umum'}</Badge>
                               </div>
                               <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors">
                                 {module.title}

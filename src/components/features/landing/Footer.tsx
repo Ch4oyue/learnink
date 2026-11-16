@@ -13,7 +13,7 @@ export function Footer() {
                         <span className="font-bold text-foreground">LearnInk</span>
                     </Link>
                     <div className="text-sm text-muted-foreground">
-                        © {new Date().getFullYear()} LearnInk Inc. All rights reserved.
+                        © {new Date().getFullYear()} LearnInk Inc. Hak cipta dilindungi.
                     </div>
                 </div>
             </div>

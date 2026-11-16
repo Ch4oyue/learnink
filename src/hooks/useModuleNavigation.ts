@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
-import { parseModuleSections } from "@/lib/moduleParser";
+import { indexModuleSections, readSectionContent, SectionData } from "@/lib/moduleParser";
 
 interface UseModuleNavigationProps {
   moduleId?: string;
@@ -17,11 +17,23 @@ export function useModuleNavigation({
   serverProgress,
   onUpdateProgress,
 }: UseModuleNavigationProps) {
-  // 1. Parse Sections
-  const { sections, order } = useMemo(() => {
+  // 1. Index Sections
+  // Only ids, titles and levels are extracted up front. Section text is sliced
+  // for the section being read, so opening a module never materialises every
+  // section's markdown at once.
+  const { sections: sectionMeta, order } = useMemo(() => {
     if (!moduleContent) return { sections: {}, order: [] };
-    return parseModuleSections(moduleContent);
+    return indexModuleSections(moduleContent);
   }, [moduleContent]);
+
+  const sections = useMemo(() => {
+    const out: Record<string, SectionData> = {};
+    for (const id of order) {
+      const meta = sectionMeta[id];
+      out[id] = { id: meta.id, title: meta.title, level: meta.level, content: "" };
+    }
+    return out;
+  }, [sectionMeta, order]);
 
   // 2. Local State & Persistence
   const [currentSectionId, setCurrentSectionId] = useState<string | null>(() => {
@@ -92,14 +104,29 @@ export function useModuleNavigation({
   const debouncedSaveProgress = useDebouncedCallback(saveProgress, 3000);
 
   // 5. Current Section Helpers
-  const currentSection =
-    currentSectionId && sections[currentSectionId]
-      ? sections[currentSectionId]
+  const currentMeta =
+    currentSectionId && sectionMeta[currentSectionId]
+      ? sectionMeta[currentSectionId]
       : order.length > 0
-      ? sections[order[0]]
+      ? sectionMeta[order[0]]
       : null;
 
-  const currentContent = currentSection?.content || moduleContent || "";
+  const sectionContent = useMemo(
+    () => (currentMeta ? readSectionContent(moduleContent || "", currentMeta) : ""),
+    [moduleContent, currentMeta]
+  );
+
+  const currentContent = sectionContent || moduleContent || "";
+
+  // Keep the object identity stable across renders so memoized consumers (the
+  // content renderer) are not invalidated on every parent render.
+  const currentSection = useMemo(
+    () =>
+      currentMeta
+        ? { id: currentMeta.id, title: currentMeta.title, level: currentMeta.level, content: currentContent }
+        : null,
+    [currentMeta, currentContent]
+  );
   const currentSectionIndex = currentSectionId ? order.indexOf(currentSectionId) : 0;
 
   // 6. Navigation Helpers

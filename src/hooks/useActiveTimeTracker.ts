@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { logger } from '@/lib/logger';
 
 import { supabase } from '@/integrations/supabase/client';
@@ -7,23 +7,25 @@ const IDLE_TIMEOUT_MS = 60 * 1000; // 60 seconds
 const SYNC_INTERVAL_MS = 10 * 1000; // 10 seconds
 const ACTIVITY_UPDATE_THROTTLE_MS = 5 * 60 * 1000; // 5 minutes
 
+/**
+ * Tracks active time on a module.
+ *
+ * The counter lives in a ref on purpose: publishing it through state meant one
+ * React render per second of the whole learn page (markdown, TOC, quiz) for a
+ * value no screen displays. Read `totalTimeRef.current` when you need it.
+ */
 export function useActiveTimeTracker(moduleId: string | undefined, userId: string | undefined) {
   const lastActivityRef = useRef<number>(Date.now());
   const lastDbUpdateRef = useRef<number>(0); // Track last DB sync
-  const startTimeRef = useRef<number>(Date.now());
-  const [totalTime, setTotalTime] = useState(0); // Exposed for UI if needed
-
-  // Ref to track totalTime for effect access without dependency
   const totalTimeRef = useRef(0);
-
-  // Sync state to ref
-  useEffect(() => {
-    totalTimeRef.current = totalTime;
-  }, [totalTime]);
 
   // Load initial time from local storage
   useEffect(() => {
     if (!moduleId || !userId) return;
+
+    totalTimeRef.current = 0;
+    lastActivityRef.current = Date.now();
+    lastDbUpdateRef.current = 0;
 
     const key = `learnink_analytics_${userId}_${moduleId}`;
     try {
@@ -31,7 +33,6 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
       if (saved) {
         const parsed = JSON.parse(saved);
         if (typeof parsed.timeSpent === 'number') {
-          setTotalTime(parsed.timeSpent);
           totalTimeRef.current = parsed.timeSpent;
         }
       }
@@ -62,26 +63,23 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
     if (!moduleId || !userId) return;
 
     const events = ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'];
-    events.forEach(event => window.addEventListener(event, handleActivity));
+    // Passive listeners: none of these need to block scrolling.
+    events.forEach(event => window.addEventListener(event, handleActivity, { passive: true }));
 
     return () => {
       events.forEach(event => window.removeEventListener(event, handleActivity));
     };
   }, [handleActivity, moduleId, userId]);
 
-  // Timer loop
+  // Timer loop - ref only, no state updates while the learner is reading
   useEffect(() => {
     if (!moduleId || !userId) return;
 
     const interval = setInterval(() => {
-      // Check idle status
-      const now = Date.now();
-      const timeSinceLastActivity = now - lastActivityRef.current;
-      const isIdle = timeSinceLastActivity > IDLE_TIMEOUT_MS;
-      const isHidden = document.hidden;
+      const isIdle = Date.now() - lastActivityRef.current > IDLE_TIMEOUT_MS;
 
-      if (!isIdle && !isHidden) {
-        setTotalTime(prev => prev + 1);
+      if (!isIdle && !document.hidden) {
+        totalTimeRef.current += 1;
       }
     }, 1000);
 
@@ -118,5 +116,5 @@ export function useActiveTimeTracker(moduleId: string | undefined, userId: strin
     };
   }, [moduleId, userId]); // Dependencies stable, won't re-run every second
 
-  return { totalTime };
+  return { totalTimeRef };
 }

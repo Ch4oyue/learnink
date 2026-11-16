@@ -150,7 +150,7 @@ export function IncomingNoteAlert({
                             <Button
                                 size="sm"
                                 variant="ghost"
-                                className="h-7 text-xs gap-1 text-destructive hover:text-destructive"
+                                className="h-7 text-xs gap-1 text-destructive-text hover:text-destructive-text"
                                 onClick={() => handleDiscard(note.id)}
                             >
                                 <X className="h-3 w-3" />

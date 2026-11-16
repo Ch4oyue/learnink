@@ -171,7 +171,7 @@ export default function DashboardUsers() {
     return (
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <AlertCircle className="h-12 w-12 text-destructive mb-4" />
+          <AlertCircle className="h-12 w-12 text-destructive-text mb-4" />
           <h2 className="text-xl font-semibold text-foreground mb-2">Gagal Memuat Data</h2>
           <p className="text-muted-foreground max-w-md">
             {isAccessDenied
@@ -329,11 +329,11 @@ export default function DashboardUsers() {
                         <TableCell>
                           <div className="flex flex-wrap gap-1 max-w-[200px]">
                             {user.labels?.map(l => (
-                              <Badge key={l} variant="secondary" className="text-[10px] px-1 h-5">
+                              <Badge key={l} variant="secondary" className="text-[13px] px-1 h-5">
                                 {l}
                                 {(currentUser?.id === SUPER_ADMIN_USER_ID || currentUser?.email === SUPER_ADMIN_EMAIL) && (
                                   <button
-                                    className="ml-1 hover:text-destructive"
+                                    className="ml-1 hover:text-destructive-text"
                                     onClick={() => {
                                       const newLabels = user.labels?.filter(label => label !== l) || [];
                                       updateLabels.mutate({ userId: user.id, labels: newLabels });

@@ -63,7 +63,7 @@ function CourseCard({
       {/* Card Header with Gradient */}
       <div className={`h-28 bg-gradient-to-br ${gradient} relative overflow-hidden`}>
         <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.3),transparent)]" />
-        <div className="absolute bottom-3 left-4 bg-zinc-900/90 backdrop-blur text-white text-[10px] font-bold px-2 py-1 rounded border border-white/10 uppercase tracking-wide">
+        <div className="absolute bottom-3 left-4 bg-zinc-900/90 backdrop-blur text-white text-[13px] font-bold px-2 py-1 rounded border border-white/10 uppercase tracking-wide">
           {category || "General"}
         </div>
       </div>
@@ -138,7 +138,7 @@ function DailyGoalCard({ progress = 0 }: { progress?: number }) {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-2xl font-bold">{Math.round(progress)}%</span>
-            <span className="text-[10px] text-muted-foreground">AVG PROGRESS</span>
+            <span className="text-[13px] text-muted-foreground">AVG PROGRESS</span>
           </div>
         </div>
       </div>
@@ -204,7 +204,7 @@ export function UserDashboardContent() {
             <div className="relative p-6 flex flex-col md:flex-row gap-6 items-start md:items-center">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                  <span className="px-2 py-0.5 rounded text-[13px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
                     Lanjut Belajar
                   </span>
                 </div>

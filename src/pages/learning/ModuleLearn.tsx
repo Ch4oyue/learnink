@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback, memo } from "react";
+import { useState, useEffect, useRef, useMemo, useCallback, memo, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModule } from "@/hooks/useModules";
@@ -32,7 +32,11 @@ import { SectionData } from "@/lib/moduleParser";
 import { HybridSidebar } from "@/components/features/module/HybridSidebar";
 import { HybridContentRenderer } from "@/components/features/module/HybridContentRenderer";
 import { HybridGuidedNotes } from "@/components/features/module/HybridGuidedNotes";
-import { GachaCompletionModal } from "@/components/features/module/GachaCompletionModal";
+// The reward modal is only needed once a module reaches 100%, so it ships as
+// its own chunk instead of in the reading route's bundle.
+const GachaCompletionModal = lazy(() =>
+  import("@/components/features/module/GachaCompletionModal").then((m) => ({ default: m.GachaCompletionModal }))
+);
 import { NotesPrintView } from "@/components/features/module/NotesPrintView";
 import { RefreshCcw, Gift } from "lucide-react";
 
@@ -76,7 +80,7 @@ const TOCItem = memo(({
     >
       <span
         className={cn(
-          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5",
+          "shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[13px] font-bold mt-0.5",
           isActive
             ? "bg-primary text-primary-foreground"
             : isCompleted
@@ -246,6 +250,13 @@ export default function ModuleLearn() {
   const [showGacha, setShowGacha] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [xpEarned, setXpEarned] = useState<number | null>(null);
+  // Once the modal has been opened it stays mounted, so its close animation and
+  // internal state behave exactly as before; the chunk just loads later.
+  const [modalMounted, setModalMounted] = useState(false);
+
+  useEffect(() => {
+    if (showGacha) setModalMounted(true);
+  }, [showGacha]);
 
   useEffect(() => {
     // Only show if completed AND not claimed yet
@@ -476,7 +487,7 @@ export default function ModuleLearn() {
                 style={{ width: `${currentProgress}%` }}
               />
             </div>
-            <p className="text-[10px] text-muted-foreground mt-1 font-medium">{currentProgress}% complete</p>
+            <p className="text-[13px] text-muted-foreground mt-1 font-medium">{currentProgress}% complete</p>
           </div>
 
           {/* TOC List */}
@@ -561,7 +572,7 @@ export default function ModuleLearn() {
 
             <div>
               <h1 className="font-semibold text-sm text-foreground line-clamp-1">{module.title}</h1>
-              <p className="text-[10px] text-muted-foreground">
+              <p className="text-[13px] text-muted-foreground">
                 {currentSectionIndex + 1} of {order.length || 1}
               </p>
             </div>
@@ -690,20 +701,24 @@ export default function ModuleLearn() {
         moduleTitle={module.title}
       />
 
-      <GachaCompletionModal
-        isOpen={showGacha}
-        onClose={() => {
-          setShowGacha(false);
-          // If they closed after earning, we can reset state for next time (though next time won't happen for this module)
-          if (xpEarned !== null) {
-             setXpEarned(null);
-          }
-        }}
-        moduleTitle={module.title}
-        onClaim={handleClaimReward}
-        isClaiming={isClaiming}
-        xpEarned={xpEarned}
-      />
+      {modalMounted && (
+        <Suspense fallback={null}>
+          <GachaCompletionModal
+            isOpen={showGacha}
+            onClose={() => {
+              setShowGacha(false);
+              // If they closed after earning, we can reset state for next time (though next time won't happen for this module)
+              if (xpEarned !== null) {
+                 setXpEarned(null);
+              }
+            }}
+            moduleTitle={module.title}
+            onClaim={handleClaimReward}
+            isClaiming={isClaiming}
+            xpEarned={xpEarned}
+          />
+        </Suspense>
+      )}
     </div>
   );
 }

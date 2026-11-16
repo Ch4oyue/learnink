@@ -194,7 +194,7 @@ export function BottomNavigation() {
                 <item.icon className={cn("h-5 w-5", active && "text-primary-foreground")} />
                 {item.badge !== undefined && item.badge > 0 && (
                   <span className={cn(
-                    "absolute -top-2 -right-2 h-4 w-4 rounded-full text-[10px] font-bold flex items-center justify-center shadow-sm z-10 animate-in zoom-in duration-300",
+                    "absolute -top-2 -right-2 h-4 w-4 rounded-full text-[13px] font-bold flex items-center justify-center shadow-sm z-10 animate-in zoom-in duration-300",
                     active ? "bg-white text-primary" : "bg-red-600 text-white"
                   )}>
                     {item.badge > 99 ? "99+" : item.badge}
@@ -205,7 +205,7 @@ export function BottomNavigation() {
                   Let's hide labels for a pure dock feel to save space, standard in floating docks.
                   Or show only if active? No, usually icons only for docks this small.
               */}
-              {/* <span className={cn("text-[10px] font-medium", active && "text-primary")}>
+              {/* <span className={cn("text-[13px] font-medium", active && "text-primary")}>
                 {item.label}
               </span> */}
             </Link>

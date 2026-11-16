@@ -99,7 +99,7 @@ export function useEnrollTrack() {
       if (error) {
         // Handle unique constraint violation gracefully
         if (error.code === '23505') {
-            throw new Error('Anda sudah terdaftar di track ini');
+            throw new Error('You are already enrolled in this track');
         }
         throw error;
       }
@@ -108,13 +108,13 @@ export function useEnrollTrack() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-tracks"] });
       toast({
-        title: "Berhasil",
-        description: "Anda berhasil mendaftar ke kursus ini",
+        title: "Success",
+        description: "You have successfully enrolled in this course",
       });
     },
     onError: (error) => {
       toast({
-        title: "Gagal Mendaftar",
+        title: "Enrollment failed",
         description: error.message,
         variant: "destructive",
       });

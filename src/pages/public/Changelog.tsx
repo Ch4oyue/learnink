@@ -168,7 +168,7 @@ export default function Changelog() {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                aria-label="Kembali"
+                                aria-label="Back"
                                 onClick={() => {
                                     if (window.history.state && window.history.state.idx > 0) {
                                         navigate(-1);

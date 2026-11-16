@@ -65,8 +65,8 @@ export default function CourseDetail() {
     return (
       <DashboardLayout>
          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold mb-4">Kursus Tidak Ditemukan</h2>
-            <Button onClick={() => navigate('/dashboard/courses')}>Kembali ke Katalog</Button>
+            <h2 className="text-2xl font-bold mb-4">Course Not Found</h2>
+            <Button onClick={() => navigate('/dashboard/courses')}>Back to Catalog</Button>
          </div>
       </DashboardLayout>
     );
@@ -83,7 +83,7 @@ export default function CourseDetail() {
              onClick={() => navigate('/dashboard')}
            >
              <ArrowLeft className="h-4 w-4" />
-             Kembali ke Dashboard
+             Back to Dashboard
            </Button>
 
            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -94,7 +94,7 @@ export default function CourseDetail() {
              {canAccess ? (
                 <div className="min-w-[200px] bg-card border border-border p-4 rounded-xl shadow-sm">
                    <div className="flex justify-between text-sm mb-2">
-                     <span className="text-muted-foreground">Progress Kursus</span>
+                     <span className="text-muted-foreground">Course Progress</span>
                      <span className="font-bold">{courseProgress}%</span>
                    </div>
                    <Progress value={courseProgress} className="h-2" />
@@ -105,7 +105,7 @@ export default function CourseDetail() {
                    onClick={() => navigate('/dashboard/courses')}
                    className="shadow-soft"
                 >
-                   Enroll Sekarang
+                   Enroll Now
                 </Button>
              )}
            </div>
@@ -115,14 +115,14 @@ export default function CourseDetail() {
         <div className="space-y-4">
            <div className="flex items-center gap-2 mb-4">
               <BookOpen className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Daftar Modul</h2>
-              <Badge variant="secondary" className="ml-2">{totalModules} Modul</Badge>
+              <h2 className="text-xl font-semibold">Module List</h2>
+              <Badge variant="secondary" className="ml-2">{totalModules} Modules</Badge>
            </div>
 
            {!canAccess && (
               <div className="bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 p-4 rounded-xl mb-6 flex items-center gap-3">
                  <Lock className="h-5 w-5" />
-                 <p>Anda belum terdaftar di kursus ini. Silakan ambil kursus untuk mengakses materi.</p>
+                 <p>You are not enrolled in this course. Please take the course to access the material.</p>
               </div>
            )}
 
@@ -151,7 +151,7 @@ export default function CourseDetail() {
                            </div>
                            <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs font-mono text-muted-foreground">MODUL {index + 1}</span>
+                                <span className="text-xs font-mono text-muted-foreground">MODULE {index + 1}</span>
                                 <Badge variant="outline" className="text-[13px] h-5">{module.level || 'Umum'}</Badge>
                               </div>
                               <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors">
@@ -166,7 +166,7 @@ export default function CourseDetail() {
                            {isLocked ? (
                               <Button variant="ghost" disabled className="gap-2 w-full md:w-auto">
                                 <Lock className="h-4 w-4" />
-                                Terkunci
+                                Locked
                               </Button>
                            ) : (
                               <Button
@@ -175,7 +175,7 @@ export default function CourseDetail() {
                                 variant={isCompleted ? "outline" : "default"}
                               >
                                 <Link to={`/learn/${module.id}`}>
-                                  {isCompleted ? 'Ulangi' : 'Mulai'}
+                                  {isCompleted ? 'Retry' : 'Start'}
                                   <Play className="h-4 w-4 ml-1" />
                                 </Link>
                               </Button>
@@ -188,7 +188,7 @@ export default function CourseDetail() {
 
               {modules?.length === 0 && (
                  <div className="text-center py-12 bg-muted/30 rounded-xl border border-dashed">
-                    <p className="text-muted-foreground">Belum ada modul di kursus ini.</p>
+                    <p className="text-muted-foreground">No modules in this course yet.</p>
                  </div>
               )}
            </div>

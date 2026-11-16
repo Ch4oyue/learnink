@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -85,11 +86,11 @@ export default function Modules() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Modul Pembelajaran
+            Learning Modules
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Jelajahi berbagai modul pembelajaran yang telah dibuat oleh tutor kami.
-            Pilih modul yang sesuai dengan minat dan tingkat kemampuan Anda.
+            Explore learning modules created by our tutors.
+            Pick a module that matches your interests and skill level.
           </p>
         </div>
 
@@ -99,7 +100,7 @@ export default function Modules() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Cari modul..."
+                placeholder="Search modules..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -107,11 +108,11 @@ export default function Modules() {
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Kategori" />
+                <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map(cat => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  <SelectItem key={cat} value={cat}>{cat === 'Semua' ? 'All' : displayCategory(cat)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -121,7 +122,7 @@ export default function Modules() {
               </SelectTrigger>
               <SelectContent>
                 {levels.map(lvl => (
-                  <SelectItem key={lvl} value={lvl}>{lvl}</SelectItem>
+                  <SelectItem key={lvl} value={lvl}>{lvl === 'Semua' ? 'All' : displayLevel(lvl)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -157,13 +158,13 @@ export default function Modules() {
                       <div className="flex gap-2">
                         <Badge className={levelColors[level]}>
                           <BarChart3 className="h-3 w-3 mr-1" />
-                          {level}
+                          {displayLevel(level)}
                         </Badge>
                       </div>
                     </div>
                     
                     <Badge className={`${categoryColors[category] || categoryColors.Umum} w-fit mb-3`}>
-                      {category}
+                      {displayCategory(category)}
                     </Badge>
 
                     <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">
@@ -191,12 +192,12 @@ export default function Modules() {
           <div className="text-center py-16">
             <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground mb-2">
-              Tidak Ada Modul Ditemukan
+              No Modules Found
             </h2>
             <p className="text-muted-foreground mb-6">
               {searchQuery || categoryFilter !== 'Semua' || levelFilter !== 'Semua'
-                ? 'Coba ubah filter atau kata kunci pencarian'
-                : 'Belum ada modul yang tersedia saat ini'}
+                ? 'Try changing the filters or search keywords'
+                : 'No modules available yet'}
             </p>
             {(searchQuery || categoryFilter !== 'Semua' || levelFilter !== 'Semua') && (
               <Button 

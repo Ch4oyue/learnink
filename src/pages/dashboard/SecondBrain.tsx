@@ -20,7 +20,7 @@ import {
     Calendar,
 } from "lucide-react";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -113,7 +113,7 @@ export default function SecondBrain() {
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight">Second Brain</h1>
                             <p className="text-sm text-muted-foreground">
-                                Semua catatan Anda di satu tempat
+                                All your notes in one place
                             </p>
                         </div>
                     </div>
@@ -122,11 +122,11 @@ export default function SecondBrain() {
                     <div className="flex items-center gap-3">
                         <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
                             <StickyNote className="h-3.5 w-3.5" />
-                            {notes?.length ?? 0} Catatan
+                            {notes?.length ?? 0} Notes
                         </Badge>
                         <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
                             <Sparkles className="h-3.5 w-3.5" />
-                            {moduleIds.length} Modul
+                            {moduleIds.length} Modules
                         </Badge>
                     </div>
                 </div>
@@ -136,7 +136,7 @@ export default function SecondBrain() {
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Cari catatan..."
+                            placeholder="Search notes..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-10"
@@ -152,7 +152,7 @@ export default function SecondBrain() {
                             className="gap-1.5"
                         >
                             <Filter className="h-3.5 w-3.5" />
-                            Semua
+                            All
                         </Button>
                         {moduleIds.slice(0, 3).map((modId) => (
                             <Button
@@ -167,7 +167,7 @@ export default function SecondBrain() {
                         ))}
                         {moduleIds.length > 3 && (
                             <Badge variant="secondary" className="px-2.5">
-                                +{moduleIds.length - 3} lainnya
+                                +{moduleIds.length - 3} more
                             </Badge>
                         )}
                     </div>
@@ -194,11 +194,11 @@ export default function SecondBrain() {
                             <div className="p-4 rounded-full bg-muted/50 mb-4">
                                 <StickyNote className="h-8 w-8 text-muted-foreground" />
                             </div>
-                            <CardTitle className="text-lg mb-1">Belum Ada Catatan</CardTitle>
+                            <CardTitle className="text-lg mb-1">No Notes Yet</CardTitle>
                             <CardDescription>
                                 {searchQuery
-                                    ? "Tidak ada catatan yang cocok dengan pencarian Anda."
-                                    : "Mulai buat catatan saat belajar modul untuk melihatnya di sini."}
+                                    ? "No notes match your search."
+                                    : "Start taking notes while learning modules to see them here."}
                             </CardDescription>
                         </CardContent>
                     </Card>

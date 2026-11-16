@@ -35,21 +35,21 @@ export function Hero() {
                     className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border-primary/30 text-primary text-sm font-medium mb-10"
                 >
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse motion-reduce:animate-none" />
-                    V2.0 TELAH RILIS
+                    V2.0 IS LIVE
                 </Badge>
 
                 {/* Main Heading */}
                 <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.1] text-balance">
-                    Kuasai Skill Teknis,
+                    Master Technical Skills,
                     <br className="hidden sm:block" />
-                    <span className="text-primary">Dengan Cara Malas.</span>
+                    <span className="text-primary">The Lazy Way.</span>
                 </h1>
 
                 {/* Subtitle */}
                 <p className="max-w-2xl mx-auto text-lg sm:text-xl text-muted-foreground mb-12 leading-relaxed">
-                    Berhenti menonton tutorial tanpa akhir. Bangun proyek nyata dengan{" "}
+                    Stop watching endless tutorials. Build real projects with{" "}
                     <strong className="text-foreground font-semibold">Guided Notes</strong>{" "}
-                    yang mencatat progres Anda otomatis.
+                    that tracks your progress automatically.
                 </p>
 
                 {/* CTA Buttons */}
@@ -60,7 +60,7 @@ export function Hero() {
                         className="w-full sm:w-auto px-8 py-3.5 shadow-glow group"
                     >
                         <Link to="/auth">
-                            Mulai Belajar Sekarang
+                            Start Learning Now
                             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                         </Link>
                     </Button>
@@ -73,7 +73,7 @@ export function Hero() {
                         {/* The label says what actually happens next. */}
                         <Link to={user ? "/dashboard" : "/auth"}>
                             <PlayCircle className="mr-2 h-5 w-5" aria-hidden="true" />
-                            {user ? "Buka Dashboard" : "Masuk untuk Mencoba"}
+                            {user ? "Open Dashboard" : "Sign In to Try"}
                         </Link>
                     </Button>
                 </div>
@@ -113,7 +113,7 @@ export function Hero() {
                     {/* Interactive Code Block */}
                     <Suspense fallback={
                         <div className="w-full h-[400px] bg-[#1e1e1e] rounded-xl border border-zinc-800/60 shadow-2xl animate-pulse flex items-center justify-center">
-                            <span className="text-zinc-400 font-mono">Memuat editor…</span>
+                            <span className="text-zinc-400 font-mono">Loading editor…</span>
                         </div>
                     }>
                         <InteractiveCodeBlock

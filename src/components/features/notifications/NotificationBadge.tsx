@@ -9,13 +9,14 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications, useUnreadNotificationCount, useMarkNotificationAsRead, useMarkAllNotificationsAsRead, Notification } from "@/hooks/useNotifications";
 import { formatDistanceToNow } from "date-fns";
-import { id as idLocale } from "date-fns/locale";
+import { enUS as idLocale } from "date-fns/locale";
 import { BookOpen, CheckCircle, MessageSquare, Info, Sparkles, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { uniqueChannelTopic } from "@/lib/realtime";
 
 const typeIcons: Record<string, React.ElementType> = {
   module: BookOpen,
@@ -51,7 +52,7 @@ export function NotificationBadge() {
     if (!user?.id) return;
 
     const channel = supabase
-      .channel("notification-badge-realtime")
+      .channel(uniqueChannelTopic("notification-badge-realtime"))
       .on(
         "postgres_changes",
         {
@@ -63,10 +64,10 @@ export function NotificationBadge() {
         (payload) => {
           // Show toast
           const newNotification = payload.new as Notification;
-          toast(newNotification.title || "Notifikasi Baru", {
+          toast(newNotification.title || "New Notification", {
             description: newNotification.message,
             action: {
-              label: "Lihat",
+              label: "View",
               onClick: () => navigate("/dashboard/notifications"),
             },
           });
@@ -128,7 +129,7 @@ export function NotificationBadge() {
         <div className="flex items-center justify-between px-4 py-3 border-b border-border/50">
           <h3 className="font-semibold text-foreground flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-primary" />
-            Notifikasi
+            Notifications
           </h3>
           {(unreadCount || 0) > 0 && (
             <Button
@@ -137,7 +138,7 @@ export function NotificationBadge() {
               onClick={handleMarkAllRead}
               className="text-xs text-primary hover:text-primary/80 h-auto py-1 px-2"
             >
-              Tandai semua dibaca
+              Mark all as read
             </Button>
           )}
         </div>
@@ -154,7 +155,7 @@ export function NotificationBadge() {
                 <Bell className="w-6 h-6 text-muted-foreground" />
               </div>
               <p className="text-sm text-muted-foreground">
-                Belum ada notifikasi
+                No notifications yet
               </p>
             </div>
           ) : (
@@ -215,7 +216,7 @@ export function NotificationBadge() {
               onClick={() => navigate("/dashboard/notifications")}
               className="w-full text-xs text-primary"
             >
-              Lihat semua notifikasi
+              View all notifications
             </Button>
           </div>
         )}

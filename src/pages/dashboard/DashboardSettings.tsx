@@ -197,7 +197,7 @@ export default function DashboardSettings() {
       onSuccess: () => {
         setNewCategoryName("");
         setNewCategoryDesc("");
-        toast({ title: "Sukses", description: "Kategori berhasil ditambahkan" });
+        toast({ title: "Success", description: "Category added successfully" });
       }
     });
   };
@@ -212,7 +212,7 @@ export default function DashboardSettings() {
       onSuccess: () => {
         setNewLevelName("");
         setNewLevelDesc("");
-        toast({ title: "Sukses", description: "Level berhasil ditambahkan" });
+        toast({ title: "Success", description: "Level added successfully" });
       }
     });
   };
@@ -233,7 +233,7 @@ export default function DashboardSettings() {
   };
 
   const handleDelete = (id: string, name: string, type: 'category' | 'level') => {
-    if (confirm(`Hapus ${type === 'category' ? 'kategori' : 'level'} "${name}"?`)) {
+    if (confirm(`Delete ${type === 'category' ? 'category' : 'level'} "${name}"?`)) {
       if (type === 'category') {
         deleteCategory.mutate(id);
       } else {
@@ -246,31 +246,31 @@ export default function DashboardSettings() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Pengaturan</h1>
-          <p className="text-muted-foreground">Kelola kategori dan level modul pembelajaran</p>
+          <h1 className="text-2xl font-semibold">Settings</h1>
+          <p className="text-muted-foreground">Manage learning module categories and levels</p>
         </div>
 
         <Tabs defaultValue="categories">
           <TabsList>
-            <TabsTrigger value="categories" className="gap-2"><Folder className="h-4 w-4" /> Kategori</TabsTrigger>
+            <TabsTrigger value="categories" className="gap-2"><Folder className="h-4 w-4" /> Category</TabsTrigger>
             <TabsTrigger value="levels" className="gap-2"><Layers className="h-4 w-4" /> Level</TabsTrigger>
           </TabsList>
 
           <TabsContent value="categories" className="space-y-4 mt-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Tambah Kategori Baru</CardTitle>
-                <CardDescription>Kategori digunakan untuk mengelompokkan modul pembelajaran</CardDescription>
+                <CardTitle className="text-lg">Add New Category</CardTitle>
+                <CardDescription>Categories are used to group learning modules</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-4">
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
-                      <Label>Nama Kategori</Label>
-                      <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Contoh: Web Development" />
+                      <Label>Category Name</Label>
+                      <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Example: Web Development" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Warna</Label>
+                      <Label>Color</Label>
                       <div className="flex items-center gap-2">
                         <Input type="color" value={newCategoryColor} onChange={(e) => setNewCategoryColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
                         <Palette className="h-4 w-4 text-muted-foreground" />
@@ -279,8 +279,8 @@ export default function DashboardSettings() {
                   </div>
                   <div className="flex gap-4 items-end">
                     <div className="flex-1 space-y-2">
-                      <Label>Deskripsi (Opsional)</Label>
-                      <Input value={newCategoryDesc} onChange={(e) => setNewCategoryDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      <Label>Description (Optional)</Label>
+                      <Input value={newCategoryDesc} onChange={(e) => setNewCategoryDesc(e.target.value)} placeholder="Brief description..." />
                     </div>
                     <Button onClick={handleAddCategory} disabled={createCategory.isPending || !newCategoryName.trim()}>
                       {createCategory.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -291,7 +291,7 @@ export default function DashboardSettings() {
             </Card>
 
             <Card>
-              <CardHeader><CardTitle className="text-lg">Daftar Kategori</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg">Category List</CardTitle></CardHeader>
               <CardContent>
                 {categoriesLoading ? (
                   <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
@@ -309,7 +309,7 @@ export default function DashboardSettings() {
                             variant="ghost"
                             size="icon"
                             onClick={() => setEditingItem({ type: 'category', id: cat.id, name: cat.name, description: cat.description || '', color: cat.color })}
-                            aria-label={`Edit kategori ${cat.name}`}
+                            aria-label={`Edit category ${cat.name}`}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -318,7 +318,7 @@ export default function DashboardSettings() {
                             size="icon"
                             className="text-destructive-text hover:text-destructive-text"
                             onClick={() => handleDelete(cat.id, cat.name, 'category')}
-                            aria-label={`Hapus kategori ${cat.name}`}
+                            aria-label={`Delete category ${cat.name}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -326,7 +326,7 @@ export default function DashboardSettings() {
                       </div>
                     ))}
                   </div>
-                ) : <p className="text-center text-muted-foreground py-8">Belum ada kategori</p>}
+                ) : <p className="text-center text-muted-foreground py-8">No categories yet</p>}
               </CardContent>
             </Card>
           </TabsContent>
@@ -334,18 +334,18 @@ export default function DashboardSettings() {
           <TabsContent value="levels" className="space-y-4 mt-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Tambah Level Baru</CardTitle>
-                <CardDescription>Level menunjukkan tingkat kesulitan modul</CardDescription>
+                <CardTitle className="text-lg">Add New Level</CardTitle>
+                <CardDescription>Levels indicate module difficulty</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-4">
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
-                      <Label>Nama Level</Label>
-                      <Input value={newLevelName} onChange={(e) => setNewLevelName(e.target.value)} placeholder="Contoh: Expert" />
+                      <Label>Level Name</Label>
+                      <Input value={newLevelName} onChange={(e) => setNewLevelName(e.target.value)} placeholder="Example: Expert" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Warna</Label>
+                      <Label>Color</Label>
                       <div className="flex items-center gap-2">
                         <Input type="color" value={newLevelColor} onChange={(e) => setNewLevelColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
                         <Palette className="h-4 w-4 text-muted-foreground" />
@@ -354,8 +354,8 @@ export default function DashboardSettings() {
                   </div>
                   <div className="flex gap-4 items-end">
                     <div className="flex-1 space-y-2">
-                      <Label>Deskripsi (Opsional)</Label>
-                      <Input value={newLevelDesc} onChange={(e) => setNewLevelDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      <Label>Description (Optional)</Label>
+                      <Input value={newLevelDesc} onChange={(e) => setNewLevelDesc(e.target.value)} placeholder="Brief description..." />
                     </div>
                     <Button onClick={handleAddLevel} disabled={createLevel.isPending || !newLevelName.trim()}>
                       {createLevel.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -366,7 +366,7 @@ export default function DashboardSettings() {
             </Card>
 
             <Card>
-              <CardHeader><CardTitle className="text-lg">Daftar Level</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg">Level List</CardTitle></CardHeader>
               <CardContent>
                 {levelsLoading ? (
                   <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
@@ -393,7 +393,7 @@ export default function DashboardSettings() {
                             size="icon"
                             className="text-destructive-text hover:text-destructive-text"
                             onClick={() => handleDelete(level.id, level.name, 'level')}
-                            aria-label={`Hapus level ${level.name}`}
+                            aria-label={`Delete level ${level.name}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -401,7 +401,7 @@ export default function DashboardSettings() {
                       </div>
                     ))}
                   </div>
-                ) : <p className="text-center text-muted-foreground py-8">Belum ada level</p>}
+                ) : <p className="text-center text-muted-foreground py-8">No levels yet</p>}
               </CardContent>
             </Card>
           </TabsContent>
@@ -411,19 +411,19 @@ export default function DashboardSettings() {
         <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
           <DialogContent className="glass-liquid rounded-[24px]">
             <DialogHeader>
-              <DialogTitle>Edit {editingItem?.type === 'category' ? 'Kategori' : 'Level'}</DialogTitle>
-              <DialogDescription>Ubah detail item di bawah ini.</DialogDescription>
+              <DialogTitle>Edit {editingItem?.type === 'category' ? 'Category' : 'Level'}</DialogTitle>
+              <DialogDescription>Edit the item details below.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Nama</Label>
+                <Label>Name</Label>
                 <Input
                   value={editingItem?.name || ''}
                   onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, name: e.target.value }) : null)}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Warna</Label>
+                <Label>Color</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     type="color"
@@ -435,7 +435,7 @@ export default function DashboardSettings() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Deskripsi</Label>
+                <Label>Description</Label>
                 <Input
                   value={editingItem?.description || ''}
                   onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, description: e.target.value }) : null)}
@@ -443,8 +443,8 @@ export default function DashboardSettings() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setEditingItem(null)}>Batal</Button>
-              <Button onClick={handleUpdate} disabled={updateCategory.isPending || updateLevel.isPending}>Simpan Perubahan</Button>
+              <Button variant="ghost" onClick={() => setEditingItem(null)}>Cancel</Button>
+              <Button onClick={handleUpdate} disabled={updateCategory.isPending || updateLevel.isPending}>Save Changes</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

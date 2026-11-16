@@ -15,9 +15,9 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 const navLinks = [
   { href: "#home", label: "Home" },
-  { href: "#fitur", label: "Fitur" },
-  { href: "/syllabus", label: "Silabus", isRoute: true },
-  { href: "#request", label: "Request Materi" },
+  { href: "#fitur", label: "Features" },
+  { href: "/syllabus", label: "Syllabus", isRoute: true },
+  { href: "#request", label: "Material Requests" },
 ];
 
 export function Navbar() {
@@ -115,7 +115,7 @@ export function Navbar() {
               size="icon"
               onClick={toggleTheme}
               className="text-muted-foreground hover:text-foreground"
-              aria-label="Ganti Tema"
+              aria-label="Toggle Theme"
             >
               {resolvedTheme === "dark" ? (
                 <Sun className="h-5 w-5" />
@@ -151,7 +151,7 @@ export function Navbar() {
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>
                       <User className="h-4 w-4 mr-2" />
-                      Profil Saya
+                      My Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleDashboardClick}>
                       <LayoutDashboard className="h-4 w-4 mr-2" />
@@ -160,7 +160,7 @@ export function Navbar() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive-text">
                       <LogOut className="h-4 w-4 mr-2" />
-                      Keluar
+                      Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -172,13 +172,13 @@ export function Navbar() {
                   onClick={handleAuthClick}
                   className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
                 >
-                  Masuk
+                  Sign In
                 </Button>
                 <Button
                   onClick={handleAuthClick}
                   className="text-sm font-medium shadow-soft hover:shadow-medium transition-shadow"
                 >
-                  Daftar
+                  Sign Up
                 </Button>
               </>
             )}
@@ -273,7 +273,7 @@ export function Navbar() {
                     className="justify-start text-base font-medium text-destructive-text hover:text-destructive-text hover:bg-transparent px-0 gap-2"
                   >
                     <LogOut className="h-4 w-4" />
-                    Keluar
+                    Sign Out
                   </Button>
                 </>
               ) : (
@@ -283,13 +283,13 @@ export function Navbar() {
                     onClick={handleAuthClick}
                     className="justify-start text-base font-medium text-muted-foreground hover:text-foreground hover:bg-transparent px-0"
                   >
-                    Masuk
+                    Sign In
                   </Button>
                   <Button
                     onClick={handleAuthClick}
                     className="w-full text-base font-medium"
                   >
-                    Daftar
+                    Sign Up
                   </Button>
                 </>
               )}

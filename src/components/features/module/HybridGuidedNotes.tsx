@@ -12,7 +12,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import type { LearningNote } from "@/hooks/useLearningNotes";
 
@@ -102,9 +102,9 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                         </div>
                     ) : !Array.isArray(notes) || notes.length === 0 ? (
                         <div className="text-center py-8">
-                            <p className="text-sm text-muted-foreground">Belum ada catatan</p>
+                            <p className="text-sm text-muted-foreground">No notes yet</p>
                             <p className="text-xs text-muted-foreground/60 mt-1">
-                                Pilih teks atau tulis catatan di bawah
+                                Select text or write a note below
                             </p>
                         </div>
                     ) : (
@@ -135,7 +135,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                         value={newNoteText}
                         onChange={(e) => setNewNoteText(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={editingNoteId ? "Edit catatan..." : "Type '/' for commands"}
+                        placeholder={editingNoteId ? "Edit note..." : "Type '/' for commands"}
                         className={cn(
                             "w-full bg-muted border-none shadow-subtle rounded-xl py-3.5 pl-12 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/20 resize-none min-h-[56px]",
                             editingNoteId && "ring-2 ring-primary/30"
@@ -150,7 +150,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                             }}
                             className="absolute left-12 -top-2 bg-destructive text-white text-[13px] px-2 py-0.5 rounded-full shadow-sm hover:scale-105 transition-transform"
                          >
-                            Batal Edit
+                            Cancel edit
                          </button>
                     )}
                     {/* Submit Button */}
@@ -261,7 +261,7 @@ function NoteCard({ note, onDelete, onEdit, isEditing, isDeleting }: NoteCardPro
                     <button
                         onClick={() => onEdit?.(note)}
                         className="p-1 hover:text-primary transition-colors"
-                        aria-label="Edit Catatan"
+                        aria-label="Edit Note"
                     >
                         <Edit3 className="h-4 w-4 text-muted-foreground hover:text-primary" />
                     </button>

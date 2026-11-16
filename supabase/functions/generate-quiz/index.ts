@@ -12,6 +12,11 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const RATE_LIMIT_MAX_REQUESTS = 20; // Max requests per window
 const RATE_LIMIT_WINDOW_MINUTES = 60; // Time window in minutes
 
+// Hard cap on questions per quiz. The endpoint spends AI credits per question
+// and inserts one row per question, so the caller-supplied count is clamped
+// rather than trusted.
+const MAX_QUESTIONS = 50;
+
 // Rate Limiting Helper
 async function checkRateLimit(
   supabase: ReturnType<typeof createClient>,
@@ -70,7 +75,15 @@ serve(async (req) => {
       );
     }
 
-    const { moduleId, questionCount = 5 } = await req.json();
+    const { moduleId, questionCount: rawQuestionCount } = await req.json();
+
+    // Clamp the requested count. `Number(undefined)` is NaN, so an omitted
+    // field falls back to the default; anything finite is bounded to
+    // [1, MAX_QUESTIONS].
+    const parsedCount = Math.trunc(Number(rawQuestionCount));
+    const questionCount = rawQuestionCount === undefined || !Number.isFinite(parsedCount)
+      ? 5
+      : Math.min(Math.max(parsedCount, 1), MAX_QUESTIONS);
 
     if (!moduleId) {
       return new Response(
@@ -273,8 +286,13 @@ PENTING:
       points: number;
     }
 
-    // Create questions
-    const questions = quizData.questions.map((q: QuizQuestion, index: number) => ({
+    // Create questions. `quizData.questions` is model output and may be
+    // missing or malformed when the response is truncated, so it is validated
+    // and sliced to the same cap before it reaches the insert.
+    const rawQuestions: QuizQuestion[] = Array.isArray(quizData.questions)
+      ? quizData.questions
+      : [];
+    const questions = rawQuestions.slice(0, MAX_QUESTIONS).map((q: QuizQuestion, index: number) => ({
       quiz_id: quiz.id,
       question_text: q.question_text,
       question_type: q.question_type,

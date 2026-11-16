@@ -10,7 +10,7 @@ interface SEOProps {
 
 export function SEO({
   title = "LearnInk - Modern Learning Management System",
-  description = "Platform belajar interaktif dengan eksekusi kode di browser, catatan otomatis, dan pelacakan progres real-time.",
+  description = "An interactive learning platform with in-browser code execution, automatic notes, and real-time progress tracking.",
   image = "/og-image.png", // Assuming this exists or will be added
   url = "https://learnink.vercel.app",
   type = "website",

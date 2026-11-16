@@ -62,7 +62,7 @@ export function PythonCodeEditor({
         setError(result.error);
       }
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : "Terjadi kesalahan saat menjalankan kode";
+      const errorMsg = err instanceof Error ? err.message : "An error occurred while running the code";
       setError(errorMsg);
     } finally {
       setIsRunning(false);
@@ -151,8 +151,8 @@ export function PythonCodeEditor({
             size="icon"
             className="h-8 w-8"
             onClick={handleCopy}
-            title="Salin kode"
-            aria-label="Salin kode"
+            title="Copy code"
+            aria-label="Copy code"
           >
             {copied ? (
               <Check className="h-4 w-4 text-green-500" />
@@ -166,7 +166,7 @@ export function PythonCodeEditor({
             className="h-8 w-8"
             onClick={handleReset}
             title="Reset"
-            aria-label="Reset kode"
+            aria-label="Reset code"
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
@@ -184,7 +184,7 @@ export function PythonCodeEditor({
             ) : (
               <>
                 <Play className="h-4 w-4" />
-                Jalankan
+                Run
               </>
             )}
           </Button>
@@ -246,8 +246,8 @@ export function PythonCodeEditor({
       {/* Footer hint */}
       <div className="px-4 py-2 bg-muted/30 border-t border-border">
         <p className="text-xs text-muted-foreground">
-          Tekan <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Ctrl</kbd> +{" "}
-          <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Enter</kbd> untuk menjalankan
+          Press <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Ctrl</kbd> +{" "}
+          <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Enter</kbd> to run
         </p>
       </div>
     </div>

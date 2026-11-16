@@ -16,23 +16,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { Loader2, Plus, FileQuestion, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { displayCategory } from "@/lib/categoryLabels";
 
 const categories = [
   { value: "AI & Machine Learning", label: "AI & Machine Learning" },
   { value: "Automation", label: "Automation" },
   { value: "Productivity", label: "Productivity" },
   { value: "Data Analysis", label: "Data Analysis" },
-  { value: "Umum", label: "Umum" },
+  { value: "Umum", label: "General" },
 ];
 
 const statusConfig = {
-  pending: { label: "Menunggu", icon: Clock, color: "bg-yellow-500/10 text-yellow-500" },
-  reviewing: { label: "Dalam Review", icon: AlertCircle, color: "bg-blue-500/10 text-blue-500" },
-  completed: { label: "Selesai", icon: CheckCircle2, color: "bg-green-500/10 text-green-500" },
-  rejected: { label: "Ditolak", icon: XCircle, color: "bg-red-500/10 text-red-500" },
+  pending: { label: "Pending", icon: Clock, color: "bg-yellow-500/10 text-yellow-500" },
+  reviewing: { label: "Under Review", icon: AlertCircle, color: "bg-blue-500/10 text-blue-500" },
+  completed: { label: "Completed", icon: CheckCircle2, color: "bg-green-500/10 text-green-500" },
+  rejected: { label: "Rejected", icon: XCircle, color: "bg-red-500/10 text-red-500" },
 };
 
 export default function DashboardRequestMaterial() {
@@ -60,8 +61,8 @@ export default function DashboardRequestMaterial() {
       {
         onSuccess: () => {
           toast({
-            title: "Request Terkirim! 🎉",
-            description: "Request materi Anda akan segera diproses oleh tim.",
+            title: "Request Sent! 🎉",
+            description: "Your material request will be processed by the team soon.",
           });
           setTopic("");
           setDescription("");
@@ -78,14 +79,14 @@ export default function DashboardRequestMaterial() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Request Materi</h1>
+            <h1 className="text-2xl font-semibold">Material Requests</h1>
             <p className="text-muted-foreground">
-              Request materi pembelajaran yang Anda butuhkan
+              Request the learning materials you need
             </p>
           </div>
           <Button onClick={() => setShowForm(!showForm)} className="gap-2">
             <Plus className="h-4 w-4" />
-            Request Baru
+            New Request
           </Button>
         </div>
 
@@ -93,37 +94,37 @@ export default function DashboardRequestMaterial() {
         {showForm && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Request Materi Baru</CardTitle>
+              <CardTitle className="text-lg">New Material Request</CardTitle>
               <CardDescription>
-                Jelaskan materi yang ingin Anda pelajari
+                Describe the material you want to learn
               </CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="topic">Topik Materi *</Label>
+                  <Label htmlFor="topic">Material Topic *</Label>
                   <Input
                     id="topic"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    placeholder="Contoh: Cara menggunakan ChatGPT untuk menulis email"
+                    placeholder="Example: How to use ChatGPT to write emails"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Deskripsi (Opsional)</Label>
+                  <Label htmlFor="description">Description (Optional)</Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Jelaskan lebih detail tentang apa yang ingin Anda pelajari..."
+                    placeholder="Describe in more detail what you want to learn..."
                     rows={3}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">Kategori</Label>
+                  <Label htmlFor="category">Category</Label>
                   <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger>
                       <SelectValue />
@@ -143,14 +144,14 @@ export default function DashboardRequestMaterial() {
                     {createRequest.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
-                    Kirim Request
+                    Send Request
                   </Button>
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={() => setShowForm(false)}
                   >
-                    Batal
+                    Cancel
                   </Button>
                 </div>
               </form>
@@ -160,7 +161,7 @@ export default function DashboardRequestMaterial() {
 
         {/* Requests List */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Request Saya</h2>
+          <h2 className="text-lg font-medium">My Requests</h2>
           
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -190,7 +191,7 @@ export default function DashboardRequestMaterial() {
                             </p>
                           )}
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>Kategori: {request.category}</span>
+                            <span>Category: {displayCategory(request.category)}</span>
                             <span>
                               {format(new Date(request.created_at!), "dd MMM yyyy", { locale: localeId })}
                             </span>
@@ -207,13 +208,13 @@ export default function DashboardRequestMaterial() {
               <CardContent className="py-12">
                 <div className="text-center">
                   <FileQuestion className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="font-medium mb-1">Belum Ada Request</h3>
+                  <h3 className="font-medium mb-1">No Requests Yet</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Anda belum pernah membuat request materi
+                    You have not made a material request yet
                   </p>
                   <Button onClick={() => setShowForm(true)} variant="outline">
                     <Plus className="h-4 w-4 mr-2" />
-                    Buat Request Pertama
+                    Create Your First Request
                   </Button>
                 </div>
               </CardContent>

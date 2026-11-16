@@ -25,6 +25,7 @@ import {
   Code,
   BookOpen,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Bot,
@@ -41,8 +42,8 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 const learningPaths = [
   {
     id: "ai-fundamentals",
-    title: "Dasar-Dasar AI",
-    description: "Pahami konsep dasar Artificial Intelligence dan Machine Learning",
+    title: "AI Fundamentals",
+    description: "Understand the basic concepts of Artificial Intelligence and Machine Learning",
     icon: Brain,
     color: "from-blue-500 to-cyan-500",
     bgColor: "bg-blue-500/10",
@@ -53,7 +54,7 @@ const learningPaths = [
   {
     id: "automation-basics",
     title: "Automation Fundamentals",
-    description: "Pelajari dasar-dasar otomatisasi workflow dan proses",
+    description: "Learn the fundamentals of workflow automation and processes",
     icon: Cog,
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-500/10",
@@ -63,8 +64,8 @@ const learningPaths = [
   },
   {
     id: "ai-tools",
-    title: "AI Tools & Aplikasi",
-    description: "Kuasai tools AI populer seperti ChatGPT, Midjourney, dan lainnya",
+    title: "AI Tools & Apps",
+    description: "Master popular AI tools like ChatGPT, Midjourney, and more",
     icon: Bot,
     color: "from-orange-500 to-red-500",
     bgColor: "bg-orange-500/10",
@@ -75,7 +76,7 @@ const learningPaths = [
   {
     id: "advanced-automation",
     title: "Advanced Automation",
-    description: "Bangun sistem automation kompleks dengan AI integration",
+    description: "Build complex automation systems with AI integration",
     icon: Workflow,
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-500/10",
@@ -152,10 +153,10 @@ export default function Syllabus() {
               Learning Path
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Silabus <span className="text-gradient">AI & Automation</span>
+              Syllabus <span className="text-gradient">AI & Automation</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Ikuti jalur pembelajaran terstruktur untuk menguasai AI dan Automation dari dasar hingga mahir
+              Follow a structured learning path to master AI and Automation from basics to advanced
             </p>
           </div>
 
@@ -164,12 +165,12 @@ export default function Syllabus() {
             <div className="max-w-md mx-auto mb-12">
               <div className="p-6 rounded-2xl border bg-card shadow-soft">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium">Progress Keseluruhan</span>
+                  <span className="text-sm font-medium">Overall Progress</span>
                   <span className="text-2xl font-bold text-primary">{overallProgress}%</span>
                 </div>
                 <Progress value={overallProgress} className="h-2" />
                 <p className="text-xs text-muted-foreground mt-2">
-                  {completedModules} dari {totalModules} modul selesai
+                  {completedModules} of {totalModules} modules completed
                 </p>
               </div>
             </div>
@@ -214,7 +215,7 @@ export default function Syllabus() {
                       <div className="flex items-center gap-3">
                         <div className="text-right">
                           <p className="text-2xl font-bold">{pathProgress}%</p>
-                          <p className="text-xs text-muted-foreground">Selesai</p>
+                          <p className="text-xs text-muted-foreground">Completed</p>
                         </div>
                         <div className="w-24">
                           <Progress value={pathProgress} className="h-2" />
@@ -239,10 +240,10 @@ export default function Syllabus() {
                     >
                       <PathIcon className={`h-8 w-8 mx-auto mb-3 ${path.textColor}`} />
                       <p className={`${path.textColor} font-medium`}>
-                        Modul untuk "{path.title}" akan segera tersedia
+                        Modules for "{path.title}" are coming soon
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Tambahkan modul dengan kategori: {path.categories.join(", ")}
+                        Add modules with the categories: {path.categories.join(", ")}
                       </p>
                     </div>
                   ) : (
@@ -304,10 +305,10 @@ export default function Syllabus() {
 
                             <div className="mt-3 flex items-center gap-2">
                               <Badge variant="secondary" className="text-xs">
-                                {module.category}
+                                {displayCategory(module.category)}
                               </Badge>
                               <Badge variant="outline" className="text-xs">
-                                {module.level}
+                                {displayLevel(module.level)}
                               </Badge>
                             </div>
                           </Link>
@@ -327,15 +328,15 @@ export default function Syllabus() {
         <section className="py-16 px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-2xl font-semibold mb-4">
-              Mulai Perjalanan AI & Automation Anda
+              Start Your AI & Automation Journey
             </h2>
             <p className="text-muted-foreground mb-6">
-              Daftar sekarang untuk melacak progress belajar dan dapatkan rekomendasi
-              materi yang dipersonalisasi
+              Sign up now to track your learning progress and get personalized
+              material recommendations
             </p>
             <Button asChild size="lg" className="gap-2">
               <Link to="/auth">
-                Mulai Sekarang
+                Start Now
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

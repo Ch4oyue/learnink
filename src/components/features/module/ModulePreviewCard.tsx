@@ -11,6 +11,7 @@ import {
   Lightbulb,
   Sparkles,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const icons = [
   { name: "Bot", icon: Bot },
@@ -49,10 +50,10 @@ export function ModulePreviewCard({ control }: ModulePreviewCardProps) {
           </div>
           <div>
             <p className="font-medium text-sm">
-              {title || "Judul Modul"}
+              {title || "Module Title"}
             </p>
             <p className="text-xs text-muted-foreground">
-              {category} • {level}
+              {displayCategory(category)} • {displayLevel(level)}
             </p>
           </div>
         </div>

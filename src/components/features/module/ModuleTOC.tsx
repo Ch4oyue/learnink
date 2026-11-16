@@ -62,7 +62,7 @@ export function ModuleTOC({ items, activeId, className }: ModuleTOCProps) {
       <div className="sticky top-28">
         <div className="flex items-center gap-2 mb-4 text-sm font-medium text-foreground">
           <List className="h-4 w-4" />
-          <span>Daftar Isi</span>
+          <span>Table of Contents</span>
         </div>
         <nav className="space-y-1">
           {items.map((item) => (

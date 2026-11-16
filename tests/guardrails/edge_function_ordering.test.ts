@@ -1,4 +1,16 @@
-// Source-pattern guardrails for the Edge Function auth fixes (repo guardrail style).
+// Ordering guardrails for the Edge Function auth fixes.
+//
+// These two checks are deliberately source-level: `requireRole` calls
+// `supabase.auth.getUser()` against the live Auth server, so "authentication
+// runs before the body is consumed" cannot be executed without network
+// credentials. What they assert is the property that matters — the guard
+// precedes the first untrusted read — and they fail if either call is moved
+// below the other.
+//
+// Everything else in this directory is behavioural: `client_ip.test.ts` drives
+// the real helper, `user_role_protection.behavior.test.ts` drives the real
+// mutation functions against scripted clients. Do not add `toContain` string
+// assertions here; if a property cannot be executed, say so in the test name.
 import { expect, test } from "bun:test";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -9,7 +21,7 @@ const read = (p: string) => readFileSync(join(root, p), "utf8");
 
 test("award-xp authenticates before consuming the request body", () => {
   const src = read("supabase/functions/award-xp/index.ts");
-  const guard = src.indexOf("requireRole(req, null, corsHeaders)");
+  const guard = src.indexOf("await requireRole(req, null, corsHeaders)");
   const parse = src.indexOf("await req.json()");
   expect(guard).toBeGreaterThan(-1);
   expect(parse).toBeGreaterThan(-1);
@@ -24,37 +36,4 @@ test("generate-quiz authenticates before the rate-limit RPC", () => {
   expect(guard).toBeGreaterThan(-1);
   expect(rateLimit).toBeGreaterThan(-1);
   expect(guard).toBeLessThan(rateLimit);
-});
-
-test("rolesOf throws on missing configuration and on query error (no silent [])", () => {
-  const src = read("supabase/functions/_shared/auth.ts");
-  expect(src).toContain('throw new Error("SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not configured")');
-  expect(src).toContain("throw new Error(`Role lookup failed: ${error.message}`)");
-  // No fail-open returns of an empty role list on the error paths.
-  const rolesOfBody = src.slice(src.indexOf("async function rolesOf"), src.indexOf("export async function requireRole"));
-  expect(rolesOfBody).not.toContain("return [];");
-});
-
-test("rolesOf validates roles against the AppRole union (no blind cast)", () => {
-  const src = read("supabase/functions/_shared/auth.ts");
-  expect(src).toContain("APP_ROLES");
-  // The mapping must filter through the union, not reassert with `as AppRole`.
-  expect(src).not.toContain("row.role as AppRole");
-});
-
-test("requireRole logs the swallowed lookup error server-side", () => {
-  const src = read("supabase/functions/_shared/auth.ts");
-  expect(src).toContain("console.error(");
-  expect(src).not.toContain("} catch {");
-});
-
-test("requireRole maps a failed role lookup to 500, not 403", () => {
-  const src = read("supabase/functions/_shared/auth.ts");
-  expect(src).toContain('jsonError(500, "Role lookup failed", corsHeaders)');
-});
-
-test("clientIp normalizes empty results to unknown on both header paths", () => {
-  const src = read("supabase/functions/_shared/client-ip.ts");
-  expect(src).toContain('stripPort(hops[hops.length - 1]) || "unknown"');
-  expect(src).toContain('stripPort(stripQuotes(realIp)) || "unknown"');
 });

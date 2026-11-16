@@ -55,7 +55,7 @@ import {
   Plus,
 } from "lucide-react";
 import { format } from "date-fns";
-import { id } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 const roleConfig: Record<AppRole, { label: string; icon: React.ReactNode; variant: "default" | "secondary" | "outline" | "destructive" }> = {
   superadmin: { label: "Super Admin", icon: <Crown className="h-3 w-3" />, variant: "destructive" },
@@ -158,7 +158,7 @@ export default function DashboardUsers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast({ title: "Label diperbarui" });
+      toast({ title: "Label updated" });
     }
   });
 
@@ -172,13 +172,13 @@ export default function DashboardUsers() {
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <AlertCircle className="h-12 w-12 text-destructive-text mb-4" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Gagal Memuat Data</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-2">Failed to Load Data</h2>
           <p className="text-muted-foreground max-w-md">
             {isAccessDenied
-              ? 'Anda tidak memiliki akses admin. Hanya admin yang dapat melihat daftar pengguna.'
+              ? 'You do not have admin access. Only admins can see the user list.'
               : isFunctionMissing
-                ? 'Database function belum tersedia. Pastikan migration sudah dijalankan di Supabase.'
-                : `Terjadi kesalahan: ${errorMessage}`
+                ? 'Database function not available yet. Make sure the migration has been run in Supabase.'
+                : `An error occurred: ${errorMessage}`
             }
           </p>
           <p className="text-xs text-muted-foreground mt-4 font-mono bg-muted p-2 rounded max-w-lg break-all">
@@ -196,10 +196,10 @@ export default function DashboardUsers() {
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Users className="h-6 w-6" />
-            Manajemen Pengguna
+            User Management
           </h1>
           <p className="text-muted-foreground mt-1">
-            Kelola pengguna dan atur role akses mereka
+            Manage users and set their access roles
           </p>
         </div>
 
@@ -207,7 +207,7 @@ export default function DashboardUsers() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="text-2xl font-bold text-foreground">{stats.totalUsers}</div>
-            <div className="text-sm text-muted-foreground">Total Pengguna</div>
+            <div className="text-sm text-muted-foreground">Total Users</div>
           </div>
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="text-2xl font-bold text-primary">{stats.adminCount}</div>
@@ -228,7 +228,7 @@ export default function DashboardUsers() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari nama..."
+              placeholder="Search names..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -242,7 +242,7 @@ export default function DashboardUsers() {
               <SelectValue placeholder="Filter Role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Role</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="superadmin">Super Admin</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="tutor">Tutor</SelectItem>
@@ -260,18 +260,18 @@ export default function DashboardUsers() {
           ) : filteredUsers?.length === 0 ? (
             <div className="text-center py-16">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">Tidak ada pengguna ditemukan</p>
+              <p className="text-muted-foreground">No users found</p>
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Pengguna</TableHead>
+                    <TableHead>User</TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead className="hidden md:table-cell">Bergabung</TableHead>
+                    <TableHead className="hidden md:table-cell">Joined</TableHead>
                     <TableHead>Label</TableHead>
-                    <TableHead>Ubah Role</TableHead>
+                    <TableHead>Change Role</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -293,9 +293,9 @@ export default function DashboardUsers() {
                             </Avatar>
                             <div>
                               <div className="font-medium text-foreground">
-                                {user.display_name || "Pengguna"}
+                                {user.display_name || "User"}
                                 {isSelf && (
-                                  <span className="ml-2 text-xs text-muted-foreground">(Anda)</span>
+                                  <span className="ml-2 text-xs text-muted-foreground">(You)</span>
                                 )}
                                 {(isProtected) && (
                                   <Badge variant="outline" className="ml-2 text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
@@ -317,7 +317,7 @@ export default function DashboardUsers() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-muted-foreground">
                           {user.created_at
-                            ? format(new Date(user.created_at), "d MMM yyyy", { locale: id })
+                            ? format(new Date(user.created_at), "d MMM yyyy", { locale: enUS })
                             : "-"
                           }
                         </TableCell>
@@ -402,7 +402,7 @@ export default function DashboardUsers() {
 
               <PaginationItem>
                 <div className="flex items-center px-4 text-sm font-medium">
-                  Halaman {page} dari {meta.totalPages}
+                  Page {page} of {meta.totalPages}
                 </div>
               </PaginationItem>
 
@@ -421,17 +421,17 @@ export default function DashboardUsers() {
       <AlertDialog open={confirmDialog.open} onOpenChange={(open) => !open && setConfirmDialog({ open: false, user: null, newRole: null })}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Perubahan Role</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin mengubah role{" "}
+              Are you sure you want to change the role of{" "}
               <span className="font-medium text-foreground">
-                {confirmDialog.user?.display_name || "pengguna ini"}
+                {confirmDialog.user?.display_name || "this user"}
               </span>{" "}
-              dari{" "}
+              from{" "}
               <Badge variant={roleConfig[confirmDialog.user?.role || "user"].variant} className="mx-1">
                 {roleConfig[confirmDialog.user?.role || "user"].label}
               </Badge>
-              menjadi{" "}
+              to{" "}
               <Badge variant={roleConfig[confirmDialog.newRole || "user"].variant} className="mx-1">
                 {roleConfig[confirmDialog.newRole || "user"].label}
               </Badge>
@@ -439,9 +439,9 @@ export default function DashboardUsers() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRoleChange}>
-              Ya, Ubah Role
+              Yes, Change Role
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

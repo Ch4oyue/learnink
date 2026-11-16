@@ -23,6 +23,12 @@ permissions:
   # Write permissions for pull-requests are required for using the `comment-summary-in-pr` option, comment out if you aren't using this option
   pull-requests: write
 
+# Cancel a superseded run on the same pull request when a new commit is pushed.
+# Push, schedule and manual runs get a unique group and are never cancelled.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   dependency-review:
     runs-on: ubuntu-latest

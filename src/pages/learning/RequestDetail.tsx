@@ -18,31 +18,32 @@ import {
   Tag,
   AlertCircle,
 } from "lucide-react";
+import { displayCategory } from "@/lib/categoryLabels";
 
 const statusConfig = {
   pending: {
-    label: 'Menunggu',
+    label: 'Pending',
     color: 'bg-amber-500/10 text-amber-600',
     icon: Clock,
-    description: 'Request Anda sedang menunggu untuk ditinjau oleh tutor.',
+    description: 'Your request is waiting to be reviewed by a tutor.',
   },
   reviewing: {
-    label: 'Sedang Ditinjau',
+    label: 'Under Review',
     color: 'bg-primary/10 text-primary',
     icon: Eye,
-    description: 'Request Anda sedang ditinjau oleh tutor kami.',
+    description: 'Your request is being reviewed by our tutors.',
   },
   completed: {
-    label: 'Selesai',
+    label: 'Completed',
     color: 'bg-green-500/10 text-green-600',
     icon: CheckCircle,
-    description: 'Request Anda telah selesai diproses dan modul telah dibuat.',
+    description: 'Your request has been processed and the module has been created.',
   },
   rejected: {
-    label: 'Ditolak',
+    label: 'Rejected',
     color: 'bg-destructive/10 text-destructive-text',
     icon: XCircle,
-    description: 'Request Anda tidak dapat diproses. Lihat catatan admin untuk detail.',
+    description: 'Your request could not be processed. See the admin notes for details.',
   },
 };
 
@@ -53,9 +54,9 @@ const priorityColors: Record<string, string> = {
 };
 
 const priorityLabels: Record<string, string> = {
-  low: 'Rendah',
-  medium: 'Sedang',
-  high: 'Tinggi',
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
 };
 
 export default function RequestDetail() {
@@ -87,13 +88,13 @@ export default function RequestDetail() {
         <main className="container mx-auto px-4 py-8">
           <div className="text-center py-16">
             <FileQuestion className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-foreground mb-2">Request Tidak Ditemukan</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Request Not Found</h1>
             <p className="text-muted-foreground mb-6">
-              Request yang Anda cari tidak ada atau bukan milik Anda.
+              The request you are looking for does not exist or is not yours.
             </p>
             <Button onClick={() => navigate('/dashboard/user')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Button>
           </div>
         </main>
@@ -119,7 +120,7 @@ export default function RequestDetail() {
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Kembali
+          Back
         </Button>
 
         {/* Header */}
@@ -130,12 +131,12 @@ export default function RequestDetail() {
               {statusInfo.label}
             </Badge>
             <Badge className={priorityColors[priority]}>
-              Prioritas: {priorityLabels[priority]}
+              Priority: {priorityLabels[priority]}
             </Badge>
             {request.category && (
               <Badge variant="outline">
                 <Tag className="h-3 w-3 mr-1" />
-                {request.category}
+                {displayCategory(request.category)}
               </Badge>
             )}
           </div>
@@ -152,8 +153,8 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               <span>
-                Dibuat: {request.created_at 
-                  ? new Date(request.created_at).toLocaleDateString('id-ID', {
+                Created: {request.created_at 
+                  ? new Date(request.created_at).toLocaleDateString('en-US', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
@@ -168,7 +169,7 @@ export default function RequestDetail() {
         {request.description && (
           <div className="bg-card border border-border rounded-2xl p-8 mb-6 shadow-soft">
             <h2 className="text-lg font-semibold text-foreground mb-4">
-              Deskripsi Request
+              Request Description
             </h2>
             <p className="text-foreground/90 whitespace-pre-wrap">
               {request.description}
@@ -182,7 +183,7 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold text-foreground">
-                Ringkasan AI
+                AI Summary
               </h2>
             </div>
             <p className="text-foreground/90">
@@ -197,7 +198,7 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle className="h-5 w-5 text-muted-foreground" />
               <h2 className="text-lg font-semibold text-foreground">
-                Catatan Admin
+                Admin Notes
               </h2>
             </div>
             <p className="text-foreground/90 whitespace-pre-wrap">
@@ -212,11 +213,11 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2 mb-4">
               <CheckCircle className="h-5 w-5 text-green-600" />
               <h2 className="text-lg font-semibold text-foreground">
-                Modul Telah Dibuat
+                Module Created
               </h2>
             </div>
             <p className="text-muted-foreground mb-6">
-              Request Anda telah diproses dan modul pembelajaran telah tersedia.
+              Your request has been processed and the learning module is now available.
             </p>
             <Link 
               to={`/module/${relatedModule.id}`}
@@ -224,7 +225,7 @@ export default function RequestDetail() {
             >
               <Button>
                 <BookOpen className="h-4 w-4 mr-2" />
-                Lihat Modul: {relatedModule.title}
+                View Module: {relatedModule.title}
               </Button>
             </Link>
           </div>

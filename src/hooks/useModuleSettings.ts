@@ -56,15 +56,15 @@ export function useUpdateCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-categories"] });
       toast({
-        title: "Sukses",
-        description: "Kategori berhasil diperbarui",
+        title: "Success",
+        description: "Category updated successfully",
       });
     },
     onError: (error) => {
       logger.error("Error updating category:", error);
       toast({
         title: "Error",
-        description: "Gagal memperbarui kategori",
+        description: "Failed to update category",
         variant: "destructive",
       });
     },
@@ -90,15 +90,15 @@ export function useUpdateLevel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-levels"] });
       toast({
-        title: "Sukses",
-        description: "Level berhasil diperbarui",
+        title: "Success",
+        description: "Level updated successfully",
       });
     },
     onError: (error) => {
       logger.error("Error updating level:", error);
       toast({
         title: "Error",
-        description: "Gagal memperbarui level",
+        description: "Failed to update level",
         variant: "destructive",
       });
     },
@@ -142,7 +142,7 @@ export function useCreateCategory() {
       logger.error("Error creating category:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat kategori",
+        description: "Failed to create category",
         variant: "destructive",
       });
     },
@@ -171,7 +171,7 @@ export function useCreateLevel() {
       logger.error("Error creating level:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat level",
+        description: "Failed to create level",
         variant: "destructive",
       });
     },
@@ -194,15 +194,15 @@ export function useDeleteCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-categories"] });
       toast({
-        title: "Sukses",
-        description: "Kategori berhasil dihapus",
+        title: "Success",
+        description: "Category deleted successfully",
       });
     },
     onError: (error) => {
       logger.error("Error deleting category:", error);
       toast({
         title: "Error",
-        description: "Gagal menghapus kategori",
+        description: "Failed to delete category",
         variant: "destructive",
       });
     },
@@ -225,15 +225,15 @@ export function useDeleteLevel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-levels"] });
       toast({
-        title: "Sukses",
-        description: "Level berhasil dihapus",
+        title: "Success",
+        description: "Level deleted successfully",
       });
     },
     onError: (error) => {
       logger.error("Error deleting level:", error);
       toast({
         title: "Error",
-        description: "Gagal menghapus level",
+        description: "Failed to delete level",
         variant: "destructive",
       });
     },

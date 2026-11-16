@@ -47,7 +47,7 @@ export function useUpdateUserRole() {
 
       // Prevent promoting any user to superadmin
       if (newRole === 'superadmin') {
-        throw new Error('Tidak dapat mengubah pengguna menjadi Super Admin');
+        throw new Error('Cannot change a user to Super Admin');
       }
 
       const { data, error } = await supabase
@@ -65,14 +65,14 @@ export function useUpdateUserRole() {
       queryClient.invalidateQueries({ queryKey: ['user-role'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
-        title: "Berhasil",
-        description: "Role pengguna berhasil diubah",
+        title: "Success",
+        description: "User role changed successfully",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal mengubah role pengguna",
+        description: error.message || "Failed to change user role",
         variant: "destructive",
       });
       logger.error('Error updating role:', error);
@@ -138,16 +138,16 @@ export function useBanUser() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
-        title: data.bannedUntil ? "Pengguna di-ban" : "Ban dicabut",
+        title: data.bannedUntil ? "User banned" : "Ban lifted",
         description: data.bannedUntil
-          ? "Pengguna tidak dapat mengakses platform"
-          : "Pengguna dapat mengakses platform kembali",
+          ? "The user can no longer access the platform"
+          : "The user can access the platform again",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal mengubah status ban pengguna",
+        description: error.message || "Failed to change user ban status",
         variant: "destructive",
       });
       logger.error('Error banning user:', error);

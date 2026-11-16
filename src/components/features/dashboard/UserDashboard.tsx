@@ -205,7 +205,7 @@ export function UserDashboardContent() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="px-2 py-0.5 rounded text-[13px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                    Lanjut Belajar
+                    Continue Learning
                   </span>
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold mb-2">{currentModule.title}</h2>
@@ -225,7 +225,7 @@ export function UserDashboardContent() {
                   size="sm"
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  Lanjutkan
+                  Continue
                 </Button>
               </div>
             </div>
@@ -240,10 +240,10 @@ export function UserDashboardContent() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              Kursus Saya
+              My Courses
             </h3>
             <Button variant="ghost" asChild className="text-sm">
-                 <Link to="/dashboard/courses">Katalog Kursus <ArrowRight className="ml-1 h-3 w-3" /></Link>
+                 <Link to="/dashboard/courses">Course Catalog <ArrowRight className="ml-1 h-3 w-3" /></Link>
             </Button>
           </div>
 
@@ -262,7 +262,7 @@ export function UserDashboardContent() {
                   title={track.name}
                   description={track.description || ""}
                   category="Track"
-                  level="Semua Level"
+                  level="All Levels"
                   progress={0}
                 />
               ))}
@@ -270,12 +270,12 @@ export function UserDashboardContent() {
           ) : (
             <div className="bg-card border border-border rounded-xl p-8 text-center">
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h4 className="font-semibold mb-2">Belum ada kursus yang diambil</h4>
+              <h4 className="font-semibold mb-2">No courses enrolled yet</h4>
               <p className="text-sm text-muted-foreground mb-4">
-                Mulai perjalanan belajar Anda dengan mengambil kursus pertama.
+                Start your learning journey by taking your first course.
               </p>
               <Button asChild>
-                 <Link to="/dashboard/courses">Lihat Katalog</Link>
+                 <Link to="/dashboard/courses">View Catalog</Link>
               </Button>
             </div>
           )}

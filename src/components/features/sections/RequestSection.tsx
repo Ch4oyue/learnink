@@ -12,18 +12,19 @@ import { Send, CheckCircle, LogIn, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCreateRequest } from "@/hooks/useMaterialRequests";
 import { useNavigate } from "react-router-dom";
+import { displayCategory } from "@/lib/categoryLabels";
 
 const requestSchema = z.object({
   topic: z
     .string()
     .trim()
-    .min(3, { message: "Topik minimal 3 karakter" })
-    .max(100, { message: "Topik maksimal 100 karakter" }),
+    .min(3, { message: "Topic must be at least 3 characters" })
+    .max(100, { message: "Topic must be at most 100 characters" }),
   description: z
     .string()
     .trim()
-    .min(10, { message: "Deskripsi minimal 10 karakter" })
-    .max(500, { message: "Deskripsi maksimal 500 karakter" }),
+    .min(10, { message: "Description must be at least 10 characters" })
+    .max(500, { message: "Description must be at most 500 characters" }),
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   category: z.string().optional(),
 });
@@ -67,8 +68,8 @@ export const RequestSection = () => {
   const onSubmit = async (data: RequestFormData) => {
     if (!user) {
       toast({
-        title: "Login Diperlukan",
-        description: "Silakan login terlebih dahulu untuk mengirim request.",
+        title: "Sign In Required",
+        description: "Please log in first to send a request.",
         variant: "destructive",
       });
       return;
@@ -102,13 +103,13 @@ export const RequestSection = () => {
           {/* Section Header */}
           <div className="text-center mb-12 md:mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              Request Materi
+              Material Requests
             </span>
             <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 tracking-tight">
-              Butuh Materi Khusus?
+              Need Specific Material?
             </h2>
             <p className="text-muted-foreground text-lg">
-              Kirim request Anda dan tim kami akan membuatkan materi sesuai kebutuhan dengan bantuan AI.
+              Send a request and our team will create the material you need with AI assistance.
             </p>
           </div>
 
@@ -121,16 +122,16 @@ export const RequestSection = () => {
                   <LogIn className="w-8 h-8 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Login Diperlukan
+                  Sign In Required
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  Silakan login terlebih dahulu untuk mengirim request materi.
+                  Sign in to send a material request.
                 </p>
                 <Button
                   onClick={() => navigate("/auth")}
                   className="rounded-xl press-effect"
                 >
-                  Login Sekarang
+                  Sign In Now
                 </Button>
               </div>
             ) : isSubmitted ? (
@@ -139,10 +140,10 @@ export const RequestSection = () => {
                   <CheckCircle className="w-8 h-8 text-success" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Terima Kasih!
+                  Thank You!
                 </h3>
                 <p className="text-muted-foreground">
-                  Request Anda telah dikirim. Kami akan memprosesnya dengan AI dan mengirim notifikasi saat selesai.
+                  Your request has been sent. We will process it with AI and notify you when it is ready.
                 </p>
               </div>
             ) : (
@@ -153,11 +154,11 @@ export const RequestSection = () => {
                     htmlFor="topic"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Topik yang Ingin Dipelajari
+                    Topic You Want to Learn
                   </label>
                   <Input
                     id="topic"
-                    placeholder="Contoh: Automasi Email dengan AI"
+                    placeholder="Example: Email Automation with AI"
                     className="input-apple"
                     {...register("topic")}
                   />
@@ -174,19 +175,19 @@ export const RequestSection = () => {
                   {/* Category */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-foreground">
-                      Kategori
+                      Category
                     </label>
                     <Select
                       value={category}
                       onValueChange={(value) => setValue("category", value)}
                     >
                       <SelectTrigger className="h-11 rounded-xl">
-                        <SelectValue placeholder="Pilih kategori" />
+                        <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((cat) => (
                           <SelectItem key={cat} value={cat}>
-                            {cat}
+                            {displayCategory(cat)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -196,7 +197,7 @@ export const RequestSection = () => {
                   {/* Priority */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-foreground">
-                      Prioritas
+                      Priority
                     </label>
                     <Select
                       value={priority}
@@ -211,19 +212,19 @@ export const RequestSection = () => {
                         <SelectItem value="low">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-success" />
-                            Rendah
+                            Low
                           </span>
                         </SelectItem>
                         <SelectItem value="medium">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-warning" />
-                            Sedang
+                            Medium
                           </span>
                         </SelectItem>
                         <SelectItem value="high">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-destructive" />
-                            Tinggi
+                            High
                           </span>
                         </SelectItem>
                       </SelectContent>
@@ -237,11 +238,11 @@ export const RequestSection = () => {
                     htmlFor="description"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Deskripsi Tujuan Belajar
+                    Learning Goals
                   </label>
                   <Textarea
                     id="description"
-                    placeholder="Jelaskan apa yang ingin Anda capai dengan mempelajari topik ini..."
+                    placeholder="Describe what you want to achieve by learning this topic..."
                     rows={5}
                     className="rounded-xl border-border/60 bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 resize-none"
                     {...register("description")}
@@ -264,12 +265,12 @@ export const RequestSection = () => {
                   {isSubmitting || createRequest.isPending ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      Mengirim...
+                      Sending...
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <Send className="w-4 h-4" />
-                      Kirim Request
+                      Send Request
                     </span>
                   )}
                 </Button>
@@ -279,7 +280,7 @@ export const RequestSection = () => {
 
           {/* Helper Text */}
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Request akan diproses dengan AI dan biasanya selesai dalam 1-2 hari kerja.
+            Requests are processed with AI and usually completed within 1-2 business days.
           </p>
         </div>
       </div>

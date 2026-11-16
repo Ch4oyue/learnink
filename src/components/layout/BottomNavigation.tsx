@@ -3,6 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadNotificationCount } from "@/hooks/useNotifications";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { uniqueChannelTopic } from "@/lib/realtime";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import {
@@ -39,7 +40,7 @@ export function BottomNavigation() {
     // Admin subscriptions
     if (role === "admin" || role === "superadmin") {
       const adminChannel = supabase
-        .channel("mobile-nav-admin-badges")
+        .channel(uniqueChannelTopic("mobile-nav-admin-badges"))
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "incoming_contents" },
@@ -57,7 +58,7 @@ export function BottomNavigation() {
 
     // User subscriptions (Notifications)
     const userChannel = supabase
-      .channel(`mobile-nav-user-badges-${user.id}`)
+      .channel(uniqueChannelTopic(`mobile-nav-user-badges-${user.id}`))
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
@@ -104,7 +105,7 @@ export function BottomNavigation() {
     },
     {
       href: "/dashboard/modules",
-      label: "Modul",
+      label: "Modules",
       icon: BookOpen,
       roles: ["user", "tutor", "admin", "superadmin"],
     },
@@ -135,7 +136,7 @@ export function BottomNavigation() {
     },
     {
       href: "/dashboard/notifications",
-      label: "Notifikasi",
+      label: "Notifications",
       icon: Bell,
       badge: unreadCount,
       roles: ["user", "tutor", "admin", "superadmin"],
@@ -143,7 +144,7 @@ export function BottomNavigation() {
     },
     {
       href: "/dashboard/profile",
-      label: "Profil",
+      label: "Profile",
       icon: User,
       roles: ["user", "tutor", "admin", "superadmin"],
     },

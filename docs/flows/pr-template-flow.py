@@ -28,5 +28,7 @@ box(1150,140,310,150,"4. Review",["Review the picture","and the checks."],"#c3a6
 for a,b2 in ((340,400),(730,790),(1090,1150)): arrow(a,215,b2)
 d.text((40,340),"The template is applied to new PRs only after it is merged to the default branch.",font=s,fill=G)
 d.text((40,374),"Nothing here runs in CI, merges, or deploys.",font=s,fill=G)
-out=os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","assets","pr-template-flow.png")
-im.save(os.path.normpath(out))
+out=os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","assets","pr-template-flow.png"))
+# docs/assets may be missing (e.g. generated assets deleted) - create it before saving.
+os.makedirs(os.path.dirname(out), exist_ok=True)
+im.save(out)

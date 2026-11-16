@@ -59,10 +59,10 @@ export function HeroSection() {
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight text-foreground leading-[1.1] animate-fade-in"
             style={{ animationDelay: "0.2s" }}
           >
-            Kuasai{" "}
+            Master{" "}
             <span className="text-gradient">AI Automation</span>
             <br />
-            Tanpa Ribet
+            Without the Hassle
           </h1>
 
           {/* Subheadline */}
@@ -70,8 +70,7 @@ export function HeroSection() {
             className="mt-6 md:mt-8 text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-fade-in"
             style={{ animationDelay: "0.3s" }}
           >
-            Materi dapat di-request sesuai kebutuhan Anda. Belajar AI dengan
-            cara yang mudah dipahami, cocok untuk pemula.
+            Request the materials you need. Learn AI with clear, beginner-friendly lessons.
           </p>
 
           {/* CTA Buttons */}

@@ -120,7 +120,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                                     size="icon"
                                     className="text-muted-foreground hover:text-primary hover:bg-primary/10"
                                     title="Clone Entire Section"
-                                    aria-label="Klon Seluruh Bagian"
+                                    aria-label="Clone Entire Section"
                                 >
                                     <LibraryBig className="h-5 w-5" />
                                 </Button>

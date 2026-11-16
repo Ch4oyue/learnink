@@ -83,7 +83,7 @@ export default function CourseDetail() {
              onClick={() => navigate('/dashboard')}
            >
              <ArrowLeft className="h-4 w-4" />
-             Kembali ke Dashboard
+             Back to Dashboard
            </Button>
 
            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -94,7 +94,7 @@ export default function CourseDetail() {
              {canAccess ? (
                 <div className="min-w-[200px] bg-card border border-border p-4 rounded-xl shadow-sm">
                    <div className="flex justify-between text-sm mb-2">
-                     <span className="text-muted-foreground">Progress Kursus</span>
+                     <span className="text-muted-foreground">Course Progress</span>
                      <span className="font-bold">{courseProgress}%</span>
                    </div>
                    <Progress value={courseProgress} className="h-2" />
@@ -105,7 +105,7 @@ export default function CourseDetail() {
                    onClick={() => navigate('/dashboard/courses')}
                    className="shadow-soft"
                 >
-                   Enroll Sekarang
+                   Enroll Now
                 </Button>
              )}
            </div>
@@ -116,7 +116,7 @@ export default function CourseDetail() {
            <div className="flex items-center gap-2 mb-4">
               <BookOpen className="h-5 w-5 text-primary" />
               <h2 className="text-xl font-semibold">Module List</h2>
-              <Badge variant="secondary" className="ml-2">{totalModules} Modul</Badge>
+              <Badge variant="secondary" className="ml-2">{totalModules} Modules</Badge>
            </div>
 
            {!canAccess && (
@@ -151,7 +151,7 @@ export default function CourseDetail() {
                            </div>
                            <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <span className="text-xs font-mono text-muted-foreground">MODUL {index + 1}</span>
+                                <span className="text-xs font-mono text-muted-foreground">MODULE {index + 1}</span>
                                 <Badge variant="outline" className="text-[13px] h-5">{module.level || 'Umum'}</Badge>
                               </div>
                               <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors">
@@ -166,7 +166,7 @@ export default function CourseDetail() {
                            {isLocked ? (
                               <Button variant="ghost" disabled className="gap-2 w-full md:w-auto">
                                 <Lock className="h-4 w-4" />
-                                Terkunci
+                                Locked
                               </Button>
                            ) : (
                               <Button
@@ -175,7 +175,7 @@ export default function CourseDetail() {
                                 variant={isCompleted ? "outline" : "default"}
                               >
                                 <Link to={`/learn/${module.id}`}>
-                                  {isCompleted ? 'Ulangi' : 'Mulai'}
+                                  {isCompleted ? 'Retry' : 'Start'}
                                   <Play className="h-4 w-4 ml-1" />
                                 </Link>
                               </Button>

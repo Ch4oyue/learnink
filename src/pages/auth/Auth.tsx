@@ -378,7 +378,7 @@ export default function Auth() {
                             <Input
                               type={showPassword ? "text" : "password"}
                               autoComplete="new-password"
-                              placeholder="Minimal 6 characters"
+                              placeholder="At least 6 characters"
                               className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />

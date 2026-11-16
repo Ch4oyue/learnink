@@ -18,8 +18,8 @@ const requestSchema = z.object({
   topic: z
     .string()
     .trim()
-    .min(3, { message: "Topik minimal 3 karakter" })
-    .max(100, { message: "Topik maksimal 100 karakter" }),
+    .min(3, { message: "Topic must be at least 3 characters" })
+    .max(100, { message: "Topic must be at most 100 characters" }),
   description: z
     .string()
     .trim()
@@ -68,7 +68,7 @@ export const RequestSection = () => {
   const onSubmit = async (data: RequestFormData) => {
     if (!user) {
       toast({
-        title: "Login Diperlukan",
+        title: "Sign In Required",
         description: "Please log in first to send a request.",
         variant: "destructive",
       });
@@ -106,10 +106,10 @@ export const RequestSection = () => {
               Material Requests
             </span>
             <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 tracking-tight">
-              Butuh Materi Khusus?
+              Need Specific Material?
             </h2>
             <p className="text-muted-foreground text-lg">
-              Kirim request Anda dan tim kami akan membuatkan materi sesuai kebutuhan dengan bantuan AI.
+              Send a request and our team will create the material you need with AI assistance.
             </p>
           </div>
 
@@ -122,16 +122,16 @@ export const RequestSection = () => {
                   <LogIn className="w-8 h-8 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Login Diperlukan
+                  Sign In Required
                 </h3>
                 <p className="text-muted-foreground mb-6">
-                  Silakan login terlebih dahulu untuk mengirim request materi.
+                  Sign in to send a material request.
                 </p>
                 <Button
                   onClick={() => navigate("/auth")}
                   className="rounded-xl press-effect"
                 >
-                  Login Sekarang
+                  Sign In Now
                 </Button>
               </div>
             ) : isSubmitted ? (
@@ -140,10 +140,10 @@ export const RequestSection = () => {
                   <CheckCircle className="w-8 h-8 text-success" />
                 </div>
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Terima Kasih!
+                  Thank You!
                 </h3>
                 <p className="text-muted-foreground">
-                  Request Anda telah dikirim. Kami akan memprosesnya dengan AI dan mengirim notifikasi saat selesai.
+                  Your request has been sent. We will process it with AI and notify you when it is ready.
                 </p>
               </div>
             ) : (
@@ -154,7 +154,7 @@ export const RequestSection = () => {
                     htmlFor="topic"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Topik yang Ingin Dipelajari
+                    Topic You Want to Learn
                   </label>
                   <Input
                     id="topic"
@@ -197,7 +197,7 @@ export const RequestSection = () => {
                   {/* Priority */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-foreground">
-                      Prioritas
+                      Priority
                     </label>
                     <Select
                       value={priority}
@@ -212,19 +212,19 @@ export const RequestSection = () => {
                         <SelectItem value="low">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-success" />
-                            Rendah
+                            Low
                           </span>
                         </SelectItem>
                         <SelectItem value="medium">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-warning" />
-                            Sedang
+                            Medium
                           </span>
                         </SelectItem>
                         <SelectItem value="high">
                           <span className="flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-destructive" />
-                            Tinggi
+                            High
                           </span>
                         </SelectItem>
                       </SelectContent>
@@ -238,7 +238,7 @@ export const RequestSection = () => {
                     htmlFor="description"
                     className="block text-sm font-medium text-foreground"
                   >
-                    Deskripsi Tujuan Belajar
+                    Learning Goals
                   </label>
                   <Textarea
                     id="description"
@@ -265,12 +265,12 @@ export const RequestSection = () => {
                   {isSubmitting || createRequest.isPending ? (
                     <span className="flex items-center gap-2">
                       <span className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      Mengirim...
+                      Sending...
                     </span>
                   ) : (
                     <span className="flex items-center gap-2">
                       <Send className="w-4 h-4" />
-                      Kirim Request
+                      Send Request
                     </span>
                   )}
                 </Button>

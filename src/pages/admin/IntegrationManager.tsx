@@ -619,7 +619,7 @@ export default function IntegrationManager() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="source">Sumber</Label>
+                                <Label htmlFor="source">Source</Label>
                                 <Select
                                     value={formData.source}
                                     onValueChange={(value: IntegrationSource) =>

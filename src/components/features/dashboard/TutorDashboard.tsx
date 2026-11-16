@@ -89,7 +89,7 @@ export function TutorDashboardContent() {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-foreground mb-1">
-          Dashboard Tutor
+          Tutor Dashboard
         </h1>
         <p className="text-muted-foreground">
           Manage modules and review material requests from users.
@@ -190,7 +190,7 @@ export function TutorDashboardContent() {
                     <TableCell colSpan={5} className="text-center py-8">
                       <div className="flex items-center justify-center gap-2 text-muted-foreground">
                         <Clock className="h-4 w-4 animate-spin" />
-                        Memuat...
+                        Loading...
                       </div>
                     </TableCell>
                   </TableRow>
@@ -200,7 +200,7 @@ export function TutorDashboardContent() {
                       <TableCell className="font-medium max-w-[200px] truncate">
                         {request.topic}
                       </TableCell>
-                      <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
+                      <TableCell>{request.user_display_name || 'Anonymous'}</TableCell>
                       <TableCell>
                         {request.created_at
                           ? new Date(request.created_at).toLocaleDateString('en-US')

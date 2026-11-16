@@ -18,3 +18,31 @@ describe('reviewed English-copy regressions', () => {
     });
   }
 });
+
+// Reviewed JSX labels and the stored true/false answer values are separate.
+// These remain source-level guards, not rendered authenticated-route coverage.
+describe('reviewed JSX copy and answer-value preservation', () => {
+  test('generate dialogs use English UI copy', () => {
+    for (const name of ['AdminDashboard', 'TutorDashboard']) {
+      const source = readFileSync(`src/components/features/dashboard/${name}.tsx`, 'utf8');
+      expect(source).toContain('AI will create a learning module for the request');
+      expect(source).toContain('This may take a few seconds.');
+      expect(source).not.toContain('Generate Modul\n');
+    }
+  });
+  test('quiz translates display labels without changing submitted values', () => {
+    const source = readFileSync('src/components/features/quiz/QuizPlayer.tsx', 'utf8');
+    expect(source).toContain('["Benar", "Salah"].map');
+    expect(source).toContain('value={option.toLowerCase()}');
+    expect(source).toContain('{option === "Benar" ? "True" : "False"}');
+    expect(source).toContain('Review Answers');
+  });
+  test('reviewed loading and request JSX labels stay English', () => {
+    const source = readFileSync('src/components/features/dashboard/AdminDashboard.tsx', 'utf8');
+    expect(source).not.toContain('Memuat...');
+    expect(source).toContain('Total Modules');
+    const requests = readFileSync('src/components/features/sections/RequestSection.tsx', 'utf8');
+    expect(requests).toContain('Need Specific Material?');
+    expect(requests).toContain('Learning Goals');
+  });
+});

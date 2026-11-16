@@ -70,11 +70,11 @@ export function PWAInstallPrompt() {
           <DrawerFooter>
             {!isIOS && (
               <Button onClick={handleInstall} className="w-full">
-                <Download className="mr-2 h-4 w-4" /> Install Sekarang
+                <Download className="mr-2 h-4 w-4" /> Install Now
               </Button>
             )}
             <Button variant="outline" onClick={handleDismiss}>
-              Nanti Saja
+              Later
             </Button>
           </DrawerFooter>
         </div>

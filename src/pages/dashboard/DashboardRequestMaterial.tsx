@@ -61,7 +61,7 @@ export default function DashboardRequestMaterial() {
       {
         onSuccess: () => {
           toast({
-            title: "Request Terkirim! 🎉",
+            title: "Request Sent! 🎉",
             description: "Your material request will be processed by the team soon.",
           });
           setTopic("");
@@ -214,7 +214,7 @@ export default function DashboardRequestMaterial() {
                   </p>
                   <Button onClick={() => setShowForm(true)} variant="outline">
                     <Plus className="h-4 w-4 mr-2" />
-                    Buat Request Pertama
+                    Create Your First Request
                   </Button>
                 </div>
               </CardContent>

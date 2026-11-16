@@ -206,7 +206,7 @@ export default function ModuleDetail() {
                 {isCompleted && (
                   <Badge className="bg-green-500/10 text-green-600 border-green-500/20" variant="outline">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    Selesai
+                    Completed
                   </Badge>
                 )}
               </div>
@@ -235,7 +235,7 @@ export default function ModuleDetail() {
                         className="gap-2"
                       >
                         <Play className="h-5 w-5" />
-                        Mulai Belajar
+                        Start Learning
                       </Button>
                     ) : isCompleted ? (
                       <div className="flex items-center gap-4">
@@ -258,7 +258,7 @@ export default function ModuleDetail() {
                         className="gap-2"
                       >
                         <Play className="h-5 w-5" />
-                        Lanjutkan Belajar
+                        Continue Learning
                       </Button>
                     )}
 

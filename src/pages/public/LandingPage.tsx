@@ -109,7 +109,7 @@ export default function LandingPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        aria-label="Menu Utama"
+                                        aria-label="Main Menu"
                                     >
                                         <Menu className="h-5 w-5" />
                                     </Button>

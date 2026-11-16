@@ -122,7 +122,7 @@ export default function SystemControl() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["system-settings"] });
-      toast({ title: "Pengaturan diperbarui" });
+      toast({ title: "Settings updated" });
     }
   });
 
@@ -145,7 +145,7 @@ export default function SystemControl() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["label-configs"] });
-      toast({ title: "Label dihapus" });
+      toast({ title: "Label deleted" });
     }
   });
 
@@ -219,8 +219,8 @@ export default function SystemControl() {
             </CardHeader>
             <CardContent className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label>Status Pemeliharaan</Label>
-                <p className="text-sm text-muted-foreground">Aktifkan saat melakukan update besar.</p>
+                <Label>Maintenance Status</Label>
+                <p className="text-sm text-muted-foreground">Enable during major updates.</p>
               </div>
               <Switch
                 checked={getSetting("maintenance_mode")?.value === "true" || getSetting("maintenance_mode")?.value === true}
@@ -272,7 +272,7 @@ export default function SystemControl() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <Label>Aktifkan Pengumuman</Label>
+                <Label>Enable Announcement</Label>
                 <Switch
                   checked={broadcast.active}
                   onCheckedChange={(checked) => setBroadcast({ ...broadcast, active: checked })}
@@ -299,7 +299,7 @@ export default function SystemControl() {
                 onClick={() => updateSetting.mutate({ key: "broadcast_message", value: broadcast })}
                 disabled={updateSetting.isPending}
               >
-                Update Pengumuman
+                Update Announcement
               </Button>
             </CardFooter>
           </Card>
@@ -320,7 +320,7 @@ export default function SystemControl() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Waktu</TableHead>
+                  <TableHead>Time</TableHead>
                   <TableHead>Event</TableHead>
                   <TableHead>Endpoint</TableHead>
                   <TableHead>IP Address</TableHead>
@@ -374,7 +374,7 @@ export default function SystemControl() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Tags className="h-5 w-5 text-purple-500" />
-                Manajemen Multiplier Label
+                Label Multiplier Management
               </CardTitle>
               <CardDescription>
                 Set the XP multiplier for each user label/tag.

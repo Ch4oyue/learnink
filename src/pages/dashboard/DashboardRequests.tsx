@@ -247,7 +247,7 @@ export default function DashboardRequests() {
             </TabsTrigger>
             <TabsTrigger value="feature" className="gap-2">
               <Lightbulb className="h-4 w-4" />
-              Fitur
+              Feature
             </TabsTrigger>
             <TabsTrigger value="bug" className="gap-2">
               <Bug className="h-4 w-4" />
@@ -305,7 +305,7 @@ export default function DashboardRequests() {
                       : `No ${typeLabels[activeTab].toLowerCase()} submitted yet`}
                   </p>
                   <Button onClick={() => setIsCreateOpen(true)} variant="outline">
-                    Ajukan Sekarang
+                    Submit Now
                   </Button>
                 </CardContent>
               </Card>
@@ -447,7 +447,7 @@ export default function DashboardRequests() {
 
             {/* Attachment Preview Area */}
             <div className="space-y-2">
-                <Label>Lampiran</Label>
+                <Label>Attachments</Label>
                 <div className="flex items-center gap-4">
                     <Button
                         type="button"
@@ -457,7 +457,7 @@ export default function DashboardRequests() {
                         disabled={uploading}
                     >
                         <Upload className="h-4 w-4 mr-2" />
-                        Upload Gambar
+                        Upload Image
                     </Button>
                     <input
                         type="file"
@@ -489,7 +489,7 @@ export default function DashboardRequests() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Prioritas</Label>
+              <Label htmlFor="priority">Priority</Label>
               <Select
                 value={formData.priority}
                 onValueChange={(val) => setFormData({ ...formData, priority: val })}
@@ -527,7 +527,7 @@ export default function DashboardRequests() {
               Generate Module with AI?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              AI akan menghasilkan modul pembelajaran berdasarkan request ini.
+              AI will create a learning module based on this request.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

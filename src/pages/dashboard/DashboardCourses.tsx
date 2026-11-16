@@ -123,7 +123,7 @@ export default function DashboardCourses() {
                     {isEnrolled && (
                       <Badge className="bg-green-500/10 text-green-600 gap-1">
                         <CheckCircle2 className="h-3 w-3" />
-                        Terdaftar
+                        Enrolled
                       </Badge>
                     )}
                   </div>
@@ -142,7 +142,7 @@ export default function DashboardCourses() {
                         onClick={() => navigate(`/dashboard/course/${track.id}`)}
                       >
                         <BookOpen className="h-4 w-4" />
-                        Lanjut Belajar
+                        Continue Learning
                       </Button>
                     ) : (
                       <Button
@@ -156,7 +156,7 @@ export default function DashboardCourses() {
                         ) : (
                           <GraduationCap className="h-4 w-4" />
                         )}
-                        Ambil Kursus
+                        Take Course
                       </Button>
                     )}
                   </div>

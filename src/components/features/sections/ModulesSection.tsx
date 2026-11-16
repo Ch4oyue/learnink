@@ -110,7 +110,7 @@ export const ModulesSection = () => {
         <div className="container mx-auto px-6 md:px-8">
           <div className="text-center max-w-2xl mx-auto">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              Daftar Modul
+              Module Catalog
             </span>
             <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 tracking-tight">
               Coming Soon

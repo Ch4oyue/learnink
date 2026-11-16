@@ -230,7 +230,7 @@ export function useToggleLearningSourceActive() {
             queryClient.invalidateQueries({ queryKey: ["learning-sources"] });
             toast({
                 title: "Success",
-                description: data.is_active ? "Sumber belajar diaktifkan" : "Sumber belajar dinonaktifkan",
+                description: data.is_active ? "Learning source enabled" : "Learning source disabled",
             });
         },
         onError: (error) => {

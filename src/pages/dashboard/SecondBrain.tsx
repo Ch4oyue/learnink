@@ -122,11 +122,11 @@ export default function SecondBrain() {
                     <div className="flex items-center gap-3">
                         <Badge variant="secondary" className="gap-1.5 px-3 py-1.5">
                             <StickyNote className="h-3.5 w-3.5" />
-                            {notes?.length ?? 0} Catatan
+                            {notes?.length ?? 0} Notes
                         </Badge>
                         <Badge variant="outline" className="gap-1.5 px-3 py-1.5">
                             <Sparkles className="h-3.5 w-3.5" />
-                            {moduleIds.length} Modul
+                            {moduleIds.length} Modules
                         </Badge>
                     </div>
                 </div>
@@ -167,7 +167,7 @@ export default function SecondBrain() {
                         ))}
                         {moduleIds.length > 3 && (
                             <Badge variant="secondary" className="px-2.5">
-                                +{moduleIds.length - 3} lainnya
+                                +{moduleIds.length - 3} more
                             </Badge>
                         )}
                     </div>

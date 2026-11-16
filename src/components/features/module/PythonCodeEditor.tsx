@@ -166,7 +166,7 @@ export function PythonCodeEditor({
             className="h-8 w-8"
             onClick={handleReset}
             title="Reset"
-            aria-label="Reset kode"
+            aria-label="Reset code"
           >
             <RotateCcw className="h-4 w-4" />
           </Button>
@@ -184,7 +184,7 @@ export function PythonCodeEditor({
             ) : (
               <>
                 <Play className="h-4 w-4" />
-                Jalankan
+                Run
               </>
             )}
           </Button>
@@ -246,7 +246,7 @@ export function PythonCodeEditor({
       {/* Footer hint */}
       <div className="px-4 py-2 bg-muted/30 border-t border-border">
         <p className="text-xs text-muted-foreground">
-          Tekan <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Ctrl</kbd> +{" "}
+          Press <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Ctrl</kbd> +{" "}
           <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Enter</kbd> to run
         </p>
       </div>

@@ -434,7 +434,7 @@ export default function ContentApproval() {
                                         {req.image_url && (
                                             <div className="mt-2 text-xs text-primary flex items-center gap-1">
                                                 <ExternalLink className="h-3 w-3" />
-                                                Lampiran Gambar
+                                                Image Attachment
                                             </div>
                                         )}
                                     </CardContent>
@@ -519,7 +519,7 @@ export default function ContentApproval() {
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
                                                 className="w-full font-mono text-sm border-none focus-visible:ring-0 p-0 min-h-[500px] bg-transparent resize-none placeholder:text-muted-foreground/50"
-                                                placeholder="Tulis konten menggunakan format Markdown..."
+                                                placeholder="Write content in Markdown..."
                                             />
                                         </div>
                                     </ResizablePanel>
@@ -554,7 +554,7 @@ export default function ContentApproval() {
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
                                                 className="font-mono text-sm min-h-[300px] bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
-                                                placeholder="Tulis konten menggunakan format Markdown..."
+                                                placeholder="Write content in Markdown..."
                                             />
                                         </TabsContent>
                                         <TabsContent value="preview" className="mt-0">
@@ -580,10 +580,10 @@ export default function ContentApproval() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             {selectedRequest?.type === 'bug' ? <Bug className="text-red-500" /> : selectedRequest?.type === 'feature' ? <Lightbulb className="text-amber-500" /> : <BookOpen className="text-blue-500" />}
-                            Detail Request
+                            Request Details
                         </DialogTitle>
                         <DialogDescription>
-                             Diajukan oleh <strong>{selectedRequest?.user_display_name}</strong> pada {selectedRequest?.created_at && formatDate(selectedRequest.created_at)}
+                             Submitted by <strong>{selectedRequest?.user_display_name}</strong> on {selectedRequest?.created_at && formatDate(selectedRequest.created_at)}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -600,15 +600,15 @@ export default function ContentApproval() {
                         </div>
                         {selectedRequest?.image_url && (
                              <div>
-                                <h4 className="font-semibold text-sm mb-1">Lampiran</h4>
+                                <h4 className="font-semibold text-sm mb-1">Attachments</h4>
                                 <a href={selectedRequest.image_url} target="_blank" rel="noreferrer">
                                     <img src={selectedRequest.image_url} alt="Attachment" className="max-h-48 rounded-lg border hover:opacity-90 transition-opacity" />
                                 </a>
                              </div>
                         )}
                         <div className="flex gap-4 text-sm">
-                            <div><span className="text-muted-foreground">Kategori:</span> {selectedRequest?.category || "-"}</div>
-                            <div><span className="text-muted-foreground">Prioritas:</span> {selectedRequest?.priority}</div>
+                            <div><span className="text-muted-foreground">Category:</span> {selectedRequest?.category || "-"}</div>
+                            <div><span className="text-muted-foreground">Priority:</span> {selectedRequest?.priority}</div>
                         </div>
                     </div>
 
@@ -619,7 +619,7 @@ export default function ContentApproval() {
                                 onClick={() => { setRequestAction('approve'); handleRequestAction(); }}
                             >
                                 <CheckCircle className="w-4 h-4 mr-2" />
-                                {selectedRequest?.type === 'feature' && role === 'superadmin' ? "Approve Feature" : "Terima"}
+                                {selectedRequest?.type === 'feature' && role === 'superadmin' ? "Approve Feature" : "Accept"}
                             </Button>
                             <Button
                                 className="flex-1"
@@ -627,7 +627,7 @@ export default function ContentApproval() {
                                 onClick={() => { setRequestAction('reject'); handleRequestAction(); }}
                             >
                                 <XCircle className="w-4 h-4 mr-2" />
-                                Tolak
+                                Reject
                             </Button>
                         </div>
                     </DialogFooter>

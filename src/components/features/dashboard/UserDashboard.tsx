@@ -205,7 +205,7 @@ export function UserDashboardContent() {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="px-2 py-0.5 rounded text-[13px] font-bold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
-                    Lanjut Belajar
+                    Continue Learning
                   </span>
                 </div>
                 <h2 className="text-xl md:text-2xl font-bold mb-2">{currentModule.title}</h2>
@@ -225,7 +225,7 @@ export function UserDashboardContent() {
                   size="sm"
                 >
                   <Play className="mr-2 h-4 w-4" />
-                  Lanjutkan
+                  Continue
                 </Button>
               </div>
             </div>

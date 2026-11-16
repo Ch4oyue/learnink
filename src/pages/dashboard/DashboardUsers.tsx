@@ -158,7 +158,7 @@ export default function DashboardUsers() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
-      toast({ title: "Label diperbarui" });
+      toast({ title: "Label updated" });
     }
   });
 
@@ -178,7 +178,7 @@ export default function DashboardUsers() {
               ? 'You do not have admin access. Only admins can see the user list.'
               : isFunctionMissing
                 ? 'Database function not available yet. Make sure the migration has been run in Supabase.'
-                : `Terjadi kesalahan: ${errorMessage}`
+                : `An error occurred: ${errorMessage}`
             }
           </p>
           <p className="text-xs text-muted-foreground mt-4 font-mono bg-muted p-2 rounded max-w-lg break-all">
@@ -407,7 +407,7 @@ export default function DashboardUsers() {
 
               <PaginationItem>
                 <div className="flex items-center px-4 text-sm font-medium">
-                  Halaman {page} dari {meta.totalPages}
+                  Page {page} of {meta.totalPages}
                 </div>
               </PaginationItem>
 

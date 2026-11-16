@@ -173,7 +173,7 @@ export function AdminDashboardContent() {
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-foreground mb-1">
-          Dashboard Admin
+          Admin Dashboard
         </h1>
         <p className="text-muted-foreground">
           Manage users, modules, and material requests.
@@ -211,7 +211,7 @@ export function AdminDashboardContent() {
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{modules?.length || 0}</p>
-              <p className="text-sm text-muted-foreground">Total Modul</p>
+              <p className="text-sm text-muted-foreground">Total Modules</p>
             </div>
           </div>
         </div>
@@ -235,7 +235,7 @@ export function AdminDashboardContent() {
         <TabsList>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="requests">Material Requests</TabsTrigger>
-          <TabsTrigger value="modules">Modul</TabsTrigger>
+          <TabsTrigger value="modules">Modules</TabsTrigger>
         </TabsList>
 
         {/* Users Tab */}
@@ -269,7 +269,7 @@ export function AdminDashboardContent() {
                 {usersLoading ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                      Memuat...
+                      Loading...
                     </TableCell>
                   </TableRow>
                 ) : filteredUsers && filteredUsers.length > 0 ? (
@@ -288,7 +288,7 @@ export function AdminDashboardContent() {
                             </div>
                             <div>
                               <p className="font-medium text-foreground">
-                                {userItem.display_name || 'Tanpa nama'}
+                                {userItem.display_name || 'Unnamed'}
                                 {isSelf && (
                                   <span className="text-xs text-muted-foreground ml-2">(You)</span>
                                 )}
@@ -381,7 +381,7 @@ export function AdminDashboardContent() {
                     <TableCell colSpan={6} className="text-center py-8">
                       <div className="flex items-center justify-center gap-2 text-muted-foreground">
                         <Clock className="h-4 w-4 animate-spin" />
-                        Memuat...
+                        Loading...
                       </div>
                     </TableCell>
                   </TableRow>
@@ -394,7 +394,7 @@ export function AdminDashboardContent() {
                       <TableCell>
                         <Badge variant="outline">{request.category || 'Umum'}</Badge>
                       </TableCell>
-                      <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
+                      <TableCell>{request.user_display_name || 'Anonymous'}</TableCell>
                       <TableCell>
                         {request.created_at
                           ? new Date(request.created_at).toLocaleDateString('en-US')

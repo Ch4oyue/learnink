@@ -165,12 +165,12 @@ export default function Syllabus() {
             <div className="max-w-md mx-auto mb-12">
               <div className="p-6 rounded-2xl border bg-card shadow-soft">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium">Progress Keseluruhan</span>
+                  <span className="text-sm font-medium">Overall Progress</span>
                   <span className="text-2xl font-bold text-primary">{overallProgress}%</span>
                 </div>
                 <Progress value={overallProgress} className="h-2" />
                 <p className="text-xs text-muted-foreground mt-2">
-                  {completedModules} dari {totalModules} modul selesai
+                  {completedModules} of {totalModules} modules completed
                 </p>
               </div>
             </div>

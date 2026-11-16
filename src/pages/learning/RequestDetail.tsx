@@ -94,7 +94,7 @@ export default function RequestDetail() {
             </p>
             <Button onClick={() => navigate('/dashboard/user')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Dashboard
+              Back to Dashboard
             </Button>
           </div>
         </main>
@@ -120,7 +120,7 @@ export default function RequestDetail() {
           className="mb-6"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Kembali
+          Back
         </Button>
 
         {/* Header */}
@@ -183,7 +183,7 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold text-foreground">
-                Ringkasan AI
+                AI Summary
               </h2>
             </div>
             <p className="text-foreground/90">
@@ -198,7 +198,7 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle className="h-5 w-5 text-muted-foreground" />
               <h2 className="text-lg font-semibold text-foreground">
-                Catatan Admin
+                Admin Notes
               </h2>
             </div>
             <p className="text-foreground/90 whitespace-pre-wrap">
@@ -213,7 +213,7 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2 mb-4">
               <CheckCircle className="h-5 w-5 text-green-600" />
               <h2 className="text-lg font-semibold text-foreground">
-                Modul Telah Dibuat
+                Module Created
               </h2>
             </div>
             <p className="text-muted-foreground mb-6">
@@ -225,7 +225,7 @@ export default function RequestDetail() {
             >
               <Button>
                 <BookOpen className="h-4 w-4 mr-2" />
-                Lihat Modul: {relatedModule.title}
+                View Module: {relatedModule.title}
               </Button>
             </Link>
           </div>

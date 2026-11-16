@@ -88,7 +88,7 @@ export const MarkdownRenderer = memo(({
     const url = new URL(window.location.href);
     url.hash = id;
     navigator.clipboard.writeText(url.toString());
-    toast({ title: "Link bagian disalin!" });
+    toast({ title: "Section link copied!" });
   }, [toast]);
 
   const components: Components = useMemo(() => ({

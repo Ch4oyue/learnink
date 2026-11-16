@@ -246,7 +246,7 @@ export default function DashboardSettings() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Pengaturan</h1>
+          <h1 className="text-2xl font-semibold">Settings</h1>
           <p className="text-muted-foreground">Manage learning module categories and levels</p>
         </div>
 
@@ -280,7 +280,7 @@ export default function DashboardSettings() {
                   <div className="flex gap-4 items-end">
                     <div className="flex-1 space-y-2">
                       <Label>Description (Optional)</Label>
-                      <Input value={newCategoryDesc} onChange={(e) => setNewCategoryDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      <Input value={newCategoryDesc} onChange={(e) => setNewCategoryDesc(e.target.value)} placeholder="Brief description..." />
                     </div>
                     <Button onClick={handleAddCategory} disabled={createCategory.isPending || !newCategoryName.trim()}>
                       {createCategory.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
@@ -355,7 +355,7 @@ export default function DashboardSettings() {
                   <div className="flex gap-4 items-end">
                     <div className="flex-1 space-y-2">
                       <Label>Description (Optional)</Label>
-                      <Input value={newLevelDesc} onChange={(e) => setNewLevelDesc(e.target.value)} placeholder="Keterangan singkat..." />
+                      <Input value={newLevelDesc} onChange={(e) => setNewLevelDesc(e.target.value)} placeholder="Brief description..." />
                     </div>
                     <Button onClick={handleAddLevel} disabled={createLevel.isPending || !newLevelName.trim()}>
                       {createLevel.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}

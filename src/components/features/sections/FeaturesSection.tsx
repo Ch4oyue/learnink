@@ -28,13 +28,13 @@ export const FeaturesSection = () => {
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            Fitur Unggulan
+            Key Features
           </span>
           <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 tracking-tight">
-            Belajar Lebih Cerdas, Bukan Lebih Keras
+            Learn Smarter, Not Harder
           </h2>
           <p className="text-muted-foreground text-lg">
-            Platform kami dirancang untuk memaksimalkan hasil belajar dengan pendekatan yang personal dan adaptif.
+            Our platform helps you learn more effectively with a personal, adaptive approach.
           </p>
         </div>
 

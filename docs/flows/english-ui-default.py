@@ -26,7 +26,7 @@ box(430,140,300,170,"2. Dates",["date-fns id -> enUS","toLocaleDateString","id-I
 box(790,140,330,170,"3. Stored values",["DB keeps raw values like","AI Dasar / Pemula.","categoryLabels.ts maps","them at render only."],"#ffd36e")
 box(1180,140,280,170,"4. Unchanged",["AI/material prompts","and DB content stay","as authored."],"#c3a6ff")
 for a,b2 in ((370,430),(730,790),(1120,1180)): arrow(a,225,b2)
-d.text((40,350),"Verification: bun run build clean, bun test 53/53 pass.",font=s,fill=G)
+d.text((40,350),"Verification: build and unit tests pass; see PR for the current test count.",font=s,fill=G)
 d.text((40,384),"Visual check (desktop + mobile): /, /auth, /syllabus, /changelog. Auth-gated routes source-inspected only.",font=s,fill=G)
 d.text((40,418),"No database values are mutated; unknown stored values render as-is.",font=s,fill=G)
 out=os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),"..","assets","english-ui-default.png"))

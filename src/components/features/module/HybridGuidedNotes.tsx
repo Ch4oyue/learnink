@@ -135,7 +135,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                         value={newNoteText}
                         onChange={(e) => setNewNoteText(e.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={editingNoteId ? "Edit catatan..." : "Type '/' for commands"}
+                        placeholder={editingNoteId ? "Edit note..." : "Type '/' for commands"}
                         className={cn(
                             "w-full bg-muted border-none shadow-subtle rounded-xl py-3.5 pl-12 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/20 resize-none min-h-[56px]",
                             editingNoteId && "ring-2 ring-primary/30"

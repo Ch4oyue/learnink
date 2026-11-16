@@ -143,7 +143,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
 
           {/* Question Review */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Review Jawaban</h3>
+            <h3 className="font-semibold">Review Answers</h3>
             {questions.map((q, i) => (
               <div
                 key={q.id}
@@ -174,7 +174,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                     </p>
                     {!results.correctAnswers[q.id] && (
                       <p className="text-sm text-green-600 mt-1">
-                        Jawaban benar: {results.correctAnswerValues[q.id]}
+                        Correct answer: {results.correctAnswerValues[q.id]}
                       </p>
                     )}
                     {results.explanations[q.id] && (
@@ -212,7 +212,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
         </div>
         <Progress value={progress} className="h-1.5" />
         <p className="text-sm text-muted-foreground mt-2">
-          Soal {currentIndex + 1} dari {questions.length}
+          Question {currentIndex + 1} of {questions.length}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -221,10 +221,10 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="text-xs">
               {currentQuestion.question_type === "multiple_choice"
-                ? "Pilihan Ganda"
+                ? "Multiple Choice"
                 : currentQuestion.question_type === "true_false"
-                ? "Benar/Salah"
-                : "Isian"}
+                ? "True/False"
+                : "Short Answer"}
             </Badge>
             <Badge variant="secondary" className="text-xs">
               {currentQuestion.points} points
@@ -267,7 +267,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                 >
                   <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} />
                   <Label htmlFor={`option-${option}`} className="flex-1 cursor-pointer">
-                    {option}
+                    {option === "Benar" ? "True" : "False"}
                   </Label>
                 </div>
               ))}
@@ -311,7 +311,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             className="gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
-            Sebelumnya
+            Previous
           </Button>
 
           {currentIndex === questions.length - 1 ? (
@@ -327,14 +327,14 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                 </>
               ) : (
                 <>
-                  Selesai
+                  Finish
                   <Check className="h-4 w-4" />
                 </>
               )}
             </Button>
           ) : (
             <Button onClick={handleNext} className="gap-2">
-              Selanjutnya
+              Next
               <ChevronRight className="h-4 w-4" />
             </Button>
           )}

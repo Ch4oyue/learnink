@@ -138,7 +138,7 @@ export default function DashboardModules() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold">Modul Pembelajaran</h1>
+            <h1 className="text-2xl font-semibold">Learning Modules</h1>
             <p className="text-muted-foreground">
               {isTutorOrAdmin
                 ? "Manage and create learning modules"
@@ -149,7 +149,7 @@ export default function DashboardModules() {
             <Button asChild className="gap-2">
               <Link to="/dashboard/modules/create">
                 <Plus className="h-4 w-4" />
-                Buat Modul
+                Create Module
               </Link>
             </Button>
           )}
@@ -195,7 +195,7 @@ export default function DashboardModules() {
                     <Button asChild className="glass-button-primary">
                       <Link to="/dashboard/modules/create">
                         <Plus className="h-4 w-4 mr-2" />
-                        Buat Modul
+                        Create Module
                       </Link>
                     </Button>
                   </CardContent>
@@ -205,11 +205,11 @@ export default function DashboardModules() {
                   <Table>
                     <TableHeader>
                       <TableRow className="hover:bg-transparent border-b border-white/10">
-                        <TableHead className="font-bold text-foreground/80">Modul</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Modules</TableHead>
                         <TableHead className="font-bold text-foreground/80">Category</TableHead>
                         <TableHead className="font-bold text-foreground/80">Level</TableHead>
                         <TableHead className="font-bold text-foreground/80">Status</TableHead>
-                        <TableHead className="font-bold text-foreground/80">Dibuat</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Created</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -253,7 +253,7 @@ export default function DashboardModules() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" aria-label="Opsi Modul" className="hover:bg-white/10 rounded-full">
+                                <Button variant="ghost" size="icon" aria-label="Module Options" className="hover:bg-white/10 rounded-full">
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
@@ -263,7 +263,7 @@ export default function DashboardModules() {
                                   className="focus:bg-white/10 cursor-pointer"
                                 >
                                   <Eye className="h-4 w-4 mr-2" />
-                                  Lihat
+                                  View
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() =>
@@ -319,7 +319,7 @@ export default function DashboardModules() {
                   </p>
                   <Button asChild variant="outline" className="glass-button">
                     <Link to={`/dashboard/requests?tab=module&topic=${encodeURIComponent(searchQuery)}`}>
-                      Request Modul Ini
+                      Request This Module
                     </Link>
                   </Button>
                 </CardContent>
@@ -342,7 +342,7 @@ export default function DashboardModules() {
                             {moduleProgress?.is_completed ? (
                               <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-1 shadow-none backdrop-blur-sm">
                                 <CheckCircle2 className="h-3 w-3" />
-                                Selesai
+                                Completed
                               </Badge>
                             ) : moduleProgress ? (
                               <Badge variant="secondary" className="gap-1 glass-button text-xs">

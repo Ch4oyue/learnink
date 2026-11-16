@@ -636,7 +636,7 @@ export default function DashboardProfile() {
                 <Link to="/dashboard/second-brain">
                   <Button size="lg" className="mt-4 gap-2">
                     <Brain className="h-5 w-5" />
-                    Buka Second Brain
+                    Open Second Brain
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </Link>

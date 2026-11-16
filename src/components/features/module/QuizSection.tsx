@@ -48,7 +48,7 @@ export function QuizSection({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                Kuis Modul
+                Module Quiz
               </h2>
               <p className="text-sm text-muted-foreground">
                 Test your understanding after reading the material
@@ -66,7 +66,7 @@ export function QuizSection({
               {isGenerating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Membuat...
+                  Generating...
                 </>
               ) : (
                 <>
@@ -110,16 +110,16 @@ export function QuizSection({
                       </span>
                       <span className="flex items-center gap-1">
                         <Target className="h-3 w-3" />
-                        Lulus: {quiz.passing_score}%
+                        Pass mark: {quiz.passing_score}%
                       </span>
                       {attempts && (
                         <>
                           <Badge variant="secondary" className="text-xs">
-                            {attempts.count}x dicoba
+                            {attempts.count}attempts
                           </Badge>
                           <span className="flex items-center gap-1 text-amber-600">
                             <Trophy className="h-3 w-3" />
-                            Skor tertinggi: {attempts.highestScore}%
+                            Best score: {attempts.highestScore}%
                           </span>
                         </>
                       )}
@@ -128,7 +128,7 @@ export function QuizSection({
                   {user ? (
                     <Button onClick={() => onStartQuiz(quiz)} size="sm">
                       <Play className="h-4 w-4 mr-2" />
-                      Mulai Kuis
+                      Start Quiz
                     </Button>
                   ) : (
                     <Button asChild size="sm" variant="outline">

@@ -47,7 +47,7 @@ class ErrorBoundary extends Component<Props, State> {
             
             <div className="space-y-2">
               <h1 className="text-2xl font-bold text-foreground">
-                Terjadi Kesalahan
+                Something Went Wrong
               </h1>
               <p className="text-muted-foreground">
                 Sorry, something unexpected happened. Try reloading the page or head back home.
@@ -65,10 +65,10 @@ class ErrorBoundary extends Component<Props, State> {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button onClick={this.handleReload} className="gap-2">
                 <RefreshCw className="h-4 w-4" />
-                Muat Ulang
+                Reload
               </Button>
               <Button variant="outline" onClick={this.handleGoHome}>
-                Kembali ke Beranda
+                Back to Home
               </Button>
             </div>
           </div>

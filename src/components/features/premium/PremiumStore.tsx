@@ -121,7 +121,7 @@ export function PremiumStore() {
               <p className="font-bold text-amber-500">Premium Status Active</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />
-                Berakhir pada {format(new Date(profile!.premium_until!), "dd MMM yyyy")}
+                Expires on {format(new Date(profile!.premium_until!), "dd MMM yyyy")}
               </p>
             </div>
           </div>
@@ -152,7 +152,7 @@ export function PremiumStore() {
                 </div>
                 <CardTitle>{offer.label}</CardTitle>
                 <CardDescription>
-                  {isStreak ? `Syarat: ${offer.streakRequired} Hari Streak` : `${offer.cost} InkPoints`}
+                  {isStreak ? `Requires a ${offer.streakRequired}-Day Streak` : `${offer.cost} InkPoints`}
                 </CardDescription>
               </CardHeader>
               <CardContent>

@@ -157,7 +157,7 @@ export function useCreateRequest() {
       queryClient.invalidateQueries({ queryKey: ['my-requests', variables.userId] });
       queryClient.invalidateQueries({ queryKey: ['all-requests'] });
       toast({
-        title: "Request terkirim",
+        title: "Request sent",
         description: "Your request has been sent successfully",
       });
     },

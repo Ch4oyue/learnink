@@ -176,7 +176,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Kembali
+            Back
           </Button>
           <div className="flex items-center gap-4">
             <FormField
@@ -360,7 +360,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                       <FormItem>
                         <FormControl>
                           <Textarea
-                            placeholder={`Tulis konten modul dalam format Markdown...
+                            placeholder={`Write module content in Markdown...
 
 # Heading 1
 ## Heading 2

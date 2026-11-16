@@ -24,8 +24,12 @@ const MAX_AGE_SECONDS = "600";
 
 // Scheme and host are case-insensitive, so normalize both sides: a capitalised
 // entry in the secret must not silently deny every request.
-function normalizeOrigin(origin: string): string {
-  return origin.trim().replace(/\/+$/, "").toLowerCase();
+function normalizeOrigin(value: string): string {
+  let origin = value.trim();
+  while (origin.endsWith("/")) {
+    origin = origin.slice(0, -1);
+  }
+  return origin.toLowerCase();
 }
 
 function parseAllowlist(raw: string | undefined): string[] {

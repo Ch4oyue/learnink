@@ -1,3 +1,4 @@
+import { mutationFeedback } from "@/lib/mutationFeedback";
 import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -91,22 +92,14 @@ export function useCreateLearningSource() {
 
             return data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
-            queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
-            toast({
-                title: "Success",
-                description: "Learning source added successfully",
-            });
-        },
-        onError: (error) => {
-            logger.error("Error creating learning source:", error);
-            toast({
-                title: "Error",
-                description: "Failed to add learning source",
-                variant: "destructive",
-            });
-        },
+        ...mutationFeedback({
+          queryClient, toast,
+          queryKeys: ['learning-sources-all', 'learning-sources'],
+          success: 'Learning source added successfully',
+          failure: 'Failed to add learning source',
+          logMessage: 'Error creating learning source:',
+          logFirst: true,
+        }),
     });
 }
 
@@ -145,22 +138,14 @@ export function useUpdateLearningSource() {
 
             return data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
-            queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
-            toast({
-                title: "Success",
-                description: "Learning source updated successfully",
-            });
-        },
-        onError: (error) => {
-            logger.error("Error updating learning source:", error);
-            toast({
-                title: "Error",
-                description: "Failed to update learning source",
-                variant: "destructive",
-            });
-        },
+        ...mutationFeedback({
+          queryClient, toast,
+          queryKeys: ['learning-sources-all', 'learning-sources'],
+          success: 'Learning source updated successfully',
+          failure: 'Failed to update learning source',
+          logMessage: 'Error updating learning source:',
+          logFirst: true,
+        }),
     });
 }
 

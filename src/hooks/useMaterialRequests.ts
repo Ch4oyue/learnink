@@ -1,3 +1,4 @@
+import { mutationFeedback } from "@/lib/mutationFeedback";
 import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -205,21 +206,12 @@ export function useUpdateRequest() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['all-requests'] });
-      toast({
-        title: "Success",
-        description: "Request updated successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to update request",
-        variant: "destructive",
-      });
-      logger.error('Error updating request:', error);
-    },
+    ...mutationFeedback({
+      queryClient, toast,
+      queryKeys: ['my-requests', 'all-requests'],
+      success: 'Request updated successfully',
+      failure: 'Failed to update request',
+      logMessage: 'Error updating request:',
+    }),
   });
 }

@@ -23,12 +23,10 @@ describe('reviewed English-copy regressions', () => {
 // These remain source-level guards, not rendered authenticated-route coverage.
 describe('reviewed JSX copy and answer-value preservation', () => {
   test('generate dialogs use English UI copy', () => {
-    for (const name of ['AdminDashboard', 'TutorDashboard']) {
-      const source = readFileSync(`src/components/features/dashboard/${name}.tsx`, 'utf8');
-      expect(source).toContain('AI will create a learning module for the request');
-      expect(source).toContain('This may take a few seconds.');
-      expect(source).not.toContain('Generate Modul\n');
-    }
+    const source = readFileSync('src/components/features/dashboard/RequestReviewPanel.tsx', 'utf8');
+    expect(source).toContain('AI will create a learning module for the request');
+    expect(source).toContain('This may take a few seconds.');
+    expect(source).not.toContain('Generate Modul\n');
   });
   test('quiz translates display labels without changing submitted values', () => {
     const source = readFileSync('src/components/features/quiz/QuizPlayer.tsx', 'utf8');

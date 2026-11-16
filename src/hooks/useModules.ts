@@ -1,3 +1,4 @@
+import { mutationFeedback } from "@/lib/mutationFeedback";
 import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -171,22 +172,13 @@ export function useCreateModule() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
-      queryClient.invalidateQueries({ queryKey: ['my-modules'] });
-      toast({
-        title: "Success",
-        description: "Module created successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create module",
-        variant: "destructive",
-      });
-      logger.error('Error creating module:', error);
-    },
+    ...mutationFeedback({
+      queryClient, toast,
+      queryKeys: ['modules', 'my-modules'],
+      success: 'Module created successfully',
+      failure: 'Failed to create module',
+      logMessage: 'Error creating module:',
+    }),
   });
 }
 
@@ -206,22 +198,13 @@ export function useUpdateModule() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['modules'] });
-      queryClient.invalidateQueries({ queryKey: ['my-modules'] });
-      toast({
-        title: "Success",
-        description: "Module updated successfully",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to update module",
-        variant: "destructive",
-      });
-      logger.error('Error updating module:', error);
-    },
+    ...mutationFeedback({
+      queryClient, toast,
+      queryKeys: ['modules', 'my-modules'],
+      success: 'Module updated successfully',
+      failure: 'Failed to update module',
+      logMessage: 'Error updating module:',
+    }),
   });
 }
 

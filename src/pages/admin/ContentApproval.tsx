@@ -68,6 +68,7 @@ import {
 import { format } from "date-fns";
 import { enUS as localeId } from "date-fns/locale";
 import { displayCategory, displayLevel } from "@/lib/categoryLabels";
+import { uniqueChannelTopic } from "@/lib/realtime";
 
 // ============================================
 // TYPES
@@ -164,7 +165,7 @@ export default function ContentApproval() {
     useEffect(() => {
         if (!isAdmin) return;
         const channel = supabase
-            .channel("approval-realtime")
+            .channel(uniqueChannelTopic("approval-realtime"))
             .on("postgres_changes", { event: "*", schema: "public", table: "incoming_contents" }, () => {
                 queryClient.invalidateQueries({ queryKey: ["incoming-contents"] });
             })

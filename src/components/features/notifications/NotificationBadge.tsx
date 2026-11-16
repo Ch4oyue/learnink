@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { uniqueChannelTopic } from "@/lib/realtime";
 
 const typeIcons: Record<string, React.ElementType> = {
   module: BookOpen,
@@ -51,7 +52,7 @@ export function NotificationBadge() {
     if (!user?.id) return;
 
     const channel = supabase
-      .channel("notification-badge-realtime")
+      .channel(uniqueChannelTopic("notification-badge-realtime"))
       .on(
         "postgres_changes",
         {

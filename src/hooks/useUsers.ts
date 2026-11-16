@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AppRole } from "@/contexts/AuthContext";
 import { logger } from "@/lib/logger";
+import { uniqueChannelTopic } from "@/lib/realtime";
 
 // Super admin identification
 export const SUPER_ADMIN_EMAIL = 'agen.salva@gmail.com';
@@ -33,10 +34,13 @@ export interface UsersResponse {
 export function useUsers(page = 1, limit = 50, search = "") {
   const queryClient = useQueryClient();
 
-  // Set up realtime subscription for profiles and user_roles
+  // Set up realtime subscription for profiles and user_roles. Channel topics
+  // must be unique per subscription (see src/lib/realtime.ts): this hook is
+  // mounted more than once on the admin dashboard, directly and via
+  // useUserStats.
   useEffect(() => {
     const profilesChannel = supabase
-      .channel('users-profiles-changes')
+      .channel(uniqueChannelTopic('users-profiles-changes'))
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'profiles' },
@@ -47,7 +51,7 @@ export function useUsers(page = 1, limit = 50, search = "") {
       .subscribe();
 
     const rolesChannel = supabase
-      .channel('users-roles-changes')
+      .channel(uniqueChannelTopic('users-roles-changes'))
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'user_roles' },

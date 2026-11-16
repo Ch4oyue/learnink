@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/contexts/AuthContext";
-import { SUPER_ADMIN_USER_ID, SUPER_ADMIN_EMAIL } from "@/hooks/useUsers";
 
 export function useUserRole(userId?: string) {
   return useQuery({
@@ -30,25 +29,25 @@ export function useUpdateUserRole() {
 
   return useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: AppRole }) => {
-      // Protect super admin from ANY role changes (Using ID check)
-      if (userId === SUPER_ADMIN_USER_ID) {
-        throw new Error("A Super Admin's role cannot be changed");
-      }
-
-      // Also check if current role is superadmin (double check against DB)
-      const { data: currentRoleData } = await supabase
+      // The current role in `user_roles` is the only source of truth for
+      // protecting the super admin — never a hardcoded id or email.
+      const { data: roleRows, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .single();
+        .eq('user_id', userId);
 
-      if (currentRoleData?.role === 'superadmin') {
-        throw new Error('The Super Admin role is permanent and cannot be changed');
+      if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
+      if (!roleRows || roleRows.length === 0) {
+        throw new Error("Gagal memeriksa peran pengguna: peran tidak ditemukan");
+      }
+      const currentRoles = roleRows.map((row: { role: string }) => row.role);
+      if (currentRoles.includes('superadmin')) {
+        throw new Error('Super Admin role bersifat permanen dan tidak dapat diubah');
       }
 
       // Prevent promoting any user to superadmin
       if (newRole === 'superadmin') {
-        throw new Error('Cannot change a user to Super Admin');
+        throw new Error('Tidak dapat mengubah pengguna menjadi Super Admin');
       }
 
       const { data, error } = await supabase
@@ -87,9 +86,19 @@ export function useBanUser() {
 
   return useMutation({
     mutationFn: async ({ userId, banDuration }: { userId: string; banDuration: 'unban' | '1h' | '24h' | '7d' | '30d' | 'permanent' }) => {
-      // Check if user is super admin
-      if (userId === SUPER_ADMIN_USER_ID) {
-        throw new Error('A Super Admin cannot be banned');
+      // Super admins are protected by role, not by a hardcoded identity.
+      const { data: roleRows, error: roleError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId);
+
+      if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
+      if (!roleRows || roleRows.length === 0) {
+        throw new Error("Gagal memeriksa peran pengguna: peran tidak ditemukan");
+      }
+      const targetRoles = roleRows.map((row: { role: string }) => row.role);
+      if (targetRoles.includes('superadmin')) {
+        throw new Error('Super Admin tidak dapat di-ban');
       }
 
       // Calculate ban end time
@@ -144,9 +153,4 @@ export function useBanUser() {
       logger.error('Error banning user:', error);
     },
   });
-}
-
-// Helper to check if user is super admin (for UI disabling)
-export function isSuperAdmin(email?: string | null, role?: AppRole | null): boolean {
-  return email === SUPER_ADMIN_EMAIL || role === 'superadmin';
 }

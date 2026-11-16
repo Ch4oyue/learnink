@@ -1,16 +1,13 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { authenticate, getUserRoles, hasRole, STAFF_ROLES } from "../_shared/auth.ts";
+import { requireRole, STAFF_ROLES } from "../_shared/auth.ts";
+import { clientIp } from "../_shared/client-ip.ts";
+import { corsFor, preflight } from "../_shared/cors.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 // Input validation and sanitization
 function validateAndSanitizeInput(text: string | null | undefined, maxLength: number, fieldName: string): string {
@@ -75,9 +72,7 @@ async function checkRateLimit(
   req: Request
 ): Promise<boolean> {
   try {
-    const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || req.headers.get("x-real-ip")
-      || "unknown";
+    const ipAddress = clientIp(req);
 
     const { data, error } = await supabase.rpc("check_rate_limit", {
       p_identifier: ipAddress,
@@ -98,9 +93,11 @@ async function checkRateLimit(
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req);
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return preflight(req);
   }
 
   try {
@@ -109,21 +106,8 @@ serve(async (req) => {
     // 1. Authentication + Authorization
     // This function uses the service role, so any signed-in user would otherwise
     // be able to create modules and spend AI credits. Only staff may call it.
-    const { userId, error: authError } = await authenticate(req);
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: authError ?? "Unauthorized", success: false }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const roles = await getUserRoles(userId);
-    if (!hasRole(roles, STAFF_ROLES)) {
-      return new Response(
-        JSON.stringify({ error: "Forbidden: staff access required", success: false }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const guard = await requireRole(req, STAFF_ROLES, corsHeaders, "Forbidden: staff access required");
+    if (!guard.ok) return guard.response;
 
     // 2. Rate Limit Check
     const withinLimit = await checkRateLimit(supabase, req);

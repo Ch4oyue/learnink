@@ -4,10 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { AppRole } from "@/contexts/AuthContext";
 import { uniqueChannelTopic } from "@/lib/realtime";
 
-// Super admin identification
-export const SUPER_ADMIN_EMAIL = 'agen.salva@gmail.com';
-export const SUPER_ADMIN_USER_ID: string | null = '676c1aca-b52c-4825-8f7c-1dfef33b107c';
-
 export interface UserWithRole {
   id: string;
   email: string | null;
@@ -88,12 +84,6 @@ export function useUsers(page = 1, limit = 50, search = "") {
     },
     retry: 1,
   });
-}
-
-export function isSuperAdmin(user: { id: string; email?: string | null }): boolean {
-  const emailMatch = !!user.email && user.email === SUPER_ADMIN_EMAIL;
-  const idMatch = SUPER_ADMIN_USER_ID !== null && user.id === SUPER_ADMIN_USER_ID;
-  return emailMatch || idMatch;
 }
 
 export function useUserStats() {

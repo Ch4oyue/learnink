@@ -1,14 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
+import { corsFor, preflight } from "../_shared/cors.ts";
+import { requireRole, STAFF_ROLES } from "../_shared/auth.ts";
+import { clientIp } from "../_shared/client-ip.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 // Rate limiting configuration
 const RATE_LIMIT_MAX_REQUESTS = 20; // Max requests per window
@@ -25,9 +23,7 @@ async function checkRateLimit(
   req: Request
 ): Promise<boolean> {
   try {
-    const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || req.headers.get("x-real-ip")
-      || "unknown";
+    const ipAddress = clientIp(req);
 
     const { data, error } = await supabase.rpc("check_rate_limit", {
       p_identifier: ipAddress,
@@ -49,54 +45,33 @@ async function checkRateLimit(
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req);
+
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return preflight(req);
   }
 
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // 1. Rate Limit Check
+    // 1. Auth & Role Validation (Admin/Tutor Only)
+    // Authenticate BEFORE the rate-limit RPC: unauthenticated callers must not
+    // trigger database work or burn the per-IP rate-limit budget.
+    const guard = await requireRole(
+      req,
+      STAFF_ROLES,
+      corsHeaders,
+      "Forbidden: Only Tutors and Admins can generate quizzes.",
+    );
+    if (!guard.ok) return guard.response;
+    const userId = guard.userId;
+
+    // 2. Rate Limit Check
     const withinLimit = await checkRateLimit(supabase, req);
     if (!withinLimit) {
       return new Response(
         JSON.stringify({ error: "Too many requests. Please try again later." }),
         { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // 2. Auth & Role Validation (Admin/Tutor Only)
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Check Roles
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id);
-
-    // Allow admins, tutors, and superadmins
-    const hasAccess = roles?.some(r => ['admin', 'tutor', 'superadmin'].includes(r.role));
-
-    if (!hasAccess) {
-      return new Response(
-        JSON.stringify({ error: "Forbidden: Only Tutors and Admins can generate quizzes." }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
@@ -277,7 +252,6 @@ PENTING:
       );
     }
 
-    const userId = user.id;
 
     // Create quiz
     const { data: quiz, error: quizError } = await supabase

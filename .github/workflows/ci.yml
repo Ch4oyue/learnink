@@ -12,10 +12,18 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# Least-privilege default for every job. A job that needs more (secret-scan also
+# reads PR metadata) declares its own `permissions`, which replaces this default,
+# so no job inherits a broader scope than it actually uses.
+permissions:
+  contents: read
 jobs:
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
+    # Hanya baca checkout.
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -44,3 +52,95 @@ jobs:
 
       - name: Test
         run: bun run test
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    # gitleaks-action membaca checkout + metadata PR untuk range commit.
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          # gitleaks-action resolves the commit range for the current event via
+          # the Action context and the GitHub API, which needs real history.
+          fetch-depth: 0
+
+      - name: Scan for committed credentials
+        # Scans only the commits introduced by this push or pull request, so the
+        # keys already in this repo's history (see docs/SECURITY.md §6) do not
+        # fail every run. A GITLEAKS_LICENSE is required for org-owned repos
+        # only; this repository is a personal account, so none is needed.
+        # Pinned to the commit behind the `v2` tag; bump deliberately.
+        uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deno-check:
+    name: Edge Function Types
+    runs-on: ubuntu-latest
+    # Hanya baca checkout.
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Deno
+        # `v2` is a movable branch for this action (there is no v2 tag), so pin
+        # the commit instead: 22d081f == v2.0.5.
+        uses: denoland/setup-deno@22d081ff2d3a40755e97629de92e3bcbfa7cf2ed
+        with:
+          # Pinned so a new Deno release cannot turn this gate red on its own.
+          deno-version: v2.9.8
+
+      - name: Type-check Edge Functions
+        # `bun run build` does not type-check supabase/functions (they are not in
+        # the Vite graph), so a type error there used to surface only at deploy.
+        #
+        # Five functions carry pre-existing errors that all trace back to the
+        # same two root causes: src/integrations/supabase/types.ts is out of date
+        # (no system_settings / label_configs / security_logs rows) and several
+        # functions type their client parameter as `ReturnType<typeof createClient>`.
+        # See docs/SECURITY.md §3 (M6). Until those are fixed, this job pins the
+        # exact error count per function and fails if any count grows, so no new
+        # type error can reach main. When a fix lands, lower or delete its entry.
+        #
+        # Shared modules need no separate pass: every one of them is imported by
+        # at least one function, so its errors already count against that
+        # function's baseline.
+        run: |
+          set -u
+
+          declare -A BASELINE=(
+            [award-xp]=3 [generate-module]=2 [generate-quiz]=2
+            [get-users]=1 [ingest-content]=17
+          )
+
+          failed=0
+          for entrypoint in supabase/functions/*/index.ts; do
+            name=$(basename "$(dirname "$entrypoint")")
+            allowed=${BASELINE[$name]:-0}
+
+            output=$(deno check "$entrypoint" 2>&1) && status=0 || status=$?
+            # One "[ERROR]" line per type error; the trailing
+            # "error: Type checking failed." summary is not counted. `|| true`
+            # because grep exits 1 on no match and this step runs with errexit.
+            errors=$(printf '%s\n' "$output" | grep -c '\[ERROR\]' || true)
+
+            if [ "$status" -ne 0 ] && [ "$errors" -eq 0 ]; then
+              echo "::error file=$entrypoint::deno check failed without reporting type errors"
+              printf '%s\n' "$output"
+              failed=1
+            elif [ "$errors" -gt "$allowed" ]; then
+              echo "::error file=$entrypoint::$errors type error(s), baseline $allowed"
+              printf '%s\n' "$output"
+              failed=1
+            else
+              echo "ok  $name ($errors known)"
+            fi
+          done
+
+          exit $failed

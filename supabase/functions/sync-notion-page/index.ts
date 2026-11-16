@@ -1,12 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { NotionToMarkdown } from "./notion-to-md.ts";
-import { authenticate, getUserRoles, hasRole, ADMIN_ROLES } from "../_shared/auth.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+import { requireRole, ADMIN_ROLES } from "../_shared/auth.ts";
+import { corsFor, preflight } from "../_shared/cors.ts";
 
 interface NotionPropertySelect {
   name: string;
@@ -39,8 +35,10 @@ interface NotionPageData {
 }
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req);
+
   if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+    return preflight(req);
   }
 
   try {
@@ -51,21 +49,8 @@ serve(async (req) => {
     // Authentication + Authorization.
     // This function writes with the service role and forwards a caller-supplied
     // Notion token, so it must never be reachable by anonymous users.
-    const { userId, error: authError } = await authenticate(req);
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: authError ?? "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const roles = await getUserRoles(userId);
-    if (!hasRole(roles, ADMIN_ROLES)) {
-      return new Response(
-        JSON.stringify({ error: "Forbidden: admin access required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const guard = await requireRole(req, ADMIN_ROLES, corsHeaders, "Forbidden: admin access required");
+    if (!guard.ok) return guard.response;
 
     const { pageId, notionApiKey } = await req.json();
 

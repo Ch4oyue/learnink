@@ -1,48 +1,30 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
+import { corsFor, preflight } from "../_shared/cors.ts";
+import { requireRole } from "../_shared/auth.ts";
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req);
+
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+    return preflight(req);
   }
 
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+
+    // Any signed-in user may claim their own reward; the guard verifies the JWT.
+    // Authenticate BEFORE consuming the body so unauthenticated requests get 401,
+    // not a 400 about a body they were never allowed to send.
+    const guard = await requireRole(req, null, corsHeaders);
+    if (!guard.ok) return guard.response;
+    const userId = guard.userId;
 
     const { module_id } = await req.json();
 
     if (!module_id) {
         throw new Error("Missing module_id");
-    }
-
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(JSON.stringify({ error: "Missing Authorization header" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // Authenticate user
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
-
-    if (userError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
     }
 
     // Use Service Role for DB operations
@@ -55,8 +37,8 @@ serve(async (req) => {
     // 2. Fetch System Settings & User Profile
     const [settingsRes, profileRes, progressRes] = await Promise.all([
         supabaseAdmin.from("system_settings").select("key, value"),
-        supabaseAdmin.from("profiles").select("xp, points, labels, is_premium").eq("id", user.id).single(),
-        supabaseAdmin.from("user_progress").select("is_completed, progress_percent, reward_claimed").eq("user_id", user.id).eq("module_id", module_id).single()
+        supabaseAdmin.from("profiles").select("xp, points, labels, is_premium").eq("id", userId).single(),
+        supabaseAdmin.from("user_progress").select("is_completed, progress_percent, reward_claimed").eq("user_id", userId).eq("module_id", module_id).single()
     ]);
 
     if (progressRes.error || !progressRes.data) {
@@ -129,7 +111,7 @@ serve(async (req) => {
     const { data: updatedRows, error: updateError } = await supabaseAdmin
         .from("user_progress")
         .update({ reward_claimed: true })
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("module_id", module_id)
         .eq("reward_claimed", false) // Ensure it wasn't already claimed
         .select();
@@ -151,14 +133,14 @@ serve(async (req) => {
     const { error: profileError } = await supabaseAdmin
         .from("profiles")
         .update({ xp: newXp, points: newPoints })
-        .eq("id", user.id);
+        .eq("id", userId);
 
     if (profileError) {
         // Revert claim flag if possible
         await supabaseAdmin
             .from("user_progress")
             .update({ reward_claimed: false })
-            .eq("user_id", user.id)
+            .eq("user_id", userId)
             .eq("module_id", module_id);
         throw new Error("Failed to update profile data");
     }

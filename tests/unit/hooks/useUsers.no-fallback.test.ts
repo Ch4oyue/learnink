@@ -21,7 +21,9 @@ mock.module("@/integrations/supabase/client", () => ({
     },
   },
 }));
-mock.module("@/lib/realtime", () => ({ uniqueChannelTopic: (t: string) => t }));
+// `@/lib/realtime` is deliberately NOT mocked: `mock.module` leaks across files
+// in a single `bun test` run, and stubbing `uniqueChannelTopic` to the identity
+// would break useUsers.realtime.test.ts.
 mock.module("@/contexts/AuthContext", () => ({}));
 mock.module("react", () => ({ useEffect: () => {} }));
 mock.module("@tanstack/react-query", () => ({

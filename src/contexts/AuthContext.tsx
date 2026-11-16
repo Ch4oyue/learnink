@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
 
   // Combined fetch using separate queries (RPC not available)
-  const fetchAuthData = useCallback(async (userId: string, userEmail?: string | null) => {
+  const fetchAuthData = useCallback(async (userId: string) => {
     try {
       // Role, profile and enrolled tracks are independent lookups: run them in
       // parallel so auth data costs one round trip instead of three sequential ones.
@@ -89,11 +89,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profileData = fullProfileResult.data;
       }
 
-      // Super admin identification (agen.salva@gmail.com)
-      const isSuperAdmin = userId === '676c1aca-b52c-4825-8f7c-1dfef33b107c' ||
-                         userEmail === 'agen.salva@gmail.com';
-
-      const userRole = (roleData?.role as AppRole) || (isSuperAdmin ? 'superadmin' : 'user');
+      // The role comes from `user_roles` only. Inferring it from an email or a
+      // hardcoded id would ship identity data to every visitor and could disagree
+      // with what RLS actually enforces.
+      const userRole = (roleData?.role as AppRole) || 'user';
       setRole(userRole);
       setProfile(profileData);
       setEnrolledTrackIds(tracksData?.map(t => t.track_id) || []);
@@ -127,7 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           // Optimized: Single RPC call instead of 3 separate requests
-          await fetchAuthData(session.user.id, session.user.email);
+          await fetchAuthData(session.user.id);
         }
 
         if (mounted) {
@@ -155,7 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Defer Supabase calls with setTimeout to avoid deadlock
           setTimeout(() => {
             if (mounted) {
-              fetchAuthData(session.user.id, session.user.email);
+              fetchAuthData(session.user.id);
             }
           }, 0);
         } else {
@@ -231,7 +230,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshProfile = useCallback(async () => {
     if (user) {
       // Optimized: Reuse the single RPC call
-      await fetchAuthData(user.id, user.email);
+      await fetchAuthData(user.id);
     }
   }, [user, fetchAuthData]);
 

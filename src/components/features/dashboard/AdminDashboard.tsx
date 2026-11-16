@@ -528,15 +528,15 @@ export function AdminDashboardContent() {
               Generate Module with AI
             </AlertDialogTitle>
             <AlertDialogDescription>
-              AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}".
-              Proses ini mungkin membutuhkan waktu beberapa detik.
+              AI will create a learning module for the request "{generateDialog.topic}".
+              This may take a few seconds.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
-              Generate Modul
+              Generate Module
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

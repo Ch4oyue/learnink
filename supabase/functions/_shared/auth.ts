@@ -10,6 +10,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 export type AppRole = "user" | "tutor" | "admin" | "superadmin";
 
+export const APP_ROLES: AppRole[] = ["user", "tutor", "admin", "superadmin"];
+
 export const ADMIN_ROLES: AppRole[] = ["admin", "superadmin"];
 export const STAFF_ROLES: AppRole[] = ["tutor", "admin", "superadmin"];
 
@@ -63,7 +65,11 @@ async function rolesOf(userId: string): Promise<AppRole[]> {
     throw new Error(`Role lookup failed: ${error.message}`);
   }
 
-  return (data ?? []).map((row: { role: string }) => row.role as AppRole);
+  // Only values in the AppRole union are returned. Anything else means
+  // corrupted user_roles data; drop it instead of propagating an invalid role.
+  return (data ?? [])
+    .map((row: { role: string }) => row.role)
+    .filter((role): role is AppRole => (APP_ROLES as string[]).includes(role));
 }
 
 /**
@@ -107,8 +113,9 @@ export async function requireRole(
     let callerRoles: AppRole[];
     try {
       callerRoles = await rolesOf(user.id);
-    } catch {
+    } catch (lookupError) {
       // A failed lookup is a server fault (500), not a denial (403).
+      console.error("Role lookup failed", lookupError);
       return { ok: false, response: jsonError(500, "Role lookup failed", corsHeaders) };
     }
     if (!callerRoles.some((role) => allowed.includes(role))) {

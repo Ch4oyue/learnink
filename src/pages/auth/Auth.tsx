@@ -26,17 +26,17 @@ import {
 // ============================================
 
 const loginSchema = z.object({
-  email: z.string().trim().email("Email tidak valid").max(255, "Email terlalu panjang"),
-  password: z.string().min(6, "Password minimal 6 karakter").max(72, "Password terlalu panjang"),
+  email: z.string().trim().email("Invalid email").max(255, "Email is too long"),
+  password: z.string().min(6, "Password must be at least 6 characters").max(72, "Password is too long"),
 });
 
 const registerSchema = z.object({
-  displayName: z.string().trim().min(2, "Nama minimal 2 karakter").max(100, "Nama terlalu panjang"),
-  email: z.string().trim().email("Email tidak valid").max(255, "Email terlalu panjang"),
-  password: z.string().min(6, "Password minimal 6 karakter").max(72, "Password terlalu panjang"),
+  displayName: z.string().trim().min(2, "Name must be at least 2 characters").max(100, "Name is too long"),
+  email: z.string().trim().email("Invalid email").max(255, "Email is too long"),
+  password: z.string().min(6, "Password must be at least 6 characters").max(72, "Password is too long"),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {
-  message: "Password tidak cocok",
+  message: "Passwords do not match",
   path: ["confirmPassword"],
 });
 
@@ -67,18 +67,18 @@ export default function Auth() {
 
   const getErrorMessage = (errorMessage: string): string => {
     if (errorMessage.includes("Invalid login credentials")) {
-      return "Email atau password salah";
+      return "Incorrect email or password";
     }
     if (errorMessage.includes("User already registered")) {
-      return "Email sudah terdaftar. Silakan masuk.";
+      return "This email is already registered. Please sign in.";
     }
     if (errorMessage.includes("Email not confirmed")) {
-      return "Silakan konfirmasi email Anda terlebih dahulu";
+      return "Please confirm your email first";
     }
     if (errorMessage.includes("Too many requests")) {
-      return "Terlalu banyak percobaan. Silakan coba lagi nanti.";
+      return "Too many attempts. Please try again later.";
     }
-    return "Terjadi kesalahan. Silakan coba lagi.";
+    return "Something went wrong. Please try again.";
   };
 
   // Redirect to dashboard if already logged in
@@ -114,14 +114,14 @@ export default function Auth() {
 
     if (error) {
       toast({
-        title: "Gagal masuk",
+        title: "Sign-in failed",
         description: getErrorMessage(error.message),
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Berhasil masuk",
-        description: "Selamat datang kembali!",
+        title: "Signed in successfully",
+        description: "Welcome back!",
       });
       navigate("/dashboard");
     }
@@ -134,14 +134,14 @@ export default function Auth() {
 
     if (error) {
       toast({
-        title: "Gagal mendaftar",
+        title: "Sign up failed",
         description: getErrorMessage(error.message),
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Berhasil mendaftar",
-        description: "Silakan cek email Anda untuk verifikasi.",
+        title: "Sign up successful",
+        description: "Please check your email for verification.",
       });
     }
   };
@@ -156,7 +156,7 @@ export default function Auth() {
 
     if (error) {
       toast({
-        title: "Gagal login",
+        title: "Sign in failed",
         description: getErrorMessage(error.message),
         variant: "destructive",
       });
@@ -171,7 +171,7 @@ export default function Auth() {
     <div className="h-screen overflow-hidden flex flex-col items-center justify-center bg-background text-foreground font-sans p-4 relative transition-colors duration-300">
       <SEO
         title={isLogin ? "Sign In" : "Create Account"}
-        description="Masuk ke akun LearnInk Anda untuk melanjutkan perjalanan belajar teknologi Anda."
+        description="Sign in to your LearnInk account to continue your tech learning journey."
       />
       {/* Main Card */}
       <main className="w-full max-w-5xl h-[85vh] bg-card rounded-2xl overflow-hidden flex flex-col md:flex-row shadow-xl border border-border z-10">
@@ -378,7 +378,7 @@ export default function Auth() {
                             <Input
                               type={showPassword ? "text" : "password"}
                               autoComplete="new-password"
-                              placeholder="Minimal 6 characters"
+                              placeholder="At least 6 characters"
                               className="pl-11 pr-11 bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground/50 focus:bg-black/40 focus:border-primary focus:ring-primary rounded-2xl py-2.5 transition-all duration-300"
                               {...field}
                             />

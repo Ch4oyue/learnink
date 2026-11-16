@@ -59,7 +59,7 @@ export function useCreateLearningNote() {
       logger.error("Error creating note:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat catatan",
+        description: "Failed to create note",
         variant: "destructive",
       });
     },
@@ -85,15 +85,15 @@ export function useUpdateLearningNote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["learning-notes"] });
       toast({
-        title: "Sukses",
-        description: "Catatan berhasil diperbarui",
+        title: "Success",
+        description: "Note updated successfully",
       });
     },
     onError: (error) => {
       logger.error("Error updating note:", error);
       toast({
         title: "Error",
-        description: "Gagal memperbarui catatan",
+        description: "Failed to update note",
         variant: "destructive",
       });
     },
@@ -116,15 +116,15 @@ export function useDeleteLearningNote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["learning-notes"] });
       toast({
-        title: "Sukses",
-        description: "Catatan berhasil dihapus",
+        title: "Success",
+        description: "Note deleted successfully",
       });
     },
     onError: (error) => {
       logger.error("Error deleting note:", error);
       toast({
         title: "Error",
-        description: "Gagal menghapus catatan",
+        description: "Failed to delete note",
         variant: "destructive",
       });
     },

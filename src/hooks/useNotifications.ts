@@ -130,7 +130,7 @@ export function useCreateNotification() {
       logger.error("Error creating notification:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat notifikasi. Pastikan Anda memiliki izin yang tepat.",
+        description: "Failed to create notification. Make sure you have the right permissions.",
         variant: "destructive",
       });
     },

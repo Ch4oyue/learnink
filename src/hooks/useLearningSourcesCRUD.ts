@@ -1,3 +1,4 @@
+import { mutationFeedback } from "@/lib/mutationFeedback";
 import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -91,22 +92,14 @@ export function useCreateLearningSource() {
 
             return data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
-            queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
-            toast({
-                title: "Berhasil",
-                description: "Sumber belajar berhasil ditambahkan",
-            });
-        },
-        onError: (error) => {
-            logger.error("Error creating learning source:", error);
-            toast({
-                title: "Error",
-                description: "Gagal menambahkan sumber belajar",
-                variant: "destructive",
-            });
-        },
+        ...mutationFeedback({
+          queryClient, toast,
+          queryKeys: ['learning-sources-all', 'learning-sources'],
+          success: 'Learning source added successfully',
+          failure: 'Failed to add learning source',
+          logMessage: 'Error creating learning source:',
+          logFirst: true,
+        }),
     });
 }
 
@@ -145,22 +138,14 @@ export function useUpdateLearningSource() {
 
             return data;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
-            queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
-            toast({
-                title: "Berhasil",
-                description: "Sumber belajar berhasil diperbarui",
-            });
-        },
-        onError: (error) => {
-            logger.error("Error updating learning source:", error);
-            toast({
-                title: "Error",
-                description: "Gagal memperbarui sumber belajar",
-                variant: "destructive",
-            });
-        },
+        ...mutationFeedback({
+          queryClient, toast,
+          queryKeys: ['learning-sources-all', 'learning-sources'],
+          success: 'Learning source updated successfully',
+          failure: 'Failed to update learning source',
+          logMessage: 'Error updating learning source:',
+          logFirst: true,
+        }),
     });
 }
 
@@ -187,15 +172,15 @@ export function useDeleteLearningSource() {
             queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
             queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
             toast({
-                title: "Berhasil",
-                description: "Sumber belajar berhasil dihapus",
+                title: "Success",
+                description: "Learning source deleted successfully",
             });
         },
         onError: (error) => {
             logger.error("Error deleting learning source:", error);
             toast({
                 title: "Error",
-                description: "Gagal menghapus sumber belajar",
+                description: "Failed to delete learning source",
                 variant: "destructive",
             });
         },
@@ -229,15 +214,15 @@ export function useToggleLearningSourceActive() {
             queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
             queryClient.invalidateQueries({ queryKey: ["learning-sources"] });
             toast({
-                title: "Berhasil",
-                description: data.is_active ? "Sumber belajar diaktifkan" : "Sumber belajar dinonaktifkan",
+                title: "Success",
+                description: data.is_active ? "Learning source enabled" : "Learning source disabled",
             });
         },
         onError: (error) => {
             logger.error("Error toggling learning source status:", error);
             toast({
                 title: "Error",
-                description: "Gagal mengubah status sumber belajar",
+                description: "Failed to change learning source status",
                 variant: "destructive",
             });
         },

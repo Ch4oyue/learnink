@@ -48,10 +48,10 @@ export function QuizSection({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-foreground">
-                Kuis Modul
+                Module Quiz
               </h2>
               <p className="text-sm text-muted-foreground">
-                Uji pemahaman Anda setelah membaca materi
+                Test your understanding after reading the material
               </p>
             </div>
           </div>
@@ -66,12 +66,12 @@ export function QuizSection({
               {isGenerating ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Membuat...
+                  Generating...
                 </>
               ) : (
                 <>
                   <Sparkles className="h-4 w-4 mr-2" />
-                  Generate Kuis AI
+                  Generate AI Quiz
                 </>
               )}
             </Button>
@@ -106,20 +106,20 @@ export function QuizSection({
                     <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                       <span className="flex items-center gap-1">
                         <Timer className="h-3 w-3" />
-                        {quiz.time_limit_minutes} menit
+                        {quiz.time_limit_minutes} minutes
                       </span>
                       <span className="flex items-center gap-1">
                         <Target className="h-3 w-3" />
-                        Lulus: {quiz.passing_score}%
+                        Pass mark: {quiz.passing_score}%
                       </span>
                       {attempts && (
                         <>
                           <Badge variant="secondary" className="text-xs">
-                            {attempts.count}x dicoba
+                            {attempts.count} attempts
                           </Badge>
                           <span className="flex items-center gap-1 text-amber-600">
                             <Trophy className="h-3 w-3" />
-                            Skor tertinggi: {attempts.highestScore}%
+                            Best score: {attempts.highestScore}%
                           </span>
                         </>
                       )}
@@ -128,11 +128,11 @@ export function QuizSection({
                   {user ? (
                     <Button onClick={() => onStartQuiz(quiz)} size="sm">
                       <Play className="h-4 w-4 mr-2" />
-                      Mulai Kuis
+                      Start Quiz
                     </Button>
                   ) : (
                     <Button asChild size="sm" variant="outline">
-                      <Link to="/auth">Login untuk Kuis</Link>
+                      <Link to="/auth">Log In to Take the Quiz</Link>
                     </Button>
                   )}
                 </div>
@@ -144,8 +144,8 @@ export function QuizSection({
             <FileQuestion className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
             <p className="text-muted-foreground">
               {canManageQuiz
-                ? "Belum ada kuis. Klik 'Generate Kuis AI' untuk membuat kuis otomatis."
-                : "Belum ada kuis tersedia untuk modul ini."}
+                ? "No quiz yet. Click 'Generate AI Quiz' to create one automatically."
+                : "No quiz available for this module yet."}
             </p>
           </div>
         )}

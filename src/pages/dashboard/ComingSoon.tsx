@@ -8,8 +8,8 @@ interface ComingSoonProps {
 }
 
 export default function ComingSoon({
-    title = "Segera Hadir",
-    description = "Fitur ini sedang dalam pengembangan dan akan segera tersedia."
+    title = "Coming Soon",
+    description = "This feature is under development and will be available soon."
 }: ComingSoonProps) {
     const navigate = useNavigate();
 
@@ -38,7 +38,7 @@ export default function ComingSoon({
                 {/* Single CTA Button - Goes back to previous page */}
                 <Button onClick={() => navigate(-1)} variant="default">
                     <ArrowLeft className="h-4 w-4 mr-2" />
-                    Kembali
+                    Back
                 </Button>
             </div>
         </div>

@@ -23,6 +23,7 @@ import {
   Wand2,
   Shield,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const levelColors: Record<string, string> = {
   Pemula: "bg-green-500/10 text-green-600 border-green-500/20",
@@ -96,7 +97,7 @@ export default function ModuleDetail() {
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Kembali</span>
+              <span className="hidden sm:inline">Back</span>
             </Button>
           </div>
         </header>
@@ -123,20 +124,20 @@ export default function ModuleDetail() {
               className="gap-2"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Kembali</span>
+              <span className="hidden sm:inline">Back</span>
             </Button>
           </div>
         </header>
         <main className="container mx-auto px-4 py-8 pt-20">
           <div className="text-center py-16">
             <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-foreground mb-2">Modul Tidak Ditemukan</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Module Not Found</h1>
             <p className="text-muted-foreground mb-6">
-              Modul yang Anda cari tidak ada atau belum dipublikasikan.
+              The module you are looking for does not exist or is not published yet.
             </p>
             <Button onClick={() => navigate('/modules')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Daftar Modul
+              Back to Module List
             </Button>
           </div>
         </main>
@@ -178,7 +179,7 @@ export default function ModuleDetail() {
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span className="hidden sm:inline">Kembali ke Modul</span>
+            <span className="hidden sm:inline">Back to Modules</span>
           </Button>
         </div>
       </header>
@@ -196,16 +197,16 @@ export default function ModuleDetail() {
                 {getCreatorBadge()}
                 <Badge className={levelColors[level]} variant="outline">
                   <BarChart3 className="h-3 w-3 mr-1" />
-                  {level}
+                  {displayLevel(level)}
                 </Badge>
                 <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
                   {categoryIcons[category] || <Brain className="h-3 w-3" />}
-                  <span className="ml-1">{category}</span>
+                  <span className="ml-1">{displayCategory(category)}</span>
                 </Badge>
                 {isCompleted && (
                   <Badge className="bg-green-500/10 text-green-600 border-green-500/20" variant="outline">
                     <CheckCircle className="h-3 w-3 mr-1" />
-                    Selesai
+                    Completed
                   </Badge>
                 )}
               </div>
@@ -234,20 +235,20 @@ export default function ModuleDetail() {
                         className="gap-2"
                       >
                         <Play className="h-5 w-5" />
-                        Mulai Belajar
+                        Start Learning
                       </Button>
                     ) : isCompleted ? (
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2 text-green-600 bg-green-500/10 px-4 py-2 rounded-lg">
                           <CheckCircle className="h-5 w-5" />
-                          <span className="font-medium">Modul selesai!</span>
+                          <span className="font-medium">Module completed!</span>
                         </div>
                         <Button
                           onClick={handleContinueLearning}
                           variant="outline"
                           size="lg"
                         >
-                          Lihat Materi
+                          View Material
                         </Button>
                       </div>
                     ) : (
@@ -257,7 +258,7 @@ export default function ModuleDetail() {
                         className="gap-2"
                       >
                         <Play className="h-5 w-5" />
-                        Lanjutkan Belajar
+                        Continue Learning
                       </Button>
                     )}
 
@@ -274,10 +275,10 @@ export default function ModuleDetail() {
                 ) : (
                   <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
                     <p className="text-muted-foreground text-sm">
-                      Masuk untuk melacak progress belajar Anda
+                      Sign in to track your learning progress
                     </p>
                     <Button onClick={() => navigate("/auth")} size="sm">
-                      Masuk
+                      Sign In
                     </Button>
                   </div>
                 )}
@@ -288,31 +289,31 @@ export default function ModuleDetail() {
             <div className="p-6 md:p-8 bg-muted/30">
               <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <ListChecks className="h-5 w-5 text-primary" />
-                Apa yang akan Anda pelajari
+                What you will learn
               </h2>
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-foreground">Materi pembelajaran lengkap dan terstruktur</span>
+                  <span className="text-sm text-foreground">Complete, structured learning material</span>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-foreground">Contoh kode dan praktik langsung</span>
+                  <span className="text-sm text-foreground">Code examples and hands-on practice</span>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-foreground">Quiz untuk menguji pemahaman</span>
+                  <span className="text-sm text-foreground">Quizzes to test your understanding</span>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-background rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-foreground">Fitur catatan untuk highlight penting</span>
+                  <span className="text-sm text-foreground">Notes feature for important highlights</span>
                 </div>
               </div>
 
               {/* Estimated time */}
               <div className="mt-6 flex items-center gap-2 text-muted-foreground text-sm">
                 <Clock className="h-4 w-4" />
-                <span>Estimasi waktu belajar: 15-30 menit</span>
+                <span>Estimated learning time: 15-30 minutes</span>
               </div>
             </div>
           </CardContent>

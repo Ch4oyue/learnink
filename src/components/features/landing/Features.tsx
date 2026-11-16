@@ -3,20 +3,20 @@ import { Zap, BookOpen, LineChart } from "lucide-react";
 const features = [
     {
         icon: Zap,
-        title: "Umpan Balik Instan",
-        description: "Tidak perlu menunggu review kode. Dapatkan analisis sintaks dan logika secara real-time saat Anda mengetik.",
+        title: "Instant Feedback",
+        description: "No need to wait for code reviews. Get syntax and logic analysis in real time as you type.",
         color: "bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400",
     },
     {
         icon: BookOpen,
-        title: "Catatan Otomatis",
-        description: "AI menyusun ringkasan setiap pelajaran, supaya Anda fokus menulis kode — bukan mencatat.",
+        title: "Automatic Notes",
+        description: "AI compiles a summary of every lesson, so you can focus on writing code - not taking notes.",
         color: "bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400",
     },
     {
         icon: LineChart,
-        title: "Pelacakan Progres",
-        description: "Lihat perkembangan Anda lewat analitik yang menunjukkan konsep mana yang sudah dikuasai.",
+        title: "Progress Tracking",
+        description: "Track your growth with analytics that show which concepts you have mastered.",
         color: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400",
     },
 ];

@@ -112,7 +112,7 @@ const formatBadgeCount = (count: string | number | undefined) => {
 };
 
 const roleLabels: Record<AppRole, string> = {
-  user: "Pelajar",
+  user: "Learner",
   tutor: "Tutor",
   admin: "Admin",
   superadmin: "Super Admin",
@@ -656,7 +656,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                         </div>
                         <h2 className="text-2xl font-bold">Maintenance Mode</h2>
                         <p className="text-muted-foreground max-w-md">
-                          LearnInk sedang dalam pemeliharaan rutin. Kami akan segera kembali!
+                          LearnInk is under routine maintenance. We will be back soon!
                         </p>
                       </div>
                     ) : (

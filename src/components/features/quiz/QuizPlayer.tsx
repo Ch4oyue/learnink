@@ -124,12 +124,12 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             )}
           </div>
           <CardTitle className="text-2xl">
-            {results.passed ? "Selamat! Anda Lulus!" : "Belum Lulus"}
+            {results.passed ? "Congratulations! You Passed!" : "Not Passed Yet"}
           </CardTitle>
           <p className="text-muted-foreground mt-2">
             {results.passed
-              ? "Anda telah menyelesaikan kuis ini dengan baik"
-              : `Skor minimal untuk lulus adalah ${quiz.passing_score}%`}
+              ? "You have completed this quiz well"
+              : `The minimum passing score is ${quiz.passing_score}%`}
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -137,13 +137,13 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           <div className="text-center p-6 rounded-xl bg-muted/50">
             <div className="text-5xl font-bold mb-2">{results.percentage}%</div>
             <p className="text-muted-foreground">
-              {results.score} / {results.totalPoints} poin
+              {results.score} / {results.totalPoints} points
             </p>
           </div>
 
           {/* Question Review */}
           <div className="space-y-4">
-            <h3 className="font-semibold">Review Jawaban</h3>
+            <h3 className="font-semibold">Review Answers</h3>
             {questions.map((q, i) => (
               <div
                 key={q.id}
@@ -170,11 +170,11 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                       {i + 1}. {q.question_text}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Jawaban Anda: {answers[q.id] || "(tidak dijawab)"}
+                      Your answer: {answers[q.id] || "(not answered)"}
                     </p>
                     {!results.correctAnswers[q.id] && (
                       <p className="text-sm text-green-600 mt-1">
-                        Jawaban benar: {results.correctAnswerValues[q.id]}
+                        Correct answer: {results.correctAnswerValues[q.id]}
                       </p>
                     )}
                     {results.explanations[q.id] && (
@@ -189,7 +189,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           </div>
 
           <Button onClick={onCancel} className="w-full">
-            Kembali ke Modul
+            Back to Modules
           </Button>
         </CardContent>
       </Card>
@@ -212,7 +212,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
         </div>
         <Progress value={progress} className="h-1.5" />
         <p className="text-sm text-muted-foreground mt-2">
-          Soal {currentIndex + 1} dari {questions.length}
+          Question {currentIndex + 1} of {questions.length}
         </p>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -221,13 +221,13 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline" className="text-xs">
               {currentQuestion.question_type === "multiple_choice"
-                ? "Pilihan Ganda"
+                ? "Multiple Choice"
                 : currentQuestion.question_type === "true_false"
-                ? "Benar/Salah"
-                : "Isian"}
+                ? "True/False"
+                : "Short Answer"}
             </Badge>
             <Badge variant="secondary" className="text-xs">
-              {currentQuestion.points} poin
+              {currentQuestion.points} points
             </Badge>
           </div>
           <h2 className="text-lg font-medium">{currentQuestion.question_text}</h2>
@@ -267,7 +267,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                 >
                   <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} />
                   <Label htmlFor={`option-${option}`} className="flex-1 cursor-pointer">
-                    {option}
+                    {option === "Benar" ? "True" : "False"}
                   </Label>
                 </div>
               ))}
@@ -278,7 +278,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             <Input
               value={answers[currentQuestion.id] || ""}
               onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
-              placeholder="Ketik jawaban Anda..."
+              placeholder="Type your answer..."
             />
           )}
         </div>
@@ -311,7 +311,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             className="gap-2"
           >
             <ChevronLeft className="h-4 w-4" />
-            Sebelumnya
+            Previous
           </Button>
 
           {currentIndex === questions.length - 1 ? (
@@ -323,18 +323,18 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
               {validateQuiz.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Menyimpan...
+                  Saving...
                 </>
               ) : (
                 <>
-                  Selesai
+                  Finish
                   <Check className="h-4 w-4" />
                 </>
               )}
             </Button>
           ) : (
             <Button onClick={handleNext} className="gap-2">
-              Selanjutnya
+              Next
               <ChevronRight className="h-4 w-4" />
             </Button>
           )}
@@ -345,7 +345,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 text-amber-600 text-sm">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>
-              {questions.length - Object.keys(answers).length} soal belum dijawab
+              {questions.length - Object.keys(answers).length} questions unanswered
             </span>
           </div>
         )}

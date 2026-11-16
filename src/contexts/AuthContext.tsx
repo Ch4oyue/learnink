@@ -219,7 +219,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) {
       toast({
         title: "Error",
-        description: "Gagal keluar dari akun",
+        description: "Failed to sign out",
         variant: "destructive",
       });
     }

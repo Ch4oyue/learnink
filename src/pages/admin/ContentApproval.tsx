@@ -66,7 +66,8 @@ import {
     ExternalLink
 } from "lucide-react";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 // ============================================
 // TYPES
@@ -211,15 +212,15 @@ export default function ContentApproval() {
         },
         onSuccess: (module) => {
             toast({
-                title: "Konten Berhasil Dipublikasi! 🎉",
-                description: `Modul baru ID: ${module.id}`,
+                title: "Content Published Successfully! 🎉",
+                description: `New module ID: ${module.id}`,
             });
             setIsPublishOpen(false);
             setSelectedContent(null);
             queryClient.invalidateQueries({ queryKey: ["incoming-contents"] });
         },
         onError: (error) => {
-            toast({ title: "Gagal Mempublikasi", description: error.message, variant: "destructive" });
+            toast({ title: "Publish Failed", description: error.message, variant: "destructive" });
         },
     });
 
@@ -236,12 +237,12 @@ export default function ContentApproval() {
             if (error) throw error;
         },
         onSuccess: () => {
-            toast({ title: "Konten Ditolak", description: "Konten ditandai sebagai ditolak." });
+            toast({ title: "Content Rejected", description: "The content has been marked as rejected." });
             setRejectContent(null);
             queryClient.invalidateQueries({ queryKey: ["incoming-contents"] });
         },
         onError: (error) => {
-            toast({ title: "Gagal Menolak", description: error.message, variant: "destructive" });
+            toast({ title: "Reject Failed", description: error.message, variant: "destructive" });
         },
     });
 
@@ -276,8 +277,8 @@ export default function ContentApproval() {
             });
 
             toast({
-                title: requestAction === 'approve' ? "Request Disetujui" : "Request Ditolak",
-                description: `Status diubah menjadi ${newStatus}`,
+                title: requestAction === 'approve' ? "Request Approved" : "Request Rejected",
+                description: `Status changed to ${newStatus}`,
             });
             setIsRequestDetailOpen(false);
             setSelectedRequest(null);
@@ -329,7 +330,7 @@ export default function ContentApproval() {
                             Unified Inbox
                         </h1>
                         <p className="text-muted-foreground">
-                            Pusat persetujuan konten dan permintaan pengguna.
+                            Content and user request approval center.
                         </p>
                     </div>
                     <Button onClick={() => { refetchContent(); refetchRequests(); }} variant="outline" className="gap-2">
@@ -395,8 +396,8 @@ export default function ContentApproval() {
                     ) : (
                         <div className="text-center py-12">
                             <FileText className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium">Inbox Kosong</h3>
-                            <p className="text-muted-foreground">Tidak ada konten draft pending.</p>
+                            <h3 className="text-lg font-medium">Empty Inbox</h3>
+                            <p className="text-muted-foreground">No pending draft content.</p>
                         </div>
                     )}
                 </TabsContent>
@@ -428,12 +429,12 @@ export default function ContentApproval() {
                                     </CardHeader>
                                     <CardContent className="pb-3">
                                         <p className="text-sm text-muted-foreground line-clamp-3">
-                                            {req.description || "Tidak ada deskripsi."}
+                                            {req.description || "No description."}
                                         </p>
                                         {req.image_url && (
                                             <div className="mt-2 text-xs text-primary flex items-center gap-1">
                                                 <ExternalLink className="h-3 w-3" />
-                                                Lampiran Gambar
+                                                Image Attachment
                                             </div>
                                         )}
                                     </CardContent>
@@ -449,7 +450,7 @@ export default function ContentApproval() {
                         <div className="text-center py-12">
                             <CheckCircle className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                             <h3 className="text-lg font-medium">All Clear!</h3>
-                            <p className="text-muted-foreground">Tidak ada permintaan pengguna yang pending.</p>
+                            <p className="text-muted-foreground">No pending user requests.</p>
                         </div>
                     )}
                 </TabsContent>
@@ -461,12 +462,12 @@ export default function ContentApproval() {
                     <div className="p-4 md:p-6 pb-0">
                         <DialogHeader>
                             <DialogTitle>Review & Publish</DialogTitle>
-                            <DialogDescription>Edit konten sebelum publikasi.</DialogDescription>
+                            <DialogDescription>Edit content before publishing.</DialogDescription>
                         </DialogHeader>
                     </div>
                     <form onSubmit={handlePublishSubmit} className="flex-1 flex flex-col p-4 md:p-6 gap-4 overflow-y-auto md:overflow-hidden">
                         <div className="space-y-2">
-                            <Label>Judul</Label>
+                            <Label>Title</Label>
                             <Input
                                 value={formData.title}
                                 onChange={e => setFormData({...formData, title: e.target.value})}
@@ -476,7 +477,7 @@ export default function ContentApproval() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Ringkasan</Label>
+                                <Label>Summary</Label>
                                 <Textarea
                                     value={formData.summary}
                                     onChange={e => setFormData({...formData, summary: e.target.value})}
@@ -485,11 +486,11 @@ export default function ContentApproval() {
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label>Kategori</Label>
+                                    <Label>Category</Label>
                                     <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
                                         <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
-                                            {categories.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+                                            {categories.map(c => <SelectItem key={c.id} value={c.name}>{displayCategory(c.name)}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -498,14 +499,14 @@ export default function ContentApproval() {
                                     <Select value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
                                         <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
-                                            {levels.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
+                                            {levels.map(l => <SelectItem key={l.id} value={l.name}>{displayLevel(l.name)}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2 md:flex-1 md:flex md:flex-col md:min-h-0">
-                            <Label>Konten</Label>
+                            <Label>Content</Label>
                             {/* Desktop: Split View, Mobile: Tabs */}
                             <div className="hidden md:block flex-1 overflow-hidden min-h-0">
                                 <ResizablePanelGroup direction="horizontal" className="gap-4">
@@ -518,7 +519,7 @@ export default function ContentApproval() {
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
                                                 className="w-full font-mono text-sm border-none focus-visible:ring-0 p-0 min-h-[500px] bg-transparent resize-none placeholder:text-muted-foreground/50"
-                                                placeholder="Tulis konten menggunakan format Markdown..."
+                                                placeholder="Write content in Markdown..."
                                             />
                                         </div>
                                     </ResizablePanel>
@@ -532,7 +533,7 @@ export default function ContentApproval() {
                                                 {formData.content ? (
                                                     <MarkdownRenderer content={formData.content} />
                                                 ) : (
-                                                    <p className="text-muted-foreground text-center italic py-8">Belum ada konten untuk dipreview.</p>
+                                                    <p className="text-muted-foreground text-center italic py-8">No content to preview yet.</p>
                                                 )}
                                             </div>
                                         </div>
@@ -553,7 +554,7 @@ export default function ContentApproval() {
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
                                                 className="font-mono text-sm min-h-[300px] bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
-                                                placeholder="Tulis konten menggunakan format Markdown..."
+                                                placeholder="Write content in Markdown..."
                                             />
                                         </TabsContent>
                                         <TabsContent value="preview" className="mt-0">
@@ -566,7 +567,7 @@ export default function ContentApproval() {
                             </div>
                         </div>
                         <DialogFooter className="mt-auto">
-                            <Button type="button" variant="ghost" onClick={() => setIsPublishOpen(false)}>Batal</Button>
+                            <Button type="button" variant="ghost" onClick={() => setIsPublishOpen(false)}>Cancel</Button>
                             <Button type="submit" disabled={publishMutation.isPending}>Publish</Button>
                         </DialogFooter>
                     </form>
@@ -579,35 +580,35 @@ export default function ContentApproval() {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             {selectedRequest?.type === 'bug' ? <Bug className="text-red-500" /> : selectedRequest?.type === 'feature' ? <Lightbulb className="text-amber-500" /> : <BookOpen className="text-blue-500" />}
-                            Detail Request
+                            Request Details
                         </DialogTitle>
                         <DialogDescription>
-                             Diajukan oleh <strong>{selectedRequest?.user_display_name}</strong> pada {selectedRequest?.created_at && formatDate(selectedRequest.created_at)}
+                             Submitted by <strong>{selectedRequest?.user_display_name}</strong> on {selectedRequest?.created_at && formatDate(selectedRequest.created_at)}
                         </DialogDescription>
                     </DialogHeader>
 
                     <div className="space-y-4 py-2">
                         <div>
-                            <h4 className="font-semibold text-sm mb-1">Topik</h4>
+                            <h4 className="font-semibold text-sm mb-1">Topic</h4>
                             <p className="text-sm bg-muted/50 p-2 rounded-md">{selectedRequest?.topic}</p>
                         </div>
                         <div>
-                            <h4 className="font-semibold text-sm mb-1">Deskripsi</h4>
+                            <h4 className="font-semibold text-sm mb-1">Description</h4>
                             <p className="text-sm whitespace-pre-wrap bg-muted/50 p-2 rounded-md min-h-[80px]">
                                 {selectedRequest?.description || "-"}
                             </p>
                         </div>
                         {selectedRequest?.image_url && (
                              <div>
-                                <h4 className="font-semibold text-sm mb-1">Lampiran</h4>
+                                <h4 className="font-semibold text-sm mb-1">Attachments</h4>
                                 <a href={selectedRequest.image_url} target="_blank" rel="noreferrer">
                                     <img src={selectedRequest.image_url} alt="Attachment" className="max-h-48 rounded-lg border hover:opacity-90 transition-opacity" />
                                 </a>
                              </div>
                         )}
                         <div className="flex gap-4 text-sm">
-                            <div><span className="text-muted-foreground">Kategori:</span> {selectedRequest?.category || "-"}</div>
-                            <div><span className="text-muted-foreground">Prioritas:</span> {selectedRequest?.priority}</div>
+                            <div><span className="text-muted-foreground">Category:</span> {selectedRequest?.category || "-"}</div>
+                            <div><span className="text-muted-foreground">Priority:</span> {selectedRequest?.priority}</div>
                         </div>
                     </div>
 
@@ -618,7 +619,7 @@ export default function ContentApproval() {
                                 onClick={() => { setRequestAction('approve'); handleRequestAction(); }}
                             >
                                 <CheckCircle className="w-4 h-4 mr-2" />
-                                {selectedRequest?.type === 'feature' && role === 'superadmin' ? "Approve Feature" : "Terima"}
+                                {selectedRequest?.type === 'feature' && role === 'superadmin' ? "Approve Feature" : "Accept"}
                             </Button>
                             <Button
                                 className="flex-1"
@@ -626,7 +627,7 @@ export default function ContentApproval() {
                                 onClick={() => { setRequestAction('reject'); handleRequestAction(); }}
                             >
                                 <XCircle className="w-4 h-4 mr-2" />
-                                Tolak
+                                Reject
                             </Button>
                         </div>
                     </DialogFooter>
@@ -637,12 +638,12 @@ export default function ContentApproval() {
             <AlertDialog open={!!rejectContent} onOpenChange={() => setRejectContent(null)}>
                 <AlertDialogContent className="glass-liquid rounded-[24px]">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Tolak Draft Konten?</AlertDialogTitle>
-                        <AlertDialogDescription>Konten ini akan dihapus dari daftar draft.</AlertDialogDescription>
+                        <AlertDialogTitle>Reject Draft Content?</AlertDialogTitle>
+                        <AlertDialogDescription>This content will be removed from the draft list.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleReject} className="bg-destructive text-destructive-foreground">Tolak</AlertDialogAction>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleReject} className="bg-destructive text-destructive-foreground">Reject</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

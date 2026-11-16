@@ -20,8 +20,8 @@ import {
 // Learning paths focused on AI & Automation
 const learningPaths = [
   {
-    title: "Dasar-Dasar AI",
-    description: "Pahami konsep fundamental Artificial Intelligence dan Machine Learning",
+    title: "AI Fundamentals",
+    description: "Understand the fundamental concepts of Artificial Intelligence and Machine Learning",
     icon: Bot,
     color: "from-cyan-500/20 to-blue-500/20",
     textColor: "text-cyan-600",
@@ -29,15 +29,15 @@ const learningPaths = [
   },
   {
     title: "Automation Fundamentals",
-    description: "Pelajari dasar otomatisasi workflow dan proses bisnis",
+    description: "Learn the basics of workflow automation and business processes",
     icon: Cpu,
     color: "from-purple-500/20 to-pink-500/20",
     textColor: "text-purple-600",
     modules: 10,
   },
   {
-    title: "AI Tools & Aplikasi",
-    description: "Kuasai ChatGPT, Midjourney, dan tools AI populer lainnya",
+    title: "AI Tools & Apps",
+    description: "Master ChatGPT, Midjourney, and other popular AI tools",
     icon: Zap,
     color: "from-orange-500/20 to-red-500/20",
     textColor: "text-orange-600",
@@ -45,7 +45,7 @@ const learningPaths = [
   },
   {
     title: "Advanced Automation",
-    description: "Bangun sistem automation kompleks dengan AI integration",
+    description: "Build complex automation systems with AI integration",
     icon: Workflow,
     color: "from-emerald-500/20 to-teal-500/20",
     textColor: "text-emerald-600",
@@ -72,14 +72,13 @@ const Index = () => {
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
                 <GraduationCap className="h-4 w-4" />
-                Kurikulum AI & Automation
+                AI & Automation Curriculum
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Jalur Pembelajaran
+                Learning Paths
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Pilih jalur belajar AI dan Automation sesuai minat Anda. Setiap jalur dirancang dengan 
-                modul-modul yang sistematis dari pemula hingga mahir.
+                Choose an AI and Automation learning path that matches your interests. Each path has structured modules from beginner to advanced.
               </p>
             </div>
 
@@ -112,7 +111,7 @@ const Index = () => {
                       {/* Stats */}
                       <div className="flex items-center gap-2 text-sm">
                         <BookOpen className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-muted-foreground">{path.modules} Modul</span>
+                        <span className="text-muted-foreground">{path.modules} Modules</span>
                       </div>
                     </div>
                   </div>
@@ -124,7 +123,7 @@ const Index = () => {
             <div className="text-center">
               <Button asChild size="lg" className="group">
                 <Link to="/syllabus">
-                  Lihat Silabus Lengkap
+                  View Full Syllabus
                   <ArrowRight className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </Button>

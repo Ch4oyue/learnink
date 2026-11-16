@@ -22,7 +22,7 @@ import {
 } from "@/hooks/useNotifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import {
   Bell,
   BookOpen,
@@ -110,11 +110,11 @@ export default function DashboardNotifications() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Notifikasi</h1>
+            <h1 className="text-2xl font-semibold">Notifications</h1>
             <p className="text-muted-foreground">
               {unreadCount > 0
-                ? `${unreadCount} notifikasi belum dibaca`
-                : "Semua notifikasi sudah dibaca"}
+                ? `${unreadCount} unread notifications`
+                : "All notifications have been read"}
             </p>
           </div>
           {unreadCount > 0 && (
@@ -126,7 +126,7 @@ export default function DashboardNotifications() {
               className="gap-2"
             >
               <CheckCheck className="h-4 w-4" />
-              Tandai Semua Dibaca
+              Mark All as Read
             </Button>
           )}
         </div>
@@ -136,7 +136,7 @@ export default function DashboardNotifications() {
           <CardHeader className="pb-3">
             <CardTitle className="text-lg flex items-center gap-2">
               <Bell className="h-5 w-5" />
-              Semua Notifikasi
+              All Notifications
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -155,9 +155,9 @@ export default function DashboardNotifications() {
             ) : notifications?.length === 0 ? (
               <div className="py-12 text-center">
                 <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                <h3 className="font-medium mb-2">Belum ada notifikasi</h3>
+                <h3 className="font-medium mb-2">No notifications yet</h3>
                 <p className="text-sm text-muted-foreground">
-                  Notifikasi akan muncul di sini ketika ada update
+                  Notifications will appear here when there are updates
                 </p>
               </div>
             ) : (

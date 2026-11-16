@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { ModulePreviewCard } from "./ModulePreviewCard";
 import { ModuleContentPreview } from "./ModuleContentPreview";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 // ============================================
 // CONSTANTS
@@ -72,12 +73,12 @@ const levels = ["Pemula", "Menengah", "Lanjutan"] as const;
 // ============================================
 
 const moduleSchema = z.object({
-  title: z.string().min(1, "Judul modul wajib diisi").max(200, "Judul terlalu panjang"),
-  summary: z.string().max(500, "Ringkasan terlalu panjang").optional().or(z.literal("")),
+  title: z.string().min(1, "Module title is required").max(200, "Title is too long"),
+  summary: z.string().max(500, "Summary is too long").optional().or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
-  category: z.string().min(1, "Pilih kategori"),
-  level: z.string().min(1, "Pilih level"),
-  icon_name: z.string().min(1, "Pilih icon"),
+  category: z.string().min(1, "Select a category"),
+  level: z.string().min(1, "Select a level"),
+  icon_name: z.string().min(1, "Select an icon"),
   is_published: z.boolean(),
 });
 
@@ -134,8 +135,8 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           source_request_id: null,
         });
         toast({
-          title: "Berhasil",
-          description: "Modul berhasil dibuat",
+          title: "Success",
+          description: "Module created successfully",
         });
         navigate("/dashboard/modules");
       } else if (module) {
@@ -146,8 +147,8 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           content: data.content || null,
         });
         toast({
-          title: "Berhasil",
-          description: "Modul berhasil diperbarui",
+          title: "Success",
+          description: "Module updated successfully",
         });
         navigate("/dashboard/modules");
       }
@@ -155,7 +156,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
       logger.error("Error saving module:", error);
       toast({
         title: "Error",
-        description: "Gagal menyimpan modul",
+        description: "Failed to save module",
         variant: "destructive",
       });
     }
@@ -175,7 +176,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Kembali
+            Back
           </Button>
           <div className="flex items-center gap-4">
             <FormField
@@ -201,7 +202,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {isPending ? "Menyimpan..." : "Simpan"}
+              {isPending ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
@@ -210,7 +211,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           {/* Left Column - Settings */}
           <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle className="text-lg">Pengaturan Modul</CardTitle>
+              <CardTitle className="text-lg">Module Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField
@@ -218,10 +219,10 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Judul Modul</FormLabel>
+                    <FormLabel>Module Title</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Masukkan judul modul..."
+                        placeholder="Enter module title..."
                         className="input-apple"
                         {...field}
                       />
@@ -236,10 +237,10 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 name="summary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ringkasan</FormLabel>
+                    <FormLabel>Summary</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Deskripsi singkat modul..."
+                        placeholder="Short module description..."
                         rows={3}
                         {...field}
                       />
@@ -254,7 +255,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kategori</FormLabel>
+                    <FormLabel>Category</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
@@ -264,7 +265,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                       <SelectContent>
                         {categories.map((cat) => (
                           <SelectItem key={cat} value={cat}>
-                            {cat}
+                            {displayCategory(cat)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -289,7 +290,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                       <SelectContent>
                         {levels.map((level) => (
                           <SelectItem key={level} value={level}>
-                            {level}
+                            {displayLevel(level)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -337,7 +338,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           <Card className="lg:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Konten Modul</CardTitle>
+                <CardTitle className="text-lg">Module Content</CardTitle>
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="grid grid-cols-2 w-[200px]">
                     <TabsTrigger value="edit">Edit</TabsTrigger>
@@ -359,7 +360,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                       <FormItem>
                         <FormControl>
                           <Textarea
-                            placeholder={`Tulis konten modul dalam format Markdown...
+                            placeholder={`Write module content in Markdown...
 
 # Heading 1
 ## Heading 2

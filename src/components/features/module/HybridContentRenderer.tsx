@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { FloatingSelectionMenu } from "./FloatingSelectionMenu";
 import { useTextSelection } from "@/hooks/useTextSelection";
+import { displayCategory } from "@/lib/categoryLabels";
 
 // ============================================
 // TYPES
@@ -89,7 +90,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                                         variant="secondary"
                                         className="text-xs font-bold uppercase tracking-wider"
                                     >
-                                        {metadata.category}
+                                        {displayCategory(metadata.category)}
                                     </Badge>
                                 )}
                                 {metadata.readingTime && (
@@ -119,7 +120,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                                     size="icon"
                                     className="text-muted-foreground hover:text-primary hover:bg-primary/10"
                                     title="Clone Entire Section"
-                                    aria-label="Klon Seluruh Bagian"
+                                    aria-label="Clone Entire Section"
                                 >
                                     <LibraryBig className="h-5 w-5" />
                                 </Button>
@@ -152,7 +153,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <p className="text-muted-foreground">Konten modul belum tersedia</p>
+                            <p className="text-muted-foreground">Module content is not available yet</p>
                         </div>
                     )}
 

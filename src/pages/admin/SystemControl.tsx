@@ -122,7 +122,7 @@ export default function SystemControl() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["system-settings"] });
-      toast({ title: "Pengaturan diperbarui" });
+      toast({ title: "Settings updated" });
     }
   });
 
@@ -145,7 +145,7 @@ export default function SystemControl() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["label-configs"] });
-      toast({ title: "Label dihapus" });
+      toast({ title: "Label deleted" });
     }
   });
 
@@ -171,7 +171,7 @@ export default function SystemControl() {
             System Control
           </h1>
           <p className="text-muted-foreground mt-2">
-            Pusat kendali aplikasi untuk Super Admin. Kelola multiplier, mode pemeliharaan, dan pengumuman.
+            Application control center for Super Admins. Manage multipliers, maintenance mode, and announcements.
           </p>
         </div>
 
@@ -184,7 +184,7 @@ export default function SystemControl() {
                 Global XP Multiplier
               </CardTitle>
               <CardDescription>
-                Atur besaran multiplier XP yang berlaku untuk seluruh pengguna.
+                Set the XP multiplier applied to all users.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -200,7 +200,7 @@ export default function SystemControl() {
                   onClick={() => updateSetting.mutate({ key: "global_xp_multiplier", value: globalXp })}
                   disabled={updateSetting.isPending}
                 >
-                  Simpan
+                  Save
                 </Button>
               </div>
             </CardContent>
@@ -214,13 +214,13 @@ export default function SystemControl() {
                 Maintenance Mode
               </CardTitle>
               <CardDescription>
-                Kunci akses aplikasi untuk semua pengguna kecuali Admin/Super Admin.
+                Lock application access for all users except Admin/Super Admin.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex items-center justify-between">
               <div className="space-y-1">
-                <Label>Status Pemeliharaan</Label>
-                <p className="text-sm text-muted-foreground">Aktifkan saat melakukan update besar.</p>
+                <Label>Maintenance Status</Label>
+                <p className="text-sm text-muted-foreground">Enable during major updates.</p>
               </div>
               <Switch
                 checked={getSetting("maintenance_mode")?.value === "true" || getSetting("maintenance_mode")?.value === true}
@@ -237,7 +237,7 @@ export default function SystemControl() {
                 APK Base Bonus
               </CardTitle>
               <CardDescription>
-                Bonus XP tambahan untuk pengguna APK. 1.0 = +100% (Double XP).
+                Extra XP bonus for APK users. 1.0 = +100% (Double XP).
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -253,7 +253,7 @@ export default function SystemControl() {
                   onClick={() => updateSetting.mutate({ key: "apk_base_bonus", value: apkBonus })}
                   disabled={updateSetting.isPending}
                 >
-                  Simpan
+                  Save
                 </Button>
               </div>
             </CardContent>
@@ -267,26 +267,26 @@ export default function SystemControl() {
                 Broadcast Message
               </CardTitle>
               <CardDescription>
-                Kirim pengumuman global ke semua pengguna.
+                Send a global announcement to all users.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between mb-2">
-                <Label>Aktifkan Pengumuman</Label>
+                <Label>Enable Announcement</Label>
                 <Switch
                   checked={broadcast.active}
                   onCheckedChange={(checked) => setBroadcast({ ...broadcast, active: checked })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Judul</Label>
+                <Label>Title</Label>
                 <Input
                   value={broadcast.title}
                   onChange={(e) => setBroadcast({ ...broadcast, title: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Konten</Label>
+                <Label>Content</Label>
                 <Input
                   value={broadcast.content}
                   onChange={(e) => setBroadcast({ ...broadcast, content: e.target.value })}
@@ -299,7 +299,7 @@ export default function SystemControl() {
                 onClick={() => updateSetting.mutate({ key: "broadcast_message", value: broadcast })}
                 disabled={updateSetting.isPending}
               >
-                Update Pengumuman
+                Update Announcement
               </Button>
             </CardFooter>
           </Card>
@@ -313,14 +313,14 @@ export default function SystemControl() {
               Security Audit Trail
             </CardTitle>
             <CardDescription>
-              10 aktivitas keamanan terakhir yang tercatat di sistem.
+              The last 10 security activities recorded in the system.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Waktu</TableHead>
+                  <TableHead>Time</TableHead>
                   <TableHead>Event</TableHead>
                   <TableHead>Endpoint</TableHead>
                   <TableHead>IP Address</TableHead>
@@ -331,7 +331,7 @@ export default function SystemControl() {
                 {securityLogs?.map((log) => (
                   <TableRow key={log.id}>
                     <TableCell className="text-xs text-muted-foreground">
-                      {new Date(log.created_at).toLocaleString('id-ID')}
+                      {new Date(log.created_at).toLocaleString('en-US')}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="capitalize">
@@ -352,7 +352,7 @@ export default function SystemControl() {
                 {securityLogs?.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
-                      Tidak ada log keamanan yang ditemukan.
+                      No security logs found.
                     </TableCell>
                   </TableRow>
                 )}
@@ -362,7 +362,7 @@ export default function SystemControl() {
           <CardFooter>
             <Button variant="ghost" size="sm" className="w-full gap-2" asChild>
                <Link to="/dashboard/admin/logs">
-                 <Activity className="h-4 w-4" /> Lihat Semua Log
+                 <Activity className="h-4 w-4" /> View All Log
                </Link>
             </Button>
           </CardFooter>
@@ -374,17 +374,17 @@ export default function SystemControl() {
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Tags className="h-5 w-5 text-purple-500" />
-                Manajemen Multiplier Label
+                Label Multiplier Management
               </CardTitle>
               <CardDescription>
-                Atur multiplier XP untuk setiap label/tag pengguna.
+                Set the XP multiplier for each user label/tag.
               </CardDescription>
             </div>
             <Button onClick={() => {
-              const id = prompt("Masukkan ID Label baru (misal: beta-tester):");
+              const id = prompt("Enter a new label ID (e.g. beta-tester):");
               if (id) manageLabel.mutate({ id, multiplier: 1.0, description: "", is_active: true });
             }} size="sm">
-              <Plus className="h-4 w-4 mr-2" /> Tambah Label
+              <Plus className="h-4 w-4 mr-2" /> Add Label
             </Button>
           </CardHeader>
           <CardContent>
@@ -393,9 +393,9 @@ export default function SystemControl() {
                 <TableRow>
                   <TableHead>Label ID</TableHead>
                   <TableHead>Multiplier</TableHead>
-                  <TableHead>Deskripsi</TableHead>
+                  <TableHead>Description</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -429,7 +429,7 @@ export default function SystemControl() {
                         size="icon"
                         className="text-destructive-text"
                         onClick={() => {
-                          if (confirm(`Hapus label ${label.id}?`)) deleteLabel.mutate(label.id);
+                          if (confirm(`Delete label ${label.id}?`)) deleteLabel.mutate(label.id);
                         }}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -453,10 +453,10 @@ export default function SystemControl() {
              </CardHeader>
              <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Aksi di bawah ini bersifat merusak atau berdampak besar pada sistem. Gunakan dengan sangat hati-hati.
+                  The actions below are destructive or have a major impact on the system. Use them with extreme care.
                 </p>
                 <Button variant="destructive" className="gap-2">
-                  <Trash2 className="h-4 w-4" /> Reset Semua Point Pengguna
+                  <Trash2 className="h-4 w-4" /> Reset All User Points
                 </Button>
              </CardContent>
            </Card>

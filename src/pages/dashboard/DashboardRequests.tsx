@@ -46,7 +46,7 @@ import { useAllRequests, useUpdateRequest, useCreateRequest, RequestType } from 
 import { useGenerateModule } from "@/hooks/useGenerateModule";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -77,8 +77,8 @@ const statusColors: Record<string, string> = {
 const statusLabels: Record<string, string> = {
   pending: "Pending",
   reviewing: "Reviewing",
-  completed: "Selesai",
-  rejected: "Ditolak",
+  completed: "Completed",
+  rejected: "Rejected",
 };
 
 const statusIcons: Record<string, typeof Clock> = {
@@ -89,8 +89,8 @@ const statusIcons: Record<string, typeof Clock> = {
 };
 
 const typeLabels: Record<RequestType, string> = {
-  module: "Materi",
-  feature: "Fitur",
+  module: "Material",
+  feature: "Feature",
   bug: "Bug",
 };
 
@@ -185,12 +185,12 @@ export default function DashboardRequests() {
         .getPublicUrl(filePath);
 
       setFormData(prev => ({ ...prev, imageUrl: data.publicUrl }));
-      toast({ title: "Berhasil upload gambar" });
+      toast({ title: "Image uploaded" });
     } catch (error) {
       logger.error('Upload error:', error);
       toast({
-        title: "Gagal upload",
-        description: (error as Error).message || "Pastikan bucket 'request-attachments' tersedia & public.",
+        title: "Upload failed",
+        description: (error as Error).message || "Make sure the 'request-attachments' bucket exists & is public.",
         variant: "destructive"
       });
     } finally {
@@ -228,13 +228,13 @@ export default function DashboardRequests() {
             <h1 className="text-2xl font-semibold">Requests & Feedback</h1>
             <p className="text-muted-foreground">
               {canManage
-                ? "Kelola permintaan dan feedback dari pengguna"
-                : "Ajukan permintaan materi, fitur baru, atau laporkan bug"}
+                ? "Manage requests and feedback from users"
+                : "Request materials or new features, or report a bug"}
             </p>
           </div>
           <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
             <Plus className="h-4 w-4" />
-            Buat Request Baru
+            Create New Request
           </Button>
         </div>
 
@@ -243,11 +243,11 @@ export default function DashboardRequests() {
           <TabsList>
             <TabsTrigger value="module" className="gap-2">
               <BookOpen className="h-4 w-4" />
-              Materi
+              Material
             </TabsTrigger>
             <TabsTrigger value="feature" className="gap-2">
               <Lightbulb className="h-4 w-4" />
-              Fitur
+              Feature
             </TabsTrigger>
             <TabsTrigger value="bug" className="gap-2">
               <Bug className="h-4 w-4" />
@@ -260,7 +260,7 @@ export default function DashboardRequests() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={`Cari ${typeLabels[activeTab]}...`}
+                placeholder={`Search ${typeLabels[activeTab]}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -271,11 +271,11 @@ export default function DashboardRequests() {
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="reviewing">Reviewing</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="rejected">Ditolak</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -298,14 +298,14 @@ export default function DashboardRequests() {
                     {activeTab === 'feature' && <Lightbulb className="h-8 w-8 text-muted-foreground" />}
                     {activeTab === 'bug' && <Bug className="h-8 w-8 text-muted-foreground" />}
                   </div>
-                  <h3 className="font-medium mb-2">Tidak ada data</h3>
+                  <h3 className="font-medium mb-2">No data</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     {searchQuery || statusFilter !== "all"
-                      ? "Coba ubah filter pencarian"
-                      : `Belum ada ${typeLabels[activeTab].toLowerCase()} yang diajukan`}
+                      ? "Try adjusting the search filter"
+                      : `No ${typeLabels[activeTab].toLowerCase()} submitted yet`}
                   </p>
                   <Button onClick={() => setIsCreateOpen(true)} variant="outline">
-                    Ajukan Sekarang
+                    Submit Now
                   </Button>
                 </CardContent>
               </Card>
@@ -314,12 +314,12 @@ export default function DashboardRequests() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Topik / Judul</TableHead>
-                      {activeTab === 'module' && <TableHead>Kategori</TableHead>}
+                      <TableHead>Topic / Title</TableHead>
+                      {activeTab === 'module' && <TableHead>Category</TableHead>}
                       <TableHead>Status</TableHead>
-                      <TableHead>Prioritas</TableHead>
-                      <TableHead>Tanggal</TableHead>
-                      {canManage && activeTab === 'module' && <TableHead className="w-[120px]">Aksi</TableHead>}
+                      <TableHead>Priority</TableHead>
+                      <TableHead>Date</TableHead>
+                      {canManage && activeTab === 'module' && <TableHead className="w-[120px]">Actions</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -392,49 +392,49 @@ export default function DashboardRequests() {
         <DialogContent className="max-w-lg glass-liquid rounded-[24px]">
           <DialogHeader>
             <DialogTitle>
-              {activeTab === 'module' && "Request Materi Baru"}
-              {activeTab === 'feature' && "Request Fitur Baru"}
-              {activeTab === 'bug' && "Lapor Bug"}
+              {activeTab === 'module' && "New Material Request"}
+              {activeTab === 'feature' && "New Feature Request"}
+              {activeTab === 'bug' && "Report a Bug"}
             </DialogTitle>
             <DialogDescription>
-              Isi detail di bawah ini. Anda juga bisa menempelkan (paste) gambar screenshot di kolom deskripsi.
+              Fill in the details below. You can also paste a screenshot straight into the description field.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="topic">
-                {activeTab === 'module' ? "Topik Materi *" : "Judul *"}
+                {activeTab === 'module' ? "Material Topic *" : "Title *"}
               </Label>
               <Input
                 id="topic"
                 value={formData.topic}
                 onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                placeholder={activeTab === 'module' ? "Contoh: Dasar Python" : "Ringkasan singkat"}
+                placeholder={activeTab === 'module' ? "Example: Python Basics" : "Short summary"}
                 required
               />
             </div>
 
             {activeTab === 'module' && (
               <div className="space-y-2">
-                <Label htmlFor="category">Kategori</Label>
+                <Label htmlFor="category">Category</Label>
                 <Input
                   id="category"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="Contoh: Programming"
+                  placeholder="Example: Programming"
                 />
               </div>
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="description">Deskripsi & Screenshot</Label>
+              <Label htmlFor="description">Description & Screenshot</Label>
               <div className="relative">
                  <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     onPaste={handlePaste}
-                    placeholder="Deskripsi detail... (Paste gambar di sini)"
+                    placeholder="Detailed description... (paste images here)"
                     rows={4}
                   />
                   {uploading && (
@@ -447,7 +447,7 @@ export default function DashboardRequests() {
 
             {/* Attachment Preview Area */}
             <div className="space-y-2">
-                <Label>Lampiran</Label>
+                <Label>Attachments</Label>
                 <div className="flex items-center gap-4">
                     <Button
                         type="button"
@@ -457,7 +457,7 @@ export default function DashboardRequests() {
                         disabled={uploading}
                     >
                         <Upload className="h-4 w-4 mr-2" />
-                        Upload Gambar
+                        Upload Image
                     </Button>
                     <input
                         type="file"
@@ -484,12 +484,12 @@ export default function DashboardRequests() {
                     )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                    Copy-paste gambar langsung ke kolom deskripsi atau gunakan tombol upload.
+                    Copy-paste an image directly into the description field or use the upload button.
                 </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="priority">Prioritas</Label>
+              <Label htmlFor="priority">Priority</Label>
               <Select
                 value={formData.priority}
                 onValueChange={(val) => setFormData({ ...formData, priority: val })}
@@ -507,11 +507,11 @@ export default function DashboardRequests() {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                Batal
+                Cancel
               </Button>
               <Button type="submit" disabled={createRequest.isPending || uploading}>
                 {createRequest.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Kirim Request
+                Send Request
               </Button>
             </DialogFooter>
           </form>
@@ -524,14 +524,14 @@ export default function DashboardRequests() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Generate Modul dengan AI?
+              Generate Module with AI?
             </AlertDialogTitle>
             <AlertDialogDescription>
-              AI akan menghasilkan modul pembelajaran berdasarkan request ini.
+              AI will create a learning module based on this request.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleGenerate}
               disabled={generateModule.isPending}

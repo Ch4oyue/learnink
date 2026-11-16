@@ -27,9 +27,9 @@ export default function ModuleEdit() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Edit Modul</h1>
+          <h1 className="text-2xl font-semibold">Edit Module</h1>
           <p className="text-muted-foreground">
-            Perbarui materi pembelajaran
+            Update learning material
           </p>
         </div>
         <ModuleEditor mode="edit" module={module} />

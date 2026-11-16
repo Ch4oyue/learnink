@@ -88,7 +88,7 @@ export const MarkdownRenderer = memo(({
     const url = new URL(window.location.href);
     url.hash = id;
     navigator.clipboard.writeText(url.toString());
-    toast({ title: "Link bagian disalin!" });
+    toast({ title: "Section link copied!" });
   }, [toast]);
 
   const components: Components = useMemo(() => ({
@@ -101,7 +101,7 @@ export const MarkdownRenderer = memo(({
           <button
             onClick={() => copyLink(id)}
             className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
-            aria-label="Salin link bagian"
+            aria-label="Copy section link"
           >
             <Link2 className="h-4 w-4" />
           </button>
@@ -117,7 +117,7 @@ export const MarkdownRenderer = memo(({
           <button
             onClick={() => copyLink(id)}
             className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
-            aria-label="Salin link bagian"
+            aria-label="Copy section link"
           >
             <Link2 className="h-4 w-4" />
           </button>
@@ -133,7 +133,7 @@ export const MarkdownRenderer = memo(({
           <button
             onClick={() => copyLink(id)}
             className="opacity-0 group-hover/h:opacity-100 transition-opacity p-1 hover:text-primary"
-            aria-label="Salin link bagian"
+            aria-label="Copy section link"
           >
             <Link2 className="h-4 w-4" />
           </button>

@@ -238,7 +238,7 @@ export default function ManageSources() {
                             Learning Sources Manager
                         </h1>
                         <p className="text-muted-foreground">
-                            Kelola sumber belajar yang ditampilkan di Landing Page marquee.
+                            Manage learning sources shown in the Landing Page marquee.
                         </p>
                     </div>
                     <Button onClick={openCreateForm} className="gap-2">

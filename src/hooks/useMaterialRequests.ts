@@ -1,3 +1,4 @@
+import { mutationFeedback } from "@/lib/mutationFeedback";
 import { logger } from "@/lib/logger";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -157,16 +158,16 @@ export function useCreateRequest() {
       queryClient.invalidateQueries({ queryKey: ['my-requests', variables.userId] });
       queryClient.invalidateQueries({ queryKey: ['all-requests'] });
       toast({
-        title: "Request terkirim",
-        description: "Permintaan Anda telah berhasil dikirim",
+        title: "Request sent",
+        description: "Your request has been sent successfully",
       });
     },
     onError: (error, variables) => {
-      const typeLabel = variables.type === 'bug' ? 'laporan bug' :
-                       variables.type === 'feature' ? 'request fitur' : 'request materi';
+      const typeLabel = variables.type === 'bug' ? 'bug report' :
+                       variables.type === 'feature' ? 'feature request' : 'material request';
       toast({
         title: "Error",
-        description: `Gagal mengirim ${typeLabel}`,
+        description: `Failed to send ${typeLabel}`,
         variant: "destructive",
       });
       logger.error('Error creating request:', error);
@@ -205,21 +206,12 @@ export function useUpdateRequest() {
       if (error) throw error;
       return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-requests'] });
-      queryClient.invalidateQueries({ queryKey: ['all-requests'] });
-      toast({
-        title: "Berhasil",
-        description: "Request berhasil diperbarui",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Gagal memperbarui request",
-        variant: "destructive",
-      });
-      logger.error('Error updating request:', error);
-    },
+    ...mutationFeedback({
+      queryClient, toast,
+      queryKeys: ['my-requests', 'all-requests'],
+      success: 'Request updated successfully',
+      failure: 'Failed to update request',
+      logMessage: 'Error updating request:',
+    }),
   });
 }

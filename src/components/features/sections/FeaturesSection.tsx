@@ -5,19 +5,19 @@ const features = [
     icon: BookOpen,
     title: "Dynamic Syllabus Generation",
     description:
-      "Silabus dibuat otomatis berdasarkan topik dan level kemampuan Anda. Belajar jadi lebih terarah dan efisien.",
+      "A syllabus is generated automatically based on your topic and skill level. Learning becomes more focused and efficient.",
   },
   {
     icon: Brain,
     title: "AI-Assisted Learning Paths",
     description:
-      "Jalur belajar personal yang disesuaikan dengan progres dan gaya belajar Anda. AI membantu Anda tetap on track.",
+      "A personal learning path adapted to your progress and learning style. AI helps you stay on track.",
   },
   {
     icon: Sparkles,
     title: "Interactive Highlights & Quizzes",
     description:
-      "Materi penting di-highlight otomatis dengan kuis interaktif untuk memastikan pemahaman yang mendalam.",
+      "Key material is highlighted automatically with interactive quizzes to ensure deep understanding.",
   },
 ];
 
@@ -28,13 +28,13 @@ export const FeaturesSection = () => {
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            Fitur Unggulan
+            Key Features
           </span>
           <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 tracking-tight">
-            Belajar Lebih Cerdas, Bukan Lebih Keras
+            Learn Smarter, Not Harder
           </h2>
           <p className="text-muted-foreground text-lg">
-            Platform kami dirancang untuk memaksimalkan hasil belajar dengan pendekatan yang personal dan adaptif.
+            Our platform helps you learn more effectively with a personal, adaptive approach.
           </p>
         </div>
 

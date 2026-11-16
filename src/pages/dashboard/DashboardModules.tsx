@@ -35,7 +35,7 @@ import { useModules, useMyModules, useDeleteModule } from "@/hooks/useModules";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import {
   Plus,
   Search,
@@ -49,6 +49,7 @@ import {
   Clock,
   Loader2,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 // Status badge configuration
 const STATUS_CONFIG = {
@@ -137,18 +138,18 @@ export default function DashboardModules() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold">Modul Pembelajaran</h1>
+            <h1 className="text-2xl font-semibold">Learning Modules</h1>
             <p className="text-muted-foreground">
               {isTutorOrAdmin
-                ? "Kelola dan buat modul pembelajaran"
-                : "Jelajahi materi pembelajaran yang tersedia"}
+                ? "Manage and create learning modules"
+                : "Browse available learning materials"}
             </p>
           </div>
           {isTutorOrAdmin && (
             <Button asChild className="gap-2">
               <Link to="/dashboard/modules/create">
                 <Plus className="h-4 w-4" />
-                Buat Modul
+                Create Module
               </Link>
             </Button>
           )}
@@ -158,7 +159,7 @@ export default function DashboardModules() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari modul..."
+            placeholder="Search modules..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -168,8 +169,8 @@ export default function DashboardModules() {
         {/* Tabs */}
         <Tabs defaultValue={isTutorOrAdmin ? "my-modules" : "all"} className="space-y-4">
           <TabsList>
-            {isTutorOrAdmin && <TabsTrigger value="my-modules">Modul Saya</TabsTrigger>}
-            <TabsTrigger value="all">Semua Modul</TabsTrigger>
+            {isTutorOrAdmin && <TabsTrigger value="my-modules">My Modules</TabsTrigger>}
+            <TabsTrigger value="all">All Modules</TabsTrigger>
           </TabsList>
 
           {/* My Modules Tab (Tutor/Admin) */}
@@ -187,14 +188,14 @@ export default function DashboardModules() {
                 <Card className="glass-panel border-dashed border-white/20">
                   <CardContent className="py-12 text-center">
                     <BookOpen className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <h3 className="font-bold mb-2 text-lg">Belum ada modul</h3>
+                    <h3 className="font-bold mb-2 text-lg">No modules yet</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Mulai buat modul pembelajaran pertama Anda
+                      Start creating your first learning module
                     </p>
                     <Button asChild className="glass-button-primary">
                       <Link to="/dashboard/modules/create">
                         <Plus className="h-4 w-4 mr-2" />
-                        Buat Modul
+                        Create Module
                       </Link>
                     </Button>
                   </CardContent>
@@ -204,11 +205,11 @@ export default function DashboardModules() {
                   <Table>
                     <TableHeader>
                       <TableRow className="hover:bg-transparent border-b border-white/10">
-                        <TableHead className="font-bold text-foreground/80">Modul</TableHead>
-                        <TableHead className="font-bold text-foreground/80">Kategori</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Modules</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Category</TableHead>
                         <TableHead className="font-bold text-foreground/80">Level</TableHead>
                         <TableHead className="font-bold text-foreground/80">Status</TableHead>
-                        <TableHead className="font-bold text-foreground/80">Dibuat</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Created</TableHead>
                         <TableHead className="w-[50px]"></TableHead>
                       </TableRow>
                     </TableHeader>
@@ -229,10 +230,10 @@ export default function DashboardModules() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="glass-button text-xs font-normal">{module.category}</Badge>
+                            <Badge variant="secondary" className="glass-button text-xs font-normal">{displayCategory(module.category)}</Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="border-white/20 text-xs">{module.level}</Badge>
+                            <Badge variant="outline" className="border-white/20 text-xs">{displayLevel(module.level)}</Badge>
                           </TableCell>
                           <TableCell>
                             {module.is_published ? (
@@ -252,7 +253,7 @@ export default function DashboardModules() {
                           <TableCell>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" aria-label="Opsi Modul" className="hover:bg-white/10 rounded-full">
+                                <Button variant="ghost" size="icon" aria-label="Module Options" className="hover:bg-white/10 rounded-full">
                                   <MoreHorizontal className="h-4 w-4" />
                                 </Button>
                               </DropdownMenuTrigger>
@@ -262,7 +263,7 @@ export default function DashboardModules() {
                                   className="focus:bg-white/10 cursor-pointer"
                                 >
                                   <Eye className="h-4 w-4 mr-2" />
-                                  Lihat
+                                  View
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   onClick={() =>
@@ -279,7 +280,7 @@ export default function DashboardModules() {
                                   className="text-destructive-text focus:bg-destructive/10 cursor-pointer"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
-                                  Hapus
+                                  Delete
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -308,17 +309,17 @@ export default function DashboardModules() {
                 <CardContent className="py-12 text-center">
                   <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4 animate-pulse" />
                   <h3 className="font-bold mb-2 text-lg">
-                    {searchQuery ? `Tidak ditemukan modul "${searchQuery}"` : "Belum ada modul tersedia"}
+                    {searchQuery ? `No module found for "${searchQuery}"` : "No modules available yet"}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
                     {searchQuery
-                      ? "Mungkin belum ada yang membuatnya. Jadilah yang pertama merequest!"
-                      : "Modul akan muncul di sini ketika sudah dipublikasikan"}
-                    {!isTutorOrAdmin && " (Hanya menampilkan modul sesuai Track Anda)"}
+                      ? "Maybe no one has created it yet. Be the first to request it!"
+                      : "Modules will appear here once published"}
+                    {!isTutorOrAdmin && " (Only showing modules matching your Track)"}
                   </p>
                   <Button asChild variant="outline" className="glass-button">
                     <Link to={`/dashboard/requests?tab=module&topic=${encodeURIComponent(searchQuery)}`}>
-                      Request Modul Ini
+                      Request This Module
                     </Link>
                   </Button>
                 </CardContent>
@@ -341,7 +342,7 @@ export default function DashboardModules() {
                             {moduleProgress?.is_completed ? (
                               <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 gap-1 shadow-none backdrop-blur-sm">
                                 <CheckCircle2 className="h-3 w-3" />
-                                Selesai
+                                Completed
                               </Badge>
                             ) : moduleProgress ? (
                               <Badge variant="secondary" className="gap-1 glass-button text-xs">
@@ -360,10 +361,10 @@ export default function DashboardModules() {
 
                           <div className="flex items-center gap-2 flex-wrap mt-auto">
                             <Badge variant="secondary" className="glass-button text-xs font-normal">
-                              {module.category}
+                              {displayCategory(module.category)}
                             </Badge>
                             <Badge variant="outline" className="border-white/20 text-xs text-muted-foreground">
-                              {module.level}
+                              {displayLevel(module.level)}
                             </Badge>
                             {/* Module Status Badge (Creator Confidence) */}
                             {module.status && STATUS_CONFIG[module.status as keyof typeof STATUS_CONFIG] && (() => {
@@ -392,18 +393,18 @@ export default function DashboardModules() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="glass-liquid rounded-[24px]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Modul?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Module?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Modul akan dihapus secara permanen.
+              This action cannot be undone. The module will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {deleteModule.isPending ? "Menghapus..." : "Hapus"}
+              {deleteModule.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

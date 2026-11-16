@@ -1,3 +1,4 @@
+import { RequestReviewPanel } from "./RequestReviewPanel";
 import { useState, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,7 +54,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const roleLabels: Record<AppRole, string> = {
-  user: 'Pelajar',
+  user: 'Learner',
   tutor: 'Tutor',
   admin: 'Admin',
   superadmin: 'Super Admin',
@@ -71,20 +72,6 @@ const roleIcons: Record<AppRole, typeof UserCircle> = {
   tutor: GraduationCap,
   admin: Shield,
   superadmin: Crown,
-};
-
-const statusLabels: Record<RequestStatus, string> = {
-  pending: 'Menunggu',
-  reviewing: 'Ditinjau',
-  completed: 'Selesai',
-  rejected: 'Ditolak',
-};
-
-const statusColors: Record<RequestStatus, string> = {
-  pending: 'bg-amber-500/10 text-amber-600',
-  reviewing: 'bg-primary/10 text-primary',
-  completed: 'bg-green-500/10 text-green-600',
-  rejected: 'bg-destructive/10 text-destructive-text',
 };
 
 export function AdminDashboardContent() {
@@ -106,12 +93,6 @@ export function AdminDashboardContent() {
     newRole: AppRole;
     userName: string;
   }>({ open: false, userId: '', newRole: 'user', userName: '' });
-  const [generateDialog, setGenerateDialog] = useState<{
-    open: boolean;
-    requestId: string;
-    topic: string;
-  }>({ open: false, requestId: '', topic: '' });
-
   const { data: usersData, isLoading: usersLoading } = useUsers();
   const { data: modules } = useModules();
   const { data: popularModules } = usePopularModules();
@@ -155,28 +136,16 @@ export function AdminDashboardContent() {
     setRoleChangeDialog({ open: false, userId: '', newRole: 'user', userName: '' });
   };
 
-  const handleStatusChange = (requestId: string, newStatus: RequestStatus) => {
-    updateRequest.mutate({ id: requestId, status: newStatus });
-  };
-
-  const handleGenerateClick = (requestId: string, topic: string) => {
-    setGenerateDialog({ open: true, requestId, topic });
-  };
-
-  const confirmGenerate = () => {
-    generateModule.mutate(generateDialog.requestId);
-    setGenerateDialog({ open: false, requestId: '', topic: '' });
-  };
 
   return (
     <>
       {/* Welcome Section */}
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-foreground mb-1">
-          Dashboard Admin
+          Admin Dashboard
         </h1>
         <p className="text-muted-foreground">
-          Kelola pengguna, modul, dan request materi.
+          Manage users, modules, and material requests.
         </p>
       </div>
 
@@ -189,7 +158,7 @@ export function AdminDashboardContent() {
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{totalUsers}</p>
-              <p className="text-sm text-muted-foreground">Total Pengguna</p>
+              <p className="text-sm text-muted-foreground">Total Users</p>
             </div>
           </div>
         </div>
@@ -211,7 +180,7 @@ export function AdminDashboardContent() {
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{modules?.length || 0}</p>
-              <p className="text-sm text-muted-foreground">Total Modul</p>
+              <p className="text-sm text-muted-foreground">Total Modules</p>
             </div>
           </div>
         </div>
@@ -224,7 +193,7 @@ export function AdminDashboardContent() {
               <p className="text-2xl font-semibold text-foreground">
                 {requests?.filter(r => r.status === 'pending').length || 0}
               </p>
-              <p className="text-sm text-muted-foreground">Request Pending</p>
+              <p className="text-sm text-muted-foreground">Pending Requests</p>
             </div>
           </div>
         </div>
@@ -233,9 +202,9 @@ export function AdminDashboardContent() {
       {/* Tabs for Users and Requests - URL Persisted */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList>
-          <TabsTrigger value="users">Manajemen Pengguna</TabsTrigger>
-          <TabsTrigger value="requests">Request Materi</TabsTrigger>
-          <TabsTrigger value="modules">Modul</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="requests">Material Requests</TabsTrigger>
+          <TabsTrigger value="modules">Modules</TabsTrigger>
         </TabsList>
 
         {/* Users Tab */}
@@ -243,11 +212,11 @@ export function AdminDashboardContent() {
           <div className="bg-card border border-border rounded-xl shadow-soft overflow-hidden">
             <div className="p-6 border-b border-border">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-foreground">Daftar Pengguna</h2>
+                <h2 className="text-lg font-semibold text-foreground">User List</h2>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Cari pengguna..."
+                    placeholder="Search users..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 w-64"
@@ -259,17 +228,17 @@ export function AdminDashboardContent() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Pengguna</TableHead>
+                  <TableHead>User</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead>Bergabung</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {usersLoading ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                      Memuat...
+                      Loading...
                     </TableCell>
                   </TableRow>
                 ) : filteredUsers && filteredUsers.length > 0 ? (
@@ -288,9 +257,9 @@ export function AdminDashboardContent() {
                             </div>
                             <div>
                               <p className="font-medium text-foreground">
-                                {userItem.display_name || 'Tanpa nama'}
+                                {userItem.display_name || 'Unnamed'}
                                 {isSelf && (
-                                  <span className="text-xs text-muted-foreground ml-2">(Anda)</span>
+                                  <span className="text-xs text-muted-foreground ml-2">(You)</span>
                                 )}
                               </p>
                               <p className="text-xs text-muted-foreground">{userItem.id.slice(0, 8)}...</p>
@@ -305,7 +274,7 @@ export function AdminDashboardContent() {
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {userItem.created_at
-                            ? new Date(userItem.created_at).toLocaleDateString('id-ID')
+                            ? new Date(userItem.created_at).toLocaleDateString('en-US')
                             : '-'}
                         </TableCell>
                         <TableCell className="text-right">
@@ -313,14 +282,14 @@ export function AdminDashboardContent() {
                             <Select
                               value={userItem.role}
                               onValueChange={(value) =>
-                                handleRoleChange(userItem.id, value as AppRole, userItem.display_name || 'Pengguna')
+                                handleRoleChange(userItem.id, value as AppRole, userItem.display_name || 'User')
                               }
                             >
                               <SelectTrigger className="w-32">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="user">Pelajar</SelectItem>
+                                <SelectItem value="user">Learner</SelectItem>
                                 <SelectItem value="tutor">Tutor</SelectItem>
                                 <SelectItem value="admin">Admin</SelectItem>
                               </SelectContent>
@@ -333,7 +302,7 @@ export function AdminDashboardContent() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                      Tidak ada pengguna ditemukan
+                      No users found
                     </TableCell>
                   </TableRow>
                 )}
@@ -344,121 +313,24 @@ export function AdminDashboardContent() {
 
         {/* Requests Tab */}
         <TabsContent value="requests" className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Request Materi</h2>
-            <Select
-              value={statusFilter}
-              onValueChange={(value) => setStatusFilter(value as RequestStatus | 'all')}
-            >
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="Filter status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="pending">Menunggu</SelectItem>
-                <SelectItem value="reviewing">Ditinjau</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="rejected">Ditolak</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="bg-card border border-border rounded-xl shadow-soft overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Topik</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead>Pengguna</TableHead>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {requestsLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8">
-                      <div className="flex items-center justify-center gap-2 text-muted-foreground">
-                        <Clock className="h-4 w-4 animate-spin" />
-                        Memuat...
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : requests && requests.length > 0 ? (
-                  requests.map((request) => (
-                    <TableRow key={request.id}>
-                      <TableCell className="font-medium max-w-[200px] truncate">
-                        {request.topic}
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{request.category || 'Umum'}</Badge>
-                      </TableCell>
-                      <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
-                      <TableCell>
-                        {request.created_at
-                          ? new Date(request.created_at).toLocaleDateString('id-ID')
-                          : '-'}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={statusColors[request.status || 'pending']}>
-                          {statusLabels[request.status || 'pending']}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          {(request.status === 'pending' || request.status === 'reviewing') && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleGenerateClick(request.id, request.topic)}
-                              disabled={generateModule.isPending}
-                              className="gap-1"
-                            >
-                              {generateModule.isPending ? (
-                                <Loader2 className="h-3 w-3 animate-spin" />
-                              ) : (
-                                <Sparkles className="h-3 w-3" />
-                              )}
-                              Generate AI
-                            </Button>
-                          )}
-                          <Select
-                            value={request.status || 'pending'}
-                            onValueChange={(value) => handleStatusChange(request.id, value as RequestStatus)}
-                          >
-                            <SelectTrigger className="w-28">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="pending">Menunggu</SelectItem>
-                              <SelectItem value="reviewing">Ditinjau</SelectItem>
-                              <SelectItem value="completed">Selesai</SelectItem>
-                              <SelectItem value="rejected">Ditolak</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      Tidak ada request
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+          <RequestReviewPanel
+            requests={requests}
+            requestsLoading={requestsLoading}
+            statusFilter={statusFilter}
+            onFilterChange={setStatusFilter}
+            onStatusChange={(id, status) => updateRequest.mutate({ id, status })}
+            onGenerate={(id) => generateModule.mutate(id)}
+            isGenerating={generateModule.isPending}
+            showCategory
+          />
         </TabsContent>
 
         {/* Modules Tab */}
         <TabsContent value="modules" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Modul Populer</h2>
+            <h2 className="text-lg font-semibold text-foreground">Popular Modules</h2>
             <Button size="sm" asChild>
-              <Link to="/dashboard/modules">Lihat Semua</Link>
+              <Link to="/dashboard/modules">View All</Link>
             </Button>
           </div>
 
@@ -496,51 +368,27 @@ export function AdminDashboardContent() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Perubahan Role</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
             <AlertDialogDescription>
-              Anda akan mengubah role <strong>{roleChangeDialog.userName}</strong> menjadi{' '}
+              You are about to change the role of <strong>{roleChangeDialog.userName}</strong> to{' '}
               <strong>{roleLabels[roleChangeDialog.newRole]}</strong>.
               {roleChangeDialog.newRole === 'admin' && (
                 <span className="block mt-2 text-destructive-text">
-                  ⚠️ Perhatian: User dengan role Admin memiliki akses penuh ke sistem.
+                  ⚠️ Warning: users with the Admin role have full access to the system.
                 </span>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRoleChange}>
-              Konfirmasi
+              Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Generate Confirmation Dialog */}
-      <AlertDialog
-        open={generateDialog.open}
-        onOpenChange={(open) => setGenerateDialog(prev => ({ ...prev, open }))}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              Generate Modul dengan AI
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}".
-              Proses ini mungkin membutuhkan waktu beberapa detik.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmGenerate}>
-              <Sparkles className="h-4 w-4 mr-2" />
-              Generate Modul
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+
     </>
   );
 }

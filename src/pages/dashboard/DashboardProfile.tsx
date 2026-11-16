@@ -16,7 +16,7 @@ import { useLearningStats } from "@/hooks/useLearningStats";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { PremiumStore } from "@/components/features/premium/PremiumStore";
 import {
   ArrowLeft,
@@ -181,15 +181,15 @@ export default function DashboardProfile() {
         .eq("id", user.id);
 
       toast({
-        title: "Sukses",
-        description: "Profil berhasil diperbarui",
+        title: "Success",
+        description: "Profile updated successfully",
       });
       setIsEditing(false);
     } catch (error: unknown) {
       logger.error("Update profile error:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Gagal memperbarui profil",
+        description: error instanceof Error ? error.message : "Failed to update profile",
         variant: "destructive",
       });
     } finally {
@@ -628,7 +628,7 @@ export default function DashboardProfile() {
                     Second Brain
                   </h2>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    Anda memiliki <span className="font-bold text-foreground">{stats?.totalNotes || 0}</span> catatan dari pembelajaran Anda.
+                    You have <span className="font-bold text-foreground">{stats?.totalNotes || 0}</span> notes from your learning.
                   </p>
                 </div>
 
@@ -636,7 +636,7 @@ export default function DashboardProfile() {
                 <Link to="/dashboard/second-brain">
                   <Button size="lg" className="mt-4 gap-2">
                     <Brain className="h-5 w-5" />
-                    Buka Second Brain
+                    Open Second Brain
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                 </Link>
@@ -769,7 +769,7 @@ export default function DashboardProfile() {
                     <Clock className="h-5 w-5 text-primary" />
                     <div className="flex flex-col items-start text-left">
                       <span className="font-medium text-foreground">View Changelog</span>
-                      <span className="text-xs font-normal text-muted-foreground">Lihat riwayat pembaruan aplikasi</span>
+                      <span className="text-xs font-normal text-muted-foreground">View app update history</span>
                     </div>
                     <ChevronRight className="h-4 w-4 ml-auto text-muted-foreground" />
                   </Button>

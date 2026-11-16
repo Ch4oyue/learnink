@@ -32,7 +32,7 @@ export function useUpdateUserRole() {
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: AppRole }) => {
       // Protect super admin from ANY role changes (Using ID check)
       if (userId === SUPER_ADMIN_USER_ID) {
-        throw new Error('Super Admin tidak dapat diubah role-nya');
+        throw new Error("A Super Admin's role cannot be changed");
       }
 
       // Also check if current role is superadmin (double check against DB)
@@ -43,12 +43,12 @@ export function useUpdateUserRole() {
         .single();
 
       if (currentRoleData?.role === 'superadmin') {
-        throw new Error('Super Admin role bersifat permanen dan tidak dapat diubah');
+        throw new Error('The Super Admin role is permanent and cannot be changed');
       }
 
       // Prevent promoting any user to superadmin
       if (newRole === 'superadmin') {
-        throw new Error('Tidak dapat mengubah pengguna menjadi Super Admin');
+        throw new Error('Cannot change a user to Super Admin');
       }
 
       const { data, error } = await supabase
@@ -66,14 +66,14 @@ export function useUpdateUserRole() {
       queryClient.invalidateQueries({ queryKey: ['user-role'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
-        title: "Berhasil",
-        description: "Role pengguna berhasil diubah",
+        title: "Success",
+        description: "User role changed successfully",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal mengubah role pengguna",
+        description: error.message || "Failed to change user role",
         variant: "destructive",
       });
       logger.error('Error updating role:', error);
@@ -89,7 +89,7 @@ export function useBanUser() {
     mutationFn: async ({ userId, banDuration }: { userId: string; banDuration: 'unban' | '1h' | '24h' | '7d' | '30d' | 'permanent' }) => {
       // Check if user is super admin
       if (userId === SUPER_ADMIN_USER_ID) {
-        throw new Error('Super Admin tidak dapat di-ban');
+        throw new Error('A Super Admin cannot be banned');
       }
 
       // Calculate ban end time
@@ -129,16 +129,16 @@ export function useBanUser() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
-        title: data.bannedUntil ? "Pengguna di-ban" : "Ban dicabut",
+        title: data.bannedUntil ? "User banned" : "Ban lifted",
         description: data.bannedUntil
-          ? "Pengguna tidak dapat mengakses platform"
-          : "Pengguna dapat mengakses platform kembali",
+          ? "The user can no longer access the platform"
+          : "The user can access the platform again",
       });
     },
     onError: (error: Error) => {
       toast({
         title: "Error",
-        description: error.message || "Gagal mengubah status ban pengguna",
+        description: error.message || "Failed to change user ban status",
         variant: "destructive",
       });
       logger.error('Error banning user:', error);

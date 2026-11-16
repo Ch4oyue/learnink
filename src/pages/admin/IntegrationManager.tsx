@@ -166,8 +166,8 @@ export default function IntegrationManager() {
         },
         onSuccess: (data) => {
             toast({
-                title: "Integrasi Berhasil Dibuat! 🎉",
-                description: "Simpan API key - tidak akan ditampilkan lagi!",
+                title: "Integration Created Successfully! 🎉",
+                description: "Save this API key - it will not be shown again!",
             });
             setNewApiKey(data.api_key);
             setFormData(INITIAL_FORM);
@@ -175,7 +175,7 @@ export default function IntegrationManager() {
         },
         onError: (error) => {
             toast({
-                title: "Gagal Membuat Integrasi",
+                title: "Failed to Create Integration",
                 description: error.message,
                 variant: "destructive",
             });
@@ -209,8 +209,8 @@ export default function IntegrationManager() {
         },
         onSuccess: () => {
             toast({
-                title: "Integrasi Dihapus",
-                description: "API key tidak lagi valid.",
+                title: "Integration Deleted",
+                description: "The API key is no longer valid.",
             });
             setDeleteIntegration(null);
             queryClient.invalidateQueries({ queryKey: ["integrations"] });
@@ -252,8 +252,8 @@ export default function IntegrationManager() {
         },
         onSuccess: (data) => {
             toast({
-                title: "API Key Diperbarui! 🔑",
-                description: "Key lama tidak lagi valid. Simpan key baru!",
+                title: "API Key Updated! 🔑",
+                description: "The old key is no longer valid. Save the new key!",
             });
             setNewApiKey(data.api_key);
             setRegenerate(null);
@@ -262,7 +262,7 @@ export default function IntegrationManager() {
         },
         onError: (error) => {
             toast({
-                title: "Gagal Memperbarui Key",
+                title: "Failed to Update Key",
                 description: error.message,
                 variant: "destructive",
             });
@@ -279,14 +279,14 @@ export default function IntegrationManager() {
     const copyToClipboard = (text: string, label: string) => {
         navigator.clipboard.writeText(text);
         toast({
-            title: "Disalin! 📋",
-            description: `${label} berhasil disalin ke clipboard.`,
+            title: "Copied! 📋",
+            description: `${label} copied to clipboard.`,
         });
     };
 
     const formatDate = (dateString: string | null) => {
-        if (!dateString) return "Belum pernah";
-        return new Date(dateString).toLocaleDateString("id-ID", {
+        if (!dateString) return "Never";
+        return new Date(dateString).toLocaleDateString("en-US", {
             day: "numeric",
             month: "short",
             year: "numeric",
@@ -322,7 +322,7 @@ export default function IntegrationManager() {
                             Integration Manager
                         </h1>
                         <p className="text-muted-foreground">
-                            Kelola koneksi dengan n8n, Notion, dan sumber eksternal lainnya.
+                            Manage connections with n8n, Notion, and other external sources.
                         </p>
                     </div>
                     <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
@@ -491,11 +491,11 @@ export default function IntegrationManager() {
                         <div className="flex flex-col items-center justify-center py-16 text-center">
                             <Plug className="h-12 w-12 text-muted-foreground/50 mb-4" />
                             <h3 className="text-lg font-medium text-foreground mb-1">
-                                Belum ada integrasi
+                                No integrations yet
                             </h3>
                             <p className="text-muted-foreground text-sm max-w-md mb-4">
-                                Buat integrasi pertamamu untuk menghubungkan LearnInk dengan n8n, Notion,
-                                atau sumber eksternal lainnya.
+                                Create your first integration to connect LearnInk with n8n, Notion,
+                                or other external sources.
                             </p>
                             <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
                                 <Plus className="h-4 w-4" />
@@ -572,8 +572,8 @@ export default function IntegrationManager() {
                         </DialogTitle>
                         <DialogDescription>
                             {newApiKey
-                                ? "Simpan API key ini sekarang. Tidak akan ditampilkan lagi!"
-                                : "Buat integrasi baru untuk menghubungkan sumber eksternal."}
+                                ? "Save this API key now. It will not be shown again!"
+                                : "Create a new integration to connect external sources."}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -581,7 +581,7 @@ export default function IntegrationManager() {
                         <div className="space-y-4">
                             <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                                 <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-2">
-                                    ⚠️ Simpan key ini sekarang!
+                                    ⚠️ Save this key now!
                                 </p>
                                 <code className="block text-xs bg-background p-3 rounded font-mono break-all border">
                                     {newApiKey}
@@ -608,7 +608,7 @@ export default function IntegrationManager() {
                     ) : (
                         <form onSubmit={handleCreate} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="name">Nama Integrasi *</Label>
+                                <Label htmlFor="name">Integration Name *</Label>
                                 <Input
                                     id="name"
                                     value={formData.name}
@@ -619,7 +619,7 @@ export default function IntegrationManager() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="source">Sumber</Label>
+                                <Label htmlFor="source">Source</Label>
                                 <Select
                                     value={formData.source}
                                     onValueChange={(value: IntegrationSource) =>
@@ -665,7 +665,7 @@ export default function IntegrationManager() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="description">Deskripsi (opsional)</Label>
+                                <Label htmlFor="description">Description (optional)</Label>
                                 <Tabs defaultValue="write" className="w-full">
                                     <TabsList className="grid w-full grid-cols-2 mb-2">
                                         <TabsTrigger value="write">Write</TabsTrigger>
@@ -676,7 +676,7 @@ export default function IntegrationManager() {
                                             id="description"
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            placeholder="Jelaskan kegunaan integrasi ini (mendukung Markdown)..."
+                                            placeholder="Describe what this integration is for (Markdown supported)..."
                                             rows={4}
                                         />
                                     </TabsContent>
@@ -686,7 +686,7 @@ export default function IntegrationManager() {
                                                 <MarkdownRenderer content={formData.description} variant="compact" />
                                             ) : (
                                                 <span className="text-muted-foreground text-sm italic">
-                                                    Tidak ada konten untuk dipreview
+                                                    No content to preview
                                                 </span>
                                             )}
                                         </div>
@@ -696,7 +696,7 @@ export default function IntegrationManager() {
 
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                                    Batal
+                                    Cancel
                                 </Button>
                                 <Button type="submit" disabled={createMutation.isPending}>
                                     {createMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
@@ -738,20 +738,20 @@ export default function IntegrationManager() {
             <AlertDialog open={!!deleteIntegration} onOpenChange={() => setDeleteIntegration(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Hapus Integrasi?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete Integration?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Anda yakin ingin menghapus <strong>{deleteIntegration?.name}</strong>?
-                            API key akan menjadi tidak valid dan tidak dapat digunakan lagi.
+                            Are you sure you want to delete <strong>{deleteIntegration?.name}</strong>?
+                            The API key will become invalid and can no longer be used.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => deleteIntegration && deleteMutation.mutate(deleteIntegration.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             {deleteMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                            Hapus
+                            Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
@@ -763,12 +763,12 @@ export default function IntegrationManager() {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Regenerate API Key?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Key lama untuk <strong>{regenerateIntegration?.name}</strong> akan menjadi tidak valid.
-                            Anda perlu memperbarui key di semua workflow yang menggunakannya.
+                            The old key for <strong>{regenerateIntegration?.name}</strong> will become invalid.
+                            You will need to update the key in every workflow that uses it.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => regenerateIntegration && regenerateMutation.mutate(regenerateIntegration)}
                         >

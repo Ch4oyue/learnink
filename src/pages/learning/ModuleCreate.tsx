@@ -6,9 +6,9 @@ export default function ModuleCreate() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Buat Modul Baru</h1>
+          <h1 className="text-2xl font-semibold">Create New Module</h1>
           <p className="text-muted-foreground">
-            Buat materi pembelajaran baru untuk siswa
+            Create new learning material for students
           </p>
         </div>
         <ModuleEditor mode="create" />

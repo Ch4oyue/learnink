@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { corsFor, preflight } from "../_shared/cors.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
 // =============================================
@@ -9,11 +10,6 @@ import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-
-const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 // =============================================
 // TYPES
@@ -54,9 +50,11 @@ function createKeyPreview(key: string): string {
 // =============================================
 
 serve(async (req) => {
+    const corsHeaders = corsFor(req);
+
     // Handle CORS preflight
     if (req.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
+        return preflight(req);
     }
 
     // Only accept POST

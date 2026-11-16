@@ -3,6 +3,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { validatePayload, ValidationError } from "./validation.ts";
+import { corsFor, preflight } from "../_shared/cors.ts";
 
 // =============================================
 // ENVIRONMENT & CONFIG
@@ -17,11 +18,6 @@ const INGEST_SECRET = Deno.env.get("INGEST_SECRET");
 // Rate limiting configuration
 const RATE_LIMIT_MAX_REQUESTS = 100; // Max requests per window
 const RATE_LIMIT_WINDOW_MINUTES = 15; // Time window in minutes
-
-const corsHeaders = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
 
 // =============================================
 // TYPES
@@ -192,9 +188,11 @@ async function updateIntegrationStats(
 // =============================================
 
 serve(async (req) => {
+    const corsHeaders = corsFor(req);
+
     // Handle CORS preflight requests
     if (req.method === "OPTIONS") {
-        return new Response(null, { headers: corsHeaders });
+        return preflight(req);
     }
 
     // Only accept POST requests

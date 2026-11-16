@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Blocks commits that stage credentials (API keys, JWTs, service_role keys).
+#
+# Enable it once per clone:
+#   git config core.hooksPath .githooks
+# `bun install` does that automatically via the "prepare" script in package.json.
+#
+# Bypass in an emergency (and rotate the credential anyway):
+#   git commit --no-verify
+#
+# This hook is a convenience; the authoritative gate is the `secret-scan` job in
+# .github/workflows/ci.yml, which cannot be skipped locally.
+
+set -e
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+    echo "pre-commit: gitleaks not found, skipping the secret scan."
+    echo "            Install it to get local protection:"
+    echo "              macOS:  brew install gitleaks"
+    echo "              Linux:  https://github.com/gitleaks/gitleaks/releases"
+    echo "            CI still blocks committed secrets."
+    exit 0
+fi
+
+# gitleaks 8.19+ renamed `protect --staged` to `git --staged`. Probe rather than
+# pin a version so the hook keeps working across upgrades.
+if gitleaks git --help >/dev/null 2>&1; then
+    scan() { gitleaks git --staged --redact --verbose --no-banner; }
+else
+    scan() { gitleaks protect --staged --redact --verbose --no-banner; }
+fi
+
+if scan; then
+    exit 0
+fi
+
+echo ""
+echo "pre-commit: BLOCKED - gitleaks found credentials in the staged changes."
+echo "            1. Remove the secret from the staged files."
+echo "            2. Rotate it; assume it is already compromised."
+echo "            3. Stage again and commit."
+echo "            Report false positives in a .gitleaks.toml allowlist."
+exit 1

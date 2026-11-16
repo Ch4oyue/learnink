@@ -1,17 +1,13 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, GET, OPTIONS, PUT, DELETE",
-  "Access-Control-Max-Age": "86400",
-};
+import { corsFor, preflight } from "../_shared/cors.ts";
 
 serve(async (req) => {
+  const corsHeaders = corsFor(req);
+
   // Handle CORS preflight request
   if (req.method === "OPTIONS") {
-    return new Response(null, { status: 200, headers: corsHeaders });
+    return preflight(req);
   }
 
   try {

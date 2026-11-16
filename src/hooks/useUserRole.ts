@@ -37,7 +37,7 @@ export function useUpdateUserRole() {
         .eq('user_id', userId);
 
       if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
-      const currentRoles = (roleRows ?? []).map((row) => row.role);
+      const currentRoles = (roleRows ?? []).map((row: { role: string }) => row.role);
       if (currentRoles.includes('superadmin')) {
         throw new Error('Super Admin role bersifat permanen dan tidak dapat diubah');
       }
@@ -90,7 +90,7 @@ export function useBanUser() {
         .eq('user_id', userId);
 
       if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
-      const targetRoles = (roleRows ?? []).map((row) => row.role);
+      const targetRoles = (roleRows ?? []).map((row: { role: string }) => row.role);
       if (targetRoles.includes('superadmin')) {
         throw new Error('Super Admin tidak dapat di-ban');
       }

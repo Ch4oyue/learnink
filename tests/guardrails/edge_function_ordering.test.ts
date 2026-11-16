@@ -35,6 +35,19 @@ test("rolesOf throws on missing configuration and on query error (no silent [])"
   expect(rolesOfBody).not.toContain("return [];");
 });
 
+test("rolesOf validates roles against the AppRole union (no blind cast)", () => {
+  const src = read("supabase/functions/_shared/auth.ts");
+  expect(src).toContain("APP_ROLES");
+  // The mapping must filter through the union, not reassert with `as AppRole`.
+  expect(src).not.toContain("row.role as AppRole");
+});
+
+test("requireRole logs the swallowed lookup error server-side", () => {
+  const src = read("supabase/functions/_shared/auth.ts");
+  expect(src).toContain("console.error(");
+  expect(src).not.toContain("} catch {");
+});
+
 test("requireRole maps a failed role lookup to 500, not 403", () => {
   const src = read("supabase/functions/_shared/auth.ts");
   expect(src).toContain('jsonError(500, "Role lookup failed", corsHeaders)');

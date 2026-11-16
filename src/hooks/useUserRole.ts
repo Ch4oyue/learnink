@@ -47,7 +47,7 @@ export function useUpdateUserRole() {
 
       // Prevent promoting any user to superadmin
       if (newRole === 'superadmin') {
-        throw new Error('Cannot change a user to Super Admin');
+        throw new Error('Tidak dapat mengubah pengguna menjadi Super Admin');
       }
 
       const { data, error } = await supabase

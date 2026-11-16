@@ -1,3 +1,6 @@
+// The hooks are called at the top level on purpose: the point of this file is
+// to capture the `mutationFn` each hook registers, not to render anything.
+/* eslint-disable react-hooks/rules-of-hooks */
 import { describe, test, expect, mock } from "bun:test";
 
 // Behavioral tests for the super-admin guards in useUserRole.ts. The supabase

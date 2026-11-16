@@ -50,10 +50,11 @@ export function clientIp(req: Request): string {
   if (forwarded) {
     const hops = forwarded.split(",").map(stripQuotes).filter((hop) => hop.length > 0);
     if (hops.length > 0) {
-      return stripPort(hops[hops.length - 1]);
+      // stripPort can yield "" for a malformed bracketed value like "[]".
+      return stripPort(hops[hops.length - 1]) || "unknown";
     }
   }
 
   const realIp = req.headers.get("x-real-ip");
-  return realIp ? stripPort(stripQuotes(realIp)) : "unknown";
+  return realIp ? stripPort(stripQuotes(realIp)) || "unknown" : "unknown";
 }

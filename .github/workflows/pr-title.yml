@@ -1,0 +1,47 @@
+name: PR Title
+
+# Checks that the pull request title follows the Conventional Commits format
+# (for example "fix: Correct typo"). It only reads the title through the API.
+# It does not check out code, review code, run tests, or release anything.
+#
+# Plain pull_request on purpose: pull_request_target would run with a write token
+# and this check needs only read access. Fork PRs get a read-only token, which is
+# enough here because the PR is public and is only read.
+on:
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+
+permissions:
+  pull-requests: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate PR title
+    # Dependabot titles ("Bump ...") are generated and are not conventional.
+    if: github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      # amannn/action-semantic-pull-request v6.1.2
+      - uses: amannn/action-semantic-pull-request@2252a14e810aa9b85c2d560bd7070c802206ecf6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Conventional Commits default types plus security, which this
+          # repository already uses in PR titles.
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+            security

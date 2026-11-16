@@ -428,15 +428,15 @@ export default function DashboardUsers() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
             <AlertDialogDescription>
-              Apakah Anda yakin ingin mengubah role{" "}
+              Are you sure you want to change the role of{" "}
               <span className="font-medium text-foreground">
                 {confirmDialog.user?.display_name || "this user"}
               </span>{" "}
-              dari{" "}
+              from{" "}
               <Badge variant={roleConfig[confirmDialog.user?.role || "user"].variant} className="mx-1">
                 {roleConfig[confirmDialog.user?.role || "user"].label}
               </Badge>
-              menjadi{" "}
+              to{" "}
               <Badge variant={roleConfig[confirmDialog.newRole || "user"].variant} className="mx-1">
                 {roleConfig[confirmDialog.newRole || "user"].label}
               </Badge>
@@ -446,7 +446,7 @@ export default function DashboardUsers() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRoleChange}>
-              Ya, Change Role
+              Yes, Change Role
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

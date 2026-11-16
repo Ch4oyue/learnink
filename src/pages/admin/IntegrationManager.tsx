@@ -166,7 +166,7 @@ export default function IntegrationManager() {
         },
         onSuccess: (data) => {
             toast({
-                title: "Integrasi Berhasil Dibuat! 🎉",
+                title: "Integration Created Successfully! 🎉",
                 description: "Save this API key - it will not be shown again!",
             });
             setNewApiKey(data.api_key);
@@ -175,7 +175,7 @@ export default function IntegrationManager() {
         },
         onError: (error) => {
             toast({
-                title: "Gagal Membuat Integrasi",
+                title: "Failed to Create Integration",
                 description: error.message,
                 variant: "destructive",
             });
@@ -209,7 +209,7 @@ export default function IntegrationManager() {
         },
         onSuccess: () => {
             toast({
-                title: "Integrasi Dihapus",
+                title: "Integration Deleted",
                 description: "The API key is no longer valid.",
             });
             setDeleteIntegration(null);
@@ -252,7 +252,7 @@ export default function IntegrationManager() {
         },
         onSuccess: (data) => {
             toast({
-                title: "API Key Diperbarui! 🔑",
+                title: "API Key Updated! 🔑",
                 description: "The old key is no longer valid. Save the new key!",
             });
             setNewApiKey(data.api_key);
@@ -262,7 +262,7 @@ export default function IntegrationManager() {
         },
         onError: (error) => {
             toast({
-                title: "Gagal Memperbarui Key",
+                title: "Failed to Update Key",
                 description: error.message,
                 variant: "destructive",
             });
@@ -279,7 +279,7 @@ export default function IntegrationManager() {
     const copyToClipboard = (text: string, label: string) => {
         navigator.clipboard.writeText(text);
         toast({
-            title: "Disalin! 📋",
+            title: "Copied! 📋",
             description: `${label} berhasil disalin ke clipboard.`,
         });
     };
@@ -665,7 +665,7 @@ export default function IntegrationManager() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="description">Deskripsi (opsional)</Label>
+                                <Label htmlFor="description">Description (optional)</Label>
                                 <Tabs defaultValue="write" className="w-full">
                                     <TabsList className="grid w-full grid-cols-2 mb-2">
                                         <TabsTrigger value="write">Write</TabsTrigger>
@@ -676,7 +676,7 @@ export default function IntegrationManager() {
                                             id="description"
                                             value={formData.description}
                                             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            placeholder="Jelaskan kegunaan integrasi ini (mendukung Markdown)..."
+                                            placeholder="Describe what this integration is for (Markdown supported)..."
                                             rows={4}
                                         />
                                     </TabsContent>
@@ -763,8 +763,8 @@ export default function IntegrationManager() {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Regenerate API Key?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Key lama untuk <strong>{regenerateIntegration?.name}</strong> akan menjadi tidak valid.
-                            Anda perlu memperbarui key di semua workflow yang menggunakannya.
+                            The old key for <strong>{regenerateIntegration?.name}</strong> will become invalid.
+                            You will need to update the key in every workflow that uses it.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>

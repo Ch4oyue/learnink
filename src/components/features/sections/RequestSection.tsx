@@ -12,6 +12,7 @@ import { Send, CheckCircle, LogIn, AlertCircle } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCreateRequest } from "@/hooks/useMaterialRequests";
 import { useNavigate } from "react-router-dom";
+import { displayCategory } from "@/lib/categoryLabels";
 
 const requestSchema = z.object({
   topic: z
@@ -174,19 +175,19 @@ export const RequestSection = () => {
                   {/* Category */}
                   <div className="space-y-2">
                     <label className="block text-sm font-medium text-foreground">
-                      Kategori
+                      Category
                     </label>
                     <Select
                       value={category}
                       onValueChange={(value) => setValue("category", value)}
                     >
                       <SelectTrigger className="h-11 rounded-xl">
-                        <SelectValue placeholder="Pilih kategori" />
+                        <SelectValue placeholder="Select a category" />
                       </SelectTrigger>
                       <SelectContent>
                         {categories.map((cat) => (
                           <SelectItem key={cat} value={cat}>
-                            {cat}
+                            {displayCategory(cat)}
                           </SelectItem>
                         ))}
                       </SelectContent>

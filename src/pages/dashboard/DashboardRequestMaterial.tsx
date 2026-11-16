@@ -19,20 +19,21 @@ import { format } from "date-fns";
 import { enUS as localeId } from "date-fns/locale";
 import { Loader2, Plus, FileQuestion, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { displayCategory } from "@/lib/categoryLabels";
 
 const categories = [
   { value: "AI & Machine Learning", label: "AI & Machine Learning" },
   { value: "Automation", label: "Automation" },
   { value: "Productivity", label: "Productivity" },
   { value: "Data Analysis", label: "Data Analysis" },
-  { value: "Umum", label: "Umum" },
+  { value: "Umum", label: "General" },
 ];
 
 const statusConfig = {
-  pending: { label: "Menunggu", icon: Clock, color: "bg-yellow-500/10 text-yellow-500" },
-  reviewing: { label: "Dalam Review", icon: AlertCircle, color: "bg-blue-500/10 text-blue-500" },
-  completed: { label: "Selesai", icon: CheckCircle2, color: "bg-green-500/10 text-green-500" },
-  rejected: { label: "Ditolak", icon: XCircle, color: "bg-red-500/10 text-red-500" },
+  pending: { label: "Pending", icon: Clock, color: "bg-yellow-500/10 text-yellow-500" },
+  reviewing: { label: "Under Review", icon: AlertCircle, color: "bg-blue-500/10 text-blue-500" },
+  completed: { label: "Completed", icon: CheckCircle2, color: "bg-green-500/10 text-green-500" },
+  rejected: { label: "Rejected", icon: XCircle, color: "bg-red-500/10 text-red-500" },
 };
 
 export default function DashboardRequestMaterial() {
@@ -190,7 +191,7 @@ export default function DashboardRequestMaterial() {
                             </p>
                           )}
                           <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                            <span>Kategori: {request.category}</span>
+                            <span>Category: {displayCategory(request.category)}</span>
                             <span>
                               {format(new Date(request.created_at!), "dd MMM yyyy", { locale: localeId })}
                             </span>

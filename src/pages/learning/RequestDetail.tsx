@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
+import { displayCategory } from "@/lib/categoryLabels";
   ArrowLeft, 
   FileQuestion, 
   Clock,
@@ -21,28 +22,28 @@ import {
 
 const statusConfig = {
   pending: {
-    label: 'Menunggu',
+    label: 'Pending',
     color: 'bg-amber-500/10 text-amber-600',
     icon: Clock,
-    description: 'Request Anda sedang menunggu untuk ditinjau oleh tutor.',
+    description: 'Your request is waiting to be reviewed by a tutor.',
   },
   reviewing: {
-    label: 'Sedang Ditinjau',
+    label: 'Under Review',
     color: 'bg-primary/10 text-primary',
     icon: Eye,
-    description: 'Request Anda sedang ditinjau oleh tutor kami.',
+    description: 'Your request is being reviewed by our tutors.',
   },
   completed: {
-    label: 'Selesai',
+    label: 'Completed',
     color: 'bg-green-500/10 text-green-600',
     icon: CheckCircle,
-    description: 'Request Anda telah selesai diproses dan modul telah dibuat.',
+    description: 'Your request has been processed and the module has been created.',
   },
   rejected: {
-    label: 'Ditolak',
+    label: 'Rejected',
     color: 'bg-destructive/10 text-destructive-text',
     icon: XCircle,
-    description: 'Request Anda tidak dapat diproses. Lihat catatan admin untuk detail.',
+    description: 'Your request could not be processed. See the admin notes for details.',
   },
 };
 
@@ -53,9 +54,9 @@ const priorityColors: Record<string, string> = {
 };
 
 const priorityLabels: Record<string, string> = {
-  low: 'Rendah',
-  medium: 'Sedang',
-  high: 'Tinggi',
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
 };
 
 export default function RequestDetail() {
@@ -130,12 +131,12 @@ export default function RequestDetail() {
               {statusInfo.label}
             </Badge>
             <Badge className={priorityColors[priority]}>
-              Prioritas: {priorityLabels[priority]}
+              Priority: {priorityLabels[priority]}
             </Badge>
             {request.category && (
               <Badge variant="outline">
                 <Tag className="h-3 w-3 mr-1" />
-                {request.category}
+                {displayCategory(request.category)}
               </Badge>
             )}
           </div>
@@ -152,7 +153,7 @@ export default function RequestDetail() {
             <div className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               <span>
-                Dibuat: {request.created_at 
+                Created: {request.created_at 
                   ? new Date(request.created_at).toLocaleDateString('en-US', {
                       day: 'numeric',
                       month: 'long',

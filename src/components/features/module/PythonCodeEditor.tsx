@@ -62,7 +62,7 @@ export function PythonCodeEditor({
         setError(result.error);
       }
     } catch (err: unknown) {
-      const errorMsg = err instanceof Error ? err.message : "Terjadi kesalahan saat menjalankan kode";
+      const errorMsg = err instanceof Error ? err.message : "An error occurred while running the code";
       setError(errorMsg);
     } finally {
       setIsRunning(false);
@@ -151,8 +151,8 @@ export function PythonCodeEditor({
             size="icon"
             className="h-8 w-8"
             onClick={handleCopy}
-            title="Salin kode"
-            aria-label="Salin kode"
+            title="Copy code"
+            aria-label="Copy code"
           >
             {copied ? (
               <Check className="h-4 w-4 text-green-500" />

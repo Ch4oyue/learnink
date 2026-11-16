@@ -252,7 +252,7 @@ export default function DashboardSettings() {
 
         <Tabs defaultValue="categories">
           <TabsList>
-            <TabsTrigger value="categories" className="gap-2"><Folder className="h-4 w-4" /> Kategori</TabsTrigger>
+            <TabsTrigger value="categories" className="gap-2"><Folder className="h-4 w-4" /> Category</TabsTrigger>
             <TabsTrigger value="levels" className="gap-2"><Layers className="h-4 w-4" /> Level</TabsTrigger>
           </TabsList>
 
@@ -267,10 +267,10 @@ export default function DashboardSettings() {
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
                       <Label>Category Name</Label>
-                      <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Contoh: Web Development" />
+                      <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Example: Web Development" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Warna</Label>
+                      <Label>Color</Label>
                       <div className="flex items-center gap-2">
                         <Input type="color" value={newCategoryColor} onChange={(e) => setNewCategoryColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
                         <Palette className="h-4 w-4 text-muted-foreground" />
@@ -309,7 +309,7 @@ export default function DashboardSettings() {
                             variant="ghost"
                             size="icon"
                             onClick={() => setEditingItem({ type: 'category', id: cat.id, name: cat.name, description: cat.description || '', color: cat.color })}
-                            aria-label={`Edit kategori ${cat.name}`}
+                            aria-label={`Edit category ${cat.name}`}
                           >
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -318,7 +318,7 @@ export default function DashboardSettings() {
                             size="icon"
                             className="text-destructive-text hover:text-destructive-text"
                             onClick={() => handleDelete(cat.id, cat.name, 'category')}
-                            aria-label={`Hapus kategori ${cat.name}`}
+                            aria-label={`Delete category ${cat.name}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -342,10 +342,10 @@ export default function DashboardSettings() {
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
                       <Label>Level Name</Label>
-                      <Input value={newLevelName} onChange={(e) => setNewLevelName(e.target.value)} placeholder="Contoh: Expert" />
+                      <Input value={newLevelName} onChange={(e) => setNewLevelName(e.target.value)} placeholder="Example: Expert" />
                     </div>
                     <div className="space-y-2">
-                      <Label>Warna</Label>
+                      <Label>Color</Label>
                       <div className="flex items-center gap-2">
                         <Input type="color" value={newLevelColor} onChange={(e) => setNewLevelColor(e.target.value)} className="w-12 h-10 p-1 cursor-pointer" />
                         <Palette className="h-4 w-4 text-muted-foreground" />
@@ -393,7 +393,7 @@ export default function DashboardSettings() {
                             size="icon"
                             className="text-destructive-text hover:text-destructive-text"
                             onClick={() => handleDelete(level.id, level.name, 'level')}
-                            aria-label={`Hapus level ${level.name}`}
+                            aria-label={`Delete level ${level.name}`}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -423,7 +423,7 @@ export default function DashboardSettings() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Warna</Label>
+                <Label>Color</Label>
                 <div className="flex items-center gap-2">
                   <Input
                     type="color"
@@ -435,7 +435,7 @@ export default function DashboardSettings() {
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Deskripsi</Label>
+                <Label>Description</Label>
                 <Input
                   value={editingItem?.description || ''}
                   onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, description: e.target.value }) : null)}

@@ -46,6 +46,7 @@ import {
 } from "lucide-react";
 import { ModulePreviewCard } from "./ModulePreviewCard";
 import { ModuleContentPreview } from "./ModuleContentPreview";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 // ============================================
 // CONSTANTS
@@ -75,9 +76,9 @@ const moduleSchema = z.object({
   title: z.string().min(1, "Module title is required").max(200, "Title is too long"),
   summary: z.string().max(500, "Summary is too long").optional().or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
-  category: z.string().min(1, "Pilih kategori"),
-  level: z.string().min(1, "Pilih level"),
-  icon_name: z.string().min(1, "Pilih icon"),
+  category: z.string().min(1, "Select a category"),
+  level: z.string().min(1, "Select a level"),
+  icon_name: z.string().min(1, "Select an icon"),
   is_published: z.boolean(),
 });
 
@@ -264,7 +265,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                       <SelectContent>
                         {categories.map((cat) => (
                           <SelectItem key={cat} value={cat}>
-                            {cat}
+                            {displayCategory(cat)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -289,7 +290,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                       <SelectContent>
                         {levels.map((level) => (
                           <SelectItem key={level} value={level}>
-                            {level}
+                            {displayLevel(level)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -337,7 +338,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           <Card className="lg:col-span-2">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Konten Modul</CardTitle>
+                <CardTitle className="text-lg">Module Content</CardTitle>
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="grid grid-cols-2 w-[200px]">
                     <TabsTrigger value="edit">Edit</TabsTrigger>

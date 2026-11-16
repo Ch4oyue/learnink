@@ -115,7 +115,7 @@ export function Navbar() {
               size="icon"
               onClick={toggleTheme}
               className="text-muted-foreground hover:text-foreground"
-              aria-label="Ganti Tema"
+              aria-label="Toggle Theme"
             >
               {resolvedTheme === "dark" ? (
                 <Sun className="h-5 w-5" />

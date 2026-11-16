@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { FloatingSelectionMenu } from "./FloatingSelectionMenu";
 import { useTextSelection } from "@/hooks/useTextSelection";
+import { displayCategory } from "@/lib/categoryLabels";
 
 // ============================================
 // TYPES
@@ -89,7 +90,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                                         variant="secondary"
                                         className="text-xs font-bold uppercase tracking-wider"
                                     >
-                                        {metadata.category}
+                                        {displayCategory(metadata.category)}
                                     </Badge>
                                 )}
                                 {metadata.readingTime && (

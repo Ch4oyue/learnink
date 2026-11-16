@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { 
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   BookOpen, 
   Search, 
   Code, 
@@ -157,13 +158,13 @@ export default function Modules() {
                       <div className="flex gap-2">
                         <Badge className={levelColors[level]}>
                           <BarChart3 className="h-3 w-3 mr-1" />
-                          {level}
+                          {displayLevel(level)}
                         </Badge>
                       </div>
                     </div>
                     
                     <Badge className={`${categoryColors[category] || categoryColors.Umum} w-fit mb-3`}>
-                      {category}
+                      {displayCategory(category)}
                     </Badge>
 
                     <h3 className="text-lg font-semibold text-foreground mb-2 group-hover:text-primary transition-colors">

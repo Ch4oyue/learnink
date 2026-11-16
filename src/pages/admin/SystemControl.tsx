@@ -279,14 +279,14 @@ export default function SystemControl() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Judul</Label>
+                <Label>Title</Label>
                 <Input
                   value={broadcast.title}
                   onChange={(e) => setBroadcast({ ...broadcast, title: e.target.value })}
                 />
               </div>
               <div className="space-y-2">
-                <Label>Konten</Label>
+                <Label>Content</Label>
                 <Input
                   value={broadcast.content}
                   onChange={(e) => setBroadcast({ ...broadcast, content: e.target.value })}
@@ -377,14 +377,14 @@ export default function SystemControl() {
                 Manajemen Multiplier Label
               </CardTitle>
               <CardDescription>
-                Atur multiplier XP untuk setiap label/tag pengguna.
+                Set the XP multiplier for each user label/tag.
               </CardDescription>
             </div>
             <Button onClick={() => {
-              const id = prompt("Masukkan ID Label baru (misal: beta-tester):");
+              const id = prompt("Enter a new label ID (e.g. beta-tester):");
               if (id) manageLabel.mutate({ id, multiplier: 1.0, description: "", is_active: true });
             }} size="sm">
-              <Plus className="h-4 w-4 mr-2" /> Tambah Label
+              <Plus className="h-4 w-4 mr-2" /> Add Label
             </Button>
           </CardHeader>
           <CardContent>
@@ -393,7 +393,7 @@ export default function SystemControl() {
                 <TableRow>
                   <TableHead>Label ID</TableHead>
                   <TableHead>Multiplier</TableHead>
-                  <TableHead>Deskripsi</TableHead>
+                  <TableHead>Description</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -429,7 +429,7 @@ export default function SystemControl() {
                         size="icon"
                         className="text-destructive-text"
                         onClick={() => {
-                          if (confirm(`Hapus label ${label.id}?`)) deleteLabel.mutate(label.id);
+                          if (confirm(`Delete label ${label.id}?`)) deleteLabel.mutate(label.id);
                         }}
                       >
                         <Trash2 className="h-4 w-4" />

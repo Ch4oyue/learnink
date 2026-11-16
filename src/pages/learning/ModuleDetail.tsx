@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   BookOpen,
   ArrowLeft,
   Play,
@@ -196,11 +197,11 @@ export default function ModuleDetail() {
                 {getCreatorBadge()}
                 <Badge className={levelColors[level]} variant="outline">
                   <BarChart3 className="h-3 w-3 mr-1" />
-                  {level}
+                  {displayLevel(level)}
                 </Badge>
                 <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
                   {categoryIcons[category] || <Brain className="h-3 w-3" />}
-                  <span className="ml-1">{category}</span>
+                  <span className="ml-1">{displayCategory(category)}</span>
                 </Badge>
                 {isCompleted && (
                   <Badge className="bg-green-500/10 text-green-600 border-green-500/20" variant="outline">

@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import {
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Bot,
   Cpu,
   Workflow,
@@ -304,10 +305,10 @@ export default function Syllabus() {
 
                             <div className="mt-3 flex items-center gap-2">
                               <Badge variant="secondary" className="text-xs">
-                                {module.category}
+                                {displayCategory(module.category)}
                               </Badge>
                               <Badge variant="outline" className="text-xs">
-                                {module.level}
+                                {displayLevel(module.level)}
                               </Badge>
                             </div>
                           </Link>

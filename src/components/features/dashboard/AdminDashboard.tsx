@@ -53,7 +53,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const roleLabels: Record<AppRole, string> = {
-  user: 'Pelajar',
+  user: 'Learner',
   tutor: 'Tutor',
   admin: 'Admin',
   superadmin: 'Super Admin',
@@ -74,10 +74,10 @@ const roleIcons: Record<AppRole, typeof UserCircle> = {
 };
 
 const statusLabels: Record<RequestStatus, string> = {
-  pending: 'Menunggu',
-  reviewing: 'Ditinjau',
-  completed: 'Selesai',
-  rejected: 'Ditolak',
+  pending: 'Pending',
+  reviewing: 'Reviewing',
+  completed: 'Completed',
+  rejected: 'Rejected',
 };
 
 const statusColors: Record<RequestStatus, string> = {
@@ -498,11 +498,11 @@ export function AdminDashboardContent() {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
             <AlertDialogDescription>
-              Anda akan mengubah role <strong>{roleChangeDialog.userName}</strong> menjadi{' '}
+              You are about to change the role of <strong>{roleChangeDialog.userName}</strong> to{' '}
               <strong>{roleLabels[roleChangeDialog.newRole]}</strong>.
               {roleChangeDialog.newRole === 'admin' && (
                 <span className="block mt-2 text-destructive-text">
-                  ⚠️ Perhatian: User dengan role Admin memiliki akses penuh ke sistem.
+                  ⚠️ Warning: users with the Admin role have full access to the system.
                 </span>
               )}
             </AlertDialogDescription>
@@ -510,7 +510,7 @@ export function AdminDashboardContent() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRoleChange}>
-              Konfirmasi
+              Confirm
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

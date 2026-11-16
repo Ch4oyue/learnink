@@ -37,10 +37,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const statusLabels: Record<RequestStatus, string> = {
-  pending: 'Menunggu',
-  reviewing: 'Ditinjau',
-  completed: 'Selesai',
-  rejected: 'Ditolak',
+  pending: 'Pending',
+  reviewing: 'Reviewing',
+  completed: 'Completed',
+  rejected: 'Rejected',
 };
 
 const statusColors: Record<RequestStatus, string> = {

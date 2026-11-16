@@ -37,6 +37,7 @@ import { useUserProgress } from "@/hooks/useUserProgress";
 import { format } from "date-fns";
 import { enUS as localeId } from "date-fns/locale";
 import {
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Plus,
   Search,
   MoreHorizontal,
@@ -229,10 +230,10 @@ export default function DashboardModules() {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="secondary" className="glass-button text-xs font-normal">{module.category}</Badge>
+                            <Badge variant="secondary" className="glass-button text-xs font-normal">{displayCategory(module.category)}</Badge>
                           </TableCell>
                           <TableCell>
-                            <Badge variant="outline" className="border-white/20 text-xs">{module.level}</Badge>
+                            <Badge variant="outline" className="border-white/20 text-xs">{displayLevel(module.level)}</Badge>
                           </TableCell>
                           <TableCell>
                             {module.is_published ? (
@@ -360,10 +361,10 @@ export default function DashboardModules() {
 
                           <div className="flex items-center gap-2 flex-wrap mt-auto">
                             <Badge variant="secondary" className="glass-button text-xs font-normal">
-                              {module.category}
+                              {displayCategory(module.category)}
                             </Badge>
                             <Badge variant="outline" className="border-white/20 text-xs text-muted-foreground">
-                              {module.level}
+                              {displayLevel(module.level)}
                             </Badge>
                             {/* Module Status Badge (Creator Confidence) */}
                             {module.status && STATUS_CONFIG[module.status as keyof typeof STATUS_CONFIG] && (() => {

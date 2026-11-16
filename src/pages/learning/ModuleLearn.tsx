@@ -167,7 +167,7 @@ export default function ModuleLearn() {
     if (!isLoading && module) {
       if (module.track_id && !canAccessTrack(module.track_id)) {
         toast({
-          title: "Akses Ditolak",
+          title: "Access Denied",
           description: "You must enroll in this course to access the material.",
           variant: "destructive",
         });
@@ -625,7 +625,7 @@ export default function ModuleLearn() {
             size="icon"
             onClick={handlePrevious}
             disabled={!hasPrevious}
-            aria-label="Halaman Sebelumnya"
+            aria-label="Previous Page"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -638,7 +638,7 @@ export default function ModuleLearn() {
             <Button
               size="icon"
               onClick={handleNext}
-              aria-label="Halaman Berikutnya"
+              aria-label="Next Page"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>

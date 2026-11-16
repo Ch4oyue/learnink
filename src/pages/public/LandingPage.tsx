@@ -78,7 +78,7 @@ export default function LandingPage() {
                                 size="icon"
                                 onClick={toggleTheme}
                                 className="rounded-lg"
-                                aria-label="Ganti Tema"
+                                aria-label="Toggle Theme"
                             >
                                 {resolvedTheme === "dark" ? (
                                     <Sun className="h-4 w-4" />
@@ -95,7 +95,7 @@ export default function LandingPage() {
                                 size="icon"
                                 onClick={toggleTheme}
                                 className="rounded-lg mr-1"
-                                aria-label="Ganti Tema"
+                                aria-label="Toggle Theme"
                             >
                                 {resolvedTheme === "dark" ? (
                                     <Sun className="h-4 w-4" />

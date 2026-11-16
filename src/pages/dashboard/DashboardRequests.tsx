@@ -77,8 +77,8 @@ const statusColors: Record<string, string> = {
 const statusLabels: Record<string, string> = {
   pending: "Pending",
   reviewing: "Reviewing",
-  completed: "Selesai",
-  rejected: "Ditolak",
+  completed: "Completed",
+  rejected: "Rejected",
 };
 
 const statusIcons: Record<string, typeof Clock> = {
@@ -317,7 +317,7 @@ export default function DashboardRequests() {
                       <TableHead>Topic / Title</TableHead>
                       {activeTab === 'module' && <TableHead>Category</TableHead>}
                       <TableHead>Status</TableHead>
-                      <TableHead>Prioritas</TableHead>
+                      <TableHead>Priority</TableHead>
                       <TableHead>Date</TableHead>
                       {canManage && activeTab === 'module' && <TableHead className="w-[120px]">Actions</TableHead>}
                     </TableRow>
@@ -403,7 +403,7 @@ export default function DashboardRequests() {
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="topic">
-                {activeTab === 'module' ? "Material Topic *" : "Judul *"}
+                {activeTab === 'module' ? "Material Topic *" : "Title *"}
               </Label>
               <Input
                 id="topic"
@@ -421,7 +421,7 @@ export default function DashboardRequests() {
                   id="category"
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  placeholder="Contoh: Programming"
+                  placeholder="Example: Programming"
                 />
               </div>
             )}

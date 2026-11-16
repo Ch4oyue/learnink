@@ -67,6 +67,7 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { enUS as localeId } from "date-fns/locale";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 // ============================================
 // TYPES
@@ -211,15 +212,15 @@ export default function ContentApproval() {
         },
         onSuccess: (module) => {
             toast({
-                title: "Konten Berhasil Dipublikasi! 🎉",
-                description: `Modul baru ID: ${module.id}`,
+                title: "Content Published Successfully! 🎉",
+                description: `New module ID: ${module.id}`,
             });
             setIsPublishOpen(false);
             setSelectedContent(null);
             queryClient.invalidateQueries({ queryKey: ["incoming-contents"] });
         },
         onError: (error) => {
-            toast({ title: "Gagal Mempublikasi", description: error.message, variant: "destructive" });
+            toast({ title: "Publish Failed", description: error.message, variant: "destructive" });
         },
     });
 
@@ -236,12 +237,12 @@ export default function ContentApproval() {
             if (error) throw error;
         },
         onSuccess: () => {
-            toast({ title: "Konten Ditolak", description: "Konten ditandai sebagai ditolak." });
+            toast({ title: "Content Rejected", description: "The content has been marked as rejected." });
             setRejectContent(null);
             queryClient.invalidateQueries({ queryKey: ["incoming-contents"] });
         },
         onError: (error) => {
-            toast({ title: "Gagal Menolak", description: error.message, variant: "destructive" });
+            toast({ title: "Reject Failed", description: error.message, variant: "destructive" });
         },
     });
 
@@ -276,8 +277,8 @@ export default function ContentApproval() {
             });
 
             toast({
-                title: requestAction === 'approve' ? "Request Disetujui" : "Request Ditolak",
-                description: `Status diubah menjadi ${newStatus}`,
+                title: requestAction === 'approve' ? "Request Approved" : "Request Rejected",
+                description: `Status changed to ${newStatus}`,
             });
             setIsRequestDetailOpen(false);
             setSelectedRequest(null);
@@ -466,7 +467,7 @@ export default function ContentApproval() {
                     </div>
                     <form onSubmit={handlePublishSubmit} className="flex-1 flex flex-col p-4 md:p-6 gap-4 overflow-y-auto md:overflow-hidden">
                         <div className="space-y-2">
-                            <Label>Judul</Label>
+                            <Label>Title</Label>
                             <Input
                                 value={formData.title}
                                 onChange={e => setFormData({...formData, title: e.target.value})}
@@ -489,7 +490,7 @@ export default function ContentApproval() {
                                     <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
                                         <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
-                                            {categories.map(c => <SelectItem key={c.id} value={c.name}>{c.name}</SelectItem>)}
+                                            {categories.map(c => <SelectItem key={c.id} value={c.name}>{displayCategory(c.name)}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -498,14 +499,14 @@ export default function ContentApproval() {
                                     <Select value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
                                         <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
-                                            {levels.map(l => <SelectItem key={l.id} value={l.name}>{l.name}</SelectItem>)}
+                                            {levels.map(l => <SelectItem key={l.id} value={l.name}>{displayLevel(l.name)}</SelectItem>)}
                                         </SelectContent>
                                     </Select>
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-2 md:flex-1 md:flex md:flex-col md:min-h-0">
-                            <Label>Konten</Label>
+                            <Label>Content</Label>
                             {/* Desktop: Split View, Mobile: Tabs */}
                             <div className="hidden md:block flex-1 overflow-hidden min-h-0">
                                 <ResizablePanelGroup direction="horizontal" className="gap-4">
@@ -592,7 +593,7 @@ export default function ContentApproval() {
                             <p className="text-sm bg-muted/50 p-2 rounded-md">{selectedRequest?.topic}</p>
                         </div>
                         <div>
-                            <h4 className="font-semibold text-sm mb-1">Deskripsi</h4>
+                            <h4 className="font-semibold text-sm mb-1">Description</h4>
                             <p className="text-sm whitespace-pre-wrap bg-muted/50 p-2 rounded-md min-h-[80px]">
                                 {selectedRequest?.description || "-"}
                             </p>
@@ -637,12 +638,12 @@ export default function ContentApproval() {
             <AlertDialog open={!!rejectContent} onOpenChange={() => setRejectContent(null)}>
                 <AlertDialogContent className="glass-liquid rounded-[24px]">
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Tolak Draft Konten?</AlertDialogTitle>
+                        <AlertDialogTitle>Reject Draft Content?</AlertDialogTitle>
                         <AlertDialogDescription>This content will be removed from the draft list.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleReject} className="bg-destructive text-destructive-foreground">Tolak</AlertDialogAction>
+                        <AlertDialogAction onClick={handleReject} className="bg-destructive text-destructive-foreground">Reject</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

@@ -6,6 +6,7 @@ import { useModules } from "@/hooks/useModules";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Zap, MessageSquare, Settings, BarChart, FileText, Bot, 
   BookOpen, Sparkles, Brain, Cpu, Code, Lightbulb, Workflow, Cog
 } from "lucide-react";
@@ -163,13 +164,13 @@ export const ModulesSection = () => {
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium ${levelColors[level] || levelColors.Pemula}`}
                     >
-                      {level}
+                      {displayLevel(level)}
                     </span>
                     {category && (
                       <span
                         className={`px-2 py-0.5 rounded-full text-[13px] font-medium ${categoryColors[category] || categoryColors["Umum"]}`}
                       >
-                        {category}
+                        {displayCategory(category)}
                       </span>
                     )}
                   </div>

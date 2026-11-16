@@ -1,5 +1,6 @@
 import { Control, useWatch } from "react-hook-form";
 import {
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Bot,
   Cpu,
   Workflow,
@@ -52,7 +53,7 @@ export function ModulePreviewCard({ control }: ModulePreviewCardProps) {
               {title || "Module Title"}
             </p>
             <p className="text-xs text-muted-foreground">
-              {category} • {level}
+              {displayCategory(category)} • {displayLevel(level)}
             </p>
           </div>
         </div>

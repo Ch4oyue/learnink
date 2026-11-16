@@ -1,0 +1,42 @@
+# Path rules for .github/workflows/labeler.yml. The key is the label to apply;
+# every changed file is matched against the globs below.
+# Labels not listed here (bug, enhancement, question, ...) stay manual.
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - docs/**
+          - LICENSE
+
+frontend:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/**
+          - public/**
+          - index.html
+          - vite.config.ts
+          - tailwind.config.ts
+          - postcss.config.js
+          - package.json
+          - bun.lock
+
+supabase:
+  - changed-files:
+      - any-glob-to-any-file: supabase/**
+
+security:
+  # auth guards, role checks, security scanning config
+  - changed-files:
+      - any-glob-to-any-file:
+          - supabase/functions/_shared/**
+          - src/hooks/useUserRole.ts
+          - .github/workflows/codeql.yml
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file: .github/**
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: tests/**

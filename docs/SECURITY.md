@@ -604,7 +604,8 @@ assume copies exist. That is precisely why rotation, not rewriting, is the fix.
 ### 10. Prevent recurrence — IMPLEMENTED
 
 - **CI gate:** `.github/workflows/ci.yml` has a `secret-scan` job running
-  `gitleaks/gitleaks-action@v2` on every push and pull request to `main`. It scans
+  `gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7` (pinned to the
+  commit behind `v2`) on every push and pull request to `main`. It scans
   only the commits in that event, so the keys already in history (this section's
   root cause) do not fail every run. A `GITLEAKS_LICENSE` is needed for
   organization-owned repos only; this repository is a personal account.
@@ -616,8 +617,8 @@ assume copies exist. That is precisely why rotation, not rewriting, is the fix.
 - GitHub secret scanning and push protection are already enabled on this
   repository; keep them on.
 - Keep `.env.example` placeholder-only; the `.gitignore` entry `!.env.example`
-  exists so it stays reviewable — review it on every PR that touches it.
-- Upgrade the action from the `@v2` tag to a pinned commit SHA.
+  exists so it stays reviewable — review it on every PR that touches it. The
+  gitleaks action is pinned to a commit SHA, not the mutable `v2` tag.
 
 ### Rollback
 

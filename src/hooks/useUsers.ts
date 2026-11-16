@@ -87,7 +87,7 @@ export function useUsers(page = 1, limit = 50, search = "") {
 }
 
 export function useUserStats() {
-  // Use the useUsers data to calculate stats (already bypasses RLS via Edge Function or fallback)
+  // Use the useUsers data to calculate stats (the Edge Function owns the read).
   const { data: usersData, isLoading, error } = useUsers(1, 1000); // Fetch all for stats
 
   const users = usersData?.users || [];

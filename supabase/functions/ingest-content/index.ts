@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 import { validatePayload, ValidationError } from "./validation.ts";
 import { corsFor, preflight } from "../_shared/cors.ts";
+import { clientIp } from "../_shared/client-ip.ts";
 
 // =============================================
 // ENVIRONMENT & CONFIG
@@ -42,9 +43,7 @@ async function logSecurityEvent(
     metadata: Record<string, unknown> = {}
 ): Promise<void> {
     try {
-        const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-            || req.headers.get("x-real-ip")
-            || "unknown";
+        const ipAddress = clientIp(req);
         const userAgent = req.headers.get("user-agent") || "unknown";
 
         await supabase.rpc("log_security_event", {
@@ -71,9 +70,7 @@ async function checkRateLimit(
     req: Request
 ): Promise<boolean> {
     try {
-        const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-            || req.headers.get("x-real-ip")
-            || "unknown";
+        const ipAddress = clientIp(req);
 
         const { data, error } = await supabase.rpc("check_rate_limit", {
             p_identifier: ipAddress,

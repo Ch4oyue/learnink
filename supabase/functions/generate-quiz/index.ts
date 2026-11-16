@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
 import { corsFor, preflight } from "../_shared/cors.ts";
 import { requireRole, STAFF_ROLES } from "../_shared/auth.ts";
+import { clientIp } from "../_shared/client-ip.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -17,9 +18,7 @@ async function checkRateLimit(
   req: Request
 ): Promise<boolean> {
   try {
-    const ipAddress = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || req.headers.get("x-real-ip")
-      || "unknown";
+    const ipAddress = clientIp(req);
 
     const { data, error } = await supabase.rpc("check_rate_limit", {
       p_identifier: ipAddress,

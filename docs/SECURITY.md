@@ -109,6 +109,8 @@ documented below it.
 | M5 | `ingest-content` accepts the API key in the request body as well as the header. Bodies are more likely to be logged by proxies. | Deprecate the body form; header only. |
 | M6 | `supabase/functions/*` are excluded from `tsc`, so type errors there are only caught at deploy time. | **Partly fixed:** `.github/workflows/ci.yml` now has a `deno-check` job. It pins the current per-function error counts (5 functions, 25 errors) and fails if any count grows, so no new type error can merge. Clearing the baseline needs the type regeneration below. |
 
+| M7 | Rate limiting and `security_logs.ip_address` used the **leftmost** `x-forwarded-for` hop, which the caller writes. | **FIXED** — the rightmost hop is used now; see the M7 subsection. |
+
 ### M1 (wildcard CORS) — FIXED
 
 All nine functions returned `Access-Control-Allow-Origin: *`. Not directly
@@ -169,6 +171,32 @@ no matches.
 > SQL triggers. That is server-side and never reaches the browser, but it should be
 > replaced by a role-based check in a follow-up migration so the account can be
 > renamed without losing protection.
+
+### M7 (spoofable client IP) — FIXED
+
+`generate-module`, `generate-quiz` and `ingest-content` derived the caller's
+address as `x-forwarded-for`.split(",")**[0]** — the leftmost entry, which is the
+one the caller supplies. Proxies append the address they observed to the right,
+so the leftmost value is simply what the client claimed. Two consequences:
+
+- **The rate limiter was bypassable.** `X-Forwarded-For: <random>` on every
+  request produced a new bucket each time, so the two AI-spending endpoints were
+  effectively unlimited.
+- **The audit trail was attacker-supplied.** Every `security_logs.ip_address`
+  row was whatever the caller sent, which undermines the misuse queries in §6
+  step 7.
+
+All three now call `clientIp(req)` from
+`supabase/functions/_shared/client-ip.ts`, which takes the **rightmost** hop (the
+one the edge appended), falls back to `x-real-ip`, and drops quotes, brackets and
+`:port` suffixes because `ip_address` is an `INET` column. When neither header is
+usable it returns `unknown`, so those callers share one bucket instead of being
+exempt.
+
+> Caveat: this assumes the edge appends exactly one hop. If another proxy in
+> front of Supabase overwrites `x-forwarded-for` from a client header, verify the
+> ordering once against the Edge Function logs before relying on the limit for
+> abuse detection.
 
 ## 4. Correctness bug found during the review — FIXED
 

@@ -330,7 +330,7 @@ export default function ContentApproval() {
                             Unified Inbox
                         </h1>
                         <p className="text-muted-foreground">
-                            Pusat persetujuan konten dan permintaan pengguna.
+                            Content and user request approval center.
                         </p>
                     </div>
                     <Button onClick={() => { refetchContent(); refetchRequests(); }} variant="outline" className="gap-2">
@@ -396,8 +396,8 @@ export default function ContentApproval() {
                     ) : (
                         <div className="text-center py-12">
                             <FileText className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
-                            <h3 className="text-lg font-medium">Inbox Kosong</h3>
-                            <p className="text-muted-foreground">Tidak ada konten draft pending.</p>
+                            <h3 className="text-lg font-medium">Empty Inbox</h3>
+                            <p className="text-muted-foreground">No pending draft content.</p>
                         </div>
                     )}
                 </TabsContent>
@@ -429,7 +429,7 @@ export default function ContentApproval() {
                                     </CardHeader>
                                     <CardContent className="pb-3">
                                         <p className="text-sm text-muted-foreground line-clamp-3">
-                                            {req.description || "Tidak ada deskripsi."}
+                                            {req.description || "No description."}
                                         </p>
                                         {req.image_url && (
                                             <div className="mt-2 text-xs text-primary flex items-center gap-1">

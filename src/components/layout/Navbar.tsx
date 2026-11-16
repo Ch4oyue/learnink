@@ -151,7 +151,7 @@ export function Navbar() {
                   <DropdownMenuContent align="end" className="w-48">
                     <DropdownMenuItem onClick={() => navigate("/dashboard/profile")}>
                       <User className="h-4 w-4 mr-2" />
-                      Profil Saya
+                      My Profile
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleDashboardClick}>
                       <LayoutDashboard className="h-4 w-4 mr-2" />
@@ -160,7 +160,7 @@ export function Navbar() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleSignOut} className="text-destructive-text">
                       <LogOut className="h-4 w-4 mr-2" />
-                      Keluar
+                      Sign Out
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -273,7 +273,7 @@ export function Navbar() {
                     className="justify-start text-base font-medium text-destructive-text hover:text-destructive-text hover:bg-transparent px-0 gap-2"
                   >
                     <LogOut className="h-4 w-4" />
-                    Keluar
+                    Sign Out
                   </Button>
                 </>
               ) : (

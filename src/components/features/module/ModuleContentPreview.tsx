@@ -18,7 +18,7 @@ export function ModuleContentPreview({ control }: ModuleContentPreviewProps) {
         <MarkdownRenderer content={content} />
       ) : (
         <p className="text-muted-foreground text-center py-10">
-          Belum ada konten untuk di-preview
+          No content to preview yet
         </p>
       )}
     </div>

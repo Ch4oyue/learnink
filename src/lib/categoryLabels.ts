@@ -11,6 +11,10 @@ const CATEGORY_LABELS: Record<string, string> = {
   "No-Code AI": "No-Code AI",
   "Umum": "General",
   "Lainnya": "Other",
+  "Matematika": "Mathematics",
+  "Sains": "Science",
+  "Bahasa": "Languages",
+  "Teknologi": "Technology",
 };
 
 const LEVEL_LABELS: Record<string, string> = {

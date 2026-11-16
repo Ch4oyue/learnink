@@ -69,7 +69,7 @@ export default function DashboardCourses() {
             Course Catalog
           </h1>
           <p className="text-lg text-muted-foreground">
-            Pilih jalur pembelajaran yang sesuai dengan minat dan tujuan karir Anda.
+            Pick a learning path that matches your interests and career goals.
           </p>
         </div>
 
@@ -169,7 +169,7 @@ export default function DashboardCourses() {
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Courses Found</h3>
             <p className="text-muted-foreground">
-              Coba kata kunci pencarian yang lain.
+              Try different search keywords.
             </p>
           </div>
         )}

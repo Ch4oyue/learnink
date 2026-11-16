@@ -129,7 +129,7 @@ export function useBanUser() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast({
-        title: data.bannedUntil ? "Pengguna di-ban" : "Ban dicabut",
+        title: data.bannedUntil ? "User banned" : "Ban lifted",
         description: data.bannedUntil
           ? "The user can no longer access the platform"
           : "The user can access the platform again",

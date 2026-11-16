@@ -113,7 +113,7 @@ export default function SecondBrain() {
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight">Second Brain</h1>
                             <p className="text-sm text-muted-foreground">
-                                Semua catatan Anda di satu tempat
+                                All your notes in one place
                             </p>
                         </div>
                     </div>
@@ -152,7 +152,7 @@ export default function SecondBrain() {
                             className="gap-1.5"
                         >
                             <Filter className="h-3.5 w-3.5" />
-                            Semua
+                            All
                         </Button>
                         {moduleIds.slice(0, 3).map((modId) => (
                             <Button
@@ -194,7 +194,7 @@ export default function SecondBrain() {
                             <div className="p-4 rounded-full bg-muted/50 mb-4">
                                 <StickyNote className="h-8 w-8 text-muted-foreground" />
                             </div>
-                            <CardTitle className="text-lg mb-1">Belum Ada Catatan</CardTitle>
+                            <CardTitle className="text-lg mb-1">No Notes Yet</CardTitle>
                             <CardDescription>
                                 {searchQuery
                                     ? "No notes match your search."

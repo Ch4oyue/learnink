@@ -172,12 +172,12 @@ export default function DashboardUsers() {
       <DashboardLayout>
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <AlertCircle className="h-12 w-12 text-destructive-text mb-4" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Gagal Memuat Data</h2>
+          <h2 className="text-xl font-semibold text-foreground mb-2">Failed to Load Data</h2>
           <p className="text-muted-foreground max-w-md">
             {isAccessDenied
-              ? 'Anda tidak memiliki akses admin. Hanya admin yang dapat melihat daftar pengguna.'
+              ? 'You do not have admin access. Only admins can see the user list.'
               : isFunctionMissing
-                ? 'Database function belum tersedia. Pastikan migration sudah dijalankan di Supabase.'
+                ? 'Database function not available yet. Make sure the migration has been run in Supabase.'
                 : `Terjadi kesalahan: ${errorMessage}`
             }
           </p>
@@ -199,7 +199,7 @@ export default function DashboardUsers() {
             User Management
           </h1>
           <p className="text-muted-foreground mt-1">
-            Kelola pengguna dan atur role akses mereka
+            Manage users and set their access roles
           </p>
         </div>
 
@@ -207,7 +207,7 @@ export default function DashboardUsers() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="text-2xl font-bold text-foreground">{stats.totalUsers}</div>
-            <div className="text-sm text-muted-foreground">Total Pengguna</div>
+            <div className="text-sm text-muted-foreground">Total Users</div>
           </div>
           <div className="bg-card border border-border rounded-xl p-4">
             <div className="text-2xl font-bold text-primary">{stats.adminCount}</div>
@@ -298,7 +298,7 @@ export default function DashboardUsers() {
                             </Avatar>
                             <div>
                               <div className="font-medium text-foreground">
-                                {user.display_name || "Pengguna"}
+                                {user.display_name || "User"}
                                 {isSelf && (
                                   <span className="ml-2 text-xs text-muted-foreground">(You)</span>
                                 )}

@@ -103,7 +103,7 @@ export function useCreateLearningSource() {
             logger.error("Error creating learning source:", error);
             toast({
                 title: "Error",
-                description: "Gagal menambahkan sumber belajar",
+                description: "Failed to add learning source",
                 variant: "destructive",
             });
         },
@@ -157,7 +157,7 @@ export function useUpdateLearningSource() {
             logger.error("Error updating learning source:", error);
             toast({
                 title: "Error",
-                description: "Gagal memperbarui sumber belajar",
+                description: "Failed to update learning source",
                 variant: "destructive",
             });
         },
@@ -195,7 +195,7 @@ export function useDeleteLearningSource() {
             logger.error("Error deleting learning source:", error);
             toast({
                 title: "Error",
-                description: "Gagal menghapus sumber belajar",
+                description: "Failed to delete learning source",
                 variant: "destructive",
             });
         },
@@ -237,7 +237,7 @@ export function useToggleLearningSourceActive() {
             logger.error("Error toggling learning source status:", error);
             toast({
                 title: "Error",
-                description: "Gagal mengubah status sumber belajar",
+                description: "Failed to change learning source status",
                 variant: "destructive",
             });
         },

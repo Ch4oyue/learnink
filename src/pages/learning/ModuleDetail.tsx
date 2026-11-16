@@ -133,11 +133,11 @@ export default function ModuleDetail() {
             <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-foreground mb-2">Module Not Found</h1>
             <p className="text-muted-foreground mb-6">
-              Modul yang Anda cari tidak ada atau belum dipublikasikan.
+              The module you are looking for does not exist or is not published yet.
             </p>
             <Button onClick={() => navigate('/modules')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Kembali ke Daftar Modul
+              Back to Module List
             </Button>
           </div>
         </main>
@@ -248,7 +248,7 @@ export default function ModuleDetail() {
                           variant="outline"
                           size="lg"
                         >
-                          Lihat Materi
+                          View Material
                         </Button>
                       </div>
                     ) : (
@@ -275,10 +275,10 @@ export default function ModuleDetail() {
                 ) : (
                   <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-xl">
                     <p className="text-muted-foreground text-sm">
-                      Masuk untuk melacak progress belajar Anda
+                      Sign in to track your learning progress
                     </p>
                     <Button onClick={() => navigate("/auth")} size="sm">
-                      Masuk
+                      Sign In
                     </Button>
                   </div>
                 )}
@@ -289,7 +289,7 @@ export default function ModuleDetail() {
             <div className="p-6 md:p-8 bg-muted/30">
               <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
                 <ListChecks className="h-5 w-5 text-primary" />
-                Apa yang akan Anda pelajari
+                What you will learn
               </h2>
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="flex items-start gap-3 p-3 bg-background rounded-lg">

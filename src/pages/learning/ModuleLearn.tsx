@@ -460,7 +460,7 @@ export default function ModuleLearn() {
     <div className="flex bg-background min-h-screen md:h-screen md:overflow-hidden">
       <SEO
         title={module.title}
-        description={module.summary || `Pelajari ${module.title} di LearnInk.`}
+        description={module.summary || `Learn ${module.title} on LearnInk.`}
       />
       {/* ============================================
           PANEL 1: Icon Rail (72px) - Desktop Only

@@ -88,9 +88,9 @@ export default function RequestDetail() {
         <main className="container mx-auto px-4 py-8">
           <div className="text-center py-16">
             <FileQuestion className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-foreground mb-2">Request Tidak Ditemukan</h1>
+            <h1 className="text-2xl font-bold text-foreground mb-2">Request Not Found</h1>
             <p className="text-muted-foreground mb-6">
-              Request yang Anda cari tidak ada atau bukan milik Anda.
+              The request you are looking for does not exist or is not yours.
             </p>
             <Button onClick={() => navigate('/dashboard/user')}>
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -169,7 +169,7 @@ export default function RequestDetail() {
         {request.description && (
           <div className="bg-card border border-border rounded-2xl p-8 mb-6 shadow-soft">
             <h2 className="text-lg font-semibold text-foreground mb-4">
-              Deskripsi Request
+              Request Description
             </h2>
             <p className="text-foreground/90 whitespace-pre-wrap">
               {request.description}
@@ -217,7 +217,7 @@ export default function RequestDetail() {
               </h2>
             </div>
             <p className="text-muted-foreground mb-6">
-              Request Anda telah diproses dan modul pembelajaran telah tersedia.
+              Your request has been processed and the learning module is now available.
             </p>
             <Link 
               to={`/module/${relatedModule.id}`}

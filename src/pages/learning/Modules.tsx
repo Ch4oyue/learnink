@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -29,7 +30,6 @@ import {
   GraduationCap,
   BarChart3,
 } from "lucide-react";
-import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BookOpen, Code, Brain, Lightbulb, Atom, Calculator, Languages, Cpu, GraduationCap,
@@ -86,11 +86,11 @@ export default function Modules() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
-            Modul Pembelajaran
+            Learning Modules
           </h1>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Jelajahi berbagai modul pembelajaran yang telah dibuat oleh tutor kami.
-            Pilih modul yang sesuai dengan minat dan tingkat kemampuan Anda.
+            Explore learning modules created by our tutors.
+            Pick a module that matches your interests and skill level.
           </p>
         </div>
 
@@ -112,7 +112,7 @@ export default function Modules() {
               </SelectTrigger>
               <SelectContent>
                 {categories.map(cat => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  <SelectItem key={cat} value={cat}>{cat === 'Semua' ? 'All' : displayCategory(cat)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -122,7 +122,7 @@ export default function Modules() {
               </SelectTrigger>
               <SelectContent>
                 {levels.map(lvl => (
-                  <SelectItem key={lvl} value={lvl}>{lvl}</SelectItem>
+                  <SelectItem key={lvl} value={lvl}>{lvl === 'Semua' ? 'All' : displayLevel(lvl)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -192,12 +192,12 @@ export default function Modules() {
           <div className="text-center py-16">
             <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-foreground mb-2">
-              Tidak Ada Modul Ditemukan
+              No Modules Found
             </h2>
             <p className="text-muted-foreground mb-6">
               {searchQuery || categoryFilter !== 'Semua' || levelFilter !== 'Semua'
-                ? 'Coba ubah filter atau kata kunci pencarian'
-                : 'No modules yet yang tersedia saat ini'}
+                ? 'Try changing the filters or search keywords'
+                : 'No modules available yet'}
             </p>
             {(searchQuery || categoryFilter !== 'Semua' || levelFilter !== 'Semua') && (
               <Button 

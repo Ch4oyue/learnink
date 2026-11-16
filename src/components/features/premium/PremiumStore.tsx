@@ -68,13 +68,13 @@ export function PremiumStore() {
       queryClient.invalidateQueries({ queryKey: ["user-role"] });
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast({
-        title: "Aktivasi Berhasil! 👑",
+        title: "Activation successful! 👑",
         description: `Premium status active until ${format(new Date(data.newPremiumUntil), "dd MMM yyyy")}`,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Gagal Aktivasi",
+        title: "Activation failed",
         description: error.message,
         variant: "destructive",
       });
@@ -172,7 +172,7 @@ export function PremiumStore() {
                   {isProcessing === offer.id ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
-                    canAfford ? "Tukarkan" : isStreak ? "Streak Belum Cukup" : "Poin Belum Cukup"
+                    canAfford ? "Redeem" : isStreak ? "Streak too low" : "Not enough points"
                   )}
                 </Button>
               </CardFooter>

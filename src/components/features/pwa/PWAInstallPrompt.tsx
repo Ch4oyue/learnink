@@ -45,7 +45,7 @@ export function PWAInstallPrompt() {
           <DrawerHeader>
             <DrawerTitle>Install the LearnInk App</DrawerTitle>
             <DrawerDescription>
-              Tambahkan ke Home Screen untuk pengalaman full screen yang lebih baik.
+              Add to your Home Screen for a better full-screen experience.
             </DrawerDescription>
           </DrawerHeader>
           <div className="p-4 pb-0">

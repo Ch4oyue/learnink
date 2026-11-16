@@ -171,7 +171,7 @@ export default function SystemControl() {
             System Control
           </h1>
           <p className="text-muted-foreground mt-2">
-            Pusat kendali aplikasi untuk Super Admin. Kelola multiplier, mode pemeliharaan, dan pengumuman.
+            Application control center for Super Admins. Manage multipliers, maintenance mode, and announcements.
           </p>
         </div>
 
@@ -184,7 +184,7 @@ export default function SystemControl() {
                 Global XP Multiplier
               </CardTitle>
               <CardDescription>
-                Atur besaran multiplier XP yang berlaku untuk seluruh pengguna.
+                Set the XP multiplier applied to all users.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -200,7 +200,7 @@ export default function SystemControl() {
                   onClick={() => updateSetting.mutate({ key: "global_xp_multiplier", value: globalXp })}
                   disabled={updateSetting.isPending}
                 >
-                  Simpan
+                  Save
                 </Button>
               </div>
             </CardContent>
@@ -214,7 +214,7 @@ export default function SystemControl() {
                 Maintenance Mode
               </CardTitle>
               <CardDescription>
-                Kunci akses aplikasi untuk semua pengguna kecuali Admin/Super Admin.
+                Lock application access for all users except Admin/Super Admin.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex items-center justify-between">
@@ -237,7 +237,7 @@ export default function SystemControl() {
                 APK Base Bonus
               </CardTitle>
               <CardDescription>
-                Bonus XP tambahan untuk pengguna APK. 1.0 = +100% (Double XP).
+                Extra XP bonus for APK users. 1.0 = +100% (Double XP).
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -253,7 +253,7 @@ export default function SystemControl() {
                   onClick={() => updateSetting.mutate({ key: "apk_base_bonus", value: apkBonus })}
                   disabled={updateSetting.isPending}
                 >
-                  Simpan
+                  Save
                 </Button>
               </div>
             </CardContent>
@@ -267,7 +267,7 @@ export default function SystemControl() {
                 Broadcast Message
               </CardTitle>
               <CardDescription>
-                Kirim pengumuman global ke semua pengguna.
+                Send a global announcement to all users.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -313,7 +313,7 @@ export default function SystemControl() {
               Security Audit Trail
             </CardTitle>
             <CardDescription>
-              10 aktivitas keamanan terakhir yang tercatat di sistem.
+              The last 10 security activities recorded in the system.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -352,7 +352,7 @@ export default function SystemControl() {
                 {securityLogs?.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-4 text-muted-foreground">
-                      Tidak ada log keamanan yang ditemukan.
+                      No security logs found.
                     </TableCell>
                   </TableRow>
                 )}
@@ -453,10 +453,10 @@ export default function SystemControl() {
              </CardHeader>
              <CardContent>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Aksi di bawah ini bersifat merusak atau berdampak besar pada sistem. Gunakan dengan sangat hati-hati.
+                  The actions below are destructive or have a major impact on the system. Use them with extreme care.
                 </p>
                 <Button variant="destructive" className="gap-2">
-                  <Trash2 className="h-4 w-4" /> Reset Semua Point Pengguna
+                  <Trash2 className="h-4 w-4" /> Reset All User Points
                 </Button>
              </CardContent>
            </Card>

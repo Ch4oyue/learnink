@@ -81,12 +81,12 @@ export default function DashboardRequestMaterial() {
           <div>
             <h1 className="text-2xl font-semibold">Material Requests</h1>
             <p className="text-muted-foreground">
-              Request materi pembelajaran yang Anda butuhkan
+              Request the learning materials you need
             </p>
           </div>
           <Button onClick={() => setShowForm(!showForm)} className="gap-2">
             <Plus className="h-4 w-4" />
-            Request Baru
+            New Request
           </Button>
         </div>
 
@@ -94,9 +94,9 @@ export default function DashboardRequestMaterial() {
         {showForm && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Material Requests Baru</CardTitle>
+              <CardTitle className="text-lg">New Material Request</CardTitle>
               <CardDescription>
-                Jelaskan materi yang ingin Anda pelajari
+                Describe the material you want to learn
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -144,14 +144,14 @@ export default function DashboardRequestMaterial() {
                     {createRequest.isPending ? (
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                     ) : null}
-                    Kirim Request
+                    Send Request
                   </Button>
                   <Button 
                     type="button" 
                     variant="outline" 
                     onClick={() => setShowForm(false)}
                   >
-                    Batal
+                    Cancel
                   </Button>
                 </div>
               </form>
@@ -161,7 +161,7 @@ export default function DashboardRequestMaterial() {
 
         {/* Requests List */}
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Request Saya</h2>
+          <h2 className="text-lg font-medium">My Requests</h2>
           
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -208,9 +208,9 @@ export default function DashboardRequestMaterial() {
               <CardContent className="py-12">
                 <div className="text-center">
                   <FileQuestion className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="font-medium mb-1">Belum Ada Request</h3>
+                  <h3 className="font-medium mb-1">No Requests Yet</h3>
                   <p className="text-sm text-muted-foreground mb-4">
-                    Anda belum pernah membuat request materi
+                    You have not made a material request yet
                   </p>
                   <Button onClick={() => setShowForm(true)} variant="outline">
                     <Plus className="h-4 w-4 mr-2" />

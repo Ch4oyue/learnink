@@ -6,6 +6,8 @@ describe("displayCategory", () => {
     expect(displayCategory("AI Dasar")).toBe("AI Basics");
     expect(displayCategory("Umum")).toBe("General");
     expect(displayCategory("Lainnya")).toBe("Other");
+    expect(displayCategory("Matematika")).toBe("Mathematics");
+    expect(displayCategory("Teknologi")).toBe("Technology");
   });
 
   test("passes through already-English categories unchanged", () => {

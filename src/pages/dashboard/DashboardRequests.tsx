@@ -185,12 +185,12 @@ export default function DashboardRequests() {
         .getPublicUrl(filePath);
 
       setFormData(prev => ({ ...prev, imageUrl: data.publicUrl }));
-      toast({ title: "Berhasil upload gambar" });
+      toast({ title: "Image uploaded" });
     } catch (error) {
       logger.error('Upload error:', error);
       toast({
-        title: "Gagal upload",
-        description: (error as Error).message || "Pastikan bucket 'request-attachments' tersedia & public.",
+        title: "Upload failed",
+        description: (error as Error).message || "Make sure the 'request-attachments' bucket exists & is public.",
         variant: "destructive"
       });
     } finally {
@@ -234,7 +234,7 @@ export default function DashboardRequests() {
           </div>
           <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
             <Plus className="h-4 w-4" />
-            Buat Request Baru
+            Create New Request
           </Button>
         </div>
 
@@ -243,7 +243,7 @@ export default function DashboardRequests() {
           <TabsList>
             <TabsTrigger value="module" className="gap-2">
               <BookOpen className="h-4 w-4" />
-              Materi
+              Material
             </TabsTrigger>
             <TabsTrigger value="feature" className="gap-2">
               <Lightbulb className="h-4 w-4" />
@@ -260,7 +260,7 @@ export default function DashboardRequests() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder={`Cari ${typeLabels[activeTab]}...`}
+                placeholder={`Search ${typeLabels[activeTab]}...`}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -298,11 +298,11 @@ export default function DashboardRequests() {
                     {activeTab === 'feature' && <Lightbulb className="h-8 w-8 text-muted-foreground" />}
                     {activeTab === 'bug' && <Bug className="h-8 w-8 text-muted-foreground" />}
                   </div>
-                  <h3 className="font-medium mb-2">Tidak ada data</h3>
+                  <h3 className="font-medium mb-2">No data</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     {searchQuery || statusFilter !== "all"
                       ? "Try adjusting the search filter"
-                      : `Belum ada ${typeLabels[activeTab].toLowerCase()} yang diajukan`}
+                      : `No ${typeLabels[activeTab].toLowerCase()} submitted yet`}
                   </p>
                   <Button onClick={() => setIsCreateOpen(true)} variant="outline">
                     Ajukan Sekarang
@@ -392,12 +392,12 @@ export default function DashboardRequests() {
         <DialogContent className="max-w-lg glass-liquid rounded-[24px]">
           <DialogHeader>
             <DialogTitle>
-              {activeTab === 'module' && "Material Requests Baru"}
+              {activeTab === 'module' && "New Material Request"}
               {activeTab === 'feature' && "New Feature Request"}
-              {activeTab === 'bug' && "Lapor Bug"}
+              {activeTab === 'bug' && "Report a Bug"}
             </DialogTitle>
             <DialogDescription>
-              Isi detail di bawah ini. Anda juga bisa menempelkan (paste) gambar screenshot di kolom deskripsi.
+              Fill in the details below. You can also paste a screenshot straight into the description field.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">
@@ -484,7 +484,7 @@ export default function DashboardRequests() {
                     )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                    Copy-paste gambar langsung ke kolom deskripsi atau gunakan tombol upload.
+                    Copy-paste an image directly into the description field or use the upload button.
                 </p>
             </div>
 
@@ -507,11 +507,11 @@ export default function DashboardRequests() {
 
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                Batal
+                Cancel
               </Button>
               <Button type="submit" disabled={createRequest.isPending || uploading}>
                 {createRequest.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                Kirim Request
+                Send Request
               </Button>
             </DialogFooter>
           </form>
@@ -524,7 +524,7 @@ export default function DashboardRequests() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Generate Modul dengan AI?
+              Generate Module with AI?
             </AlertDialogTitle>
             <AlertDialogDescription>
               AI akan menghasilkan modul pembelajaran berdasarkan request ini.

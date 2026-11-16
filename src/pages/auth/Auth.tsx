@@ -134,13 +134,13 @@ export default function Auth() {
 
     if (error) {
       toast({
-        title: "Gagal mendaftar",
+        title: "Sign up failed",
         description: getErrorMessage(error.message),
         variant: "destructive",
       });
     } else {
       toast({
-        title: "Berhasil mendaftar",
+        title: "Sign up successful",
         description: "Please check your email for verification.",
       });
     }
@@ -156,7 +156,7 @@ export default function Auth() {
 
     if (error) {
       toast({
-        title: "Gagal login",
+        title: "Sign in failed",
         description: getErrorMessage(error.message),
         variant: "destructive",
       });

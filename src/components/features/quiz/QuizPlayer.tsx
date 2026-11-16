@@ -345,7 +345,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-500/10 text-amber-600 text-sm">
             <AlertCircle className="h-4 w-4 flex-shrink-0" />
             <span>
-              {questions.length - Object.keys(answers).length} soal belum dijawab
+              {questions.length - Object.keys(answers).length} questions unanswered
             </span>
           </div>
         )}

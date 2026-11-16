@@ -162,11 +162,11 @@ export function useCreateRequest() {
       });
     },
     onError: (error, variables) => {
-      const typeLabel = variables.type === 'bug' ? 'laporan bug' :
-                       variables.type === 'feature' ? 'request fitur' : 'request materi';
+      const typeLabel = variables.type === 'bug' ? 'bug report' :
+                       variables.type === 'feature' ? 'feature request' : 'material request';
       toast({
         title: "Error",
-        description: `Gagal mengirim ${typeLabel}`,
+        description: `Failed to send ${typeLabel}`,
         variant: "destructive",
       });
       logger.error('Error creating request:', error);
@@ -216,7 +216,7 @@ export function useUpdateRequest() {
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Gagal memperbarui request",
+        description: "Failed to update request",
         variant: "destructive",
       });
       logger.error('Error updating request:', error);

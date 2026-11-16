@@ -247,7 +247,7 @@ export function PythonCodeEditor({
       <div className="px-4 py-2 bg-muted/30 border-t border-border">
         <p className="text-xs text-muted-foreground">
           Tekan <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Ctrl</kbd> +{" "}
-          <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Enter</kbd> untuk menjalankan
+          <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">Enter</kbd> to run
         </p>
       </div>
     </div>

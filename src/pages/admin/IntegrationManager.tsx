@@ -280,12 +280,12 @@ export default function IntegrationManager() {
         navigator.clipboard.writeText(text);
         toast({
             title: "Copied! 📋",
-            description: `${label} berhasil disalin ke clipboard.`,
+            description: `${label} copied to clipboard.`,
         });
     };
 
     const formatDate = (dateString: string | null) => {
-        if (!dateString) return "Belum pernah";
+        if (!dateString) return "Never";
         return new Date(dateString).toLocaleDateString("en-US", {
             day: "numeric",
             month: "short",
@@ -322,7 +322,7 @@ export default function IntegrationManager() {
                             Integration Manager
                         </h1>
                         <p className="text-muted-foreground">
-                            Kelola koneksi dengan n8n, Notion, dan sumber eksternal lainnya.
+                            Manage connections with n8n, Notion, and other external sources.
                         </p>
                     </div>
                     <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
@@ -491,11 +491,11 @@ export default function IntegrationManager() {
                         <div className="flex flex-col items-center justify-center py-16 text-center">
                             <Plug className="h-12 w-12 text-muted-foreground/50 mb-4" />
                             <h3 className="text-lg font-medium text-foreground mb-1">
-                                Belum ada integrasi
+                                No integrations yet
                             </h3>
                             <p className="text-muted-foreground text-sm max-w-md mb-4">
-                                Buat integrasi pertamamu untuk menghubungkan LearnInk dengan n8n, Notion,
-                                atau sumber eksternal lainnya.
+                                Create your first integration to connect LearnInk with n8n, Notion,
+                                or other external sources.
                             </p>
                             <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
                                 <Plus className="h-4 w-4" />
@@ -581,7 +581,7 @@ export default function IntegrationManager() {
                         <div className="space-y-4">
                             <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                                 <p className="text-sm text-amber-600 dark:text-amber-400 font-medium mb-2">
-                                    ⚠️ Simpan key ini sekarang!
+                                    ⚠️ Save this key now!
                                 </p>
                                 <code className="block text-xs bg-background p-3 rounded font-mono break-all border">
                                     {newApiKey}
@@ -686,7 +686,7 @@ export default function IntegrationManager() {
                                                 <MarkdownRenderer content={formData.description} variant="compact" />
                                             ) : (
                                                 <span className="text-muted-foreground text-sm italic">
-                                                    Tidak ada konten untuk dipreview
+                                                    No content to preview
                                                 </span>
                                             )}
                                         </div>
@@ -696,7 +696,7 @@ export default function IntegrationManager() {
 
                             <DialogFooter>
                                 <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
-                                    Batal
+                                    Cancel
                                 </Button>
                                 <Button type="submit" disabled={createMutation.isPending}>
                                     {createMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
@@ -740,8 +740,8 @@ export default function IntegrationManager() {
                     <AlertDialogHeader>
                         <AlertDialogTitle>Delete Integration?</AlertDialogTitle>
                         <AlertDialogDescription>
-                            Anda yakin ingin menghapus <strong>{deleteIntegration?.name}</strong>?
-                            API key akan menjadi tidak valid dan tidak dapat digunakan lagi.
+                            Are you sure you want to delete <strong>{deleteIntegration?.name}</strong>?
+                            The API key will become invalid and can no longer be used.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
@@ -751,7 +751,7 @@ export default function IntegrationManager() {
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                             {deleteMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
-                            Hapus
+                            Delete
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

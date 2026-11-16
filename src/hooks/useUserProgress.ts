@@ -197,7 +197,7 @@ export function useUpdateProgress() {
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Gagal menyimpan progress",
+        description: "Failed to save progress",
         variant: "destructive",
       });
       logger.error('Error updating progress:', error);

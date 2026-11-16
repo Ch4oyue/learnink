@@ -628,7 +628,7 @@ export default function DashboardProfile() {
                     Second Brain
                   </h2>
                   <p className="text-muted-foreground max-w-md mx-auto">
-                    Anda memiliki <span className="font-bold text-foreground">{stats?.totalNotes || 0}</span> catatan dari pembelajaran Anda.
+                    You have <span className="font-bold text-foreground">{stats?.totalNotes || 0}</span> notes from your learning.
                   </p>
                 </div>
 

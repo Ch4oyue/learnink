@@ -202,7 +202,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {isPending ? "Saving..." : "Simpan"}
+              {isPending ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>

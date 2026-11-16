@@ -190,7 +190,7 @@ export default function DashboardModules() {
                     <BookOpen className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
                     <h3 className="font-bold mb-2 text-lg">No modules yet</h3>
                     <p className="text-sm text-muted-foreground mb-4">
-                      Mulai buat modul pembelajaran pertama Anda
+                      Start creating your first learning module
                     </p>
                     <Button asChild className="glass-button-primary">
                       <Link to="/dashboard/modules/create">
@@ -280,7 +280,7 @@ export default function DashboardModules() {
                                   className="text-destructive-text focus:bg-destructive/10 cursor-pointer"
                                 >
                                   <Trash2 className="h-4 w-4 mr-2" />
-                                  Hapus
+                                  Delete
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
@@ -395,7 +395,7 @@ export default function DashboardModules() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Module?</AlertDialogTitle>
             <AlertDialogDescription>
-              Tindakan ini tidak dapat dibatalkan. Modul akan dihapus secara permanen.
+              This action cannot be undone. The module will be permanently deleted.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -404,7 +404,7 @@ export default function DashboardModules() {
               onClick={handleDelete}
               className="bg-destructive hover:bg-destructive/90"
             >
-              {deleteModule.isPending ? "Menghapus..." : "Hapus"}
+              {deleteModule.isPending ? "Deleting..." : "Delete"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

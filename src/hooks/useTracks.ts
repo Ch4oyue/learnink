@@ -99,7 +99,7 @@ export function useEnrollTrack() {
       if (error) {
         // Handle unique constraint violation gracefully
         if (error.code === '23505') {
-            throw new Error('Anda sudah terdaftar di track ini');
+            throw new Error('You are already enrolled in this track');
         }
         throw error;
       }
@@ -114,7 +114,7 @@ export function useEnrollTrack() {
     },
     onError: (error) => {
       toast({
-        title: "Gagal Mendaftar",
+        title: "Enrollment failed",
         description: error.message,
         variant: "destructive",
       });

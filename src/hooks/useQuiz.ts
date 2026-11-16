@@ -236,7 +236,7 @@ export function useValidateQuizAnswers() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["quiz-attempts"] });
       toast({
-        title: data.results.passed ? "Selamat!" : "Coba Lagi",
+        title: data.results.passed ? "Congratulations!" : "Try Again",
         description: data.results.passed 
           ? `You passed with a score of ${data.results.percentage}%` 
           : `Your score is ${data.results.percentage}%. A minimum score is required to pass.`,
@@ -275,7 +275,7 @@ export function useSubmitQuizAttempt() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["quiz-attempts"] });
       toast({
-        title: data.passed ? "Selamat!" : "Coba Lagi",
+        title: data.passed ? "Congratulations!" : "Try Again",
         description: data.passed 
           ? `You passed with a score of ${data.percentage}%` 
           : `Your score is ${data.percentage}%. A minimum of ${70}% is required to pass.`,

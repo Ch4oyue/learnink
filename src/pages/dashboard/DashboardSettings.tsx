@@ -233,7 +233,7 @@ export default function DashboardSettings() {
   };
 
   const handleDelete = (id: string, name: string, type: 'category' | 'level') => {
-    if (confirm(`Hapus ${type === 'category' ? 'kategori' : 'level'} "${name}"?`)) {
+    if (confirm(`Delete ${type === 'category' ? 'category' : 'level'} "${name}"?`)) {
       if (type === 'category') {
         deleteCategory.mutate(id);
       } else {
@@ -291,7 +291,7 @@ export default function DashboardSettings() {
             </Card>
 
             <Card>
-              <CardHeader><CardTitle className="text-lg">Daftar Kategori</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg">Category List</CardTitle></CardHeader>
               <CardContent>
                 {categoriesLoading ? (
                   <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
@@ -326,7 +326,7 @@ export default function DashboardSettings() {
                       </div>
                     ))}
                   </div>
-                ) : <p className="text-center text-muted-foreground py-8">Belum ada kategori</p>}
+                ) : <p className="text-center text-muted-foreground py-8">No categories yet</p>}
               </CardContent>
             </Card>
           </TabsContent>
@@ -366,7 +366,7 @@ export default function DashboardSettings() {
             </Card>
 
             <Card>
-              <CardHeader><CardTitle className="text-lg">Daftar Level</CardTitle></CardHeader>
+              <CardHeader><CardTitle className="text-lg">Level List</CardTitle></CardHeader>
               <CardContent>
                 {levelsLoading ? (
                   <div className="flex justify-center py-8"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>
@@ -401,7 +401,7 @@ export default function DashboardSettings() {
                       </div>
                     ))}
                   </div>
-                ) : <p className="text-center text-muted-foreground py-8">Belum ada level</p>}
+                ) : <p className="text-center text-muted-foreground py-8">No levels yet</p>}
               </CardContent>
             </Card>
           </TabsContent>

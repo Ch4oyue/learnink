@@ -50,7 +50,7 @@ class ErrorBoundary extends Component<Props, State> {
                 Terjadi Kesalahan
               </h1>
               <p className="text-muted-foreground">
-                Maaf, terjadi kesalahan yang tidak terduga. Silakan coba muat ulang halaman atau kembali ke beranda.
+                Sorry, something unexpected happened. Try reloading the page or head back home.
               </p>
             </div>
 

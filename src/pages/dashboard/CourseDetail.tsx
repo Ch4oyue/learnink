@@ -65,7 +65,7 @@ export default function CourseDetail() {
     return (
       <DashboardLayout>
          <div className="text-center py-12">
-            <h2 className="text-2xl font-bold mb-4">Kursus Tidak Ditemukan</h2>
+            <h2 className="text-2xl font-bold mb-4">Course Not Found</h2>
             <Button onClick={() => navigate('/dashboard/courses')}>Back to Catalog</Button>
          </div>
       </DashboardLayout>
@@ -115,7 +115,7 @@ export default function CourseDetail() {
         <div className="space-y-4">
            <div className="flex items-center gap-2 mb-4">
               <BookOpen className="h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold">Daftar Modul</h2>
+              <h2 className="text-xl font-semibold">Module List</h2>
               <Badge variant="secondary" className="ml-2">{totalModules} Modul</Badge>
            </div>
 

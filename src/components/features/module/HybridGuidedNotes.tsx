@@ -102,9 +102,9 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                         </div>
                     ) : !Array.isArray(notes) || notes.length === 0 ? (
                         <div className="text-center py-8">
-                            <p className="text-sm text-muted-foreground">Belum ada catatan</p>
+                            <p className="text-sm text-muted-foreground">No notes yet</p>
                             <p className="text-xs text-muted-foreground/60 mt-1">
-                                Pilih teks atau tulis catatan di bawah
+                                Select text or write a note below
                             </p>
                         </div>
                     ) : (
@@ -150,7 +150,7 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
                             }}
                             className="absolute left-12 -top-2 bg-destructive text-white text-[13px] px-2 py-0.5 rounded-full shadow-sm hover:scale-105 transition-transform"
                          >
-                            Batal Edit
+                            Cancel edit
                          </button>
                     )}
                     {/* Submit Button */}

@@ -92,7 +92,7 @@ export function TutorDashboardContent() {
           Dashboard Tutor
         </h1>
         <p className="text-muted-foreground">
-          Kelola modul dan review request materi dari pengguna.
+          Manage modules and review material requests from users.
         </p>
       </div>
 
@@ -250,7 +250,7 @@ export function TutorDashboardContent() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      Tidak ada request
+                      No requests
                     </TableCell>
                   </TableRow>
                 )}
@@ -321,7 +321,7 @@ export function TutorDashboardContent() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Generate Modul dengan AI
+              Generate Module with AI
             </AlertDialogTitle>
             <AlertDialogDescription>
               AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}".

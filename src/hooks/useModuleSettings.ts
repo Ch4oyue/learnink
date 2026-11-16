@@ -64,7 +64,7 @@ export function useUpdateCategory() {
       logger.error("Error updating category:", error);
       toast({
         title: "Error",
-        description: "Gagal memperbarui kategori",
+        description: "Failed to update category",
         variant: "destructive",
       });
     },
@@ -98,7 +98,7 @@ export function useUpdateLevel() {
       logger.error("Error updating level:", error);
       toast({
         title: "Error",
-        description: "Gagal memperbarui level",
+        description: "Failed to update level",
         variant: "destructive",
       });
     },
@@ -142,7 +142,7 @@ export function useCreateCategory() {
       logger.error("Error creating category:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat kategori",
+        description: "Failed to create category",
         variant: "destructive",
       });
     },
@@ -171,7 +171,7 @@ export function useCreateLevel() {
       logger.error("Error creating level:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat level",
+        description: "Failed to create level",
         variant: "destructive",
       });
     },
@@ -202,7 +202,7 @@ export function useDeleteCategory() {
       logger.error("Error deleting category:", error);
       toast({
         title: "Error",
-        description: "Gagal menghapus kategori",
+        description: "Failed to delete category",
         variant: "destructive",
       });
     },
@@ -233,7 +233,7 @@ export function useDeleteLevel() {
       logger.error("Error deleting level:", error);
       toast({
         title: "Error",
-        description: "Gagal menghapus level",
+        description: "Failed to delete level",
         variant: "destructive",
       });
     },

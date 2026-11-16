@@ -176,7 +176,7 @@ export function AdminDashboardContent() {
           Dashboard Admin
         </h1>
         <p className="text-muted-foreground">
-          Kelola pengguna, modul, dan request materi.
+          Manage users, modules, and material requests.
         </p>
       </div>
 
@@ -189,7 +189,7 @@ export function AdminDashboardContent() {
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{totalUsers}</p>
-              <p className="text-sm text-muted-foreground">Total Pengguna</p>
+              <p className="text-sm text-muted-foreground">Total Users</p>
             </div>
           </div>
         </div>
@@ -313,7 +313,7 @@ export function AdminDashboardContent() {
                             <Select
                               value={userItem.role}
                               onValueChange={(value) =>
-                                handleRoleChange(userItem.id, value as AppRole, userItem.display_name || 'Pengguna')
+                                handleRoleChange(userItem.id, value as AppRole, userItem.display_name || 'User')
                               }
                             >
                               <SelectTrigger className="w-32">
@@ -444,7 +444,7 @@ export function AdminDashboardContent() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      Tidak ada request
+                      No requests
                     </TableCell>
                   </TableRow>
                 )}
@@ -525,7 +525,7 @@ export function AdminDashboardContent() {
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
               <Sparkles className="h-5 w-5 text-primary" />
-              Generate Modul dengan AI
+              Generate Module with AI
             </AlertDialogTitle>
             <AlertDialogDescription>
               AI akan membuat modul pembelajaran berdasarkan request "{generateDialog.topic}".

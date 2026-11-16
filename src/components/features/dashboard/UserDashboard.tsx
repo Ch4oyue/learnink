@@ -240,7 +240,7 @@ export function UserDashboardContent() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-primary" />
-              Kursus Saya
+              My Courses
             </h3>
             <Button variant="ghost" asChild className="text-sm">
                  <Link to="/dashboard/courses">Course Catalog <ArrowRight className="ml-1 h-3 w-3" /></Link>
@@ -272,7 +272,7 @@ export function UserDashboardContent() {
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <h4 className="font-semibold mb-2">No courses enrolled yet</h4>
               <p className="text-sm text-muted-foreground mb-4">
-                Mulai perjalanan belajar Anda dengan mengambil kursus pertama.
+                Start your learning journey by taking your first course.
               </p>
               <Button asChild>
                  <Link to="/dashboard/courses">View Catalog</Link>

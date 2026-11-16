@@ -51,7 +51,7 @@ export function QuizSection({
                 Kuis Modul
               </h2>
               <p className="text-sm text-muted-foreground">
-                Uji pemahaman Anda setelah membaca materi
+                Test your understanding after reading the material
               </p>
             </div>
           </div>

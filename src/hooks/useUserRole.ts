@@ -37,7 +37,10 @@ export function useUpdateUserRole() {
         .eq('user_id', userId);
 
       if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
-      const currentRoles = (roleRows ?? []).map((row: { role: string }) => row.role);
+      if (!roleRows || roleRows.length === 0) {
+        throw new Error("Gagal memeriksa peran pengguna: peran tidak ditemukan");
+      }
+      const currentRoles = roleRows.map((row: { role: string }) => row.role);
       if (currentRoles.includes('superadmin')) {
         throw new Error('Super Admin role bersifat permanen dan tidak dapat diubah');
       }

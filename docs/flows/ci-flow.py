@@ -1,11 +1,24 @@
 from PIL import Image, ImageDraw, ImageFont
+import os
 import sys
 # Regenerates docs/assets/ci-flow.png. Run from the repo root: python3 docs/flows/ci-flow.py
 variant=sys.argv[1] if len(sys.argv)>1 else "learnink"; out="docs/assets/ci-flow.png"; L=variant=="learnink"
 W,H=1500,820
 im=Image.new("RGB",(W,H),"#0f1420"); d=ImageDraw.Draw(im)
-F="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"; FB="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-t=ImageFont.truetype(FB,34); b=ImageFont.truetype(FB,22); s=ImageFont.truetype(F,19)
+def _font(paths, size):
+    for p in paths:
+        if os.path.exists(p):
+            try:
+                return ImageFont.truetype(p, size)
+            except OSError:
+                continue
+    try:
+        return ImageFont.load_default(size=size)
+    except TypeError:
+        return ImageFont.load_default()
+_REGULAR_FONTS = ["/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf", "/usr/share/fonts/truetype/freefont/FreeSans.ttf"]
+_BOLD_FONTS = ["/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf", "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf"]
+t = _font(_BOLD_FONTS, 34); b = _font(_BOLD_FONTS, 22); s = _font(_REGULAR_FONTS, 19)
 G="#9fb0cc"
 d.text((40,26),"How it works: checks on a pull request",font=t,fill="#ffffff")
 d.text((40,74),"A new commit and a title edit start different checks. Only older runs of the same PR are cancelled.",font=s,fill=G)

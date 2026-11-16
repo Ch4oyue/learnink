@@ -152,7 +152,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <p className="text-muted-foreground">Konten modul belum tersedia</p>
+                            <p className="text-muted-foreground">Module content is not available yet</p>
                         </div>
                     )}
 

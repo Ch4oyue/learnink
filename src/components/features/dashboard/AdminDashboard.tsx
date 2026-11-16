@@ -224,7 +224,7 @@ export function AdminDashboardContent() {
               <p className="text-2xl font-semibold text-foreground">
                 {requests?.filter(r => r.status === 'pending').length || 0}
               </p>
-              <p className="text-sm text-muted-foreground">Request Pending</p>
+              <p className="text-sm text-muted-foreground">Pending Requests</p>
             </div>
           </div>
         </div>
@@ -233,8 +233,8 @@ export function AdminDashboardContent() {
       {/* Tabs for Users and Requests - URL Persisted */}
       <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
         <TabsList>
-          <TabsTrigger value="users">Manajemen Pengguna</TabsTrigger>
-          <TabsTrigger value="requests">Request Materi</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="requests">Material Requests</TabsTrigger>
           <TabsTrigger value="modules">Modul</TabsTrigger>
         </TabsList>
 
@@ -243,11 +243,11 @@ export function AdminDashboardContent() {
           <div className="bg-card border border-border rounded-xl shadow-soft overflow-hidden">
             <div className="p-6 border-b border-border">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-foreground">Daftar Pengguna</h2>
+                <h2 className="text-lg font-semibold text-foreground">User List</h2>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Cari pengguna..."
+                    placeholder="Search users..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-9 w-64"
@@ -259,10 +259,10 @@ export function AdminDashboardContent() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Pengguna</TableHead>
+                  <TableHead>User</TableHead>
                   <TableHead>Role</TableHead>
-                  <TableHead>Bergabung</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead>Joined</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -290,7 +290,7 @@ export function AdminDashboardContent() {
                               <p className="font-medium text-foreground">
                                 {userItem.display_name || 'Tanpa nama'}
                                 {isSelf && (
-                                  <span className="text-xs text-muted-foreground ml-2">(Anda)</span>
+                                  <span className="text-xs text-muted-foreground ml-2">(You)</span>
                                 )}
                               </p>
                               <p className="text-xs text-muted-foreground">{userItem.id.slice(0, 8)}...</p>
@@ -305,7 +305,7 @@ export function AdminDashboardContent() {
                         </TableCell>
                         <TableCell className="text-muted-foreground">
                           {userItem.created_at
-                            ? new Date(userItem.created_at).toLocaleDateString('id-ID')
+                            ? new Date(userItem.created_at).toLocaleDateString('en-US')
                             : '-'}
                         </TableCell>
                         <TableCell className="text-right">
@@ -320,7 +320,7 @@ export function AdminDashboardContent() {
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="user">Pelajar</SelectItem>
+                                <SelectItem value="user">Learner</SelectItem>
                                 <SelectItem value="tutor">Tutor</SelectItem>
                                 <SelectItem value="admin">Admin</SelectItem>
                               </SelectContent>
@@ -333,7 +333,7 @@ export function AdminDashboardContent() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
-                      Tidak ada pengguna ditemukan
+                      No users found
                     </TableCell>
                   </TableRow>
                 )}
@@ -345,7 +345,7 @@ export function AdminDashboardContent() {
         {/* Requests Tab */}
         <TabsContent value="requests" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Request Materi</h2>
+            <h2 className="text-lg font-semibold text-foreground">Material Requests</h2>
             <Select
               value={statusFilter}
               onValueChange={(value) => setStatusFilter(value as RequestStatus | 'all')}
@@ -354,11 +354,11 @@ export function AdminDashboardContent() {
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="pending">Menunggu</SelectItem>
-                <SelectItem value="reviewing">Ditinjau</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="rejected">Ditolak</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="reviewing">Under Review</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -367,12 +367,12 @@ export function AdminDashboardContent() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Topik</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead>Pengguna</TableHead>
-                  <TableHead>Tanggal</TableHead>
+                  <TableHead>Topic</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -397,7 +397,7 @@ export function AdminDashboardContent() {
                       <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
                       <TableCell>
                         {request.created_at
-                          ? new Date(request.created_at).toLocaleDateString('id-ID')
+                          ? new Date(request.created_at).toLocaleDateString('en-US')
                           : '-'}
                       </TableCell>
                       <TableCell>
@@ -431,10 +431,10 @@ export function AdminDashboardContent() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="pending">Menunggu</SelectItem>
-                              <SelectItem value="reviewing">Ditinjau</SelectItem>
-                              <SelectItem value="completed">Selesai</SelectItem>
-                              <SelectItem value="rejected">Ditolak</SelectItem>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="reviewing">Under Review</SelectItem>
+                              <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="rejected">Rejected</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -456,9 +456,9 @@ export function AdminDashboardContent() {
         {/* Modules Tab */}
         <TabsContent value="modules" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Modul Populer</h2>
+            <h2 className="text-lg font-semibold text-foreground">Popular Modules</h2>
             <Button size="sm" asChild>
-              <Link to="/dashboard/modules">Lihat Semua</Link>
+              <Link to="/dashboard/modules">View All</Link>
             </Button>
           </div>
 
@@ -496,7 +496,7 @@ export function AdminDashboardContent() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Perubahan Role</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
             <AlertDialogDescription>
               Anda akan mengubah role <strong>{roleChangeDialog.userName}</strong> menjadi{' '}
               <strong>{roleLabels[roleChangeDialog.newRole]}</strong>.
@@ -508,7 +508,7 @@ export function AdminDashboardContent() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRoleChange}>
               Konfirmasi
             </AlertDialogAction>
@@ -533,7 +533,7 @@ export function AdminDashboardContent() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
               Generate Modul

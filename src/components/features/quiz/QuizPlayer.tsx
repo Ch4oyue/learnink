@@ -124,12 +124,12 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             )}
           </div>
           <CardTitle className="text-2xl">
-            {results.passed ? "Selamat! Anda Lulus!" : "Belum Lulus"}
+            {results.passed ? "Congratulations! You Passed!" : "Not Passed Yet"}
           </CardTitle>
           <p className="text-muted-foreground mt-2">
             {results.passed
-              ? "Anda telah menyelesaikan kuis ini dengan baik"
-              : `Skor minimal untuk lulus adalah ${quiz.passing_score}%`}
+              ? "You have completed this quiz well"
+              : `The minimum passing score is ${quiz.passing_score}%`}
           </p>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -137,7 +137,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           <div className="text-center p-6 rounded-xl bg-muted/50">
             <div className="text-5xl font-bold mb-2">{results.percentage}%</div>
             <p className="text-muted-foreground">
-              {results.score} / {results.totalPoints} poin
+              {results.score} / {results.totalPoints} points
             </p>
           </div>
 
@@ -170,7 +170,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                       {i + 1}. {q.question_text}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Jawaban Anda: {answers[q.id] || "(tidak dijawab)"}
+                      Your answer: {answers[q.id] || "(not answered)"}
                     </p>
                     {!results.correctAnswers[q.id] && (
                       <p className="text-sm text-green-600 mt-1">
@@ -189,7 +189,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
           </div>
 
           <Button onClick={onCancel} className="w-full">
-            Kembali ke Modul
+            Back to Modules
           </Button>
         </CardContent>
       </Card>
@@ -227,7 +227,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                 : "Isian"}
             </Badge>
             <Badge variant="secondary" className="text-xs">
-              {currentQuestion.points} poin
+              {currentQuestion.points} points
             </Badge>
           </div>
           <h2 className="text-lg font-medium">{currentQuestion.question_text}</h2>
@@ -278,7 +278,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             <Input
               value={answers[currentQuestion.id] || ""}
               onChange={(e) => handleAnswer(currentQuestion.id, e.target.value)}
-              placeholder="Ketik jawaban Anda..."
+              placeholder="Type your answer..."
             />
           )}
         </div>
@@ -323,7 +323,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
               {validateQuiz.isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Menyimpan...
+                  Saving...
                 </>
               ) : (
                 <>

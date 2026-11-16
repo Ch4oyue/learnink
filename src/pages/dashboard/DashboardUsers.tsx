@@ -55,7 +55,7 @@ import {
   Plus,
 } from "lucide-react";
 import { format } from "date-fns";
-import { id } from "date-fns/locale";
+import { enUS } from "date-fns/locale";
 
 const roleConfig: Record<AppRole, { label: string; icon: React.ReactNode; variant: "default" | "secondary" | "outline" | "destructive" }> = {
   superadmin: { label: "Super Admin", icon: <Crown className="h-3 w-3" />, variant: "destructive" },
@@ -196,7 +196,7 @@ export default function DashboardUsers() {
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Users className="h-6 w-6" />
-            Manajemen Pengguna
+            User Management
           </h1>
           <p className="text-muted-foreground mt-1">
             Kelola pengguna dan atur role akses mereka
@@ -228,7 +228,7 @@ export default function DashboardUsers() {
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Cari nama..."
+              placeholder="Search names..."
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
@@ -242,7 +242,7 @@ export default function DashboardUsers() {
               <SelectValue placeholder="Filter Role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Semua Role</SelectItem>
+              <SelectItem value="all">All Roles</SelectItem>
               <SelectItem value="superadmin">Super Admin</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
               <SelectItem value="tutor">Tutor</SelectItem>
@@ -260,18 +260,18 @@ export default function DashboardUsers() {
           ) : filteredUsers?.length === 0 ? (
             <div className="text-center py-16">
               <Users className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-              <p className="text-muted-foreground">Tidak ada pengguna ditemukan</p>
+              <p className="text-muted-foreground">No users found</p>
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Pengguna</TableHead>
+                    <TableHead>User</TableHead>
                     <TableHead>Role</TableHead>
-                    <TableHead className="hidden md:table-cell">Bergabung</TableHead>
+                    <TableHead className="hidden md:table-cell">Joined</TableHead>
                     <TableHead>Label</TableHead>
-                    <TableHead>Ubah Role</TableHead>
+                    <TableHead>Change Role</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -300,7 +300,7 @@ export default function DashboardUsers() {
                               <div className="font-medium text-foreground">
                                 {user.display_name || "Pengguna"}
                                 {isSelf && (
-                                  <span className="ml-2 text-xs text-muted-foreground">(Anda)</span>
+                                  <span className="ml-2 text-xs text-muted-foreground">(You)</span>
                                 )}
                                 {(isProtected) && (
                                   <Badge variant="outline" className="ml-2 text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
@@ -322,7 +322,7 @@ export default function DashboardUsers() {
                         </TableCell>
                         <TableCell className="hidden md:table-cell text-muted-foreground">
                           {user.created_at
-                            ? format(new Date(user.created_at), "d MMM yyyy", { locale: id })
+                            ? format(new Date(user.created_at), "d MMM yyyy", { locale: enUS })
                             : "-"
                           }
                         </TableCell>
@@ -426,11 +426,11 @@ export default function DashboardUsers() {
       <AlertDialog open={confirmDialog.open} onOpenChange={(open) => !open && setConfirmDialog({ open: false, user: null, newRole: null })}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Konfirmasi Perubahan Role</AlertDialogTitle>
+            <AlertDialogTitle>Confirm Role Change</AlertDialogTitle>
             <AlertDialogDescription>
               Apakah Anda yakin ingin mengubah role{" "}
               <span className="font-medium text-foreground">
-                {confirmDialog.user?.display_name || "pengguna ini"}
+                {confirmDialog.user?.display_name || "this user"}
               </span>{" "}
               dari{" "}
               <Badge variant={roleConfig[confirmDialog.user?.role || "user"].variant} className="mx-1">
@@ -444,9 +444,9 @@ export default function DashboardUsers() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRoleChange}>
-              Ya, Ubah Role
+              Ya, Change Role
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -43,7 +43,7 @@ export function PWAInstallPrompt() {
       <DrawerContent>
         <div className="mx-auto w-full max-w-sm">
           <DrawerHeader>
-            <DrawerTitle>Install Aplikasi LearnInk</DrawerTitle>
+            <DrawerTitle>Install the LearnInk App</DrawerTitle>
             <DrawerDescription>
               Tambahkan ke Home Screen untuk pengalaman full screen yang lebih baik.
             </DrawerDescription>
@@ -53,17 +53,17 @@ export function PWAInstallPrompt() {
               <div className="flex flex-col gap-4 text-sm">
                 <div className="flex items-center gap-3">
                   <div className="bg-muted p-2 rounded-md"><Share className="h-5 w-5" /></div>
-                  <p>1. Tap tombol <strong>Share</strong> di menu bawah browser.</p>
+                  <p>1. Tap the <strong>Share</strong> in the browser's bottom menu.</p>
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="bg-muted p-2 rounded-md"><PlusSquare className="h-5 w-5" /></div>
-                  <p>2. Pilih <strong>Add to Home Screen</strong>.</p>
+                  <p>2. Select <strong>Add to Home Screen</strong>.</p>
                 </div>
               </div>
             ) : (
                <div className="flex flex-col items-center justify-center py-4">
                   <img src="/icon-192.png" alt="Icon" className="w-16 h-16 rounded-xl mb-4 shadow-lg" />
-                  <p className="text-center text-muted-foreground">Aplikasi akan diinstall di perangkat Anda.</p>
+                  <p className="text-center text-muted-foreground">The app will be installed on your device.</p>
                </div>
             )}
           </div>

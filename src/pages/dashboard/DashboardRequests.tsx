@@ -46,7 +46,7 @@ import { useAllRequests, useUpdateRequest, useCreateRequest, RequestType } from 
 import { useGenerateModule } from "@/hooks/useGenerateModule";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import {
@@ -89,8 +89,8 @@ const statusIcons: Record<string, typeof Clock> = {
 };
 
 const typeLabels: Record<RequestType, string> = {
-  module: "Materi",
-  feature: "Fitur",
+  module: "Material",
+  feature: "Feature",
   bug: "Bug",
 };
 
@@ -228,8 +228,8 @@ export default function DashboardRequests() {
             <h1 className="text-2xl font-semibold">Requests & Feedback</h1>
             <p className="text-muted-foreground">
               {canManage
-                ? "Kelola permintaan dan feedback dari pengguna"
-                : "Ajukan permintaan materi, fitur baru, atau laporkan bug"}
+                ? "Manage requests and feedback from users"
+                : "Request materials or new features, or report a bug"}
             </p>
           </div>
           <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
@@ -271,11 +271,11 @@ export default function DashboardRequests() {
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua Status</SelectItem>
+                <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="reviewing">Reviewing</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="rejected">Ditolak</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -301,7 +301,7 @@ export default function DashboardRequests() {
                   <h3 className="font-medium mb-2">Tidak ada data</h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     {searchQuery || statusFilter !== "all"
-                      ? "Coba ubah filter pencarian"
+                      ? "Try adjusting the search filter"
                       : `Belum ada ${typeLabels[activeTab].toLowerCase()} yang diajukan`}
                   </p>
                   <Button onClick={() => setIsCreateOpen(true)} variant="outline">
@@ -314,12 +314,12 @@ export default function DashboardRequests() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Topik / Judul</TableHead>
-                      {activeTab === 'module' && <TableHead>Kategori</TableHead>}
+                      <TableHead>Topic / Title</TableHead>
+                      {activeTab === 'module' && <TableHead>Category</TableHead>}
                       <TableHead>Status</TableHead>
                       <TableHead>Prioritas</TableHead>
-                      <TableHead>Tanggal</TableHead>
-                      {canManage && activeTab === 'module' && <TableHead className="w-[120px]">Aksi</TableHead>}
+                      <TableHead>Date</TableHead>
+                      {canManage && activeTab === 'module' && <TableHead className="w-[120px]">Actions</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -392,8 +392,8 @@ export default function DashboardRequests() {
         <DialogContent className="max-w-lg glass-liquid rounded-[24px]">
           <DialogHeader>
             <DialogTitle>
-              {activeTab === 'module' && "Request Materi Baru"}
-              {activeTab === 'feature' && "Request Fitur Baru"}
+              {activeTab === 'module' && "Material Requests Baru"}
+              {activeTab === 'feature' && "New Feature Request"}
               {activeTab === 'bug' && "Lapor Bug"}
             </DialogTitle>
             <DialogDescription>
@@ -403,20 +403,20 @@ export default function DashboardRequests() {
           <form onSubmit={handleCreate} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="topic">
-                {activeTab === 'module' ? "Topik Materi *" : "Judul *"}
+                {activeTab === 'module' ? "Material Topic *" : "Judul *"}
               </Label>
               <Input
                 id="topic"
                 value={formData.topic}
                 onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
-                placeholder={activeTab === 'module' ? "Contoh: Dasar Python" : "Ringkasan singkat"}
+                placeholder={activeTab === 'module' ? "Example: Python Basics" : "Short summary"}
                 required
               />
             </div>
 
             {activeTab === 'module' && (
               <div className="space-y-2">
-                <Label htmlFor="category">Kategori</Label>
+                <Label htmlFor="category">Category</Label>
                 <Input
                   id="category"
                   value={formData.category}
@@ -427,14 +427,14 @@ export default function DashboardRequests() {
             )}
 
             <div className="space-y-2">
-              <Label htmlFor="description">Deskripsi & Screenshot</Label>
+              <Label htmlFor="description">Description & Screenshot</Label>
               <div className="relative">
                  <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     onPaste={handlePaste}
-                    placeholder="Deskripsi detail... (Paste gambar di sini)"
+                    placeholder="Detailed description... (paste images here)"
                     rows={4}
                   />
                   {uploading && (
@@ -531,7 +531,7 @@ export default function DashboardRequests() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleGenerate}
               disabled={generateModule.isPending}

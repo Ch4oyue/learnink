@@ -32,7 +32,7 @@ export default function LandingPage() {
         <div className="bg-background text-foreground transition-colors duration-300 min-h-screen flex flex-col font-sans antialiased">
             <SEO
                 title="LearnInk - Master Tech Skills The Lazy Way"
-                description="Hentikan menonton tutorial tanpa akhir. Bangun proyek nyata dengan Guided Notes yang melacak kemajuan Anda secara otomatis."
+                description="Stop watching endless tutorials. Build real projects with Guided Notes that track your progress automatically."
             />
             {/* Header */}
             <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border pt-[env(safe-area-inset-top)] transition-all">

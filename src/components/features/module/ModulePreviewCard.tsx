@@ -49,7 +49,7 @@ export function ModulePreviewCard({ control }: ModulePreviewCardProps) {
           </div>
           <div>
             <p className="font-medium text-sm">
-              {title || "Judul Modul"}
+              {title || "Module Title"}
             </p>
             <p className="text-xs text-muted-foreground">
               {category} • {level}

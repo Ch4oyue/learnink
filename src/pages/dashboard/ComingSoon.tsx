@@ -9,7 +9,7 @@ interface ComingSoonProps {
 
 export default function ComingSoon({
     title = "Segera Hadir",
-    description = "Fitur ini sedang dalam pengembangan dan akan segera tersedia."
+    description = "This feature is under development and will be available soon."
 }: ComingSoonProps) {
     const navigate = useNavigate();
 

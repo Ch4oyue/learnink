@@ -51,7 +51,7 @@ export function HeroSection() {
             style={{ animationDelay: "0.1s" }}
           >
             <Sparkles className="w-4 h-4" />
-            <span>Platform Belajar AI #1 untuk Non-IT</span>
+            <span>The #1 AI Learning Platform for Non-IT</span>
           </div>
 
           {/* Headline */}
@@ -110,13 +110,13 @@ export function HeroSection() {
                 <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center">
                   <Brain className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-medium">1000+ Pelajar</span>
+                <span className="text-sm font-medium">1000+ Learners</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground/60">
                 <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center">
                   <Zap className="w-4 h-4" />
                 </div>
-                <span className="text-sm font-medium">50+ Modul</span>
+                <span className="text-sm font-medium">50+ Modules</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground/60">
                 <div className="w-8 h-8 rounded-lg bg-secondary flex items-center justify-center">

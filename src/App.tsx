@@ -221,7 +221,7 @@ const App = () => (
                         path="/dashboard/analytics"
                         element={
                           <ProtectedRoute>
-                            <ComingSoon title="Analytics" description="Fitur analytics untuk melihat statistik pembelajaran Anda secara detail sedang dalam pengembangan." />
+                            <ComingSoon title="Analytics" description="The analytics feature for viewing your learning statistics in detail is under development." />
                           </ProtectedRoute>
                         }
                       />
@@ -229,7 +229,7 @@ const App = () => (
                         path="/dashboard/achievements"
                         element={
                           <ProtectedRoute>
-                            <ComingSoon title="Achievements" description="Fitur achievements untuk melihat semua pencapaian belajar Anda sedang dalam pengembangan." />
+                            <ComingSoon title="Achievements" description="The achievements feature for viewing all your learning achievements is under development." />
                           </ProtectedRoute>
                         }
                       />

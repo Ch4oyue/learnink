@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { Loader2, Plus, FileQuestion, Clock, CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -61,7 +61,7 @@ export default function DashboardRequestMaterial() {
         onSuccess: () => {
           toast({
             title: "Request Terkirim! 🎉",
-            description: "Request materi Anda akan segera diproses oleh tim.",
+            description: "Your material request will be processed by the team soon.",
           });
           setTopic("");
           setDescription("");
@@ -78,7 +78,7 @@ export default function DashboardRequestMaterial() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold">Request Materi</h1>
+            <h1 className="text-2xl font-semibold">Material Requests</h1>
             <p className="text-muted-foreground">
               Request materi pembelajaran yang Anda butuhkan
             </p>
@@ -93,7 +93,7 @@ export default function DashboardRequestMaterial() {
         {showForm && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Request Materi Baru</CardTitle>
+              <CardTitle className="text-lg">Material Requests Baru</CardTitle>
               <CardDescription>
                 Jelaskan materi yang ingin Anda pelajari
               </CardDescription>
@@ -101,29 +101,29 @@ export default function DashboardRequestMaterial() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="topic">Topik Materi *</Label>
+                  <Label htmlFor="topic">Material Topic *</Label>
                   <Input
                     id="topic"
                     value={topic}
                     onChange={(e) => setTopic(e.target.value)}
-                    placeholder="Contoh: Cara menggunakan ChatGPT untuk menulis email"
+                    placeholder="Example: How to use ChatGPT to write emails"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Deskripsi (Opsional)</Label>
+                  <Label htmlFor="description">Description (Optional)</Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Jelaskan lebih detail tentang apa yang ingin Anda pelajari..."
+                    placeholder="Describe in more detail what you want to learn..."
                     rows={3}
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="category">Kategori</Label>
+                  <Label htmlFor="category">Category</Label>
                   <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger>
                       <SelectValue />

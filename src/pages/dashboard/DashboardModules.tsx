@@ -35,7 +35,7 @@ import { useModules, useMyModules, useDeleteModule } from "@/hooks/useModules";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import {
   Plus,
   Search,
@@ -140,8 +140,8 @@ export default function DashboardModules() {
             <h1 className="text-2xl font-semibold">Modul Pembelajaran</h1>
             <p className="text-muted-foreground">
               {isTutorOrAdmin
-                ? "Kelola dan buat modul pembelajaran"
-                : "Jelajahi materi pembelajaran yang tersedia"}
+                ? "Manage and create learning modules"
+                : "Browse available learning materials"}
             </p>
           </div>
           {isTutorOrAdmin && (
@@ -158,7 +158,7 @@ export default function DashboardModules() {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Cari modul..."
+            placeholder="Search modules..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -168,8 +168,8 @@ export default function DashboardModules() {
         {/* Tabs */}
         <Tabs defaultValue={isTutorOrAdmin ? "my-modules" : "all"} className="space-y-4">
           <TabsList>
-            {isTutorOrAdmin && <TabsTrigger value="my-modules">Modul Saya</TabsTrigger>}
-            <TabsTrigger value="all">Semua Modul</TabsTrigger>
+            {isTutorOrAdmin && <TabsTrigger value="my-modules">My Modules</TabsTrigger>}
+            <TabsTrigger value="all">All Modules</TabsTrigger>
           </TabsList>
 
           {/* My Modules Tab (Tutor/Admin) */}
@@ -187,7 +187,7 @@ export default function DashboardModules() {
                 <Card className="glass-panel border-dashed border-white/20">
                   <CardContent className="py-12 text-center">
                     <BookOpen className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                    <h3 className="font-bold mb-2 text-lg">Belum ada modul</h3>
+                    <h3 className="font-bold mb-2 text-lg">No modules yet</h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       Mulai buat modul pembelajaran pertama Anda
                     </p>
@@ -205,7 +205,7 @@ export default function DashboardModules() {
                     <TableHeader>
                       <TableRow className="hover:bg-transparent border-b border-white/10">
                         <TableHead className="font-bold text-foreground/80">Modul</TableHead>
-                        <TableHead className="font-bold text-foreground/80">Kategori</TableHead>
+                        <TableHead className="font-bold text-foreground/80">Category</TableHead>
                         <TableHead className="font-bold text-foreground/80">Level</TableHead>
                         <TableHead className="font-bold text-foreground/80">Status</TableHead>
                         <TableHead className="font-bold text-foreground/80">Dibuat</TableHead>
@@ -308,13 +308,13 @@ export default function DashboardModules() {
                 <CardContent className="py-12 text-center">
                   <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4 animate-pulse" />
                   <h3 className="font-bold mb-2 text-lg">
-                    {searchQuery ? `Tidak ditemukan modul "${searchQuery}"` : "Belum ada modul tersedia"}
+                    {searchQuery ? `No module found for "${searchQuery}"` : "No modules available yet"}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-4 max-w-md mx-auto">
                     {searchQuery
-                      ? "Mungkin belum ada yang membuatnya. Jadilah yang pertama merequest!"
-                      : "Modul akan muncul di sini ketika sudah dipublikasikan"}
-                    {!isTutorOrAdmin && " (Hanya menampilkan modul sesuai Track Anda)"}
+                      ? "Maybe no one has created it yet. Be the first to request it!"
+                      : "Modules will appear here once published"}
+                    {!isTutorOrAdmin && " (Only showing modules matching your Track)"}
                   </p>
                   <Button asChild variant="outline" className="glass-button">
                     <Link to={`/dashboard/requests?tab=module&topic=${encodeURIComponent(searchQuery)}`}>
@@ -392,13 +392,13 @@ export default function DashboardModules() {
       <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
         <AlertDialogContent className="glass-liquid rounded-[24px]">
           <AlertDialogHeader>
-            <AlertDialogTitle>Hapus Modul?</AlertDialogTitle>
+            <AlertDialogTitle>Delete Module?</AlertDialogTitle>
             <AlertDialogDescription>
               Tindakan ini tidak dapat dibatalkan. Modul akan dihapus secara permanen.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               className="bg-destructive hover:bg-destructive/90"

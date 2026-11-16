@@ -66,7 +66,7 @@ export default function CourseDetail() {
       <DashboardLayout>
          <div className="text-center py-12">
             <h2 className="text-2xl font-bold mb-4">Kursus Tidak Ditemukan</h2>
-            <Button onClick={() => navigate('/dashboard/courses')}>Kembali ke Katalog</Button>
+            <Button onClick={() => navigate('/dashboard/courses')}>Back to Catalog</Button>
          </div>
       </DashboardLayout>
     );
@@ -122,7 +122,7 @@ export default function CourseDetail() {
            {!canAccess && (
               <div className="bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 p-4 rounded-xl mb-6 flex items-center gap-3">
                  <Lock className="h-5 w-5" />
-                 <p>Anda belum terdaftar di kursus ini. Silakan ambil kursus untuk mengakses materi.</p>
+                 <p>You are not enrolled in this course. Please take the course to access the material.</p>
               </div>
            )}
 
@@ -188,7 +188,7 @@ export default function CourseDetail() {
 
               {modules?.length === 0 && (
                  <div className="text-center py-12 bg-muted/30 rounded-xl border border-dashed">
-                    <p className="text-muted-foreground">Belum ada modul di kursus ini.</p>
+                    <p className="text-muted-foreground">No modules in this course yet.</p>
                  </div>
               )}
            </div>

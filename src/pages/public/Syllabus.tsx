@@ -42,7 +42,7 @@ const learningPaths = [
   {
     id: "ai-fundamentals",
     title: "Dasar-Dasar AI",
-    description: "Pahami konsep dasar Artificial Intelligence dan Machine Learning",
+    description: "Understand the basic concepts of Artificial Intelligence and Machine Learning",
     icon: Brain,
     color: "from-blue-500 to-cyan-500",
     bgColor: "bg-blue-500/10",
@@ -53,7 +53,7 @@ const learningPaths = [
   {
     id: "automation-basics",
     title: "Automation Fundamentals",
-    description: "Pelajari dasar-dasar otomatisasi workflow dan proses",
+    description: "Learn the fundamentals of workflow automation and processes",
     icon: Cog,
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-500/10",
@@ -64,7 +64,7 @@ const learningPaths = [
   {
     id: "ai-tools",
     title: "AI Tools & Aplikasi",
-    description: "Kuasai tools AI populer seperti ChatGPT, Midjourney, dan lainnya",
+    description: "Master popular AI tools like ChatGPT, Midjourney, and more",
     icon: Bot,
     color: "from-orange-500 to-red-500",
     bgColor: "bg-orange-500/10",
@@ -75,7 +75,7 @@ const learningPaths = [
   {
     id: "advanced-automation",
     title: "Advanced Automation",
-    description: "Bangun sistem automation kompleks dengan AI integration",
+    description: "Build complex automation systems with AI integration",
     icon: Workflow,
     color: "from-amber-500 to-yellow-500",
     bgColor: "bg-amber-500/10",
@@ -214,7 +214,7 @@ export default function Syllabus() {
                       <div className="flex items-center gap-3">
                         <div className="text-right">
                           <p className="text-2xl font-bold">{pathProgress}%</p>
-                          <p className="text-xs text-muted-foreground">Selesai</p>
+                          <p className="text-xs text-muted-foreground">Completed</p>
                         </div>
                         <div className="w-24">
                           <Progress value={pathProgress} className="h-2" />

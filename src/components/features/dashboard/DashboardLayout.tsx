@@ -112,7 +112,7 @@ const formatBadgeCount = (count: string | number | undefined) => {
 };
 
 const roleLabels: Record<AppRole, string> = {
-  user: "Pelajar",
+  user: "Learner",
   tutor: "Tutor",
   admin: "Admin",
   superadmin: "Super Admin",

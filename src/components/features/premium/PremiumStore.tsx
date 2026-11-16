@@ -20,9 +20,9 @@ import { cn } from "@/lib/utils";
 import { format, addDays } from "date-fns";
 
 const PREMIUM_OFFERS = [
-  { id: "7_days", label: "7 Hari Premium", cost: 500, days: 7, icon: Zap },
-  { id: "30_days", label: "30 Hari Premium", cost: 1500, days: 30, icon: Crown, popular: true },
-  { id: "streak_claim", label: "Streak Reward (30 Hari)", cost: 0, streakRequired: 30, days: 14, icon: Flame },
+  { id: "7_days", label: "7 Days Premium", cost: 500, days: 7, icon: Zap },
+  { id: "30_days", label: "30 Days Premium", cost: 1500, days: 30, icon: Crown, popular: true },
+  { id: "streak_claim", label: "Streak Reward (30 Days)", cost: 0, streakRequired: 30, days: 14, icon: Flame },
 ];
 
 export function PremiumStore() {
@@ -37,10 +37,10 @@ export function PremiumStore() {
 
       // Validations
       if (!isStreakClaim && (profile.points || 0) < cost) {
-        throw new Error("Poin tidak cukup");
+        throw new Error("Not enough points");
       }
       if (isStreakClaim && (profile.current_streak || 0) < 30) {
-        throw new Error("Streak belum mencapai 30 hari");
+        throw new Error("Streak has not reached 30 days");
       }
 
       const currentPremiumUntil = profile.premium_until ? new Date(profile.premium_until) : new Date();
@@ -69,7 +69,7 @@ export function PremiumStore() {
       queryClient.invalidateQueries({ queryKey: ["profile"] });
       toast({
         title: "Aktivasi Berhasil! 👑",
-        description: `Status Premium aktif hingga ${format(new Date(data.newPremiumUntil), "dd MMM yyyy")}`,
+        description: `Premium status active until ${format(new Date(data.newPremiumUntil), "dd MMM yyyy")}`,
       });
     },
     onError: (error: Error) => {
@@ -101,7 +101,7 @@ export function PremiumStore() {
             <Sparkles className="h-6 w-6 text-primary" />
             LearnInk Elite
           </h2>
-          <p className="text-muted-foreground">Tukarkan poin atau streak Anda untuk akses fitur eksklusif.</p>
+          <p className="text-muted-foreground">Redeem points or streaks for exclusive feature access.</p>
         </div>
         <div className="text-right">
           <Badge variant="secondary" className="text-lg px-3 py-1 gap-2">
@@ -118,7 +118,7 @@ export function PremiumStore() {
               <Crown className="h-6 w-6 text-amber-500" />
             </div>
             <div>
-              <p className="font-bold text-amber-500">Status Premium Aktif</p>
+              <p className="font-bold text-amber-500">Premium Status Active</p>
               <p className="text-sm text-muted-foreground flex items-center gap-1">
                 <Clock className="h-3 w-3" />
                 Berakhir pada {format(new Date(profile!.premium_until!), "dd MMM yyyy")}
@@ -158,8 +158,8 @@ export function PremiumStore() {
               <CardContent>
                 <ul className="text-sm space-y-2 text-muted-foreground">
                   <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Multiplier XP 1.5x</li>
-                  <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Badge Elite di Profil</li>
-                  <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Tanpa Iklan (Coming Soon)</li>
+                  <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Elite Badge on Profile</li>
+                  <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Ad-Free (Coming Soon)</li>
                 </ul>
               </CardContent>
               <CardFooter>
@@ -182,7 +182,7 @@ export function PremiumStore() {
       </div>
 
       <div className="pt-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Keuntungan Elite</h3>
+        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Elite Benefits</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
            <div className="p-4 rounded-2xl bg-white/5 flex gap-4">
              <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -190,7 +190,7 @@ export function PremiumStore() {
              </div>
              <div>
                <p className="font-bold text-sm">Turbo Learning</p>
-               <p className="text-xs text-muted-foreground">Dapatkan XP lebih cepat dengan multiplier premium.</p>
+               <p className="text-xs text-muted-foreground">Earn XP faster with the premium multiplier.</p>
              </div>
            </div>
            <div className="p-4 rounded-2xl bg-white/5 flex gap-4">
@@ -199,7 +199,7 @@ export function PremiumStore() {
              </div>
              <div>
                <p className="font-bold text-sm">Exclusive Badge</p>
-               <p className="text-xs text-muted-foreground">Tunjukkan status Anda dengan ikon mahkota dan VFX.</p>
+               <p className="text-xs text-muted-foreground">Show off your status with a crown icon and VFX.</p>
              </div>
            </div>
         </div>

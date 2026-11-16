@@ -99,7 +99,7 @@ export default function Modules() {
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Cari modul..."
+                placeholder="Search modules..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -107,7 +107,7 @@ export default function Modules() {
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full md:w-48">
-                <SelectValue placeholder="Kategori" />
+                <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
                 {categories.map(cat => (
@@ -196,7 +196,7 @@ export default function Modules() {
             <p className="text-muted-foreground mb-6">
               {searchQuery || categoryFilter !== 'Semua' || levelFilter !== 'Semua'
                 ? 'Coba ubah filter atau kata kunci pencarian'
-                : 'Belum ada modul yang tersedia saat ini'}
+                : 'No modules yet yang tersedia saat ini'}
             </p>
             {(searchQuery || categoryFilter !== 'Semua' || levelFilter !== 'Semua') && (
               <Button 

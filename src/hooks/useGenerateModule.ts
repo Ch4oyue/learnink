@@ -23,14 +23,14 @@ export function useGenerateModule() {
       queryClient.invalidateQueries({ queryKey: ['my-modules'] });
       toast({
         title: "Modul Berhasil Dibuat!",
-        description: "Modul baru telah di-generate dari request materi.",
+        description: "A new module has been generated from the material request.",
       });
     },
     onError: (error: Error) => {
       logger.error('Error generating module:', error);
       toast({
         title: "Gagal Generate Modul",
-        description: error.message || "Terjadi kesalahan saat generate modul.",
+        description: error.message || "An error occurred while generating the module.",
         variant: "destructive",
       });
     },

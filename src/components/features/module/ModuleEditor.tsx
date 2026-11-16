@@ -72,8 +72,8 @@ const levels = ["Pemula", "Menengah", "Lanjutan"] as const;
 // ============================================
 
 const moduleSchema = z.object({
-  title: z.string().min(1, "Judul modul wajib diisi").max(200, "Judul terlalu panjang"),
-  summary: z.string().max(500, "Ringkasan terlalu panjang").optional().or(z.literal("")),
+  title: z.string().min(1, "Module title is required").max(200, "Title is too long"),
+  summary: z.string().max(500, "Summary is too long").optional().or(z.literal("")),
   content: z.string().optional().or(z.literal("")),
   category: z.string().min(1, "Pilih kategori"),
   level: z.string().min(1, "Pilih level"),
@@ -134,8 +134,8 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           source_request_id: null,
         });
         toast({
-          title: "Berhasil",
-          description: "Modul berhasil dibuat",
+          title: "Success",
+          description: "Module created successfully",
         });
         navigate("/dashboard/modules");
       } else if (module) {
@@ -146,8 +146,8 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           content: data.content || null,
         });
         toast({
-          title: "Berhasil",
-          description: "Modul berhasil diperbarui",
+          title: "Success",
+          description: "Module updated successfully",
         });
         navigate("/dashboard/modules");
       }
@@ -155,7 +155,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
       logger.error("Error saving module:", error);
       toast({
         title: "Error",
-        description: "Gagal menyimpan modul",
+        description: "Failed to save module",
         variant: "destructive",
       });
     }
@@ -201,7 +201,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              {isPending ? "Menyimpan..." : "Simpan"}
+              {isPending ? "Saving..." : "Simpan"}
             </Button>
           </div>
         </div>
@@ -218,10 +218,10 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 name="title"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Judul Modul</FormLabel>
+                    <FormLabel>Module Title</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Masukkan judul modul..."
+                        placeholder="Enter module title..."
                         className="input-apple"
                         {...field}
                       />
@@ -236,10 +236,10 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 name="summary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Ringkasan</FormLabel>
+                    <FormLabel>Summary</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Deskripsi singkat modul..."
+                        placeholder="Short module description..."
                         rows={3}
                         {...field}
                       />
@@ -254,7 +254,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 name="category"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Kategori</FormLabel>
+                    <FormLabel>Category</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>

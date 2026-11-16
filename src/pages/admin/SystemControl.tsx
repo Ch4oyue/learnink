@@ -331,7 +331,7 @@ export default function SystemControl() {
                 {securityLogs?.map((log) => (
                   <TableRow key={log.id}>
                     <TableCell className="text-xs text-muted-foreground">
-                      {new Date(log.created_at).toLocaleString('id-ID')}
+                      {new Date(log.created_at).toLocaleString('en-US')}
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="capitalize">
@@ -362,7 +362,7 @@ export default function SystemControl() {
           <CardFooter>
             <Button variant="ghost" size="sm" className="w-full gap-2" asChild>
                <Link to="/dashboard/admin/logs">
-                 <Activity className="h-4 w-4" /> Lihat Semua Log
+                 <Activity className="h-4 w-4" /> View All Log
                </Link>
             </Button>
           </CardFooter>
@@ -395,7 +395,7 @@ export default function SystemControl() {
                   <TableHead>Multiplier</TableHead>
                   <TableHead>Deskripsi</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

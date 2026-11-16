@@ -153,7 +153,7 @@ export default function RequestDetail() {
               <Calendar className="h-4 w-4" />
               <span>
                 Dibuat: {request.created_at 
-                  ? new Date(request.created_at).toLocaleDateString('id-ID', {
+                  ? new Date(request.created_at).toLocaleDateString('en-US', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',

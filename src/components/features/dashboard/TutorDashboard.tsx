@@ -105,7 +105,7 @@ export function TutorDashboardContent() {
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{myModules?.length || 0}</p>
-              <p className="text-sm text-muted-foreground">Modul Saya</p>
+              <p className="text-sm text-muted-foreground">My Modules</p>
             </div>
           </div>
         </div>
@@ -116,7 +116,7 @@ export function TutorDashboardContent() {
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{pendingRequests}</p>
-              <p className="text-sm text-muted-foreground">Request Pending</p>
+              <p className="text-sm text-muted-foreground">Pending Requests</p>
             </div>
           </div>
         </div>
@@ -127,7 +127,7 @@ export function TutorDashboardContent() {
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{totalStudents}</p>
-              <p className="text-sm text-muted-foreground">Total Siswa</p>
+              <p className="text-sm text-muted-foreground">Total Students</p>
             </div>
           </div>
         </div>
@@ -140,7 +140,7 @@ export function TutorDashboardContent() {
               <p className="text-2xl font-semibold text-foreground">
                 {requests?.filter(r => r.status === 'completed').length || 0}
               </p>
-              <p className="text-sm text-muted-foreground">Request Selesai</p>
+              <p className="text-sm text-muted-foreground">Completed Requests</p>
             </div>
           </div>
         </div>
@@ -150,12 +150,12 @@ export function TutorDashboardContent() {
       <Tabs defaultValue="requests" className="space-y-6">
         <TabsList>
           <TabsTrigger value="requests">Review Request</TabsTrigger>
-          <TabsTrigger value="modules">Modul Saya</TabsTrigger>
+          <TabsTrigger value="modules">My Modules</TabsTrigger>
         </TabsList>
 
         <TabsContent value="requests" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Request Materi</h2>
+            <h2 className="text-lg font-semibold text-foreground">Material Requests</h2>
             <Select
               value={statusFilter}
               onValueChange={(value) => setStatusFilter(value as RequestStatus | 'all')}
@@ -164,11 +164,11 @@ export function TutorDashboardContent() {
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Semua</SelectItem>
-                <SelectItem value="pending">Menunggu</SelectItem>
-                <SelectItem value="reviewing">Ditinjau</SelectItem>
-                <SelectItem value="completed">Selesai</SelectItem>
-                <SelectItem value="rejected">Ditolak</SelectItem>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="reviewing">Under Review</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -177,11 +177,11 @@ export function TutorDashboardContent() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Topik</TableHead>
-                  <TableHead>Pengguna</TableHead>
-                  <TableHead>Tanggal</TableHead>
+                  <TableHead>Topic</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Date</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Aksi</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -203,7 +203,7 @@ export function TutorDashboardContent() {
                       <TableCell>{request.user_display_name || 'Anonim'}</TableCell>
                       <TableCell>
                         {request.created_at
-                          ? new Date(request.created_at).toLocaleDateString('id-ID')
+                          ? new Date(request.created_at).toLocaleDateString('en-US')
                           : '-'}
                       </TableCell>
                       <TableCell>
@@ -237,10 +237,10 @@ export function TutorDashboardContent() {
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="pending">Menunggu</SelectItem>
-                              <SelectItem value="reviewing">Ditinjau</SelectItem>
-                              <SelectItem value="completed">Selesai</SelectItem>
-                              <SelectItem value="rejected">Ditolak</SelectItem>
+                              <SelectItem value="pending">Pending</SelectItem>
+                              <SelectItem value="reviewing">Under Review</SelectItem>
+                              <SelectItem value="completed">Completed</SelectItem>
+                              <SelectItem value="rejected">Rejected</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -261,9 +261,9 @@ export function TutorDashboardContent() {
 
         <TabsContent value="modules" className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-foreground">Modul yang Saya Buat</h2>
+            <h2 className="text-lg font-semibold text-foreground">Modules I Created</h2>
             <Button size="sm" asChild>
-              <Link to="/dashboard/modules/create">+ Buat Modul</Link>
+              <Link to="/dashboard/modules/create">+ Create Module</Link>
             </Button>
           </div>
 
@@ -303,9 +303,9 @@ export function TutorDashboardContent() {
           ) : (
             <div className="bg-card border border-border rounded-xl p-12 text-center shadow-soft">
               <BookOpen className="h-12 w-12 text-muted-foreground/50 mx-auto mb-3" />
-              <p className="text-muted-foreground mb-4">Anda belum membuat modul</p>
+              <p className="text-muted-foreground mb-4">You have not created any modules yet</p>
               <Button asChild>
-                <Link to="/dashboard/modules/create">Buat Modul Pertama</Link>
+                <Link to="/dashboard/modules/create">Create Your First Module</Link>
               </Button>
             </div>
           )}
@@ -329,7 +329,7 @@ export function TutorDashboardContent() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Batal</AlertDialogCancel>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={confirmGenerate}>
               <Sparkles className="h-4 w-4 mr-2" />
               Generate Modul

@@ -243,7 +243,7 @@ export function UserDashboardContent() {
               Kursus Saya
             </h3>
             <Button variant="ghost" asChild className="text-sm">
-                 <Link to="/dashboard/courses">Katalog Kursus <ArrowRight className="ml-1 h-3 w-3" /></Link>
+                 <Link to="/dashboard/courses">Course Catalog <ArrowRight className="ml-1 h-3 w-3" /></Link>
             </Button>
           </div>
 
@@ -262,7 +262,7 @@ export function UserDashboardContent() {
                   title={track.name}
                   description={track.description || ""}
                   category="Track"
-                  level="Semua Level"
+                  level="All Levels"
                   progress={0}
                 />
               ))}
@@ -270,12 +270,12 @@ export function UserDashboardContent() {
           ) : (
             <div className="bg-card border border-border rounded-xl p-8 text-center">
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <h4 className="font-semibold mb-2">Belum ada kursus yang diambil</h4>
+              <h4 className="font-semibold mb-2">No courses enrolled yet</h4>
               <p className="text-sm text-muted-foreground mb-4">
                 Mulai perjalanan belajar Anda dengan mengambil kursus pertama.
               </p>
               <Button asChild>
-                 <Link to="/dashboard/courses">Lihat Katalog</Link>
+                 <Link to="/dashboard/courses">View Catalog</Link>
               </Button>
             </div>
           )}

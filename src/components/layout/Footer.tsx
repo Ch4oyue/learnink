@@ -3,8 +3,8 @@ import { Mail, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
 
 const quickLinks = [
   { label: "Home", href: "/", isRoute: true },
-  { label: "Fitur", href: "/#fitur", isRoute: false },
-  { label: "Silabus", href: "/syllabus", isRoute: true },
+  { label: "Features", href: "/#fitur", isRoute: false },
+  { label: "Syllabus", href: "/syllabus", isRoute: true },
   { label: "Modul", href: "/modules", isRoute: true },
   { label: "Request", href: "/#request", isRoute: false },
 ];

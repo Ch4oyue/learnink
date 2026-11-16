@@ -180,7 +180,7 @@ export const ModulesSection = () => {
                   {module.title}
                 </h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6 line-clamp-2">
-                  {module.summary || "Materi pembelajaran AI & Automation yang terstruktur dan mudah dipahami."}
+                  {module.summary || "Structured, easy-to-understand AI & Automation learning material."}
                 </p>
 
                 {/* Progress Bar */}

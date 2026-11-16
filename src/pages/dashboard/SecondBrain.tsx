@@ -20,7 +20,7 @@ import {
     Calendar,
 } from "lucide-react";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
@@ -136,7 +136,7 @@ export default function SecondBrain() {
                     <div className="relative flex-1">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Cari catatan..."
+                            placeholder="Search notes..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className="pl-10"
@@ -197,8 +197,8 @@ export default function SecondBrain() {
                             <CardTitle className="text-lg mb-1">Belum Ada Catatan</CardTitle>
                             <CardDescription>
                                 {searchQuery
-                                    ? "Tidak ada catatan yang cocok dengan pencarian Anda."
-                                    : "Mulai buat catatan saat belajar modul untuk melihatnya di sini."}
+                                    ? "No notes match your search."
+                                    : "Start taking notes while learning modules to see them here."}
                             </CardDescription>
                         </CardContent>
                     </Card>

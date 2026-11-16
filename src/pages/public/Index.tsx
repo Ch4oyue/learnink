@@ -21,7 +21,7 @@ import {
 const learningPaths = [
   {
     title: "Dasar-Dasar AI",
-    description: "Pahami konsep fundamental Artificial Intelligence dan Machine Learning",
+    description: "Understand the fundamental concepts of Artificial Intelligence and Machine Learning",
     icon: Bot,
     color: "from-cyan-500/20 to-blue-500/20",
     textColor: "text-cyan-600",
@@ -29,7 +29,7 @@ const learningPaths = [
   },
   {
     title: "Automation Fundamentals",
-    description: "Pelajari dasar otomatisasi workflow dan proses bisnis",
+    description: "Learn the basics of workflow automation and business processes",
     icon: Cpu,
     color: "from-purple-500/20 to-pink-500/20",
     textColor: "text-purple-600",
@@ -37,7 +37,7 @@ const learningPaths = [
   },
   {
     title: "AI Tools & Aplikasi",
-    description: "Kuasai ChatGPT, Midjourney, dan tools AI populer lainnya",
+    description: "Master ChatGPT, Midjourney, and other popular AI tools",
     icon: Zap,
     color: "from-orange-500/20 to-red-500/20",
     textColor: "text-orange-600",
@@ -45,7 +45,7 @@ const learningPaths = [
   },
   {
     title: "Advanced Automation",
-    description: "Bangun sistem automation kompleks dengan AI integration",
+    description: "Build complex automation systems with AI integration",
     icon: Workflow,
     color: "from-emerald-500/20 to-teal-500/20",
     textColor: "text-emerald-600",

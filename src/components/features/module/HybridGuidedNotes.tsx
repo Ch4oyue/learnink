@@ -12,7 +12,7 @@ import {
     Loader2,
 } from "lucide-react";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import { cn } from "@/lib/utils";
 import type { LearningNote } from "@/hooks/useLearningNotes";
 
@@ -261,7 +261,7 @@ function NoteCard({ note, onDelete, onEdit, isEditing, isDeleting }: NoteCardPro
                     <button
                         onClick={() => onEdit?.(note)}
                         className="p-1 hover:text-primary transition-colors"
-                        aria-label="Edit Catatan"
+                        aria-label="Edit Note"
                     >
                         <Edit3 className="h-4 w-4 text-muted-foreground hover:text-primary" />
                     </button>

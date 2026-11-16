@@ -95,8 +95,8 @@ export function useCreateLearningSource() {
             queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
             queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
             toast({
-                title: "Berhasil",
-                description: "Sumber belajar berhasil ditambahkan",
+                title: "Success",
+                description: "Learning source added successfully",
             });
         },
         onError: (error) => {
@@ -149,8 +149,8 @@ export function useUpdateLearningSource() {
             queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
             queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
             toast({
-                title: "Berhasil",
-                description: "Sumber belajar berhasil diperbarui",
+                title: "Success",
+                description: "Learning source updated successfully",
             });
         },
         onError: (error) => {
@@ -187,8 +187,8 @@ export function useDeleteLearningSource() {
             queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
             queryClient.invalidateQueries({ queryKey: ["learning-sources"] }); // For marquee
             toast({
-                title: "Berhasil",
-                description: "Sumber belajar berhasil dihapus",
+                title: "Success",
+                description: "Learning source deleted successfully",
             });
         },
         onError: (error) => {
@@ -229,7 +229,7 @@ export function useToggleLearningSourceActive() {
             queryClient.invalidateQueries({ queryKey: ["learning-sources-all"] });
             queryClient.invalidateQueries({ queryKey: ["learning-sources"] });
             toast({
-                title: "Berhasil",
+                title: "Success",
                 description: data.is_active ? "Sumber belajar diaktifkan" : "Sumber belajar dinonaktifkan",
             });
         },

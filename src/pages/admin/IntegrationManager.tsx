@@ -167,7 +167,7 @@ export default function IntegrationManager() {
         onSuccess: (data) => {
             toast({
                 title: "Integrasi Berhasil Dibuat! 🎉",
-                description: "Simpan API key - tidak akan ditampilkan lagi!",
+                description: "Save this API key - it will not be shown again!",
             });
             setNewApiKey(data.api_key);
             setFormData(INITIAL_FORM);
@@ -210,7 +210,7 @@ export default function IntegrationManager() {
         onSuccess: () => {
             toast({
                 title: "Integrasi Dihapus",
-                description: "API key tidak lagi valid.",
+                description: "The API key is no longer valid.",
             });
             setDeleteIntegration(null);
             queryClient.invalidateQueries({ queryKey: ["integrations"] });
@@ -253,7 +253,7 @@ export default function IntegrationManager() {
         onSuccess: (data) => {
             toast({
                 title: "API Key Diperbarui! 🔑",
-                description: "Key lama tidak lagi valid. Simpan key baru!",
+                description: "The old key is no longer valid. Save the new key!",
             });
             setNewApiKey(data.api_key);
             setRegenerate(null);
@@ -286,7 +286,7 @@ export default function IntegrationManager() {
 
     const formatDate = (dateString: string | null) => {
         if (!dateString) return "Belum pernah";
-        return new Date(dateString).toLocaleDateString("id-ID", {
+        return new Date(dateString).toLocaleDateString("en-US", {
             day: "numeric",
             month: "short",
             year: "numeric",
@@ -572,8 +572,8 @@ export default function IntegrationManager() {
                         </DialogTitle>
                         <DialogDescription>
                             {newApiKey
-                                ? "Simpan API key ini sekarang. Tidak akan ditampilkan lagi!"
-                                : "Buat integrasi baru untuk menghubungkan sumber eksternal."}
+                                ? "Save this API key now. It will not be shown again!"
+                                : "Create a new integration to connect external sources."}
                         </DialogDescription>
                     </DialogHeader>
 
@@ -608,7 +608,7 @@ export default function IntegrationManager() {
                     ) : (
                         <form onSubmit={handleCreate} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="name">Nama Integrasi *</Label>
+                                <Label htmlFor="name">Integration Name *</Label>
                                 <Input
                                     id="name"
                                     value={formData.name}
@@ -738,14 +738,14 @@ export default function IntegrationManager() {
             <AlertDialog open={!!deleteIntegration} onOpenChange={() => setDeleteIntegration(null)}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Hapus Integrasi?</AlertDialogTitle>
+                        <AlertDialogTitle>Delete Integration?</AlertDialogTitle>
                         <AlertDialogDescription>
                             Anda yakin ingin menghapus <strong>{deleteIntegration?.name}</strong>?
                             API key akan menjadi tidak valid dan tidak dapat digunakan lagi.
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => deleteIntegration && deleteMutation.mutate(deleteIntegration.id)}
                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -768,7 +768,7 @@ export default function IntegrationManager() {
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction
                             onClick={() => regenerateIntegration && regenerateMutation.mutate(regenerateIntegration)}
                         >

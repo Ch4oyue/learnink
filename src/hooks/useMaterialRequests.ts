@@ -158,7 +158,7 @@ export function useCreateRequest() {
       queryClient.invalidateQueries({ queryKey: ['all-requests'] });
       toast({
         title: "Request terkirim",
-        description: "Permintaan Anda telah berhasil dikirim",
+        description: "Your request has been sent successfully",
       });
     },
     onError: (error, variables) => {
@@ -209,8 +209,8 @@ export function useUpdateRequest() {
       queryClient.invalidateQueries({ queryKey: ['my-requests'] });
       queryClient.invalidateQueries({ queryKey: ['all-requests'] });
       toast({
-        title: "Berhasil",
-        description: "Request berhasil diperbarui",
+        title: "Success",
+        description: "Request updated successfully",
       });
     },
     onError: (error) => {

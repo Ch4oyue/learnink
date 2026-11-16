@@ -197,7 +197,7 @@ export default function DashboardSettings() {
       onSuccess: () => {
         setNewCategoryName("");
         setNewCategoryDesc("");
-        toast({ title: "Sukses", description: "Kategori berhasil ditambahkan" });
+        toast({ title: "Success", description: "Category added successfully" });
       }
     });
   };
@@ -212,7 +212,7 @@ export default function DashboardSettings() {
       onSuccess: () => {
         setNewLevelName("");
         setNewLevelDesc("");
-        toast({ title: "Sukses", description: "Level berhasil ditambahkan" });
+        toast({ title: "Success", description: "Level added successfully" });
       }
     });
   };
@@ -247,7 +247,7 @@ export default function DashboardSettings() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-semibold">Pengaturan</h1>
-          <p className="text-muted-foreground">Kelola kategori dan level modul pembelajaran</p>
+          <p className="text-muted-foreground">Manage learning module categories and levels</p>
         </div>
 
         <Tabs defaultValue="categories">
@@ -259,14 +259,14 @@ export default function DashboardSettings() {
           <TabsContent value="categories" className="space-y-4 mt-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Tambah Kategori Baru</CardTitle>
-                <CardDescription>Kategori digunakan untuk mengelompokkan modul pembelajaran</CardDescription>
+                <CardTitle className="text-lg">Add New Category</CardTitle>
+                <CardDescription>Categories are used to group learning modules</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-4">
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
-                      <Label>Nama Kategori</Label>
+                      <Label>Category Name</Label>
                       <Input value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} placeholder="Contoh: Web Development" />
                     </div>
                     <div className="space-y-2">
@@ -279,7 +279,7 @@ export default function DashboardSettings() {
                   </div>
                   <div className="flex gap-4 items-end">
                     <div className="flex-1 space-y-2">
-                      <Label>Deskripsi (Opsional)</Label>
+                      <Label>Description (Optional)</Label>
                       <Input value={newCategoryDesc} onChange={(e) => setNewCategoryDesc(e.target.value)} placeholder="Keterangan singkat..." />
                     </div>
                     <Button onClick={handleAddCategory} disabled={createCategory.isPending || !newCategoryName.trim()}>
@@ -334,14 +334,14 @@ export default function DashboardSettings() {
           <TabsContent value="levels" className="space-y-4 mt-6">
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Tambah Level Baru</CardTitle>
-                <CardDescription>Level menunjukkan tingkat kesulitan modul</CardDescription>
+                <CardTitle className="text-lg">Add New Level</CardTitle>
+                <CardDescription>Levels indicate module difficulty</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-4">
                   <div className="flex gap-4 items-start">
                     <div className="flex-1 space-y-2">
-                      <Label>Nama Level</Label>
+                      <Label>Level Name</Label>
                       <Input value={newLevelName} onChange={(e) => setNewLevelName(e.target.value)} placeholder="Contoh: Expert" />
                     </div>
                     <div className="space-y-2">
@@ -354,7 +354,7 @@ export default function DashboardSettings() {
                   </div>
                   <div className="flex gap-4 items-end">
                     <div className="flex-1 space-y-2">
-                      <Label>Deskripsi (Opsional)</Label>
+                      <Label>Description (Optional)</Label>
                       <Input value={newLevelDesc} onChange={(e) => setNewLevelDesc(e.target.value)} placeholder="Keterangan singkat..." />
                     </div>
                     <Button onClick={handleAddLevel} disabled={createLevel.isPending || !newLevelName.trim()}>
@@ -411,12 +411,12 @@ export default function DashboardSettings() {
         <Dialog open={!!editingItem} onOpenChange={(open) => !open && setEditingItem(null)}>
           <DialogContent className="glass-liquid rounded-[24px]">
             <DialogHeader>
-              <DialogTitle>Edit {editingItem?.type === 'category' ? 'Kategori' : 'Level'}</DialogTitle>
-              <DialogDescription>Ubah detail item di bawah ini.</DialogDescription>
+              <DialogTitle>Edit {editingItem?.type === 'category' ? 'Category' : 'Level'}</DialogTitle>
+              <DialogDescription>Edit the item details below.</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-4">
               <div className="space-y-2">
-                <Label>Nama</Label>
+                <Label>Name</Label>
                 <Input
                   value={editingItem?.name || ''}
                   onChange={(e) => setEditingItem(prev => prev ? ({ ...prev, name: e.target.value }) : null)}
@@ -443,8 +443,8 @@ export default function DashboardSettings() {
               </div>
             </div>
             <DialogFooter>
-              <Button variant="ghost" onClick={() => setEditingItem(null)}>Batal</Button>
-              <Button onClick={handleUpdate} disabled={updateCategory.isPending || updateLevel.isPending}>Simpan Perubahan</Button>
+              <Button variant="ghost" onClick={() => setEditingItem(null)}>Cancel</Button>
+              <Button onClick={handleUpdate} disabled={updateCategory.isPending || updateLevel.isPending}>Save Changes</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

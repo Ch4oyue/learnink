@@ -66,7 +66,7 @@ import {
     ExternalLink
 } from "lucide-react";
 import { format } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 
 // ============================================
 // TYPES
@@ -449,7 +449,7 @@ export default function ContentApproval() {
                         <div className="text-center py-12">
                             <CheckCircle className="h-12 w-12 text-muted-foreground/50 mx-auto mb-4" />
                             <h3 className="text-lg font-medium">All Clear!</h3>
-                            <p className="text-muted-foreground">Tidak ada permintaan pengguna yang pending.</p>
+                            <p className="text-muted-foreground">No pending user requests.</p>
                         </div>
                     )}
                 </TabsContent>
@@ -461,7 +461,7 @@ export default function ContentApproval() {
                     <div className="p-4 md:p-6 pb-0">
                         <DialogHeader>
                             <DialogTitle>Review & Publish</DialogTitle>
-                            <DialogDescription>Edit konten sebelum publikasi.</DialogDescription>
+                            <DialogDescription>Edit content before publishing.</DialogDescription>
                         </DialogHeader>
                     </div>
                     <form onSubmit={handlePublishSubmit} className="flex-1 flex flex-col p-4 md:p-6 gap-4 overflow-y-auto md:overflow-hidden">
@@ -476,7 +476,7 @@ export default function ContentApproval() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Ringkasan</Label>
+                                <Label>Summary</Label>
                                 <Textarea
                                     value={formData.summary}
                                     onChange={e => setFormData({...formData, summary: e.target.value})}
@@ -485,7 +485,7 @@ export default function ContentApproval() {
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-2">
-                                    <Label>Kategori</Label>
+                                    <Label>Category</Label>
                                     <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
                                         <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
@@ -532,7 +532,7 @@ export default function ContentApproval() {
                                                 {formData.content ? (
                                                     <MarkdownRenderer content={formData.content} />
                                                 ) : (
-                                                    <p className="text-muted-foreground text-center italic py-8">Belum ada konten untuk dipreview.</p>
+                                                    <p className="text-muted-foreground text-center italic py-8">No content to preview yet.</p>
                                                 )}
                                             </div>
                                         </div>
@@ -566,7 +566,7 @@ export default function ContentApproval() {
                             </div>
                         </div>
                         <DialogFooter className="mt-auto">
-                            <Button type="button" variant="ghost" onClick={() => setIsPublishOpen(false)}>Batal</Button>
+                            <Button type="button" variant="ghost" onClick={() => setIsPublishOpen(false)}>Cancel</Button>
                             <Button type="submit" disabled={publishMutation.isPending}>Publish</Button>
                         </DialogFooter>
                     </form>
@@ -588,7 +588,7 @@ export default function ContentApproval() {
 
                     <div className="space-y-4 py-2">
                         <div>
-                            <h4 className="font-semibold text-sm mb-1">Topik</h4>
+                            <h4 className="font-semibold text-sm mb-1">Topic</h4>
                             <p className="text-sm bg-muted/50 p-2 rounded-md">{selectedRequest?.topic}</p>
                         </div>
                         <div>
@@ -638,10 +638,10 @@ export default function ContentApproval() {
                 <AlertDialogContent className="glass-liquid rounded-[24px]">
                     <AlertDialogHeader>
                         <AlertDialogTitle>Tolak Draft Konten?</AlertDialogTitle>
-                        <AlertDialogDescription>Konten ini akan dihapus dari daftar draft.</AlertDialogDescription>
+                        <AlertDialogDescription>This content will be removed from the draft list.</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Batal</AlertDialogCancel>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
                         <AlertDialogAction onClick={handleReject} className="bg-destructive text-destructive-foreground">Tolak</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

@@ -22,7 +22,7 @@ import {
 } from "@/hooks/useNotifications";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { id as localeId } from "date-fns/locale";
+import { enUS as localeId } from "date-fns/locale";
 import {
   Bell,
   BookOpen,
@@ -114,7 +114,7 @@ export default function DashboardNotifications() {
             <p className="text-muted-foreground">
               {unreadCount > 0
                 ? `${unreadCount} notifikasi belum dibaca`
-                : "Semua notifikasi sudah dibaca"}
+                : "All notifications have been read"}
             </p>
           </div>
           {unreadCount > 0 && (
@@ -155,7 +155,7 @@ export default function DashboardNotifications() {
             ) : notifications?.length === 0 ? (
               <div className="py-12 text-center">
                 <Sparkles className="h-12 w-12 mx-auto text-muted-foreground/50 mb-4" />
-                <h3 className="font-medium mb-2">Belum ada notifikasi</h3>
+                <h3 className="font-medium mb-2">No notifications yet</h3>
                 <p className="text-sm text-muted-foreground">
                   Notifikasi akan muncul di sini ketika ada update
                 </p>

@@ -66,7 +66,7 @@ export default function DashboardCourses() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Katalog Kursus
+            Course Catalog
           </h1>
           <p className="text-lg text-muted-foreground">
             Pilih jalur pembelajaran yang sesuai dengan minat dan tujuan karir Anda.
@@ -79,7 +79,7 @@ export default function DashboardCourses() {
             <div className="relative max-w-md w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Cari kursus..."
+                placeholder="Search courses..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -167,7 +167,7 @@ export default function DashboardCourses() {
         ) : (
           <div className="text-center py-16 bg-card border border-border rounded-xl">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Tidak Ada Kursus Ditemukan</h3>
+            <h3 className="text-lg font-semibold mb-2">No Courses Found</h3>
             <p className="text-muted-foreground">
               Coba kata kunci pencarian yang lain.
             </p>

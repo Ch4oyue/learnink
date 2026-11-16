@@ -177,13 +177,13 @@ export function useCreateQuiz() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quizzes"] });
-      toast({ title: "Sukses", description: "Kuis berhasil dibuat" });
+      toast({ title: "Success", description: "Quiz created successfully" });
     },
     onError: (error) => {
       logger.error("Error creating quiz:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat kuis",
+        description: "Failed to create quiz",
         variant: "destructive",
       });
     },
@@ -210,7 +210,7 @@ export function useCreateQuizQuestions() {
       logger.error("Error creating questions:", error);
       toast({
         title: "Error",
-        description: "Gagal membuat soal kuis",
+        description: "Failed to create quiz questions",
         variant: "destructive",
       });
     },
@@ -238,8 +238,8 @@ export function useValidateQuizAnswers() {
       toast({
         title: data.results.passed ? "Selamat!" : "Coba Lagi",
         description: data.results.passed 
-          ? `Anda lulus dengan skor ${data.results.percentage}%` 
-          : `Skor Anda ${data.results.percentage}%. Minimal untuk lulus adalah skor tertentu.`,
+          ? `You passed with a score of ${data.results.percentage}%` 
+          : `Your score is ${data.results.percentage}%. A minimum score is required to pass.`,
         variant: data.results.passed ? "default" : "destructive",
       });
     },
@@ -247,7 +247,7 @@ export function useValidateQuizAnswers() {
       logger.error("Error validating quiz:", error);
       toast({
         title: "Error",
-        description: "Gagal memproses hasil kuis",
+        description: "Failed to process quiz results",
         variant: "destructive",
       });
     },
@@ -277,8 +277,8 @@ export function useSubmitQuizAttempt() {
       toast({
         title: data.passed ? "Selamat!" : "Coba Lagi",
         description: data.passed 
-          ? `Anda lulus dengan skor ${data.percentage}%` 
-          : `Skor Anda ${data.percentage}%. Minimal ${70}% untuk lulus.`,
+          ? `You passed with a score of ${data.percentage}%` 
+          : `Your score is ${data.percentage}%. A minimum of ${70}% is required to pass.`,
         variant: data.passed ? "default" : "destructive",
       });
     },
@@ -286,7 +286,7 @@ export function useSubmitQuizAttempt() {
       logger.error("Error submitting attempt:", error);
       toast({
         title: "Error",
-        description: "Gagal menyimpan hasil kuis",
+        description: "Failed to save quiz results",
         variant: "destructive",
       });
     },

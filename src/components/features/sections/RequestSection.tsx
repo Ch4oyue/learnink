@@ -22,8 +22,8 @@ const requestSchema = z.object({
   description: z
     .string()
     .trim()
-    .min(10, { message: "Deskripsi minimal 10 karakter" })
-    .max(500, { message: "Deskripsi maksimal 500 karakter" }),
+    .min(10, { message: "Description must be at least 10 characters" })
+    .max(500, { message: "Description must be at most 500 characters" }),
   priority: z.enum(["low", "medium", "high"]).default("medium"),
   category: z.string().optional(),
 });
@@ -68,7 +68,7 @@ export const RequestSection = () => {
     if (!user) {
       toast({
         title: "Login Diperlukan",
-        description: "Silakan login terlebih dahulu untuk mengirim request.",
+        description: "Please log in first to send a request.",
         variant: "destructive",
       });
       return;
@@ -102,7 +102,7 @@ export const RequestSection = () => {
           {/* Section Header */}
           <div className="text-center mb-12 md:mb-16">
             <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-              Request Materi
+              Material Requests
             </span>
             <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 tracking-tight">
               Butuh Materi Khusus?
@@ -157,7 +157,7 @@ export const RequestSection = () => {
                   </label>
                   <Input
                     id="topic"
-                    placeholder="Contoh: Automasi Email dengan AI"
+                    placeholder="Example: Email Automation with AI"
                     className="input-apple"
                     {...register("topic")}
                   />
@@ -241,7 +241,7 @@ export const RequestSection = () => {
                   </label>
                   <Textarea
                     id="description"
-                    placeholder="Jelaskan apa yang ingin Anda capai dengan mempelajari topik ini..."
+                    placeholder="Describe what you want to achieve by learning this topic..."
                     rows={5}
                     className="rounded-xl border-border/60 bg-background focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all duration-200 resize-none"
                     {...register("description")}
@@ -279,7 +279,7 @@ export const RequestSection = () => {
 
           {/* Helper Text */}
           <p className="text-center text-sm text-muted-foreground mt-6">
-            Request akan diproses dengan AI dan biasanya selesai dalam 1-2 hari kerja.
+            Requests are processed with AI and usually completed within 1-2 business days.
           </p>
         </div>
       </div>

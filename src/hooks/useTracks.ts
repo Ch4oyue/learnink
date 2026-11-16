@@ -108,8 +108,8 @@ export function useEnrollTrack() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["user-tracks"] });
       toast({
-        title: "Berhasil",
-        description: "Anda berhasil mendaftar ke kursus ini",
+        title: "Success",
+        description: "You have successfully enrolled in this course",
       });
     },
     onError: (error) => {

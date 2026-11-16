@@ -175,14 +175,14 @@ export function useCreateModule() {
       queryClient.invalidateQueries({ queryKey: ['modules'] });
       queryClient.invalidateQueries({ queryKey: ['my-modules'] });
       toast({
-        title: "Berhasil",
-        description: "Modul berhasil dibuat",
+        title: "Success",
+        description: "Module created successfully",
       });
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Gagal membuat modul",
+        description: "Failed to create module",
         variant: "destructive",
       });
       logger.error('Error creating module:', error);
@@ -210,14 +210,14 @@ export function useUpdateModule() {
       queryClient.invalidateQueries({ queryKey: ['modules'] });
       queryClient.invalidateQueries({ queryKey: ['my-modules'] });
       toast({
-        title: "Berhasil",
-        description: "Modul berhasil diperbarui",
+        title: "Success",
+        description: "Module updated successfully",
       });
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Gagal memperbarui modul",
+        description: "Failed to update module",
         variant: "destructive",
       });
       logger.error('Error updating module:', error);
@@ -242,14 +242,14 @@ export function useDeleteModule() {
       queryClient.invalidateQueries({ queryKey: ['modules'] });
       queryClient.invalidateQueries({ queryKey: ['my-modules'] });
       toast({
-        title: "Berhasil",
-        description: "Modul berhasil dihapus",
+        title: "Success",
+        description: "Module deleted successfully",
       });
     },
     onError: (error) => {
       toast({
         title: "Error",
-        description: "Gagal menghapus modul",
+        description: "Failed to delete module",
         variant: "destructive",
       });
       logger.error('Error deleting module:', error);

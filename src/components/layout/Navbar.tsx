@@ -15,9 +15,9 @@ import { useTheme } from "@/contexts/ThemeContext";
 
 const navLinks = [
   { href: "#home", label: "Home" },
-  { href: "#fitur", label: "Fitur" },
-  { href: "/syllabus", label: "Silabus", isRoute: true },
-  { href: "#request", label: "Request Materi" },
+  { href: "#fitur", label: "Features" },
+  { href: "/syllabus", label: "Syllabus", isRoute: true },
+  { href: "#request", label: "Material Requests" },
 ];
 
 export function Navbar() {

@@ -56,8 +56,8 @@ export function useUpdateCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-categories"] });
       toast({
-        title: "Sukses",
-        description: "Kategori berhasil diperbarui",
+        title: "Success",
+        description: "Category updated successfully",
       });
     },
     onError: (error) => {
@@ -90,8 +90,8 @@ export function useUpdateLevel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-levels"] });
       toast({
-        title: "Sukses",
-        description: "Level berhasil diperbarui",
+        title: "Success",
+        description: "Level updated successfully",
       });
     },
     onError: (error) => {
@@ -194,8 +194,8 @@ export function useDeleteCategory() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-categories"] });
       toast({
-        title: "Sukses",
-        description: "Kategori berhasil dihapus",
+        title: "Success",
+        description: "Category deleted successfully",
       });
     },
     onError: (error) => {
@@ -225,8 +225,8 @@ export function useDeleteLevel() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["module-levels"] });
       toast({
-        title: "Sukses",
-        description: "Level berhasil dihapus",
+        title: "Success",
+        description: "Level deleted successfully",
       });
     },
     onError: (error) => {

@@ -85,8 +85,8 @@ export function useUpdateLearningNote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["learning-notes"] });
       toast({
-        title: "Sukses",
-        description: "Catatan berhasil diperbarui",
+        title: "Success",
+        description: "Note updated successfully",
       });
     },
     onError: (error) => {
@@ -116,8 +116,8 @@ export function useDeleteLearningNote() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["learning-notes"] });
       toast({
-        title: "Sukses",
-        description: "Catatan berhasil dihapus",
+        title: "Success",
+        description: "Note deleted successfully",
       });
     },
     onError: (error) => {

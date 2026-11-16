@@ -168,7 +168,7 @@ export default function ModuleLearn() {
       if (module.track_id && !canAccessTrack(module.track_id)) {
         toast({
           title: "Akses Ditolak",
-          description: "Anda harus mendaftar di kursus ini untuk mengakses materi.",
+          description: "You must enroll in this course to access the material.",
           variant: "destructive",
         });
         navigate(`/dashboard/course/${module.track_id}`);
@@ -539,7 +539,7 @@ export default function ModuleLearn() {
                   variant="ghost"
                   size="icon"
                   className="text-muted-foreground hover:text-foreground"
-                  aria-label="Buka Daftar Isi"
+                  aria-label="Open Table of Contents"
                 >
                   <Menu className="h-5 w-5" />
                 </Button>
@@ -585,7 +585,7 @@ export default function ModuleLearn() {
                 variant="ghost"
                 size="icon"
                 className="text-muted-foreground hover:text-foreground"
-                aria-label="Buka Catatan"
+                aria-label="Open Notes"
               >
                 <StickyNote className="h-5 w-5" />
               </Button>
@@ -649,7 +649,7 @@ export default function ModuleLearn() {
                 size="icon"
                 onClick={handleResetProgress}
                 title="Reset Progress"
-                aria-label="Ulangi Progres"
+                aria-label="Restart Progress"
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>

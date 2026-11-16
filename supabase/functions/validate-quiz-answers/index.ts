@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
 import { corsFor, preflight } from "../_shared/cors.ts";
+import { requireRole } from "../_shared/auth.ts";
 
 interface ValidateRequest {
   quiz_id: string;
@@ -21,29 +22,13 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get user from auth header
-    const authHeader = req.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Authorization required' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // Verify user token
-    const token = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      console.error('Auth error:', authError);
-      return new Response(
-        JSON.stringify({ error: 'Invalid token' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
+    // Any signed-in user may submit their own quiz answers.
+    const guard = await requireRole(req, null, corsHeaders);
+    if (!guard.ok) return guard.response;
+    const userId = guard.userId;
 
     const { quiz_id, answers, time_taken }: ValidateRequest = await req.json();
-    console.log(`Validating quiz ${quiz_id} for user ${user.id}`);
+    console.log(`Validating quiz ${quiz_id} for user ${userId}`);
 
     if (!quiz_id || !answers) {
       return new Response(
@@ -89,7 +74,7 @@ serve(async (req) => {
     // Check if time_taken is provided and valid (allow 0 for very short quizzes if strictly logic, but realistically > 0)
     // We treat missing time_taken (undefined) as failure if we want to enforce it.
     if (typeof time_taken !== 'number' || time_taken < minRequiredTime) {
-      console.warn(`Suspicious activity: User ${user.id} completed quiz ${quiz_id} in ${time_taken}s (min required: ${minRequiredTime}s)`);
+      console.warn(`Suspicious activity: User ${userId} completed quiz ${quiz_id} in ${time_taken}s (min required: ${minRequiredTime}s)`);
       return new Response(
         JSON.stringify({ error: 'Suspicious activity: Quiz completed too quickly. Please take your time to read the questions.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -127,7 +112,7 @@ serve(async (req) => {
     const { data: attempt, error: attemptError } = await supabase
       .from('user_quiz_attempts')
       .insert({
-        user_id: user.id,
+        user_id: userId,
         quiz_id,
         score,
         total_points: totalPoints,

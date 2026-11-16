@@ -1,6 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { authenticate, getUserRoles, hasRole, STAFF_ROLES } from "../_shared/auth.ts";
+import { requireRole, STAFF_ROLES } from "../_shared/auth.ts";
 import { corsFor, preflight } from "../_shared/cors.ts";
 
 const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
@@ -32,21 +32,8 @@ serve(async (req) => {
   try {
     // Authentication + Authorization: this endpoint spends Gemini quota, so it
     // must not be reachable by anonymous or non-staff callers.
-    const { userId, error: authError } = await authenticate(req);
-    if (!userId) {
-      return new Response(
-        JSON.stringify({ error: authError ?? "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const roles = await getUserRoles(userId);
-    if (!hasRole(roles, STAFF_ROLES)) {
-      return new Response(
-        JSON.stringify({ error: "Forbidden: staff access required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const guard = await requireRole(req, STAFF_ROLES, corsHeaders, "Forbidden: staff access required");
+    if (!guard.ok) return guard.response;
 
     const { topic, description } = await req.json();
 

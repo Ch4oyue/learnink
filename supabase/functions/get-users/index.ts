@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsFor, preflight } from "../_shared/cors.ts";
+import { requireRole, ADMIN_ROLES } from "../_shared/auth.ts";
 
 serve(async (req) => {
   const corsHeaders = corsFor(req);
@@ -13,7 +14,6 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
 
     const url = new URL(req.url);
     const page = parseInt(url.searchParams.get("page") ?? "1");
@@ -21,53 +21,12 @@ serve(async (req) => {
     const search = url.searchParams.get("search")?.trim() || "";
     const offset = (page - 1) * limit;
 
-    // 1. Validate Auth Header
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Missing Authorization header" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    // Admin-only: the guard verifies the JWT, then the role in `user_roles`.
+    const guard = await requireRole(req, ADMIN_ROLES, corsHeaders, "Forbidden: Admin access required");
+    if (!guard.ok) return guard.response;
 
-    // 2. Validate User (using Anon Key + User Token)
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
-
-    const { data: { user }, error: userError } = await supabaseAuth.auth.getUser();
-
-    if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // 3. Create Admin Client (Service Role) for privileged operations
+    // Service-role client for the privileged reads below.
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);
-
-    // 4. Validate Role (Must be 'admin' or 'superadmin')
-    const { data: userRoles, error: roleError } = await supabaseAdmin
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id);
-
-    if (roleError) {
-      console.error("Role check error:", roleError);
-      throw roleError;
-    }
-
-    // Explicitly check for admin or superadmin roles
-    const isSuperAdmin = userRoles?.some(r => r.role === 'superadmin');
-    const isAdmin = userRoles?.some(r => r.role === 'admin');
-
-    if (!isSuperAdmin && !isAdmin) {
-      return new Response(
-        JSON.stringify({ error: "Forbidden: Admin access required" }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
 
     // 5. Fetch Data (using Admin Client)
     // Fetch profiles with pagination and search

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsFor, preflight } from "../_shared/cors.ts";
+import { requireRole, ADMIN_ROLES } from "../_shared/auth.ts";
 import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 
 // =============================================
@@ -8,7 +9,6 @@ import * as bcrypt from "https://deno.land/x/bcrypt@v0.4.1/mod.ts";
 // =============================================
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY")!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
 // =============================================
@@ -77,66 +77,15 @@ serve(async (req) => {
         // -------------------------
         // 1. Verify User Authorization
         // -------------------------
-        const authHeader = req.headers.get("Authorization");
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return new Response(
-                JSON.stringify({ error: "Missing authorization header", success: false }),
-                { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
-
-        // Create client with user's JWT token (passed by supabase.functions.invoke)
-        const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-            global: {
-                headers: { Authorization: authHeader },
-            },
-        });
-
-        // Get the authenticated user
-        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-
-        if (userError || !user) {
-            console.error("Auth error:", userError);
-            return new Response(
-                JSON.stringify({ error: "Invalid or expired token", success: false }),
-                { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
-
-        console.log(`User authenticated: ${user.id}`);
-
-        // -------------------------
-        // 2. Check if user is admin using service role
-        // -------------------------
-        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-
         // Roles are resolved from `user_roles` only. Never identify an admin by a
         // hardcoded email or user id: that is a permanent backdoor in the source
         // and breaks as soon as the account is renamed or the row is removed.
-        const { data: userRoles, error: roleError } = await supabaseAdmin
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", user.id);
+        const guard = await requireRole(req, ADMIN_ROLES, corsHeaders, "Admin access required");
+        if (!guard.ok) return guard.response;
+        const userId = guard.userId;
 
-        if (roleError) {
-            console.error("Role check error:", roleError);
-            return new Response(
-                JSON.stringify({ error: "Failed to verify user role", success: false }),
-                { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
-
-        const allowedRoles = ["admin", "superadmin"];
-        const hasAccess = userRoles?.some(r => allowedRoles.includes(r.role)) || false;
-
-        if (!hasAccess) {
-            return new Response(
-                JSON.stringify({ error: "Admin access required", success: false }),
-                { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-        }
-
-        console.log(`Admin verified: ${user.id}`);
+        // Service-role client for the key insert below.
+        const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
         // -------------------------
         // 3. Parse and Validate Request
@@ -205,7 +154,7 @@ serve(async (req) => {
                 api_key_preview: apiKeyPreview,
                 webhook_url: webhookUrl,
                 is_active: true,
-                created_by: user.id,
+                created_by: userId,
             })
             .select("id, name, source, api_key_preview, webhook_url, is_active, created_at")
             .single();

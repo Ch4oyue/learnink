@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.89.0";
 import { corsFor, preflight } from "../_shared/cors.ts";
+import { requireRole, STAFF_ROLES } from "../_shared/auth.ts";
 
 const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
@@ -59,39 +60,14 @@ serve(async (req) => {
     }
 
     // 2. Auth & Role Validation (Admin/Tutor Only)
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const token = authHeader.replace("Bearer ", "");
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-    if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Check Roles
-    const { data: roles } = await supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", user.id);
-
-    // Allow admins, tutors, and superadmins
-    const hasAccess = roles?.some(r => ['admin', 'tutor', 'superadmin'].includes(r.role));
-
-    if (!hasAccess) {
-      return new Response(
-        JSON.stringify({ error: "Forbidden: Only Tutors and Admins can generate quizzes." }),
-        { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
+    const guard = await requireRole(
+      req,
+      STAFF_ROLES,
+      corsHeaders,
+      "Forbidden: Only Tutors and Admins can generate quizzes.",
+    );
+    if (!guard.ok) return guard.response;
+    const userId = guard.userId;
 
     const { moduleId, questionCount = 5 } = await req.json();
 
@@ -262,7 +238,6 @@ PENTING:
       );
     }
 
-    const userId = user.id;
 
     // Create quiz
     const { data: quiz, error: quizError } = await supabase

@@ -6,15 +6,16 @@ on:
   pull_request:
     branches: [ main ]
 
-# Token izin minimal: semua job hanya membaca checkout/PR metadata.
-permissions:
-  contents: read
-  pull-requests: read
-
+# Token izin minimal per job (bukan workflow-level): tiap job mendeklarasikan
+# scope-nya sendiri, jadi tak ada job yang jatuh ke default repo dan tak ada
+# yang membawa scope yang tak dipakainya.
 jobs:
   quality-gate:
     name: Quality Gate
     runs-on: ubuntu-latest
+    # Hanya baca checkout.
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -39,6 +40,10 @@ jobs:
   secret-scan:
     name: Secret Scan
     runs-on: ubuntu-latest
+    # gitleaks-action membaca checkout + metadata PR untuk range commit.
+    permissions:
+      contents: read
+      pull-requests: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -60,6 +65,9 @@ jobs:
   deno-check:
     name: Edge Function Types
     runs-on: ubuntu-latest
+    # Hanya baca checkout.
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

@@ -10,6 +10,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 export type AppRole = "user" | "tutor" | "admin" | "superadmin";
 
+export const APP_ROLES: AppRole[] = ["user", "tutor", "admin", "superadmin"];
+
 export const ADMIN_ROLES: AppRole[] = ["admin", "superadmin"];
 export const STAFF_ROLES: AppRole[] = ["tutor", "admin", "superadmin"];
 
@@ -38,13 +40,19 @@ function bearerToken(req: Request): string | null {
   return match ? match[1] : null;
 }
 
-/** Roles held by a user, read with the service role (`user_roles` has no RLS read policy). */
+/**
+ * Roles held by a user, read with the service role (`user_roles` has no RLS read policy).
+ *
+ * Throws when the service configuration is missing or the lookup fails: returning
+ * `[]` there would answer 403 ("no roles") for what is really a server fault and
+ * mask the misconfiguration. Callers must turn the throw into a 500, not a denial.
+ */
 async function rolesOf(userId: string): Promise<AppRole[]> {
   const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
   if (!supabaseUrl || !serviceRoleKey) {
-    return [];
+    throw new Error("SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not configured");
   }
 
   const admin = createClient(supabaseUrl, serviceRoleKey);
@@ -53,11 +61,15 @@ async function rolesOf(userId: string): Promise<AppRole[]> {
     .select("role")
     .eq("user_id", userId);
 
-  if (error || !data) {
-    return [];
+  if (error) {
+    throw new Error(`Role lookup failed: ${error.message}`);
   }
 
-  return data.map((row: { role: string }) => row.role as AppRole);
+  // Only values in the AppRole union are returned. Anything else means
+  // corrupted user_roles data; drop it instead of propagating an invalid role.
+  return (data ?? [])
+    .map((row: { role: string }) => row.role)
+    .filter((role): role is AppRole => (APP_ROLES as string[]).includes(role));
 }
 
 /**
@@ -97,8 +109,18 @@ export async function requireRole(
     return { ok: false, response: jsonError(401, "Invalid or expired token", corsHeaders) };
   }
 
-  if (allowed && !(await rolesOf(user.id)).some((role) => allowed.includes(role))) {
-    return { ok: false, response: jsonError(403, forbiddenMessage, corsHeaders) };
+  if (allowed) {
+    let callerRoles: AppRole[];
+    try {
+      callerRoles = await rolesOf(user.id);
+    } catch (lookupError) {
+      // A failed lookup is a server fault (500), not a denial (403).
+      console.error("Role lookup failed", lookupError);
+      return { ok: false, response: jsonError(500, "Role lookup failed", corsHeaders) };
+    }
+    if (!callerRoles.some((role) => allowed.includes(role))) {
+      return { ok: false, response: jsonError(403, forbiddenMessage, corsHeaders) };
+    }
   }
 
   return { ok: true, userId: user.id };

@@ -31,13 +31,14 @@ export function useUpdateUserRole() {
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: AppRole }) => {
       // The current role in `user_roles` is the only source of truth for
       // protecting the super admin — never a hardcoded id or email.
-      const { data: currentRoleData } = await supabase
+      const { data: roleRows, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .single();
+        .eq('user_id', userId);
 
-      if (currentRoleData?.role === 'superadmin') {
+      if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
+      const currentRoles = (roleRows ?? []).map((row: { role: string }) => row.role);
+      if (currentRoles.includes('superadmin')) {
         throw new Error('Super Admin role bersifat permanen dan tidak dapat diubah');
       }
 
@@ -83,13 +84,14 @@ export function useBanUser() {
   return useMutation({
     mutationFn: async ({ userId, banDuration }: { userId: string; banDuration: 'unban' | '1h' | '24h' | '7d' | '30d' | 'permanent' }) => {
       // Super admins are protected by role, not by a hardcoded identity.
-      const { data: targetRole } = await supabase
+      const { data: roleRows, error: roleError } = await supabase
         .from('user_roles')
         .select('role')
-        .eq('user_id', userId)
-        .single();
+        .eq('user_id', userId);
 
-      if (targetRole?.role === 'superadmin') {
+      if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
+      const targetRoles = (roleRows ?? []).map((row: { role: string }) => row.role);
+      if (targetRoles.includes('superadmin')) {
         throw new Error('Super Admin tidak dapat di-ban');
       }
 
@@ -146,4 +148,3 @@ export function useBanUser() {
     },
   });
 }
-

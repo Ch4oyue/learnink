@@ -49,16 +49,9 @@ serve(async (req) => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
-    // 1. Rate Limit Check
-    const withinLimit = await checkRateLimit(supabase, req);
-    if (!withinLimit) {
-      return new Response(
-        JSON.stringify({ error: "Too many requests. Please try again later." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // 2. Auth & Role Validation (Admin/Tutor Only)
+    // 1. Auth & Role Validation (Admin/Tutor Only)
+    // Authenticate BEFORE the rate-limit RPC: unauthenticated callers must not
+    // trigger database work or burn the per-IP rate-limit budget.
     const guard = await requireRole(
       req,
       STAFF_ROLES,
@@ -67,6 +60,15 @@ serve(async (req) => {
     );
     if (!guard.ok) return guard.response;
     const userId = guard.userId;
+
+    // 2. Rate Limit Check
+    const withinLimit = await checkRateLimit(supabase, req);
+    if (!withinLimit) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     const { moduleId, questionCount = 5 } = await req.json();
 

@@ -93,7 +93,10 @@ export function useBanUser() {
         .eq('user_id', userId);
 
       if (roleError) throw new Error(`Gagal memeriksa peran pengguna: ${roleError.message}`);
-      const targetRoles = (roleRows ?? []).map((row: { role: string }) => row.role);
+      if (!roleRows || roleRows.length === 0) {
+        throw new Error("Gagal memeriksa peran pengguna: peran tidak ditemukan");
+      }
+      const targetRoles = roleRows.map((row: { role: string }) => row.role);
       if (targetRoles.includes('superadmin')) {
         throw new Error('Super Admin tidak dapat di-ban');
       }

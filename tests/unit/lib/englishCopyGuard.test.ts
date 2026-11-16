@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 // These inspect source strings; they do not exercise authenticated routes.
 describe('reviewed English-copy regressions', () => {
   const cases = [
+    ['src/components/features/module/QuizSection.tsx', '{attempts.count} attempts', '{attempts.count}attempts'],
     ['src/pages/learning/Modules.tsx', 'No modules available yet', 'No modules yet yang tersedia saat ini'],
     ['src/pages/dashboard/DashboardRequestMaterial.tsx', 'New Material Request', 'Material Requests Baru'],
     ['src/pages/dashboard/DashboardRequests.tsx', 'New Material Request', 'Material Requests Baru'],

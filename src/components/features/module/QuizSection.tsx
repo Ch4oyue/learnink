@@ -115,7 +115,7 @@ export function QuizSection({
                       {attempts && (
                         <>
                           <Badge variant="secondary" className="text-xs">
-                            {attempts.count}attempts
+                            {attempts.count} attempts
                           </Badge>
                           <span className="flex items-center gap-1 text-amber-600">
                             <Trophy className="h-3 w-3" />

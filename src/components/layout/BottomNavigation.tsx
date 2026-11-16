@@ -104,7 +104,7 @@ export function BottomNavigation() {
     },
     {
       href: "/dashboard/modules",
-      label: "Modul",
+      label: "Modules",
       icon: BookOpen,
       roles: ["user", "tutor", "admin", "superadmin"],
     },
@@ -135,7 +135,7 @@ export function BottomNavigation() {
     },
     {
       href: "/dashboard/notifications",
-      label: "Notifikasi",
+      label: "Notifications",
       icon: Bell,
       badge: unreadCount,
       roles: ["user", "tutor", "admin", "superadmin"],
@@ -143,7 +143,7 @@ export function BottomNavigation() {
     },
     {
       href: "/dashboard/profile",
-      label: "Profil",
+      label: "Profile",
       icon: User,
       roles: ["user", "tutor", "admin", "superadmin"],
     },

@@ -1,6 +1,5 @@
 import { Control, useWatch } from "react-hook-form";
 import {
-import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Bot,
   Cpu,
   Workflow,
@@ -12,6 +11,7 @@ import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Lightbulb,
   Sparkles,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const icons = [
   { name: "Bot", icon: Bot },

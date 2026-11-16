@@ -9,7 +9,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useModules } from "@/hooks/useModules";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import {
-import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Bot,
   Cpu,
   Workflow,
@@ -26,6 +25,7 @@ import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Code,
   BookOpen,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Bot,
@@ -42,7 +42,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 const learningPaths = [
   {
     id: "ai-fundamentals",
-    title: "Dasar-Dasar AI",
+    title: "AI Fundamentals",
     description: "Understand the basic concepts of Artificial Intelligence and Machine Learning",
     icon: Brain,
     color: "from-blue-500 to-cyan-500",
@@ -64,7 +64,7 @@ const learningPaths = [
   },
   {
     id: "ai-tools",
-    title: "AI Tools & Aplikasi",
+    title: "AI Tools & Apps",
     description: "Master popular AI tools like ChatGPT, Midjourney, and more",
     icon: Bot,
     color: "from-orange-500 to-red-500",
@@ -153,10 +153,10 @@ export default function Syllabus() {
               Learning Path
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Silabus <span className="text-gradient">AI & Automation</span>
+              Syllabus <span className="text-gradient">AI & Automation</span>
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Ikuti jalur pembelajaran terstruktur untuk menguasai AI dan Automation dari dasar hingga mahir
+              Follow a structured learning path to master AI and Automation from basics to advanced
             </p>
           </div>
 
@@ -240,10 +240,10 @@ export default function Syllabus() {
                     >
                       <PathIcon className={`h-8 w-8 mx-auto mb-3 ${path.textColor}`} />
                       <p className={`${path.textColor} font-medium`}>
-                        Modul untuk "{path.title}" akan segera tersedia
+                        Modules for "{path.title}" are coming soon
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Tambahkan modul dengan kategori: {path.categories.join(", ")}
+                        Add modules with the categories: {path.categories.join(", ")}
                       </p>
                     </div>
                   ) : (
@@ -328,15 +328,15 @@ export default function Syllabus() {
         <section className="py-16 px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-2xl font-semibold mb-4">
-              Mulai Perjalanan AI & Automation Anda
+              Start Your AI & Automation Journey
             </h2>
             <p className="text-muted-foreground mb-6">
-              Daftar sekarang untuk melacak progress belajar dan dapatkan rekomendasi
-              materi yang dipersonalisasi
+              Sign up now to track your learning progress and get personalized
+              material recommendations
             </p>
             <Button asChild size="lg" className="gap-2">
               <Link to="/auth">
-                Mulai Sekarang
+                Start Now
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </Button>

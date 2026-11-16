@@ -172,13 +172,13 @@ export function Navbar() {
                   onClick={handleAuthClick}
                   className="text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-transparent"
                 >
-                  Masuk
+                  Sign In
                 </Button>
                 <Button
                   onClick={handleAuthClick}
                   className="text-sm font-medium shadow-soft hover:shadow-medium transition-shadow"
                 >
-                  Daftar
+                  Sign Up
                 </Button>
               </>
             )}
@@ -283,13 +283,13 @@ export function Navbar() {
                     onClick={handleAuthClick}
                     className="justify-start text-base font-medium text-muted-foreground hover:text-foreground hover:bg-transparent px-0"
                   >
-                    Masuk
+                    Sign In
                   </Button>
                   <Button
                     onClick={handleAuthClick}
                     className="w-full text-base font-medium"
                   >
-                    Daftar
+                    Sign Up
                   </Button>
                 </>
               )}

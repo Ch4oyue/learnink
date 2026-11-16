@@ -60,7 +60,7 @@ export function Hero() {
                         className="w-full sm:w-auto px-8 py-3.5 shadow-glow group"
                     >
                         <Link to="/auth">
-                            Mulai Belajar Sekarang
+                            Start Learning Now
                             <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
                         </Link>
                     </Button>

@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   BookOpen,
   ArrowLeft,
   Play,
@@ -24,6 +23,7 @@ import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Wand2,
   Shield,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const levelColors: Record<string, string> = {
   Pemula: "bg-green-500/10 text-green-600 border-green-500/20",

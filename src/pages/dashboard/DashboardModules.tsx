@@ -37,7 +37,6 @@ import { useUserProgress } from "@/hooks/useUserProgress";
 import { format } from "date-fns";
 import { enUS as localeId } from "date-fns/locale";
 import {
-import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Plus,
   Search,
   MoreHorizontal,
@@ -50,6 +49,7 @@ import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Clock,
   Loader2,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 // Status badge configuration
 const STATUS_CONFIG = {

@@ -6,7 +6,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
-import { displayCategory } from "@/lib/categoryLabels";
   ArrowLeft, 
   FileQuestion, 
   Clock,
@@ -19,6 +18,7 @@ import { displayCategory } from "@/lib/categoryLabels";
   Tag,
   AlertCircle,
 } from "lucide-react";
+import { displayCategory } from "@/lib/categoryLabels";
 
 const statusConfig = {
   pending: {

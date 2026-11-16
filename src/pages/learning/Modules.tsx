@@ -17,7 +17,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { 
-import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   BookOpen, 
   Search, 
   Code, 
@@ -30,6 +29,7 @@ import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   GraduationCap,
   BarChart3,
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   BookOpen, Code, Brain, Lightbulb, Atom, Calculator, Languages, Cpu, GraduationCap,

@@ -6,10 +6,10 @@ import { useModules } from "@/hooks/useModules";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { useAuth } from "@/contexts/AuthContext";
 import { 
-import { displayCategory, displayLevel } from "@/lib/categoryLabels";
   Zap, MessageSquare, Settings, BarChart, FileText, Bot, 
   BookOpen, Sparkles, Brain, Cpu, Code, Lightbulb, Workflow, Cog
 } from "lucide-react";
+import { displayCategory, displayLevel } from "@/lib/categoryLabels";
 
 // Icon mapping for AI & Automation focused modules
 const iconMap: Record<string, React.ElementType> = {
@@ -116,7 +116,7 @@ export const ModulesSection = () => {
               Coming Soon
             </h2>
             <p className="text-muted-foreground text-lg">
-              Modul pembelajaran sedang disiapkan. Kirim request materi Anda untuk membantu kami memprioritaskan topik yang Anda butuhkan.
+              Learning modules are being prepared. Send a material request to help us prioritize the topics you need.
             </p>
           </div>
         </div>
@@ -130,13 +130,13 @@ export const ModulesSection = () => {
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-16 md:mb-20">
           <span className="inline-block px-4 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-4">
-            Daftar Modul
+            Module Catalog
           </span>
           <h2 className="text-3xl md:text-4xl font-semibold text-foreground mb-4 tracking-tight">
-            Mulai Perjalanan Belajar Anda
+            Start Your Learning Journey
           </h2>
           <p className="text-muted-foreground text-lg">
-            Pilih modul yang sesuai dengan level dan kebutuhan Anda. Belajar step-by-step dengan materi yang terstruktur.
+            Choose modules that match your level and needs. Learn step by step with structured materials.
           </p>
         </div>
 

@@ -32,7 +32,7 @@ export function useUpdateUserRole() {
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: AppRole }) => {
       // Protect super admin from ANY role changes (Using ID check)
       if (userId === SUPER_ADMIN_USER_ID) {
-        throw new Error('A Super Admin's role cannot be changed');
+        throw new Error("A Super Admin's role cannot be changed");
       }
 
       // Also check if current role is superadmin (double check against DB)

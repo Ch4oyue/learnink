@@ -5,7 +5,7 @@ const quickLinks = [
   { label: "Home", href: "/", isRoute: true },
   { label: "Features", href: "/#fitur", isRoute: false },
   { label: "Syllabus", href: "/syllabus", isRoute: true },
-  { label: "Modul", href: "/modules", isRoute: true },
+  { label: "Modules", href: "/modules", isRoute: true },
   { label: "Request", href: "/#request", isRoute: false },
 ];
 
@@ -31,8 +31,8 @@ export const Footer = () => {
               </span>
             </Link>
             <p className="text-background/70 max-w-sm leading-relaxed">
-              Platform belajar AI dan Automation yang dirancang untuk membantu Anda
-              menguasai teknologi masa depan dengan cara yang mudah dan terarah.
+              An AI & Automation learning platform designed to help you
+              master future technology in an easy, structured way.
             </p>
           </div>
 

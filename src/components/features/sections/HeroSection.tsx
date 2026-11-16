@@ -84,7 +84,7 @@ export function HeroSection() {
               onClick={handleStartLearning}
               className="w-full sm:w-auto px-8 py-6 text-base font-medium shadow-soft hover:shadow-medium transition-all duration-300 group press-effect rounded-xl"
             >
-              Mulai Belajar
+              Start Learning
               <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
             </Button>
             <Button
@@ -93,7 +93,7 @@ export function HeroSection() {
               onClick={handleViewModules}
               className="w-full sm:w-auto px-8 py-6 text-base font-medium border-border/60 hover:bg-secondary/50 transition-all duration-300 press-effect rounded-xl"
             >
-              Lihat Modul
+              View Modules
             </Button>
           </div>
 
@@ -103,7 +103,7 @@ export function HeroSection() {
             style={{ animationDelay: "0.5s" }}
           >
             <p className="text-sm text-muted-foreground mb-6">
-              Dipercaya oleh mahasiswa dan profesional
+              Trusted by students and professionals
             </p>
             <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
               <div className="flex items-center gap-2 text-muted-foreground/60">

@@ -211,7 +211,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
           {/* Left Column - Settings */}
           <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle className="text-lg">Pengaturan Modul</CardTitle>
+              <CardTitle className="text-lg">Module Settings</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <FormField

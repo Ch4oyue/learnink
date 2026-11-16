@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { AppRole } from "@/contexts/AuthContext";
-import { SUPER_ADMIN_USER_ID, SUPER_ADMIN_EMAIL } from "@/hooks/useUsers";
 
 export function useUserRole(userId?: string) {
   return useQuery({
@@ -30,12 +29,8 @@ export function useUpdateUserRole() {
 
   return useMutation({
     mutationFn: async ({ userId, newRole }: { userId: string; newRole: AppRole }) => {
-      // Protect super admin from ANY role changes (Using ID check)
-      if (userId === SUPER_ADMIN_USER_ID) {
-        throw new Error('Super Admin tidak dapat diubah role-nya');
-      }
-
-      // Also check if current role is superadmin (double check against DB)
+      // The current role in `user_roles` is the only source of truth for
+      // protecting the super admin — never a hardcoded id or email.
       const { data: currentRoleData } = await supabase
         .from('user_roles')
         .select('role')
@@ -87,8 +82,14 @@ export function useBanUser() {
 
   return useMutation({
     mutationFn: async ({ userId, banDuration }: { userId: string; banDuration: 'unban' | '1h' | '24h' | '7d' | '30d' | 'permanent' }) => {
-      // Check if user is super admin
-      if (userId === SUPER_ADMIN_USER_ID) {
+      // Super admins are protected by role, not by a hardcoded identity.
+      const { data: targetRole } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .single();
+
+      if (targetRole?.role === 'superadmin') {
         throw new Error('Super Admin tidak dapat di-ban');
       }
 
@@ -146,7 +147,3 @@ export function useBanUser() {
   });
 }
 
-// Helper to check if user is super admin (for UI disabling)
-export function isSuperAdmin(email?: string | null, role?: AppRole | null): boolean {
-  return email === SUPER_ADMIN_EMAIL || role === 'superadmin';
-}

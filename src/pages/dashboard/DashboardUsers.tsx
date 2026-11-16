@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
-import { useUsers, UserWithRole, SUPER_ADMIN_EMAIL, SUPER_ADMIN_USER_ID, useUserStats } from "@/hooks/useUsers";
+import { useUsers, UserWithRole, useUserStats } from "@/hooks/useUsers";
 import { useUpdateUserRole } from "@/hooks/useUserRole";
 import { useAuth, AppRole } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -65,7 +65,7 @@ const roleConfig: Record<AppRole, { label: string; icon: React.ReactNode; varian
 };
 
 export default function DashboardUsers() {
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, role: currentRole } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -278,13 +278,8 @@ export default function DashboardUsers() {
                   {filteredUsers?.map((user) => {
                     const config = roleConfig[user.role];
                     const isSelf = user.id === currentUser?.id;
-                    // Check if this user is a super admin
-                    const isUserSuperAdmin = user.role === 'superadmin';
-                    // Legacy check for backward compatibility during migration
-                    const isLegacySuperAdmin = (SUPER_ADMIN_USER_ID && user.id === SUPER_ADMIN_USER_ID) ||
-                      (user.email === SUPER_ADMIN_EMAIL);
-
-                    const isProtected = isUserSuperAdmin || isLegacySuperAdmin;
+                    // Super-admin status comes from `user_roles` only.
+                    const isProtected = user.role === 'superadmin';
 
                     return (
                       <TableRow key={user.id}>
@@ -331,7 +326,7 @@ export default function DashboardUsers() {
                             {user.labels?.map(l => (
                               <Badge key={l} variant="secondary" className="text-[13px] px-1 h-5">
                                 {l}
-                                {(currentUser?.id === SUPER_ADMIN_USER_ID || currentUser?.email === SUPER_ADMIN_EMAIL) && (
+                                {currentRole === "superadmin" && (
                                   <button
                                     className="ml-1 hover:text-destructive-text"
                                     onClick={() => {
@@ -344,7 +339,7 @@ export default function DashboardUsers() {
                                 )}
                               </Badge>
                             ))}
-                            {(currentUser?.id === SUPER_ADMIN_USER_ID || currentUser?.email === SUPER_ADMIN_EMAIL) && (
+                            {currentRole === "superadmin" && (
                               <Select onValueChange={(val) => {
                                 if (user.labels?.includes(val)) return;
                                 const newLabels = [...(user.labels || []), val];

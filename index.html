@@ -27,10 +27,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://imkghltdscefumdmbrld.supabase.co" crossorigin>
 
-    <!-- Inter Font - Optimized for performance -->
+    <!-- Inter Font. The stylesheet is loaded unconditionally: the old
+         media="print" + inline-event-handler trick that flipped the media
+         attribute after load would violate the strict Content-Security-Policy in
+         vercel.json, whose script-src has no 'unsafe-inline'. -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"></noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/x-icon" href="/favicon-circle.png">
 </head>
 

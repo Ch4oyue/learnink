@@ -14,16 +14,18 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
+    // Any signed-in user may claim their own reward; the guard verifies the JWT.
+    // Authenticate BEFORE consuming the body so unauthenticated requests get 401,
+    // not a 400 about a body they were never allowed to send.
+    const guard = await requireRole(req, null, corsHeaders);
+    if (!guard.ok) return guard.response;
+    const userId = guard.userId;
+
     const { module_id } = await req.json();
 
     if (!module_id) {
         throw new Error("Missing module_id");
     }
-
-    // Any signed-in user may claim their own reward; the guard verifies the JWT.
-    const guard = await requireRole(req, null, corsHeaders);
-    if (!guard.ok) return guard.response;
-    const userId = guard.userId;
 
     // Use Service Role for DB operations
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey);

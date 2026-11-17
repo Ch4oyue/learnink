@@ -31,11 +31,11 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       const app = await installApp(page, { role: 'admin', db: seed() });
       await page.goto('/dashboard/admin/approval');
       await page.getByRole('button').filter({ has: page.locator('svg.lucide-circle-x, svg.lucide-x-circle') }).nth(0).click();
-      await expect(page.getByRole('alertdialog')).toBeVisible();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel' }).click();
+      await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toBeVisible();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Cancel' }).click();
       expect(app.writes.filter((w) => w.startsWith('PATCH incoming_contents'))).toHaveLength(0);
       await page.getByRole('button').filter({ has: page.locator('svg.lucide-circle-x, svg.lucide-x-circle') }).nth(0).click();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Reject' }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Reject' }).click();
       await expect.poll(() => app.db.incoming_contents.filter((c) => c.status === 'rejected').length).toBe(1);
       expect(app.db.modules).toHaveLength(0);
     });

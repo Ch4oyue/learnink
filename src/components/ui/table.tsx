@@ -43,7 +43,7 @@ const Table = React.forwardRef<
   const rows = nodes(body?.props.children);
   return (
     <HeroTable className="relative w-full overflow-hidden" variant="secondary">
-      <HeroTable.ScrollContainer className="w-full overflow-auto">
+      <HeroTable.ScrollContainer tabIndex={0} role="region" aria-label={`${props["aria-label"] ?? "Data table"} scroll area`} className="w-full overflow-auto focus-visible:outline-2 focus-visible:outline-primary">
         <HeroTable.Content
           {...props}
           ref={ref}

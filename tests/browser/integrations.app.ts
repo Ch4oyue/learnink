@@ -36,18 +36,18 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await page.goto('/dashboard/admin/integrations');
       const trash = () => page.locator('button:has(svg[class*="lucide-trash"])').first();
       await trash().click();
-      await expect(page.getByRole('alertdialog')).toContainText('Delete Integration?');
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel' }).click();
+      await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toContainText('Delete Integration?');
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Cancel' }).click();
       expect(app.writes.filter((w) => w.startsWith('DELETE integrations'))).toHaveLength(0);
       await trash().click();
-      await page.getByRole('alertdialog').getByRole('button').last().click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button').last().click();
       await expect.poll(() => app.db.integrations.some((i) => i.id === 'i1')).toBe(false);
     });
     test('integrations: regenerate creates the new key first, then retires the old one', async ({ page }) => {
       const app = await installApp(page, { role: 'admin', db: seed(), functions: { 'generate-api-key': () => ({ success: true, api_key: 'lk_new_key' }) } });
       await page.goto('/dashboard/admin/integrations');
       await page.locator('button:has(svg[class*="lucide-refresh"])').first().click();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Regenerate' }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Regenerate' }).click();
       await expect(page.getByText('lk_new_key')).toBeVisible();
       await expect.poll(() => app.db.integrations.some((i) => i.id === 'i1')).toBe(false);
     });
@@ -56,7 +56,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       const app = await installApp(page, { role: 'admin', db: seed(), functions: { 'generate-api-key': () => ({ success: false, error: 'key service down' }) } });
       await page.goto('/dashboard/admin/integrations');
       await page.locator('button:has(svg[class*="lucide-refresh"])').first().click();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Regenerate' }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Regenerate' }).click();
       await expect(page.getByText('key service down').first()).toBeVisible();
       expect(app.writes.filter((w) => w.startsWith('DELETE integrations'))).toHaveLength(0);
       expect(app.db.integrations.some((i) => i.id === 'i1')).toBe(true);
@@ -67,7 +67,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
         route.request().method() === 'DELETE' ? route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'delete denied' }) }) : route.fallback());
       await page.goto('/dashboard/admin/integrations');
       await page.locator('button:has(svg[class*="lucide-refresh"])').first().click();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Regenerate' }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Regenerate' }).click();
       await expect(page.getByText('New key created, old key still active').first()).toBeVisible();
       await expect(page.getByText('lk_partial_key')).toBeVisible();
       expect(app.db.integrations.some((i) => i.id === 'i1')).toBe(true);

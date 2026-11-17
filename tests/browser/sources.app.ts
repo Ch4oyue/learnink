@@ -30,10 +30,10 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect.poll(() => app.db.learning_sources.some((s) => s.name === 'edX')).toBe(true);
 
       await page.getByRole('row').filter({ hasText: 'Coursera' }).getByRole('button').last().click();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel' }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Cancel' }).click();
       expect(app.writes.filter((w) => w.startsWith('DELETE learning_sources'))).toHaveLength(0);
       await page.getByRole('row').filter({ hasText: 'Coursera' }).getByRole('button').last().click();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Delete' }).click();
       await expect.poll(() => app.db.learning_sources.some((s) => s.id === 's1')).toBe(false);
     });
   });

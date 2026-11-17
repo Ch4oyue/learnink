@@ -5,7 +5,6 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Quiz, QuizQuestionSafe, QuizAttempt, QuizValidationResult, useValidateQuizAnswers } from "@/hooks/useQuiz";
 import { useAuth } from "@/contexts/AuthContext";
 import { logger } from "@/lib/logger";
@@ -255,10 +254,9 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                     key={i}
                     className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                   >
-                    <RadioGroupItem value={option} id={`option-${i}`} aria-label={option} />
-                    <Label htmlFor={`option-${i}`} className="flex min-h-11 flex-1 items-center cursor-pointer">
-                      {option}
-                    </Label>
+                    <RadioGroupItem value={option} id={`option-${i}`} aria-label={option}>
+                      <span className="text-sm font-medium">{option}</span>
+                    </RadioGroupItem>
                   </div>
                 ))}
               </RadioGroup>
@@ -274,10 +272,9 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                   key={option}
                   className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                 >
-                  <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} aria-label={option === "Benar" ? "True" : "False"} />
-                  <Label htmlFor={`option-${option}`} className="flex min-h-11 flex-1 items-center cursor-pointer">
-                    {option === "Benar" ? "True" : "False"}
-                  </Label>
+                  <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} aria-label={option === "Benar" ? "True" : "False"}>
+                    <span className="text-sm font-medium">{option === "Benar" ? "True" : "False"}</span>
+                  </RadioGroupItem>
                 </div>
               ))}
             </RadioGroup>

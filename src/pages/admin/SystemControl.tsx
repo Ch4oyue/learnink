@@ -409,7 +409,8 @@ export default function SystemControl() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
+            <p className="mb-3 text-xs text-muted-foreground sm:hidden">Swipe horizontally to see every column.</p>
+            <Table aria-label="Security audit trail">
               <TableHeader>
                 <TableRow>
                   <TableHead>Time</TableHead>

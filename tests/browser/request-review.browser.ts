@@ -24,16 +24,16 @@ test('admin vs tutor columns, fallbacks, action eligibility and status mutation'
 
 test('generate requires confirmation, cancel is inert, and next dialog uses next request', async ({ page }) => {
   await page.getByRole('row').filter({ hasText: 'Topic 0' }).getByRole('button', { name: 'Generate AI' }).click();
-  await expect(page.getByRole('alertdialog')).toContainText('Topic 0');
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toContainText('Topic 0');
   await expect(page.getByTestId('events')).toHaveText('[]');
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toHaveCount(0);
   await expect(page.getByTestId('events')).toHaveText('[]');
   await page.getByRole('row').filter({ hasText: 'Topic 1' }).getByRole('button', { name: 'Generate AI' }).click();
-  await expect(page.getByRole('alertdialog')).toContainText('Topic 1');
-  await expect(page.getByRole('alertdialog')).not.toContainText('Topic 0');
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toContainText('Topic 1');
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).not.toContainText('Topic 0');
   await page.getByRole('button', { name: 'Generate Module', exact: true }).click();
-  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toHaveCount(0);
   await expect(page.getByTestId('events')).toHaveText('[{"generate":"request-1"}]');
 });
 

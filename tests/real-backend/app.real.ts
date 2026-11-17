@@ -49,8 +49,10 @@ test('quiz: answers are graded by the real function and the attempt is stored', 
   await expect(dialog.getByText('Flexbox check')).toBeVisible({ timeout: 20000 });
   await dialog.getByRole('button', { name: 'Start Quiz' }).click();
   await dialog.getByText('flex-direction').click();
+  await expect(dialog.getByRole('radio',{name:'flex-direction',exact:true})).toBeChecked();
   await dialog.getByRole('button', { name: 'Next' }).click();
   await dialog.getByText('True', { exact: true }).click();
+  await expect(dialog.getByRole('radio',{name:'True',exact:true})).toBeChecked();
   await page.waitForTimeout(4500);
   await dialog.getByRole('button', { name: 'Finish' }).click();
   await expect(dialog.getByText('100%')).toBeVisible({ timeout: 20000 });
@@ -85,7 +87,7 @@ test('admin users table is served by the real get-users function; a learner is r
   await expect(page.getByRole('row')).toHaveCount(6, { timeout: 20000 }); // header + 5 seeded users
   for (const name of ['Tutor', 'Learner', 'Other']) {
     // Hidden native select options also contain role names; match the visible identity cell.
-    await expect(page.getByRole('row').filter({ has: page.getByRole('cell').first().getByText(name, { exact: true }) })).toHaveCount(1);
+    await expect(page.getByRole('row').filter({ has: page.getByRole('rowheader').getByText(name, { exact: true }) })).toHaveCount(1);
   }
   await expect(page.getByText('Loading')).toHaveCount(0);
   const res = await fetch(`${API}/functions/v1/get-users?page=1&limit=10`, { headers: { Authorization: `Bearer ${tokenFor('learner')}` } });
@@ -100,7 +102,7 @@ test('integrations: regenerate calls the real generate-api-key, then retires the
   await page.goto('/dashboard/admin/integrations');
   await expect(page.getByText('Nightly Import').first()).toBeVisible({ timeout: 20000 });
   await page.locator('button:has(svg[class*="lucide-refresh"])').first().click();
-  await page.getByRole('alertdialog').getByRole('button', { name: 'Regenerate' }).click();
+  await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Regenerate' }).click();
   await expect(page.getByText('API Key Updated').first()).toBeVisible({ timeout: 20000 });
   const rows = await rest('integrations?select=id,name,is_active');
   expect(rows.body).toHaveLength(1);

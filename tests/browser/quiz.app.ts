@@ -45,6 +45,8 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await dialog.getByRole('button', { name: 'Start Quiz' }).click();
       await expect(dialog.getByText('Which property sets the main axis?')).toBeVisible();
       const answer = dialog.getByRole('radio', { name: 'flex-direction', exact: true });
+      await dialog.getByText('flex-direction', {exact:true}).click();
+      await expect(answer).toBeChecked();
       await answer.focus();
       await answer.press('Space');
       await expect(answer).toBeChecked();

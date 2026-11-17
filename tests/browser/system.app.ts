@@ -68,7 +68,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       });
       await page.goto('/dashboard/admin/system');
       await page.getByRole('button', { name: 'Delete label beta-tester' }).click();
-      const confirm = page.getByRole('alertdialog');
+      const confirm = page.locator('[role=alertdialog]:not([aria-modal=false])');
       await confirm.getByRole('button', { name: 'Delete' }).click();
       await expect(page.getByText('Failed to delete label', { exact: true }).first()).toBeVisible();
       await expect(confirm).toBeVisible();
@@ -105,11 +105,11 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect.poll(() => app.db.label_configs.find((l) => l.id === 'beta-tester')?.multiplier).toBe(2);
 
       await page.getByRole('button', { name: 'Delete label beta-tester' }).click();
-      await expect(page.getByRole('alertdialog')).toContainText('Delete label beta-tester?');
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Cancel' }).click();
+      await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toContainText('Delete label beta-tester?');
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Cancel' }).click();
       expect(app.writes.filter((w) => w.startsWith('DELETE label_configs'))).toHaveLength(0);
       await page.getByRole('button', { name: 'Delete label beta-tester' }).click();
-      await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: 'Delete' }).click();
       await expect.poll(() => app.db.label_configs.some((l) => l.id === 'beta-tester')).toBe(false);
       expect(nativeDialogs).toBe(0);
     });
@@ -150,3 +150,5 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
     });
   });
 }
+
+ test('mobile audit table exposes all columns through its scroll region',async({page})=>{await page.setViewportSize({width:390,height:844});await installApp(page,{role:'superadmin',db:seed()});await page.goto('/dashboard/admin/system');const region=page.getByRole('region',{name:'Security audit trail scroll area'});await region.scrollIntoViewIfNeeded();await region.evaluate(e=>e.scrollLeft=e.scrollWidth);await expect.poll(()=>region.evaluate(e=>e.scrollLeft)).toBeGreaterThan(0);const header=page.getByRole('columnheader',{name:'Status',exact:true});const box=await header.boundingBox();expect(box&&box.x>=0&&box.x+box.width<=390).toBe(true);await page.screenshot({path:'/downloads/audit-scroll-mobile.png'});});

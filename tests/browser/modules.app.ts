@@ -55,7 +55,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await row.getByRole('button', { name: 'Module Options' }).click();
       await page.getByRole('menuitem', { name: /delete/i }).click();
       expect(app.writes.filter((w) => w.startsWith('DELETE modules'))).toHaveLength(0);
-      await page.getByRole('alertdialog').getByRole('button', { name: /delete/i }).click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button', { name: /delete/i }).click();
       await expect.poll(() => app.writes.some((w) => w.startsWith('DELETE modules') && w.includes('id=eq.m2'))).toBe(true);
       await expect(page.getByText('Draft Module', { exact: true })).toHaveCount(0);
     });

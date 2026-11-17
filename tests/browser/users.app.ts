@@ -35,15 +35,15 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       expect(box && box.x >= 0 && box.x + box.width <= viewport.width).toBe(true);
       await roleControl.click();
       await page.getByRole('option', { name: 'Tutor', exact: true }).click();
-      await expect(page.getByRole('alertdialog')).toContainText('Confirm Role Change');
+      await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toContainText('Confirm Role Change');
       expect(app.writes.filter((w) => w.startsWith('PATCH user_roles'))).toHaveLength(0);
       await page.getByRole('button', { name: 'Cancel' }).click();
-      await expect(page.getByRole('alertdialog')).toHaveCount(0);
+      await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toHaveCount(0);
       expect(app.writes.filter((w) => w.startsWith('PATCH user_roles') || w.startsWith('POST user_roles'))).toHaveLength(0);
 
       await row.locator('[data-slot="select-trigger"]').last().click();
       await page.getByRole('option', { name: 'Tutor', exact: true }).click();
-      await page.getByRole('alertdialog').getByRole('button').last().click();
+      await page.locator('[role=alertdialog]:not([aria-modal=false])').getByRole('button').last().click();
       await expect.poll(() => app.writes.some((w) => w.startsWith('PATCH user_roles') && w.includes('user_id=eq.u2'))).toBe(true);
       expect(app.db.user_roles.find((r) => r.user_id === 'u2')).toMatchObject({ role: 'tutor' });
     });

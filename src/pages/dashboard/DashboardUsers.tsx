@@ -322,7 +322,7 @@ export default function DashboardUsers() {
                             : "-"
                           }
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={user.labels?.length || currentRole === "superadmin" ? undefined : "hidden md:table-cell"}>
                           <p className="text-xs text-muted-foreground mb-2 md:hidden">Labels</p>
                           <div className="flex flex-wrap gap-1 max-w-[200px]">
                             {user.labels?.map(l => (

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Terminal, Moon, Sun, Heart, Github, BookOpen, LayoutDashboard, Menu } from "lucide-react";
 import { Hero } from "@/components/features/landing/Hero";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
 import { lazy, Suspense, useState } from "react";
@@ -115,6 +115,7 @@ export default function LandingPage() {
                                     </Button>
                                 </SheetTrigger>
                                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                                    <SheetTitle className="sr-only">Main Menu</SheetTitle>
                                     <nav className="flex flex-col gap-4 mt-8">
                                         {user ? (
                                             <Link

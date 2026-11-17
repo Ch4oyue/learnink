@@ -1,107 +1,200 @@
-import * as SheetPrimitive from "@radix-ui/react-dialog";
-import { cva, type VariantProps } from "class-variance-authority";
-import { X } from "lucide-react";
 import * as React from "react";
-
+import { Drawer as HeroDrawer } from "@heroui/react";
+import { Slot } from "@radix-ui/react-slot";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-const Sheet = SheetPrimitive.Root;
-
-const SheetTrigger = SheetPrimitive.Trigger;
-
-const SheetClose = SheetPrimitive.Close;
-
-const SheetPortal = SheetPrimitive.Portal;
-
-const SheetOverlay = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Overlay>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Overlay>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Overlay
-    className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-      className,
-    )}
-    {...props}
-    ref={ref}
-  />
-));
-SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
-
-const sheetVariants = cva(
-  "fixed z-50 gap-4 glass-liquid p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500 border-none",
-  {
-    variants: {
-      side: {
-        top: "inset-x-0 top-0 data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top rounded-b-[32px]",
-        bottom:
-          "inset-x-0 bottom-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom rounded-t-[32px]",
-        left: "inset-y-0 left-0 h-full w-3/4 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm rounded-r-[32px]",
-        right:
-          "inset-y-0 right-0 h-full w-3/4 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm rounded-l-[32px]",
-      },
+const Context = React.createContext<{
+  setOpen: (open: boolean) => void;
+  titleId: string;
+  descriptionId: string;
+} | null>(null);
+function useSheet() {
+  const c = React.useContext(Context);
+  if (!c) throw new Error("Sheet requires its root");
+  return c;
+}
+type RootProps = {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  children?: React.ReactNode;
+};
+function Sheet({
+  open,
+  defaultOpen = false,
+  onOpenChange,
+  children,
+}: RootProps) {
+  const [local, setLocal] = React.useState(defaultOpen);
+  const id = React.useId();
+  const setOpen = React.useCallback(
+    (v: boolean) => {
+      setLocal(v);
+      onOpenChange?.(v);
     },
-    defaultVariants: {
-      side: "right",
-    },
-  },
-);
-
-interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-    VariantProps<typeof sheetVariants> {}
-
-const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, SheetContentProps>(
-  ({ side = "right", className, children, ...props }, ref) => (
-    <SheetPortal>
-      <SheetOverlay />
-      <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
+    [onOpenChange],
+  );
+  return (
+    <Context.Provider
+      value={{
+        setOpen,
+        titleId: `${id}-title`,
+        descriptionId: `${id}-description`,
+      }}
+    >
+      <HeroDrawer isOpen={open ?? local} onOpenChange={setOpen}>
         {children}
-        <SheetPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-secondary hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </SheetPrimitive.Close>
-      </SheetPrimitive.Content>
-    </SheetPortal>
-  ),
-);
-SheetContent.displayName = SheetPrimitive.Content.displayName;
-
-const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col space-y-2 text-center sm:text-left", className)} {...props} />
-);
-SheetHeader.displayName = "SheetHeader";
-
-const SheetFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)} {...props} />
-);
-SheetFooter.displayName = "SheetFooter";
-
+      </HeroDrawer>
+    </Context.Provider>
+  );
+}
+const SheetTrigger = React.forwardRef<
+  HTMLButtonElement,
+  React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }
+>(({ asChild, onClick, ...props }, ref) => {
+  const { setOpen } = useSheet();
+  const Comp = asChild ? Slot : "button";
+  return (
+    <Comp
+      {...props}
+      ref={ref}
+      onClick={(e) => {
+        onClick?.(e);
+        if (!e.defaultPrevented) setOpen(true);
+      }}
+    />
+  );
+});
+SheetTrigger.displayName = "SheetTrigger";
+const SheetClose = React.forwardRef<
+  HTMLButtonElement,
+  React.ComponentPropsWithoutRef<typeof Button>
+>(({ onClick, ...props }, ref) => {
+  const { setOpen } = useSheet();
+  return (
+    <Button
+      {...props}
+      ref={ref}
+      onClick={(e) => {
+        onClick?.(e);
+        if (!e.defaultPrevented) setOpen(false);
+      }}
+    />
+  );
+});
+SheetClose.displayName = "SheetClose";
+type ContentProps = Omit<
+  React.ComponentPropsWithoutRef<typeof HeroDrawer.Dialog>,
+  "children"
+> & { children?: React.ReactNode } & {
+  side?: "left" | "right" | "top" | "bottom";
+  showClose?: boolean;
+};
+function SheetContent({
+  side = "right",
+  className,
+  children,
+  showClose = true,
+  ...props
+}: ContentProps) {
+  const { titleId, descriptionId } = useSheet();
+  return (
+    <HeroDrawer.Backdrop isDismissable className="z-50 bg-black/40">
+      <HeroDrawer.Content placement={side} className="z-50">
+        <HeroDrawer.Dialog
+          {...props}
+          aria-labelledby={titleId}
+          aria-describedby={descriptionId}
+          aria-label="Navigation"
+          className={cn(
+            "relative flex flex-col overflow-y-auto bg-card text-card-foreground p-6 shadow-xl outline-none",
+            side === "left" || side === "right"
+              ? "h-full w-80 max-w-[calc(100vw-32px)]"
+              : "w-full max-h-[85dvh]",
+            side === "left"
+              ? "rounded-r-3xl"
+              : side === "right"
+                ? "rounded-l-3xl"
+                : side === "bottom"
+                  ? "rounded-t-3xl"
+                  : "rounded-b-3xl",
+            className,
+          )}
+        >
+          {children}
+          {showClose && (
+            <SheetClose
+              variant="ghost"
+              size="icon"
+              className="absolute right-2 top-2 z-30 min-h-11 min-w-11"
+              aria-label="Close"
+            >
+              <X className="size-4" />
+            </SheetClose>
+          )}
+        </HeroDrawer.Dialog>
+      </HeroDrawer.Content>
+    </HeroDrawer.Backdrop>
+  );
+}
+SheetContent.displayName = "SheetContent";
+function SheetHeader({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div {...props} className={cn("flex flex-col gap-2 pr-8", className)} />
+  );
+}
+function SheetFooter({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div
+      {...props}
+      className={cn("mt-auto flex flex-col gap-2 pt-4", className)}
+    />
+  );
+}
 const SheetTitle = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Title>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Title>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Title ref={ref} className={cn("text-lg font-semibold text-foreground", className)} {...props} />
-));
-SheetTitle.displayName = SheetPrimitive.Title.displayName;
-
+  HTMLHeadingElement,
+  React.ComponentPropsWithoutRef<typeof HeroDrawer.Heading>
+>(({ className, ...props }, ref) => {
+  const { titleId } = useSheet();
+  return (
+    <HeroDrawer.Heading
+      {...props}
+      ref={ref}
+      id={titleId}
+      className={cn("text-lg font-semibold text-foreground", className)}
+    />
+  );
+});
+SheetTitle.displayName = "SheetTitle";
 const SheetDescription = React.forwardRef<
-  React.ElementRef<typeof SheetPrimitive.Description>,
-  React.ComponentPropsWithoutRef<typeof SheetPrimitive.Description>
->(({ className, ...props }, ref) => (
-  <SheetPrimitive.Description ref={ref} className={cn("text-sm text-muted-foreground", className)} {...props} />
-));
-SheetDescription.displayName = SheetPrimitive.Description.displayName;
-
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => {
+  const { descriptionId } = useSheet();
+  return (
+    <p
+      {...props}
+      ref={ref}
+      id={descriptionId}
+      className={cn("text-sm text-muted-foreground", className)}
+    />
+  );
+});
+SheetDescription.displayName = "SheetDescription";
 export {
   Sheet,
+  SheetTrigger,
   SheetClose,
   SheetContent,
-  SheetDescription,
-  SheetFooter,
   SheetHeader,
-  SheetOverlay,
-  SheetPortal,
+  SheetFooter,
   SheetTitle,
-  SheetTrigger,
+  SheetDescription,
 };

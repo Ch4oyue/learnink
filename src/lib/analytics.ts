@@ -68,6 +68,8 @@ export function summarizeProgress(rows: ProgressRow[]): ProgressSummary {
 export interface QuizSummary {
   attempts: number;
   passedAttempts: number;
+  /** Distinct quizzes with at least one passing attempt (repeat passes count once). */
+  distinctQuizzesPassed: number;
   passRate: number;
   avgPercentage: number;
   bestPercentage: number;
@@ -77,15 +79,19 @@ export interface QuizSummary {
 export function summarizeQuizAttempts(rows: QuizAttemptRow[]): QuizSummary {
   const attempts = rows.length;
   if (attempts === 0) {
-    return { attempts: 0, passedAttempts: 0, passRate: 0, avgPercentage: 0, bestPercentage: 0, totalPointsEarned: 0 };
+    return { attempts: 0, passedAttempts: 0, distinctQuizzesPassed: 0, passRate: 0, avgPercentage: 0, bestPercentage: 0, totalPointsEarned: 0 };
   }
   let passed = 0;
+  const passedQuizIds = new Set<string>();
   let pctSum = 0;
   let pctCount = 0;
   let best = 0;
   let points = 0;
   for (const row of rows) {
-    if (row.passed) passed += 1;
+    if (row.passed) {
+      passed += 1;
+      passedQuizIds.add(row.quiz_id);
+    }
     if (row.percentage != null) {
       pctSum += row.percentage;
       pctCount += 1;
@@ -96,6 +102,7 @@ export function summarizeQuizAttempts(rows: QuizAttemptRow[]): QuizSummary {
   return {
     attempts,
     passedAttempts: passed,
+    distinctQuizzesPassed: passedQuizIds.size,
     passRate: Math.round((passed / attempts) * 100),
     avgPercentage: pctCount === 0 ? 0 : Math.round(pctSum / pctCount),
     bestPercentage: Math.round(best),

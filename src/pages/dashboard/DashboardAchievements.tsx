@@ -49,7 +49,7 @@ export default function DashboardAchievements() {
   const milestones = data
     ? computeMilestones({
         modulesCompleted: data.summary.modulesCompleted,
-        passedQuizzes: data.quiz.passedAttempts,
+        passedQuizzes: data.quiz.distinctQuizzesPassed,
         bestQuizPercentage: data.quiz.bestPercentage,
         currentStreak: profile?.current_streak ?? 0,
         points: profile?.points ?? 0,

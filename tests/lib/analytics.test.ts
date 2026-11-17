@@ -59,6 +59,13 @@ describe("summarizeQuizAttempts", () => {
     expect(s.totalPointsEarned).toBe(22);
   });
 
+  it("counts repeated passes of the same quiz once as a distinct quiz", () => {
+    const mk = (quiz_id: string, passed: boolean) => ({ quiz_id, score: 1, percentage: 80, passed, total_points: 1, started_at: null, completed_at: null });
+    const s = summarizeQuizAttempts([mk("q1", true), mk("q1", true), mk("q1", true), mk("q2", false), mk("q3", true)]);
+    expect(s.passedAttempts).toBe(4);
+    expect(s.distinctQuizzesPassed).toBe(2);
+  });
+
   it("skips null percentages in the average", () => {
     const s = summarizeQuizAttempts([
       { quiz_id: "q1", score: null, percentage: null, passed: null, total_points: null, started_at: null, completed_at: null },

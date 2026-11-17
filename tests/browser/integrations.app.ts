@@ -43,5 +43,23 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await page.getByRole('alertdialog').getByRole('button').last().click();
       await expect.poll(() => app.db.integrations.some((i) => i.id === 'i1')).toBe(false);
     });
+    test('integrations: regenerate creates the new key first, then retires the old one', async ({ page }) => {
+      const app = await installApp(page, { role: 'admin', db: seed(), functions: { 'generate-api-key': () => ({ success: true, api_key: 'lk_new_key' }) } });
+      await page.goto('/dashboard/admin/integrations');
+      await page.locator('button:has(svg[class*="lucide-refresh"])').first().click();
+      await page.getByRole('alertdialog').getByRole('button', { name: 'Regenerate' }).click();
+      await expect(page.getByText('lk_new_key')).toBeVisible();
+      await expect.poll(() => app.db.integrations.some((i) => i.id === 'i1')).toBe(false);
+    });
+
+    test('integrations: a failed regenerate keeps the existing integration', async ({ page }) => {
+      const app = await installApp(page, { role: 'admin', db: seed(), functions: { 'generate-api-key': () => ({ success: false, error: 'key service down' }) } });
+      await page.goto('/dashboard/admin/integrations');
+      await page.locator('button:has(svg[class*="lucide-refresh"])').first().click();
+      await page.getByRole('alertdialog').getByRole('button', { name: 'Regenerate' }).click();
+      await expect(page.getByText('key service down').first()).toBeVisible();
+      expect(app.writes.filter((w) => w.startsWith('DELETE integrations'))).toHaveLength(0);
+      expect(app.db.integrations.some((i) => i.id === 'i1')).toBe(true);
+    });
   });
 }

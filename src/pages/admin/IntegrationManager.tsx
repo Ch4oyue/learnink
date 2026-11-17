@@ -220,17 +220,7 @@ export default function IntegrationManager() {
     // Regenerate key mutation
     const regenerateMutation = useMutation({
         mutationFn: async (integration: Integration) => {
-            // Delete old integration
-            const { error: deleteError } = await supabase
-                .from("integrations")
-                .delete()
-                .eq("id", integration.id);
-
-            if (deleteError) {
-                throw new Error(`Failed to delete old integration: ${deleteError.message}`);
-            }
-
-            // Create new one
+            // Create the replacement first: if this fails the existing integration and its key stay intact.
             const { data, error } = await supabase.functions.invoke("generate-api-key", {
                 body: {
                     name: integration.name,
@@ -246,6 +236,16 @@ export default function IntegrationManager() {
 
             if (!data?.success) {
                 throw new Error(data?.error || "Failed to generate API key");
+            }
+
+            // Only now retire the old key.
+            const { error: deleteError } = await supabase
+                .from("integrations")
+                .delete()
+                .eq("id", integration.id);
+
+            if (deleteError) {
+                throw new Error(`New key was created but the old one could not be removed: ${deleteError.message}`);
             }
 
             return data;

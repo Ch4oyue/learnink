@@ -2,22 +2,29 @@
 @import "tw-animate-css";
 
 /* HeroUI v3 - selective component styles only (full bundle is ~940 kB and
-   would blow the PWA precache budget + low-end device cost) */
-@import "@heroui/styles/base";
+   would blow the PWA precache budget + low-end device cost).
+   Layered imports: HeroUI's base ships an unlayered universal
+   `* { border-color: var(--border, currentColor) }` that would otherwise beat
+   every Tailwind border-color utility (and computes black here because the
+   app's shadcn --border is an HSL triplet). Pinning HeroUI into Tailwind's
+   cascade layers keeps utilities authoritative. */
+@import "@heroui/styles/base" layer(base);
+/* utilities stays unlayered: it uses @utility, which Tailwind 4 forbids
+   inside a cascade layer. It carries no universal border-color rule. */
 @import "@heroui/styles/utilities";
-@import "@heroui/styles/themes/default";
-@import "@heroui/styles/components/button.css";
-@import "@heroui/styles/components/input.css";
-@import "@heroui/styles/components/textfield.css";
-@import "@heroui/styles/components/card.css";
-@import "@heroui/styles/components/surface.css";
-@import "@heroui/styles/components/checkbox.css";
-@import "@heroui/styles/components/switch.css";
-@import "@heroui/styles/components/chip.css";
-@import "@heroui/styles/components/avatar.css";
-@import "@heroui/styles/components/separator.css";
-@import "@heroui/styles/components/spinner.css";
-@import "@heroui/styles/components/label.css";
+@import "@heroui/styles/themes/default" layer(theme);
+@import "@heroui/styles/components/button.css" layer(components);
+@import "@heroui/styles/components/input.css" layer(components);
+@import "@heroui/styles/components/textfield.css" layer(components);
+@import "@heroui/styles/components/card.css" layer(components);
+@import "@heroui/styles/components/surface.css" layer(components);
+@import "@heroui/styles/components/checkbox.css" layer(components);
+@import "@heroui/styles/components/switch.css" layer(components);
+@import "@heroui/styles/components/chip.css" layer(components);
+@import "@heroui/styles/components/avatar.css" layer(components);
+@import "@heroui/styles/components/separator.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/components/label.css" layer(components);
 
 @config "../tailwind.config.ts";
 

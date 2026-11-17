@@ -21,9 +21,9 @@ export function Hero() {
     const [selectedLanguage, setSelectedLanguage] = useState<"javascript" | "python" | "typescript">("javascript");
 
     const languageOptions = [
-        { key: "javascript" as const, label: "React", icon: "⚛️" },
-        { key: "python" as const, label: "Python", icon: "🐍" },
-        { key: "typescript" as const, label: "TypeScript", icon: "📘" },
+        { key: "javascript" as const, label: "React", dot: "#61DAFB" },
+        { key: "python" as const, label: "Python", dot: "#3776AB" },
+        { key: "typescript" as const, label: "TypeScript", dot: "#3178C6" },
     ];
 
     return (
@@ -91,7 +91,7 @@ export function Hero() {
                                     : "bg-secondary text-muted-foreground hover:text-foreground"
                                     }`}
                             >
-                                <span className="mr-1.5" aria-hidden="true">{option.icon}</span>
+                                <span className="mr-2 h-2 w-2 rounded-full" style={{ backgroundColor: option.dot }} aria-hidden="true" />
                                 {option.label}
                                 {isSelected && <Check className="ml-1.5 h-4 w-4" aria-hidden="true" />}
                             </button>

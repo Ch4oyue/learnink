@@ -43,6 +43,7 @@ const DashboardRequests = lazy(() => import("./pages/dashboard/DashboardRequests
 const CourseDetail = lazy(() => import("./pages/dashboard/CourseDetail"));
 const ComingSoon = lazy(() => import("./pages/dashboard/ComingSoon"));
 const SecondBrain = lazy(() => import("./pages/dashboard/SecondBrain"));
+const DashboardAnalytics = lazy(() => import("./pages/dashboard/DashboardAnalytics"));
 const ShareTargetHandler = lazy(() => import("./pages/dashboard/ShareTargetHandler"));
 
 // Learning Pages
@@ -221,7 +222,7 @@ const App = () => (
                         path="/dashboard/analytics"
                         element={
                           <ProtectedRoute>
-                            <ComingSoon title="Analytics" description="The analytics feature for viewing your learning statistics in detail is under development." />
+                            <DashboardAnalytics />
                           </ProtectedRoute>
                         }
                       />

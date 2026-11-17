@@ -15,7 +15,7 @@ export function TopProgressBar() {
         >
             <div
                 className="h-full bg-primary animate-progress-grow"
-                style={{ boxShadow: "0 0 10px hsl(var(--primary))" }}
+                style={{ boxShadow: "0 0 10px hsl(var(--primary-hsl))" }}
             />
         </div>
     );

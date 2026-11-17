@@ -62,7 +62,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
             <main
                 ref={ref}
                 className="md:flex-1 md:overflow-y-auto overflow-visible bg-background relative scroll-smooth"
-                style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted)) transparent" }}
+                style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted-hsl)) transparent" }}
             >
                 {/* Floating Selection Menu - Only render if selection is active to avoid null ref errors */}
                 {selection && (

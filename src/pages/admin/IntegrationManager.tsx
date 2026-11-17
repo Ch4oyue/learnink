@@ -631,7 +631,7 @@ export default function IntegrationManager() {
 
                             <div className="space-y-2">
                                 <Label htmlFor="source">Source</Label>
-                                <Select
+                                <Select aria-label="Source"
                                     value={formData.source}
                                     onValueChange={(value: IntegrationSource) =>
                                         setFormData({ ...formData, source: value })

@@ -279,7 +279,7 @@ export function AdminDashboardContent() {
                         </TableCell>
                         <TableCell className="text-right">
                           {!isSelf && (
-                            <Select
+                            <Select aria-label="User role"
                               value={userItem.role}
                               onValueChange={(value) =>
                                 handleRoleChange(userItem.id, value as AppRole, userItem.display_name || 'User')

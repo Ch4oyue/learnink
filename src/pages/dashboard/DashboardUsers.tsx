@@ -237,7 +237,7 @@ export default function DashboardUsers() {
               className="pl-10"
             />
           </div>
-          <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as AppRole | "all")}>
+          <Select aria-label="Role filter" value={roleFilter} onValueChange={(v) => setRoleFilter(v as AppRole | "all")}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter Role" />
             </SelectTrigger>
@@ -340,7 +340,7 @@ export default function DashboardUsers() {
                               </Badge>
                             ))}
                             {currentRole === "superadmin" && (
-                              <Select onValueChange={(val) => {
+                              <Select aria-label="Add label" onValueChange={(val) => {
                                 if (user.labels?.includes(val)) return;
                                 const newLabels = [...(user.labels || []), val];
                                 updateLabels.mutate({ userId: user.id, labels: newLabels });
@@ -364,7 +364,7 @@ export default function DashboardUsers() {
                               Immutable
                             </Badge>
                           ) : (
-                            <Select
+                            <Select aria-label="User role"
                               value={user.role}
                               onValueChange={(v) => handleRoleChange(user, v as AppRole)}
                               disabled={isSelf || updateRole.isPending}

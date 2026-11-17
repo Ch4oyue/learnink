@@ -177,7 +177,7 @@ export const RequestSection = () => {
                     <label className="block text-sm font-medium text-foreground">
                       Category
                     </label>
-                    <Select
+                    <Select aria-label="Category"
                       value={category}
                       onValueChange={(value) => setValue("category", value)}
                     >
@@ -199,7 +199,7 @@ export const RequestSection = () => {
                     <label className="block text-sm font-medium text-foreground">
                       Priority
                     </label>
-                    <Select
+                    <Select aria-label="Priority"
                       value={priority}
                       onValueChange={(value: "low" | "medium" | "high") =>
                         setValue("priority", value)

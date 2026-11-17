@@ -257,7 +257,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select aria-label="Category" value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
@@ -282,7 +282,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Level</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select aria-label="Level" value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />

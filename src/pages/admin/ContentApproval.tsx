@@ -488,7 +488,7 @@ export default function ContentApproval() {
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <Label>Category</Label>
-                                    <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
+                                    <Select aria-label="Category" value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
                                         <SelectTrigger className="bg-black/20 rounded-2xl focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             {categories.map(c => <SelectItem key={c.id} value={c.name}>{displayCategory(c.name)}</SelectItem>)}
@@ -497,7 +497,7 @@ export default function ContentApproval() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Level</Label>
-                                    <Select value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
+                                    <Select aria-label="Level" value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
                                         <SelectTrigger className="bg-black/20 rounded-2xl focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             {levels.map(l => <SelectItem key={l.id} value={l.name}>{displayLevel(l.name)}</SelectItem>)}

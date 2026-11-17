@@ -106,7 +106,7 @@ export default function Modules() {
                 className="pl-10"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <Select aria-label="Category filter" value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
@@ -116,7 +116,7 @@ export default function Modules() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={levelFilter} onValueChange={setLevelFilter}>
+            <Select aria-label="Level filter" value={levelFilter} onValueChange={setLevelFilter}>
               <SelectTrigger className="w-full md:w-48">
                 <SelectValue placeholder="Level" />
               </SelectTrigger>

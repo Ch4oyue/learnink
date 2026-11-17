@@ -17,20 +17,20 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await page.goto('/dashboard/users');
       await expect(page.getByText('Ayu Lestari').first()).toBeVisible();
       await expect(page.getByText('Budi Santoso').first()).toBeVisible();
-      await page.getByRole('combobox').first().click();
+      await page.locator('[data-slot="select-trigger"]').first().click();
       await page.getByRole('option', { name: 'Tutor', exact: true }).click();
       await expect(page.getByText('Budi Santoso').first()).toBeVisible();
       await expect(page.getByText('Ayu Lestari')).toHaveCount(0);
-      await page.getByRole('combobox').first().click();
+      await page.locator('[data-slot="select-trigger"]').first().click();
       await page.getByRole('option', { name: 'All Roles' }).click();
-      await expect(page.getByRole('row').filter({ hasText: 'Test Admin' }).getByRole('combobox').last()).toBeDisabled();
+      await expect(page.getByRole('row').filter({ hasText: 'Test Admin' }).locator('[data-slot="select-trigger"]').last()).toBeDisabled();
     });
 
     test('users: changing a role asks for confirmation, cancel is inert, confirm writes', async ({ page }) => {
       const app = await installApp(page, { role: 'admin', db: { user_roles: [{ user_id: USER_ID, role: 'admin' }, { user_id: 'u2', role: 'user' }], label_configs: [] }, functions: { 'get-users': payload } });
       await page.goto('/dashboard/users');
       const row = page.getByRole('row').filter({ hasText: 'Ayu Lestari' });
-      await row.getByRole('combobox').last().click();
+      await row.locator('[data-slot="select-trigger"]').last().click();
       await page.getByRole('option', { name: 'Tutor', exact: true }).click();
       await expect(page.getByRole('alertdialog')).toContainText('Confirm Role Change');
       expect(app.writes.filter((w) => w.startsWith('PATCH user_roles'))).toHaveLength(0);
@@ -38,7 +38,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect(page.getByRole('alertdialog')).toHaveCount(0);
       expect(app.writes.filter((w) => w.startsWith('PATCH user_roles') || w.startsWith('POST user_roles'))).toHaveLength(0);
 
-      await row.getByRole('combobox').last().click();
+      await row.locator('[data-slot="select-trigger"]').last().click();
       await page.getByRole('option', { name: 'Tutor', exact: true }).click();
       await page.getByRole('alertdialog').getByRole('button').last().click();
       await expect.poll(() => app.writes.some((w) => w.startsWith('PATCH user_roles') && w.includes('user_id=eq.u2'))).toBe(true);

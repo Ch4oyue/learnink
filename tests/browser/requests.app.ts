@@ -29,11 +29,11 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect(page.getByText('Python Basics', { exact: true })).toHaveCount(0);
       await page.getByPlaceholder(/search material/i).fill('');
 
-      await page.getByRole('combobox').click();
+      await page.locator('[data-slot="select-trigger"]').click();
       await page.getByRole('option', { name: 'Completed' }).click();
       await expect(page.getByText('Rust Ownership', { exact: true })).toBeVisible();
       await expect(page.getByText('Python Basics', { exact: true })).toHaveCount(0);
-      await page.getByRole('combobox').click();
+      await page.locator('[data-slot="select-trigger"]').click();
       await page.getByRole('option', { name: 'All Status' }).click();
 
       await page.getByRole('tab', { name: /Feature/ }).click();

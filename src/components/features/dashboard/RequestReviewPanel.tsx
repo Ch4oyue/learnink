@@ -46,7 +46,7 @@ export function RequestReviewPanel({ requests, requestsLoading, statusFilter, on
     <>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-foreground">Material Requests</h2>
-            <Select
+            <Select aria-label="Status filter"
               value={statusFilter}
               onValueChange={(value) => onFilterChange(value as RequestStatus | 'all')}
             >
@@ -125,7 +125,7 @@ export function RequestReviewPanel({ requests, requestsLoading, statusFilter, on
                               Generate AI
                             </Button>
                           )}
-                          <Select
+                          <Select aria-label="Request status"
                             value={request.status || 'pending'}
                             onValueChange={(value) => onStatusChange(request.id, value as RequestStatus)}
                           >

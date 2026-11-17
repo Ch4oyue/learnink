@@ -266,7 +266,7 @@ export default function DashboardRequests() {
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select aria-label="Status filter" value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
@@ -490,7 +490,7 @@ export default function DashboardRequests() {
 
             <div className="space-y-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select
+              <Select aria-label="Priority"
                 value={formData.priority}
                 onValueChange={(val) => setFormData({ ...formData, priority: val })}
               >

@@ -445,7 +445,7 @@ export default function ManageSources() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="category">Category</Label>
-                                <Select
+                                <Select aria-label="Category"
                                     value={formData.category}
                                     onValueChange={(value) => setFormData({ ...formData, category: value })}
                                 >

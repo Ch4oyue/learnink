@@ -46,6 +46,8 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await page.getByRole('button', { name: /Open Second Brain/ }).click();
       await expect(page).toHaveURL(/\/dashboard\/second-brain$/);
       await page.goto('/dashboard/profile?tab=settings');
+      await page.getByRole('link', { name: 'Open settings', exact: true }).click();
+      await expect(page).toHaveURL(/\/dashboard\/settings$/);
       await page.getByRole('button', { name: /^Dark/ }).click();
       await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(true);
       await page.reload();

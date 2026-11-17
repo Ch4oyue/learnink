@@ -9,7 +9,6 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { usePWA } from "@/contexts/PWAContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { useLearningStats } from "@/hooks/useLearningStats";
@@ -36,9 +35,6 @@ import {
   BookOpen,
   Clock,
   LogOut,
-  Sun,
-  Moon,
-  Monitor,
   Construction,
   Sparkles,
   StickyNote,
@@ -64,7 +60,6 @@ const roleLabels: Record<string, string> = {
 export default function DashboardProfile() {
   const navigate = useNavigate();
   const { user, role, profile, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
   const { isInstalled, deferredPrompt, installApp } = usePWA();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
@@ -555,35 +550,9 @@ export default function DashboardProfile() {
                 <CardTitle>Appearance</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[
-                    { value: "light" as const, label: "Light", icon: Sun },
-                    { value: "dark" as const, label: "Dark", icon: Moon },
-                    { value: "system" as const, label: "System", icon: Monitor },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => setTheme(option.value)}
-                      className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/50 hover:bg-muted/50"
-                        }`}
-                    >
-                      <option.icon
-                        className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
-                          }`}
-                      />
-                      <div className="text-center">
-                        <span
-                          className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
-                            }`}
-                        >
-                          {option.label}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                <Link to="/dashboard/settings" className="text-sm text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+                  Open settings
+                </Link>
               </CardContent>
             </Card>
 

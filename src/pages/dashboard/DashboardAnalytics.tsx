@@ -116,7 +116,9 @@ export default function DashboardAnalytics() {
     (data.summary.modulesCompleted > 0 ||
       data.summary.modulesInProgress > 0 ||
       data.quiz.attempts > 0 ||
-      data.perTrack.some((t) => t.publishedModules > 0));
+      data.perTrack.some((t) => t.publishedModules > 0) ||
+      (profile?.points ?? 0) > 0 ||
+      (profile?.current_streak ?? 0) > 0);
 
   return (
     <DashboardLayout>

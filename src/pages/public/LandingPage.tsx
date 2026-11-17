@@ -41,7 +41,7 @@ export default function LandingPage() {
                         {/* Logo */}
                         <Link to="/" className="flex items-center gap-2.5">
                             <div className="w-8 h-8 bg-foreground rounded-[10px] flex items-center justify-center text-background">
-                                <Terminal className="h-4.5 w-4.5" strokeWidth={2.25} />
+                                <Terminal className="h-5 w-5" strokeWidth={2.25} />
                             </div>
                             <span className="font-semibold text-[17px] tracking-tight text-foreground">LearnInk</span>
                         </Link>

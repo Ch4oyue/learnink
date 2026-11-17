@@ -10,6 +10,14 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+/** Resolve a theme choice to a concrete palette without reading the DOM. */
+export function resolveTheme(value: Theme, prefersDark: boolean): "light" | "dark" {
+    return value === "dark" || (value === "system" && prefersDark) ? "dark" : "light";
+}
+
+const prefersDark = () =>
+    typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setTheme] = useState<Theme>(() => {
         if (typeof window !== "undefined") {
@@ -20,18 +28,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         return "light";
     });
 
-    const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+    const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() =>
+        resolveTheme(theme, prefersDark()));
 
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove("light", "dark");
 
-        let resolved: "light" | "dark";
-        if (theme === "system") {
-            resolved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        } else {
-            resolved = theme;
-        }
+        const resolved = resolveTheme(theme, prefersDark());
 
         root.classList.add(resolved);
         setResolvedTheme(resolved);

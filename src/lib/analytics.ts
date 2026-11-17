@@ -39,12 +39,25 @@ export interface ProgressSummary {
   avgCompletionPercent: number;
 }
 
+const isBetterProgressRow = (candidate: ProgressRow, current: ProgressRow): boolean => {
+  const candidateCompleted = candidate.is_completed === true;
+  const currentCompleted = current.is_completed === true;
+  if (candidateCompleted !== currentCompleted) return candidateCompleted;
+  return (candidate.progress_percent ?? 0) > (current.progress_percent ?? 0);
+};
+
+const utcDayKey = (value: string | null): string | null => {
+  if (!value) return null;
+  const timestamp = new Date(value).getTime();
+  return Number.isNaN(timestamp) ? null : new Date(timestamp).toISOString().slice(0, 10);
+};
+
 /** Collapse progress rows to one best row per module, then summarize. */
 export function summarizeProgress(rows: ProgressRow[]): ProgressSummary {
   const bestByModule = new Map<string, ProgressRow>();
   for (const row of rows) {
     const existing = bestByModule.get(row.module_id);
-    if (!existing || (row.progress_percent ?? 0) > (existing.progress_percent ?? 0)) {
+    if (!existing || isBetterProgressRow(row, existing)) {
       bestByModule.set(row.module_id, row);
     }
   }
@@ -178,15 +191,14 @@ export function activitySeries(
     out.push(entry);
   }
   for (const row of progressRows) {
-    if (!row.completed_at) continue;
-    const key = new Date(row.completed_at).toISOString().slice(0, 10);
+    const key = utcDayKey(row.completed_at);
+    if (!key) continue;
     const entry = byDay.get(key);
     if (entry) entry.completions += 1;
   }
   for (const row of attemptRows) {
-    const ts = row.completed_at ?? row.started_at;
-    if (!ts) continue;
-    const key = new Date(ts).toISOString().slice(0, 10);
+    const key = utcDayKey(row.completed_at ?? row.started_at);
+    if (!key) continue;
     const entry = byDay.get(key);
     if (entry) entry.quizAttempts += 1;
   }

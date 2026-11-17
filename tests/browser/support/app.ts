@@ -15,6 +15,8 @@ export interface AppOptions {
   rpc?: Record<string, unknown | ((body: unknown, db: Db) => unknown)>;
   /** Edge function stand-ins keyed by function name (query string stripped). */
   functions?: Record<string, (req: { query: URLSearchParams; body: unknown }) => unknown>;
+  /** Return true to fail a write descriptor (e.g. "POST label_configs") with HTTP 500. */
+  failWrites?: (descriptor: string) => boolean;
 }
 
 export interface AppHandle {
@@ -108,19 +110,25 @@ export async function installApp(page: Page, opts: AppOptions = {}): Promise<App
     const wantsObject = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object');
     const method = req.method();
     if (method === 'PATCH') {
-      writes.push(`PATCH ${path}${url.search}`);
+      const descriptor = `PATCH ${path}${url.search}`;
+      writes.push(descriptor);
+      if (opts.failWrites?.(descriptor)) return json({ message: 'simulated failure' }, 500);
       let body: Row = {};
       try { body = JSON.parse(req.postData() ?? '{}'); } catch { /* empty */ }
       db[path] = rows.map((r) => (matches(r, url.searchParams) ? { ...r, ...body } : r));
       return route.fulfill({ status: 204, body: '' });
     }
     if (method === 'DELETE') {
-      writes.push(`DELETE ${path}${url.search}`);
+      const descriptor = `DELETE ${path}${url.search}`;
+      writes.push(descriptor);
+      if (opts.failWrites?.(descriptor)) return json({ message: 'simulated failure' }, 500);
       db[path] = rows.filter((r) => !matches(r, url.searchParams));
       return route.fulfill({ status: 204, body: '' });
     }
     if (method === 'POST') {
-      writes.push(`POST ${path}`);
+      const descriptor = `POST ${path}`;
+      writes.push(descriptor);
+      if (opts.failWrites?.(descriptor)) return json({ message: 'simulated failure' }, 500);
       let body: Row | Row[] = {};
       try { body = JSON.parse(req.postData() ?? '{}'); } catch { /* empty */ }
       const incoming = (Array.isArray(body) ? body : [body]).map((r, i) => ({ id: `new-${rows.length + i}`, ...r }));

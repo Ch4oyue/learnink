@@ -158,7 +158,7 @@ export default function DashboardProfile() {
     navigate("/");
   };
 
-  const { data: analytics } = useAnalytics(user?.id);
+  const { data: analytics, isLoading: isAnalyticsLoading } = useAnalytics(user?.id);
   const week = (analytics?.activity ?? []).slice(-7).map((d) => {
     const total = d.completions + d.quizAttempts;
     return { key: d.day, label: new Date(d.day + "T00:00:00Z").toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), total };
@@ -285,7 +285,9 @@ export default function DashboardProfile() {
                   </CardHeader>
                 <CardContent>
                   {/* Activity Chart: real completions + quiz attempts per day */}
-                  {weekTotal === 0 ? (
+                  {isAnalyticsLoading ? (
+                    <p role="status" className="mt-4 text-sm text-muted-foreground">Loading activity…</p>
+                  ) : weekTotal === 0 ? (
                     <p className="mt-4 text-sm text-muted-foreground">No activity in the last 7 days.</p>
                   ) : (
                     <div className="w-full h-48 flex items-end justify-between gap-2 sm:gap-4 mt-4" role="img" aria-label={`${weekTotal} learning events in the last 7 days`}>

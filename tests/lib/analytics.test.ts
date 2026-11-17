@@ -27,6 +27,15 @@ describe("summarizeProgress", () => {
     expect(s.avgCompletionPercent).toBe(75);
   });
 
+  it("keeps completion when an in-progress row has a higher percent", () => {
+    const s = summarizeProgress([
+      { module_id: "m1", progress_percent: 40, is_completed: true, started_at: null, completed_at: "2026-11-01T10:00:00Z" },
+      { module_id: "m1", progress_percent: 90, is_completed: false, started_at: null, completed_at: null },
+    ]);
+    expect(s.modulesCompleted).toBe(1);
+    expect(s.modulesInProgress).toBe(0);
+  });
+
   it("treats null percent as 0 and never invents progress", () => {
     const s = summarizeProgress([
       { module_id: "m1", progress_percent: null, is_completed: false, started_at: null, completed_at: null },
@@ -121,6 +130,21 @@ describe("activitySeries", () => {
     expect(out[0]).toMatchObject({ completions: 0, quizAttempts: 0 });
     expect(out[1]).toMatchObject({ completions: 1, quizAttempts: 0 });
     expect(out[2]).toMatchObject({ completions: 0, quizAttempts: 1 });
+  });
+
+  it("ignores invalid timestamps instead of throwing", () => {
+    const out = activitySeries(
+      [
+        { module_id: "m1", progress_percent: 100, is_completed: true, started_at: null, completed_at: "not-a-date" },
+      ],
+      [
+        { quiz_id: "q1", score: 1, percentage: 100, passed: true, total_points: 1, started_at: "also-invalid", completed_at: null },
+      ],
+      2,
+      new Date("2026-11-17T12:00:00Z"),
+    );
+    expect(out).toHaveLength(2);
+    expect(out.every((d) => d.completions === 0 && d.quizAttempts === 0)).toBe(true);
   });
 
   it("returns zero-filled days when there is no activity", () => {

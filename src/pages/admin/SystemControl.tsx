@@ -161,6 +161,9 @@ export default function SystemControl() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["label-configs"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to save label", variant: "destructive" });
     }
   });
 
@@ -172,8 +175,17 @@ export default function SystemControl() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["label-configs"] });
       toast({ title: "Label deleted" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete label", variant: "destructive" });
     }
   });
+
+  // Keep the validated text form: parseFloat in award-xp reads it, and "1.0" stays "1.0".
+  const saveMultiplier = (key: string, raw: string) => {
+    if (parseMultiplier(raw) === null) return;
+    updateSetting.mutate({ key, value: raw.trim() });
+  };
 
   // --- LABEL ROW CONTROLS (shared by the desktop table and the mobile cards) ---
   const multiplierInput = (label: LabelConfig) => (
@@ -269,7 +281,7 @@ export default function SystemControl() {
                   className="max-w-[120px]"
                 />
                 <Button
-                  onClick={() => updateSetting.mutate({ key: "global_xp_multiplier", value: String(parseMultiplier(globalXp)) })}
+                  onClick={() => saveMultiplier("global_xp_multiplier", globalXp)}
                   disabled={updateSetting.isPending || parseMultiplier(globalXp) === null}
                 >
                   Save
@@ -326,7 +338,7 @@ export default function SystemControl() {
                   className="max-w-[120px]"
                 />
                 <Button
-                  onClick={() => updateSetting.mutate({ key: "apk_base_bonus", value: String(parseMultiplier(apkBonus)) })}
+                  onClick={() => saveMultiplier("apk_base_bonus", apkBonus)}
                   disabled={updateSetting.isPending || parseMultiplier(apkBonus) === null}
                 >
                   Save
@@ -543,8 +555,10 @@ export default function SystemControl() {
               e.preventDefault();
               const id = newLabelId.trim();
               if (!LABEL_ID_PATTERN.test(id) || labelConfigs?.some((l) => l.id === id)) return;
-              manageLabel.mutate({ id, multiplier: 1.0, description: "", is_active: true });
-              setNewLabelOpen(false);
+              manageLabel.mutate(
+                { id, multiplier: 1.0, description: "", is_active: true },
+                { onSuccess: () => { setNewLabelOpen(false); setNewLabelId(""); } },
+              );
             }}
             className="space-y-4"
           >
@@ -564,7 +578,7 @@ export default function SystemControl() {
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setNewLabelOpen(false)}>Cancel</Button>
-              <Button type="submit" disabled={!LABEL_ID_PATTERN.test(newLabelId.trim()) || !!labelConfigs?.some((l) => l.id === newLabelId.trim())}>Add label</Button>
+              <Button type="submit" disabled={manageLabel.isPending || !LABEL_ID_PATTERN.test(newLabelId.trim()) || !!labelConfigs?.some((l) => l.id === newLabelId.trim())}>Add label</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -578,7 +592,16 @@ export default function SystemControl() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { if (labelToDelete) deleteLabel.mutate(labelToDelete); setLabelToDelete(null); }}>Delete</AlertDialogAction>
+            <AlertDialogAction
+              disabled={deleteLabel.isPending}
+              onClick={(e) => {
+                // Keep the dialog open until the delete resolves; Radix closes on click otherwise.
+                e.preventDefault();
+                const id = labelToDelete;
+                if (!id) return;
+                deleteLabel.mutate(id, { onSuccess: () => setLabelToDelete(null) });
+              }}
+            >Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

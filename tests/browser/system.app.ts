@@ -39,6 +39,42 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       expect(app.writes.filter((w) => w.startsWith('PATCH system_settings'))).toHaveLength(0);
     });
 
+    test('system: a valid multiplier keeps its text form when saved', async ({ page }) => {
+      const app = await installApp(page, { role: 'superadmin', db: seed() });
+      await page.goto('/dashboard/admin/system');
+      const xp = page.locator('input[type="number"]').first();
+      await xp.fill('1.0');
+      await page.getByRole('button', { name: 'Save' }).first().click();
+      await expect.poll(() => app.db.system_settings.find((s) => s.key === 'global_xp_multiplier')?.value).toBe('1.0');
+    });
+
+    test('system: failed add label keeps the dialog open and reports the error', async ({ page }) => {
+      const app = await installApp(page, {
+        role: 'superadmin', db: seed(), failWrites: (d) => d === 'POST label_configs',
+      });
+      await page.goto('/dashboard/admin/system');
+      await page.getByRole('button', { name: 'Add Label' }).click();
+      const dialog = page.getByRole('dialog');
+      await dialog.getByLabel('Label ID').fill('vip');
+      await dialog.getByRole('button', { name: 'Add label' }).click();
+      await expect(page.getByText('Failed to save label', { exact: true }).first()).toBeVisible();
+      await expect(dialog).toBeVisible();
+      await expect.poll(() => app.db.label_configs.some((l) => l.id === 'vip')).toBe(false);
+    });
+
+    test('system: failed delete keeps the confirm open and reports the error', async ({ page }) => {
+      const app = await installApp(page, {
+        role: 'superadmin', db: seed(), failWrites: (d) => d.startsWith('DELETE label_configs'),
+      });
+      await page.goto('/dashboard/admin/system');
+      await page.getByRole('button', { name: 'Delete label beta-tester' }).click();
+      const confirm = page.getByRole('alertdialog');
+      await confirm.getByRole('button', { name: 'Delete' }).click();
+      await expect(page.getByText('Failed to delete label', { exact: true }).first()).toBeVisible();
+      await expect(confirm).toBeVisible();
+      await expect.poll(() => app.db.label_configs.some((l) => l.id === 'beta-tester')).toBe(true);
+    });
+
     test('system: labels use accessible dialogs with validation (add, duplicate, delete confirm, bad multiplier)', async ({ page }) => {
       const app = await installApp(page, { role: 'superadmin', db: seed() });
       let nativeDialogs = 0;

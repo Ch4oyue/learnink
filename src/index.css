@@ -1,6 +1,25 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* HeroUI v3 - selective component styles only (full bundle is ~940 kB and
+   would blow the PWA precache budget + low-end device cost) */
+@import "@heroui/styles/base";
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/themes/default";
+@import "@heroui/styles/components/button.css";
+@import "@heroui/styles/components/input.css";
+@import "@heroui/styles/components/textfield.css";
+@import "@heroui/styles/components/card.css";
+@import "@heroui/styles/components/surface.css";
+@import "@heroui/styles/components/checkbox.css";
+@import "@heroui/styles/components/switch.css";
+@import "@heroui/styles/components/chip.css";
+@import "@heroui/styles/components/avatar.css";
+@import "@heroui/styles/components/separator.css";
+@import "@heroui/styles/components/spinner.css";
+@import "@heroui/styles/components/label.css";
+
+@config "../tailwind.config.ts";
 
 /* ======================================
    LEARNINK DESIGN SYSTEM - DARK MODE OPTIMIZED

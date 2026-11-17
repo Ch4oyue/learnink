@@ -97,7 +97,7 @@ export default function CourseDetail() {
                      <span className="text-muted-foreground">Course Progress</span>
                      <span className="font-bold">{courseProgress}%</span>
                    </div>
-                   <Progress value={courseProgress} className="h-2" />
+                   <Progress value={courseProgress} className="h-2" aria-label="Course progress" />
                 </div>
              ) : (
                 <Button

@@ -26,9 +26,9 @@ const Dialog = ({open,defaultOpen=false,onOpenChange,children}:DialogProps) => {
 // Existing callers open controlled dialogs from their own buttons. Keep asChild
 // compatibility for future semantic triggers without adding a nested button.
 const DialogTrigger = React.forwardRef<HTMLButtonElement,React.ButtonHTMLAttributes<HTMLButtonElement> & {asChild?:boolean}>(
-  ({asChild,onClick,...props},ref)=>{
+  ({asChild,type,onClick,...props},ref)=>{
     const {setOpen}=useDialog(); const Comp=asChild ? Slot : "button";
-    return <Comp {...props} ref={ref} onClick={(e)=>{onClick?.(e);if(!e.defaultPrevented)setOpen(true);}} />;
+    return <Comp {...props} ref={ref} type={asChild ? type : (type ?? "button")} onClick={(e)=>{onClick?.(e);if(!e.defaultPrevented)setOpen(true);}} />;
   },
 );
 DialogTrigger.displayName="DialogTrigger";

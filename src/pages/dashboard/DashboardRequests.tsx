@@ -311,7 +311,7 @@ export default function DashboardRequests() {
               </Card>
             ) : (
               <Card>
-                <Table>
+                <Table aria-label="Material requests">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Topic / Title</TableHead>

@@ -218,7 +218,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             <span className="font-mono font-medium">{formatTime(timeLeft)}</span>
           </div>
         </div>
-        <Progress value={progress} className="h-1.5" />
+        <Progress value={progress} className="h-1.5" aria-label="Quiz progress" />
         <p className="text-sm text-muted-foreground mt-2">
           Question {currentIndex + 1} of {questions.length}
         </p>

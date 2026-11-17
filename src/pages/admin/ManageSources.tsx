@@ -277,7 +277,7 @@ export default function ManageSources() {
                 {isLoading ? (
                     <TableSkeleton />
                 ) : (
-                    <Table>
+                    <Table aria-label="Learning sources">
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="hidden md:table-cell w-[60px]">Logo</TableHead>

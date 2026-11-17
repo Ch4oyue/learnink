@@ -32,12 +32,19 @@ export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonE
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, onClick, disabled, type = "button", children, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, onClick, disabled, type, children, ...props }, ref) => {
     if (asChild) {
+      // Slot merges onto a link/trigger, so `disabled` cannot be forwarded as an
+      // attribute: mirror native disabled semantics (out of tab order, no pointer
+      // activation) and announce the state instead.
       return (
         <Slot
-          className={buttonVariants({ variant, size, className })}
+          className={cn(buttonVariants({ variant, size, className }), disabled && "pointer-events-none opacity-50")}
           ref={ref}
+          aria-disabled={disabled || undefined}
+          data-disabled={disabled ? "true" : undefined}
+          tabIndex={disabled ? -1 : undefined}
+          type={type}
           onClick={onClick as React.MouseEventHandler<HTMLElement>}
           {...props}
         >
@@ -54,7 +61,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         size={SIZE[s]}
         isIconOnly={s === "icon"}
         isDisabled={disabled}
-        type={type}
+        type={type ?? "button"}
         className={cn(v === "link" && LINK_STYLE, className)}
         onClick={onClick as React.MouseEventHandler<HTMLButtonElement> | undefined}
         {...(props as object)}

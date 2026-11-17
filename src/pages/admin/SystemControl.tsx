@@ -500,7 +500,7 @@ export default function SystemControl() {
                 )}
               </ul>
             ) : (
-            <Table>
+            <Table aria-label="Label multipliers">
               <TableHeader>
                 <TableRow>
                   <TableHead>Label ID</TableHead>

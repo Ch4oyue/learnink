@@ -225,7 +225,7 @@ export function AdminDashboardContent() {
               </div>
             </div>
 
-            <Table>
+            <Table aria-label="Users">
               <TableHeader>
                 <TableRow>
                   <TableHead>User</TableHead>

@@ -92,7 +92,7 @@ export default function CourseDetail() {
                 <p className="text-lg text-muted-foreground">{track.description}</p>
              </div>
              {canAccess ? (
-                <div className="min-w-[200px] bg-card border border-border p-4 rounded-xl shadow-sm">
+                <div className="min-w-[200px] bg-card p-4 rounded-[24px] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]">
                    <div className="flex justify-between text-sm mb-2">
                      <span className="text-muted-foreground">Course Progress</span>
                      <span className="font-bold">{courseProgress}%</span>
@@ -120,7 +120,7 @@ export default function CourseDetail() {
            </div>
 
            {!canAccess && (
-              <div className="bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 p-4 rounded-xl mb-6 flex items-center gap-3">
+              <div className="bg-amber-500/10 text-amber-700 dark:text-amber-400 p-4 rounded-xl mb-6 flex items-center gap-3">
                  <Lock className="h-5 w-5" />
                  <p>You are not enrolled in this course. Please take the course to access the material.</p>
               </div>
@@ -136,8 +136,8 @@ export default function CourseDetail() {
                    <div
                      key={module.id}
                      className={`
-                       group relative bg-card border border-border rounded-xl p-6 shadow-sm transition-all
-                       ${isLocked ? 'opacity-70 grayscale-[0.5]' : 'hover:shadow-md hover:border-primary/30'}
+                       group relative bg-card rounded-[24px] p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] transition-all
+                       ${isLocked ? 'opacity-70 grayscale-[0.5]' : 'hover:shadow-md'}
                      `}
                    >
                      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
@@ -145,7 +145,7 @@ export default function CourseDetail() {
                         <div className="flex gap-4 flex-1">
                            <div className={`
                              h-12 w-12 shrink-0 rounded-xl flex items-center justify-center
-                             ${isCompleted ? 'bg-green-500/10 text-green-600' : 'bg-primary/10 text-primary'}
+                             ${isCompleted ? 'bg-primary text-primary-foreground' : 'bg-primary/10 text-primary'}
                            `}>
                               {isCompleted ? <CheckCircle2 className="h-6 w-6" /> : <Lightbulb className="h-6 w-6" />}
                            </div>
@@ -187,7 +187,7 @@ export default function CourseDetail() {
               })}
 
               {modules?.length === 0 && (
-                 <div className="text-center py-12 bg-muted/30 rounded-xl border border-dashed">
+                 <div className="text-center py-12 bg-secondary/50 rounded-[24px]">
                     <p className="text-muted-foreground">No modules in this course yet.</p>
                  </div>
               )}

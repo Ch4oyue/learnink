@@ -27,7 +27,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
 };
 
 export default function DashboardCourses() {
-  const { user, enrolledTrackIds } = useAuth();
+  const { user, enrolledTrackIds, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -54,6 +54,8 @@ export default function DashboardCourses() {
     }
     try {
         await enrollTrack.mutateAsync({ userId: user.id, trackId });
+        // enrolledTrackIds lives in AuthContext; without a refresh the course opens locked.
+        await refreshProfile();
         navigate(`/dashboard/course/${trackId}`);
     } catch (error) {
         // Error handled by hook toast
@@ -74,7 +76,7 @@ export default function DashboardCourses() {
         </div>
 
         {/* Search & Filter */}
-        <div className="bg-card border border-border rounded-xl p-6 shadow-soft space-y-4">
+        <div className="bg-card rounded-[24px] p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] space-y-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             <div className="relative max-w-md w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -114,14 +116,14 @@ export default function DashboardCourses() {
               return (
                 <div
                   key={track.id}
-                  className="bg-card border border-border rounded-xl p-6 shadow-soft hover:shadow-md transition-all duration-300 h-full flex flex-col"
+                  className="bg-card rounded-[24px] p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)] hover:shadow-md transition-shadow duration-300 h-full flex flex-col"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center">
                       <IconComponent className="h-6 w-6 text-primary" />
                     </div>
                     {isEnrolled && (
-                      <Badge className="bg-green-500/10 text-green-600 gap-1">
+                      <Badge className="bg-primary/10 text-primary gap-1">
                         <CheckCircle2 className="h-3 w-3" />
                         Enrolled
                       </Badge>
@@ -135,7 +137,7 @@ export default function DashboardCourses() {
                     {track.description}
                   </p>
 
-                  <div className="mt-auto pt-4 border-t border-border">
+                  <div className="mt-auto pt-4">
                     {isEnrolled ? (
                       <Button
                         className="w-full gap-2"
@@ -165,7 +167,7 @@ export default function DashboardCourses() {
             })}
           </div>
         ) : (
-          <div className="text-center py-16 bg-card border border-border rounded-xl">
+          <div className="text-center py-16 bg-card rounded-[24px] shadow-[0_1px_2px_rgba(0,0,0,0.04),0_8px_24px_-12px_rgba(0,0,0,0.12)]">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">No Courses Found</h3>
             <p className="text-muted-foreground">

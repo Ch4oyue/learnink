@@ -397,7 +397,7 @@ export default function DashboardRequests() {
               {activeTab === 'bug' && "Report a Bug"}
             </DialogTitle>
             <DialogDescription>
-              Fill in the details below. You can also paste a screenshot straight into the description field.
+              Describe the material you want to learn.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">

@@ -83,7 +83,10 @@ test('admin users table is served by the real get-users function; a learner is r
   await signIn(page, 'admin');
   await page.goto('/dashboard/users');
   await expect(page.getByRole('row')).toHaveCount(6, { timeout: 20000 }); // header + 5 seeded users
-  for (const name of ['Tutor', 'Learner', 'Other']) await expect(page.getByRole('row').filter({ hasText: name })).toHaveCount(1);
+  for (const name of ['Tutor', 'Learner', 'Other']) {
+    // Hidden native select options also contain role names; match the visible identity cell.
+    await expect(page.getByRole('row').filter({ has: page.getByRole('cell').first().getByText(name, { exact: true }) })).toHaveCount(1);
+  }
   await expect(page.getByText('Loading')).toHaveCount(0);
   const res = await fetch(`${API}/functions/v1/get-users?page=1&limit=10`, { headers: { Authorization: `Bearer ${tokenFor('learner')}` } });
   expect(res.status).toBe(403);

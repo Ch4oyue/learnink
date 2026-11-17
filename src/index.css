@@ -32,6 +32,7 @@
 @import "@heroui/styles/components/list-box.css" layer(components);
 @import "@heroui/styles/components/list-box-item.css" layer(components);
 @import "@heroui/styles/components/label.css" layer(components);
+@import "@heroui/styles/components/modal.css" layer(components);
 
 @config "../tailwind.config.ts";
 

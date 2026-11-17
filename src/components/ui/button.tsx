@@ -56,7 +56,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         isDisabled={disabled}
         type={type}
         className={cn(v === "link" && LINK_STYLE, className)}
-        onPress={onClick ? (e) => (onClick as (ev: unknown) => void)(e) : undefined}
+        onClick={onClick as React.MouseEventHandler<HTMLButtonElement> | undefined}
         {...(props as object)}
       >
         {children}

@@ -38,7 +38,10 @@ const GachaCompletionModal = lazy(() =>
   import("@/components/features/module/GachaCompletionModal").then((m) => ({ default: m.GachaCompletionModal }))
 );
 import { NotesPrintView } from "@/components/features/module/NotesPrintView";
-import { RefreshCcw, Gift } from "lucide-react";
+import { RefreshCcw, Gift, FileQuestion } from "lucide-react";
+import { useQuizzes } from "@/hooks/useQuiz";
+
+const ModuleQuizDialog = lazy(() => import("@/components/features/module/ModuleQuizDialog"));
 
 /**
  * ModuleLearn - Hybrid View with 4-Panel Layout
@@ -247,6 +250,9 @@ export default function ModuleLearn() {
   }, [handleSectionClick]);
 
   // Gacha Logic
+  const [showQuiz, setShowQuiz] = useState(false);
+  const { data: moduleQuizzes } = useQuizzes(moduleId);
+  const hasQuiz = (moduleQuizzes?.length ?? 0) > 0;
   const [showGacha, setShowGacha] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [xpEarned, setXpEarned] = useState<number | null>(null);
@@ -653,6 +659,12 @@ export default function ModuleLearn() {
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
+              {hasQuiz && (
+                <Button variant="outline" onClick={() => setShowQuiz(true)} aria-label="Take Quiz">
+                  <FileQuestion className="h-4 w-4 mr-2" />
+                  Quiz
+                </Button>
+              )}
               {!progress?.reward_claimed ? (
                 <Button
                   onClick={() => setShowGacha(true)}
@@ -700,6 +712,12 @@ export default function ModuleLearn() {
         notes={notes || []}
         moduleTitle={module.title}
       />
+
+      {showQuiz && moduleId && (
+        <Suspense fallback={null}>
+          <ModuleQuizDialog moduleId={moduleId} open={showQuiz} onOpenChange={setShowQuiz} />
+        </Suspense>
+      )}
 
       {modalMounted && (
         <Suspense fallback={null}>

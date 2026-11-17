@@ -30,9 +30,9 @@
    ====================================== */
 @layer base {
     :root {
-        /* Base colors - Light mode */
+        /* Base colors - Light mode (Apple HIG: white canvas, #1d1d1f label) */
         --background: 0 0% 100%;
-        --foreground: 240 10% 3.9%;
+        --foreground: 240 4% 12%;
 
         --card: 0 0% 100%;
         --card-foreground: 240 10% 3.9%;
@@ -40,17 +40,17 @@
         --popover: 0 0% 100%;
         --popover-foreground: 240 10% 3.9%;
 
-        --primary: 221.2 83.2% 53.3%;
-        --primary-foreground: 210 40% 98%;
+        --primary: 211 100% 50%;
+        --primary-foreground: 0 0% 100%;
 
-        --secondary: 240 4.8% 95.9%;
-        --secondary-foreground: 240 5.9% 10%;
+        --secondary: 240 11% 96%;
+        --secondary-foreground: 240 4% 12%;
 
-        --muted: 240 4.8% 95.9%;
-        --muted-foreground: 240 3.8% 46.1%;
+        --muted: 240 11% 96%;
+        --muted-foreground: 240 4% 45%;
 
-        --accent: 240 4.8% 95.9%;
-        --accent-foreground: 240 5.9% 10%;
+        --accent: 240 11% 96%;
+        --accent-foreground: 240 4% 12%;
 
         --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
@@ -63,42 +63,42 @@
         --info: 221 83% 45%;
         --info-foreground: 0 0% 100%;
 
-        --border: 240 5.9% 90%;
-        --input: 240 5.9% 90%;
-        --ring: 221.2 83.2% 53.3%;
+        --border: 240 6% 90%;
+        --input: 240 6% 90%;
+        --ring: 211 100% 50%;
 
-        --radius: 1rem;
+        --radius: 1.125rem;
 
         /* Sidebar - Light mode */
-        --sidebar: 220 14% 96%;
-        --sidebar-foreground: 240 5.9% 10%;
-        --sidebar-border: 240 5.9% 90%;
-        --sidebar-accent: 240 4.8% 95.9%;
-        --sidebar-accent-foreground: 240 5.9% 10%;
+        --sidebar: 240 11% 96%;
+        --sidebar-foreground: 240 4% 12%;
+        --sidebar-border: 240 6% 90%;
+        --sidebar-accent: 240 11% 94%;
+        --sidebar-accent-foreground: 240 4% 12%;
     }
 
     /* Dark mode colors */
     .dark {
-        --background: 240 10% 3.9%;
-        --foreground: 0 0% 95%;
+        --background: 0 0% 0%;
+        --foreground: 240 11% 96%;
 
-        --card: 240 10% 3.9%;
-        --card-foreground: 0 0% 95%;
+        --card: 240 3% 11%;
+        --card-foreground: 240 11% 96%;
 
-        --popover: 240 10% 3.9%;
-        --popover-foreground: 0 0% 95%;
+        --popover: 240 3% 11%;
+        --popover-foreground: 240 11% 96%;
 
-        --primary: 217.2 91.2% 59.8%;
-        --primary-foreground: 222.2 47.4% 11.2%;
+        --primary: 210 100% 52%;
+        --primary-foreground: 0 0% 100%;
 
-        --secondary: 240 3.7% 15.9%;
-        --secondary-foreground: 0 0% 98%;
+        --secondary: 240 3% 17%;
+        --secondary-foreground: 240 11% 96%;
 
-        --muted: 240 3.7% 15.9%;
+        --muted: 240 3% 17%;
         --muted-foreground: 240 5% 64.9%;
 
-        --accent: 240 3.7% 15.9%;
-        --accent-foreground: 0 0% 98%;
+        --accent: 240 3% 17%;
+        --accent-foreground: 240 11% 96%;
 
         --destructive: 0 62.8% 30.6%;
         --destructive-foreground: 0 85.7% 97.3%;
@@ -111,16 +111,16 @@
         --info: 213 94% 68%;
         --info-foreground: 240 10% 3.9%;
 
-        --border: 240 3.7% 15.9%;
-        --input: 240 3.7% 15.9%;
-        --ring: 224.3 76.3% 48%;
+        --border: 240 3% 20%;
+        --input: 240 3% 20%;
+        --ring: 210 100% 52%;
 
         /* Sidebar - Dark mode */
-        --sidebar: 220 13% 8%;
-        --sidebar-foreground: 0 0% 95%;
-        --sidebar-border: 240 3.7% 15.9%;
-        --sidebar-accent: 240 3.7% 15.9%;
-        --sidebar-accent-foreground: 0 0% 98%;
+        --sidebar: 0 0% 4%;
+        --sidebar-foreground: 240 11% 96%;
+        --sidebar-border: 240 3% 20%;
+        --sidebar-accent: 240 3% 17%;
+        --sidebar-accent-foreground: 240 11% 96%;
     }
 
     /* ======================================
@@ -210,6 +210,10 @@
         transition: background-color 0.3s ease, color 0.3s ease;
         min-height: 100dvh;
         -webkit-tap-highlight-color: transparent;
+    }
+
+    h1, h2, h3, h4 {
+        letter-spacing: -0.022em;
     }
 
     body {
@@ -354,24 +358,22 @@
    CUSTOM UTILITIES
    ====================================== */
     @layer utilities {
+        /* Apple-style soft, diffuse elevation - no colored glow */
         .shadow-glow {
             box-shadow:
-                0 0 20px -5px hsl(var(--primary) / 0.4),
-                0 0 40px -10px hsl(var(--primary) / 0.2);
+                0 12px 32px -12px rgba(0, 0, 0, 0.12),
+                0 2px 8px -4px rgba(0, 0, 0, 0.06);
         }
 
         .dark .shadow-glow {
             box-shadow:
-                0 0 30px -5px hsl(var(--primary) / 0.3),
-                0 0 60px -10px hsl(var(--primary) / 0.15);
+                0 12px 32px -12px rgba(0, 0, 0, 0.55),
+                0 2px 8px -4px rgba(0, 0, 0, 0.35);
         }
 
-        /* Gradient text helper */
+        /* Solid accent text (kept name for compatibility; gradients read as template slop) */
         .gradient-text {
-            background: linear-gradient(135deg, hsl(var(--primary)), hsl(217 91% 60%), hsl(192 91% 60%));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: hsl(var(--primary));
         }
 
         /* Glass effect */

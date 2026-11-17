@@ -50,7 +50,7 @@ const Table = React.forwardRef<
           aria-label={props["aria-label"] ?? "Data table"}
           className={cn("w-full caption-bottom text-sm", className)}
         >
-          <HeroTable.Header className="[&_tr]:border-b">
+          <HeroTable.Header className={cn("[&_tr]:border-b",header?.props.className)}>
             {columns.map((column, index) => (
               <HeroTable.Column
                 key={`column-${index}`}
@@ -72,7 +72,7 @@ const Table = React.forwardRef<
               </HeroTable.Column>
             ))}
           </HeroTable.Header>
-          <HeroTable.Body className="[&_tr:last-child]:border-0">
+          <HeroTable.Body className={cn("[&_tr:last-child]:border-0",body?.props.className)}>
             {rows.map((row, index) => {
               const cells = nodes(row.props.children);
               return (

@@ -177,7 +177,7 @@ export default function SystemControl() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Global Multiplier */}
-          <Card className="glass-liquid border-white/10">
+          <Card className="glass-liquid">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-green-500" />
@@ -207,7 +207,7 @@ export default function SystemControl() {
           </Card>
 
           {/* Maintenance Mode */}
-          <Card className="glass-liquid border-white/10">
+          <Card className="glass-liquid">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldAlert className="h-5 w-5 text-red-500" />
@@ -230,7 +230,7 @@ export default function SystemControl() {
           </Card>
 
           {/* APK Base Bonus */}
-          <Card className="glass-liquid border-white/10">
+          <Card className="glass-liquid">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Smartphone className="h-5 w-5 text-blue-500" />
@@ -260,7 +260,7 @@ export default function SystemControl() {
           </Card>
 
           {/* Broadcast Message */}
-          <Card className="glass-liquid border-white/10 md:col-span-1">
+          <Card className="glass-liquid md:col-span-1">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Megaphone className="h-5 w-5 text-amber-500" />
@@ -306,7 +306,7 @@ export default function SystemControl() {
         </div>
 
         {/* Security Audit Trail (Quick View) */}
-        <Card className="glass-liquid border-white/10">
+        <Card className="glass-liquid">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <History className="h-5 w-5 text-amber-500" />
@@ -369,7 +369,7 @@ export default function SystemControl() {
         </Card>
 
         {/* Label Configs Management */}
-        <Card className="glass-liquid border-white/10">
+        <Card className="glass-liquid">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">

@@ -438,7 +438,7 @@ export default function DashboardRequests() {
                     rows={4}
                   />
                   {uploading && (
-                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     </div>
                   )}

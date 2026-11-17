@@ -139,7 +139,7 @@ export function PremiumStore() {
           return (
             <Card key={offer.id} className={cn(
               "glass-liquid transition-all duration-300 relative overflow-hidden",
-              offer.popular && "border-primary shadow-glow scale-105 z-10"
+              offer.popular && "border-primary shadow-md scale-105 z-10"
             )}>
               {offer.popular && (
                 <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[13px] font-bold px-2 py-1 rounded-bl-lg">
@@ -147,7 +147,7 @@ export function PremiumStore() {
                 </div>
               )}
               <CardHeader>
-                <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center mb-2">
+                <div className="h-12 w-12 rounded-2xl bg-secondary/50 flex items-center justify-center mb-2">
                   <offer.icon className={cn("h-6 w-6", isStreak ? "text-orange-500" : "text-primary")} />
                 </div>
                 <CardTitle>{offer.label}</CardTitle>
@@ -184,7 +184,7 @@ export function PremiumStore() {
       <div className="pt-4">
         <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Elite Benefits</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-           <div className="p-4 rounded-2xl bg-white/5 flex gap-4">
+           <div className="p-4 rounded-2xl bg-secondary/50 flex gap-4">
              <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
                <Zap className="h-5 w-5 text-primary" />
              </div>
@@ -193,7 +193,7 @@ export function PremiumStore() {
                <p className="text-xs text-muted-foreground">Earn XP faster with the premium multiplier.</p>
              </div>
            </div>
-           <div className="p-4 rounded-2xl bg-white/5 flex gap-4">
+           <div className="p-4 rounded-2xl bg-secondary/50 flex gap-4">
              <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-500/10 flex items-center justify-center">
                <Crown className="h-5 w-5 text-amber-500" />
              </div>

@@ -102,7 +102,7 @@ export default function DashboardSettings() {
             <h1 className="text-2xl font-semibold">Settings</h1>
             <p className="text-muted-foreground">Manage your preferences</p>
           </div>
-          <Card className="glass-panel border-white/20 dark:border-white/5">
+          <Card className="">
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
               <CardDescription>Customize how LearnInk looks on your device</CardDescription>
@@ -113,7 +113,7 @@ export default function DashboardSettings() {
                   <button
                     key={option.value}
                     onClick={() => setTheme(option.value)}
-                    className={`flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all duration-300 ${theme === option.value ? "border-primary bg-primary/10 shadow-glow" : "border-white/10 hover:border-primary/30 hover:bg-white/5"}`}
+                    className={`flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all duration-300 ${theme === option.value ? "border-primary bg-primary/10 shadow-md" : "  hover:bg-secondary/60"}`}
                   >
                     <option.icon className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"}`} />
                     <div className="text-center">
@@ -125,10 +125,10 @@ export default function DashboardSettings() {
               </div>
 
               {/* Mobile Preferences - Only visible on mobile/tablet */}
-              <div className="mt-8 border-t border-white/10 pt-6 md:hidden">
+              <div className="mt-8 border-t pt-6 md:hidden">
                 <h3 className="text-base font-bold mb-1">Mobile Preferences</h3>
                 <p className="text-sm text-muted-foreground mb-4">Adjust settings for mobile experience</p>
-                <div className="flex items-center justify-between p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl border">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-primary/10 rounded-xl">
                       <Layers className="h-5 w-5 text-primary" />
@@ -145,11 +145,11 @@ export default function DashboardSettings() {
               </div>
 
               {/* Install PWA Section */}
-              <div className="mt-8 border-t border-white/10 pt-6">
+              <div className="mt-8 border-t pt-6">
                 <h3 className="text-base font-bold mb-1">Install Application</h3>
                 <p className="text-sm text-muted-foreground mb-4">Install LearnInk to your device for better experience.</p>
                 {isInstalled ? (
-                  <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3 rounded-xl border-white/10 bg-white/5">
+                  <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3 rounded-xl bg-secondary/50">
                     <CheckCircle2 className="h-5 w-5 text-green-500" />
                     <div className="flex flex-col items-start">
                       <span className="font-bold text-foreground">App Installed</span>
@@ -157,7 +157,7 @@ export default function DashboardSettings() {
                     </div>
                   </Button>
                 ) : deferredPrompt ? (
-                  <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3 rounded-xl glass-button-primary">
+                  <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3 rounded-xl">
                     <Download className="h-5 w-5" />
                     <div className="flex flex-col items-start">
                       <span className="font-bold">Install App</span>
@@ -165,7 +165,7 @@ export default function DashboardSettings() {
                     </div>
                   </Button>
                 ) : (
-                  <div className="bg-white/5 rounded-xl p-4 border border-dashed border-white/20">
+                  <div className="bg-secondary/50 rounded-xl p-4 border border-dashed">
                     <p className="text-sm text-muted-foreground text-center">
                       To install, use your browser's <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong> feature.
                     </p>
@@ -174,11 +174,11 @@ export default function DashboardSettings() {
               </div>
             </CardContent>
           </Card>
-          <Card className="glass-panel border-white/20 dark:border-white/5 mt-6">
+          <Card className="mt-6">
             <CardContent className="py-4">
               <a href="/changelog" className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors group">
                 <span className="font-medium group-hover:text-primary transition-colors">View Changelog & Version History</span>
-                <span className="text-xs bg-white/10 px-2 py-1 rounded-full">v1.8.0</span>
+                <span className="text-xs bg-secondary px-2 py-1 rounded-full">v1.8.0</span>
               </a>
             </CardContent>
           </Card>

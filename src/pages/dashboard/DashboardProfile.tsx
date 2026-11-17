@@ -201,7 +201,7 @@ export default function DashboardProfile() {
         {activeTab === "profile" && (
           <>
             {/* Glass Hero Profile Header */}
-            <div className="relative rounded-3xl overflow-hidden glass-panel border border-white/20 dark:border-white/5 shadow-2xl">
+            <div className="relative rounded-3xl overflow-hidden border shadow-2xl">
               {/* Background Gradient Blob */}
 
               <div className="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center md:items-start gap-8">
@@ -210,7 +210,7 @@ export default function DashboardProfile() {
                   <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <Avatar
                     isPremium={profile?.is_premium}
-                    className="h-40 w-40 border-4 border-white/50 dark:border-white/10 shadow-xl ring-4 ring-white/20 dark:ring-black/20 backdrop-blur-md"
+                    className="h-40 w-40 border-4 shadow-xl ring-4 ring-white/20 dark:ring-black/20 backdrop-blur-md"
                   >
                     <AvatarImage src={profile?.avatar_url || undefined} alt={userName} className="object-cover" />
                     <AvatarFallback className="text-5xl font-extrabold bg-primary/10 text-primary">
@@ -220,7 +220,7 @@ export default function DashboardProfile() {
 
                   {/* Glass Streak Badge */}
                   <div
-                    className="absolute -bottom-2 -right-2 flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-lg z-20 transition-transform hover:scale-105"
+                    className="absolute -bottom-2 -right-2 flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-md border shadow-lg z-20 transition-transform hover:scale-105"
                     title={`${streak}-Day Streak!`}
                   >
                     <Flame className="h-6 w-6 text-orange-500 fill-orange-500 animate-pulse-slow" />
@@ -231,7 +231,7 @@ export default function DashboardProfile() {
 
                   {/* Glass Camera Button */}
                   <button
-                    className="absolute top-2 right-2 h-10 w-10 rounded-full bg-white/20 dark:bg-black/40 backdrop-blur-md flex items-center justify-center text-foreground hover:bg-primary hover:text-white transition-all border border-white/20 shadow-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300"
+                    className="absolute top-2 right-2 h-10 w-10 rounded-full bg-white/20 dark:bg-black/40 backdrop-blur-md flex items-center justify-center text-foreground hover:bg-primary hover:text-white transition-all border shadow-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300"
                     aria-label="Change Avatar"
                   >
                     <Camera className="h-5 w-5" />
@@ -246,11 +246,11 @@ export default function DashboardProfile() {
                     </h1>
                     <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
                       {role === 'superadmin' ? (
-                        <Badge variant="outline" className="glass-button border-amber-500/30 text-amber-600 dark:text-amber-400">
+                        <Badge variant="outline" className="border-amber-500/30 text-amber-600 dark:text-amber-400">
                           <Crown className="h-3 w-3 mr-1" /> Super Admin
                         </Badge>
                       ) : role ? (
-                        <Badge variant="outline" className="glass-button border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                        <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
                           <CheckCircle className="h-3 w-3 mr-1" /> {roleLabels[role] || "Member"}
                         </Badge>
                       ) : null}
@@ -259,7 +259,7 @@ export default function DashboardProfile() {
 
                   {/* Action Buttons */}
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
-                    <Button onClick={() => setIsEditing(true)} className="glass-button-primary h-12 px-8 rounded-2xl shadow-lg hover:shadow-primary/20">
+                    <Button onClick={() => setIsEditing(true)} className="h-12 px-8 rounded-2xl shadow-lg hover:shadow-primary/20">
                       <Edit className="h-4 w-4 mr-2" /> Edit Profile
                     </Button>
                     <Button variant="ghost" onClick={handleSignOut} className="h-12 px-6 rounded-2xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive-text transition-colors">
@@ -703,7 +703,7 @@ export default function DashboardProfile() {
                       className={`flex flex-col items-center gap-2 group ${!contrib.url && "cursor-default"}`}
                     >
                       <div className="relative">
-                        <Avatar className="h-14 w-14 border-2 border-background shadow-sm group-hover:scale-110 transition-transform duration-200 group-hover:shadow-glow">
+                        <Avatar className="h-14 w-14 border-2 border-background shadow-sm group-hover:scale-110 transition-transform duration-200 group-hover:shadow-md">
                           <AvatarImage src={contrib.image} alt={contrib.name} className="object-cover" />
                           <AvatarFallback className={`${contrib.color} text-white font-bold`}>
                             {contrib.initial}

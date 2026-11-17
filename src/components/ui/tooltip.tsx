@@ -1,28 +1,13 @@
 import * as React from "react";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-
-import { cn } from "@/lib/utils";
-
-const TooltipProvider = TooltipPrimitive.Provider;
-
-const Tooltip = TooltipPrimitive.Root;
-
-const TooltipTrigger = TooltipPrimitive.Trigger;
-
-const TooltipContent = React.forwardRef<
-  React.ElementRef<typeof TooltipPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof TooltipPrimitive.Content>
->(({ className, sideOffset = 4, ...props }, ref) => (
-  <TooltipPrimitive.Content
-    ref={ref}
-    sideOffset={sideOffset}
-    className={cn(
-      "z-50 overflow-hidden rounded-md border bg-popover px-3 py-1.5 text-sm text-popover-foreground shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-      className,
-    )}
-    {...props}
-  />
-));
-TooltipContent.displayName = TooltipPrimitive.Content.displayName;
-
-export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider };
+import {Tooltip as HeroTooltip} from "@heroui/react";
+import {Slot} from "@radix-ui/react-slot";
+import {cn} from "@/lib/utils";
+const DelayContext=React.createContext(500);
+function TooltipProvider({children,delayDuration=500}:{children:React.ReactNode;delayDuration?:number}){return <DelayContext.Provider value={delayDuration}>{children}</DelayContext.Provider>;}
+type Props=Omit<React.ComponentProps<typeof HeroTooltip>,"isOpen"|"defaultOpen"> & {open?:boolean;defaultOpen?:boolean;onOpenChange?:(open:boolean)=>void;delayDuration?:number};
+function Tooltip({open,defaultOpen,delayDuration,...props}:Props){const delay=React.useContext(DelayContext);return <HeroTooltip {...props} delay={delayDuration??delay} isOpen={open} defaultOpen={defaultOpen}/>;}
+function TooltipTrigger({asChild,children,...props}:React.HTMLAttributes<HTMLDivElement>&{asChild?:boolean}){return <HeroTooltip.Trigger {...props} render={asChild?p=><Slot {...p}>{children}</Slot>:undefined}>{asChild?undefined:children}</HeroTooltip.Trigger>;}
+type ContentProps=Omit<React.ComponentPropsWithoutRef<typeof HeroTooltip.Content>,"placement"> & {side?:"top"|"bottom"|"left"|"right";sideOffset?:number;align?:"start"|"center"|"end"};
+const TooltipContent=React.forwardRef<HTMLDivElement,ContentProps>(({className,side="top",sideOffset=4,align="center",...props},ref)=><HeroTooltip.Content {...props} ref={ref} placement={align==="center"?side:side==="left"||side==="right"?`${side} ${align==="start"?"top":"bottom"}`:`${side} ${align}`} offset={sideOffset} className={cn("z-50 max-w-72 rounded-lg border border-border bg-popover px-3 py-2 text-sm text-popover-foreground shadow-md",className)}/>);
+TooltipContent.displayName="TooltipContent";
+export {Tooltip,TooltipTrigger,TooltipContent,TooltipProvider};

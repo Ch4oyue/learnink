@@ -12,6 +12,8 @@ export interface AppOptions {
   role?: 'user' | 'tutor' | 'admin' | 'superadmin';
   db?: Db;
   rpc?: Record<string, unknown>;
+  /** Edge function stand-ins keyed by function name (query string stripped). */
+  functions?: Record<string, (req: { query: URLSearchParams; body: unknown }) => unknown>;
 }
 
 export interface AppHandle {
@@ -74,6 +76,14 @@ export async function installApp(page: Page, opts: AppOptions = {}): Promise<App
     const url = new URL(req.url());
     const json = (body: unknown, status = 200, headers: Record<string, string> = {}) =>
       route.fulfill({ status, contentType: 'application/json', body: JSON.stringify(body), headers });
+    if (url.pathname.startsWith('/functions/v1/')) {
+      const name = url.pathname.replace('/functions/v1/', '');
+      writes.push(`FUNCTION ${name}${req.method() === 'GET' ? '' : ' ' + (req.postData() ?? '')}`);
+      const fn = opts.functions?.[name];
+      let body: unknown = null;
+      try { body = JSON.parse(req.postData() ?? 'null'); } catch { /* empty */ }
+      return fn ? json(fn({ query: url.searchParams, body })) : json({ error: `no stand-in for ${name}` }, 404);
+    }
     if (!url.pathname.startsWith('/rest/v1/')) return json({});
     const path = url.pathname.replace('/rest/v1/', '');
     if (path.startsWith('rpc/')) return json(opts.rpc?.[path.slice(4)] ?? 0);

@@ -41,6 +41,8 @@ const DashboardModules = lazy(() => import("./pages/dashboard/DashboardModules")
 const DashboardNotifications = lazy(() => import("./pages/dashboard/DashboardNotifications"));
 const DashboardRequests = lazy(() => import("./pages/dashboard/DashboardRequests"));
 const CourseDetail = lazy(() => import("./pages/dashboard/CourseDetail"));
+const ModuleCreate = lazy(() => import("./pages/learning/ModuleCreate"));
+const ModuleEdit = lazy(() => import("./pages/learning/ModuleEdit"));
 const DashboardAchievements = lazy(() => import("./pages/dashboard/DashboardAchievements"));
 const SecondBrain = lazy(() => import("./pages/dashboard/SecondBrain"));
 const DashboardAnalytics = lazy(() => import("./pages/dashboard/DashboardAnalytics"));
@@ -129,6 +131,14 @@ const SmartLanding = () => {
 // ============================================
 // MODULE REDIRECT (Legacy /module/:id -> /learn/:id)
 // ============================================
+
+// Authoring pages are for tutors and admins; learners are sent back to the dashboard.
+// Writes are still enforced server-side, this only keeps the UI from opening an editor that cannot save.
+const TutorOnly = ({ children }: { children: React.ReactNode }) => {
+  const { isTutor, loading, role } = useAuth();
+  if (loading || role === null) return null;
+  return isTutor ? <>{children}</> : <Navigate to="/dashboard" replace />;
+};
 
 const ModuleRedirect = () => {
   const { moduleId } = useParams();
@@ -263,6 +273,26 @@ const App = () => (
                         element={
                           <ProtectedRoute>
                             <DashboardModules />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard/modules/create"
+                        element={
+                          <ProtectedRoute>
+                            <TutorOnly>
+                              <ModuleCreate />
+                            </TutorOnly>
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/dashboard/modules/edit/:id"
+                        element={
+                          <ProtectedRoute>
+                            <TutorOnly>
+                              <ModuleEdit />
+                            </TutorOnly>
                           </ProtectedRoute>
                         }
                       />

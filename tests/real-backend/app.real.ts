@@ -74,6 +74,7 @@ for (const [name, size] of [['desktop', { width: 1280, height: 900 }], ['mobile'
   await dialog.getByRole('button', { name: 'Finish' }).click();
   await expect(dialog.getByText('0%', { exact: true }).first()).toBeVisible({ timeout: 20000 });
   await expect(page.getByText('Something Went Wrong')).toHaveCount(0);
+  await expect(page.getByText('Try Again')).toHaveCount(0);
   const attempts = await rest(`user_quiz_attempts?user_id=eq.${L}&select=score,passed`);
   expect(attempts.body).toEqual([{ score: 0, passed: false }]);
 });

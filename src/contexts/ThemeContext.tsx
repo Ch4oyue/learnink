@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "system" | "light" | "dark";
+import {resolveTheme,type Theme} from "@/lib/themeResolution";
 
 interface ThemeContextType {
     theme: Theme;
@@ -9,11 +9,6 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-/** Resolve a theme choice to a concrete palette without reading the DOM. */
-export function resolveTheme(value: Theme, prefersDark: boolean): "light" | "dark" {
-    return value === "dark" || (value === "system" && prefersDark) ? "dark" : "light";
-}
 
 const prefersDark = () =>
     typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;

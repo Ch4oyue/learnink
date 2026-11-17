@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { resolveTheme } from "@/contexts/ThemeContext";
+import { resolveTheme } from "@/lib/themeResolution";
 
 describe("resolveTheme", () => {
   test("uses the stored dark choice on the first render", () => {

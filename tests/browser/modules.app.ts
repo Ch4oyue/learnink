@@ -55,6 +55,27 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect(page.getByText('Draft Module', { exact: true })).toHaveCount(0);
     });
 
+    test('editor: empty title is rejected, valid create writes a module, edit saves changes', async ({ page }) => {
+      const app = await installApp(page, { role: 'tutor', db: { ...seed(), user_roles: [{ user_id: USER_ID, role: 'tutor' }] } });
+      await page.goto('/dashboard/modules/create');
+      await page.getByRole('button', { name: 'Save' }).click();
+      await expect(page.getByText('Module title is required')).toBeVisible();
+      expect(app.writes.filter((w) => w.startsWith('POST modules'))).toHaveLength(0);
+      await page.getByPlaceholder('Enter module title...').fill('Flexbox Basics');
+      await page.getByRole('button', { name: 'Save' }).click();
+      await expect(page).toHaveURL(/\/dashboard\/modules$/);
+      expect(app.db.modules.find((m) => m.title === 'Flexbox Basics')).toMatchObject({ created_by: USER_ID, is_published: false });
+
+      await page.goto('/dashboard/modules/edit/m1');
+      const title = page.getByPlaceholder('Enter module title...');
+      await expect(title).toHaveValue('CSS Layout');
+      await title.fill('CSS Layout v2');
+      await page.getByRole('button', { name: 'Save' }).click();
+      await expect(page).toHaveURL(/\/dashboard\/modules$/);
+      expect(app.writes.some((w) => w.startsWith('PATCH modules') && w.includes('id=eq.m1'))).toBe(true);
+      expect(app.db.modules.find((m) => m.id === 'm1')).toMatchObject({ title: 'CSS Layout v2' });
+    });
+
     test('authoring routes send a learner back to the dashboard', async ({ page }) => {
       await installApp(page, { role: 'user', db: seed() });
       await page.goto('/dashboard/modules/create');

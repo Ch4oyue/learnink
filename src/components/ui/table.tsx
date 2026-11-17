@@ -1,72 +1,107 @@
 import * as React from "react";
-
+import { Table as HeroTable } from "@heroui/react";
 import { cn } from "@/lib/utils";
-
-const Table = React.forwardRef<HTMLTableElement, React.HTMLAttributes<HTMLTableElement>>(
-  ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
-      <table ref={ref} className={cn("w-full caption-bottom text-sm", className)} {...props} />
-    </div>
-  ),
-);
+type NodeProps = React.HTMLAttributes<HTMLElement> & {
+  children?: React.ReactNode;
+  colSpan?: number;
+};
+function nodes(children: React.ReactNode): React.ReactElement<NodeProps>[] {
+  return React.Children.toArray(children).flatMap((child) =>
+    React.isValidElement<NodeProps>(child)
+      ? child.type === React.Fragment
+        ? nodes(child.props.children)
+        : [child]
+      : [],
+  );
+}
+// These compatibility markers are consumed by Table and converted into the HeroUI collection.
+function TableHeader({ children }: NodeProps) {
+  return <>{children}</>;
+}
+function TableBody({ children }: NodeProps) {
+  return <>{children}</>;
+}
+function TableRow({ children }: NodeProps) {
+  return <>{children}</>;
+}
+function TableHead({ children }: NodeProps) {
+  return <>{children}</>;
+}
+function TableCell({ children }: NodeProps) {
+  return <>{children}</>;
+}
+const Table = React.forwardRef<
+  HTMLTableElement,
+  React.HTMLAttributes<HTMLTableElement>
+>(({ className, children, ...props }, ref) => {
+  const parts = nodes(children);
+  const header = parts.find((p) => p.type === TableHeader);
+  const body = parts.find((p) => p.type === TableBody);
+  const columns = nodes(header?.props.children).flatMap((p) =>
+    p.type === TableRow ? nodes(p.props.children) : [p],
+  );
+  const rows = nodes(body?.props.children);
+  return (
+    <HeroTable className="relative w-full overflow-hidden" variant="secondary">
+      <HeroTable.ScrollContainer className="w-full overflow-auto">
+        <HeroTable.Content
+          {...props}
+          ref={ref}
+          aria-label={props["aria-label"] ?? "Data table"}
+          className={cn("w-full caption-bottom text-sm", className)}
+        >
+          <HeroTable.Header className="[&_tr]:border-b">
+            {columns.map((column, index) => (
+              <HeroTable.Column
+                key={`column-${index}`}
+                id={`column-${index}`}
+                isRowHeader={index === 0}
+                aria-label={
+                  typeof column.props.children === "string"
+                    ? column.props.children
+                    : index === columns.length - 1
+                      ? "Actions"
+                      : `Column ${index + 1}`
+                }
+                className={cn(
+                  "h-12 px-4 text-left align-middle font-medium text-muted-foreground",
+                  column.props.className,
+                )}
+              >
+                {column.props.children ?? " "}
+              </HeroTable.Column>
+            ))}
+          </HeroTable.Header>
+          <HeroTable.Body className="[&_tr:last-child]:border-0">
+            {rows.map((row, index) => {
+              const cells = nodes(row.props.children);
+              return (
+                <HeroTable.Row
+                  key={row.key ?? `row-${index}`}
+                  id={String(row.key ?? `row-${index}`)}
+                  className={cn(
+                    "border-b transition-colors hover:bg-muted/50",
+                    row.props.className,
+                  )}
+                >
+                  {cells.map((cell, cellIndex) => (
+                    <HeroTable.Cell
+                      key={`cell-${cellIndex}`}
+                      focusMode="child"
+                      colSpan={cell.props.colSpan}
+                      className={cn("p-4 align-middle", cell.props.className)}
+                    >
+                      {cell.props.children ?? null}
+                    </HeroTable.Cell>
+                  ))}
+                </HeroTable.Row>
+              );
+            })}
+          </HeroTable.Body>
+        </HeroTable.Content>
+      </HeroTable.ScrollContainer>
+    </HeroTable>
+  );
+});
 Table.displayName = "Table";
-
-const TableHeader = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />,
-);
-TableHeader.displayName = "TableHeader";
-
-const TableBody = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => (
-    <tbody ref={ref} className={cn("[&_tr:last-child]:border-0", className)} {...props} />
-  ),
-);
-TableBody.displayName = "TableBody";
-
-const TableFooter = React.forwardRef<HTMLTableSectionElement, React.HTMLAttributes<HTMLTableSectionElement>>(
-  ({ className, ...props }, ref) => (
-    <tfoot ref={ref} className={cn("border-t bg-muted/50 font-medium [&>tr]:last:border-b-0", className)} {...props} />
-  ),
-);
-TableFooter.displayName = "TableFooter";
-
-const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
-  ({ className, ...props }, ref) => (
-    <tr
-      ref={ref}
-      className={cn("border-b transition-colors data-[state=selected]:bg-muted hover:bg-muted/50", className)}
-      {...props}
-    />
-  ),
-);
-TableRow.displayName = "TableRow";
-
-const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => (
-    <th
-      ref={ref}
-      className={cn(
-        "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
-        className,
-      )}
-      {...props}
-    />
-  ),
-);
-TableHead.displayName = "TableHead";
-
-const TableCell = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
-  ({ className, ...props }, ref) => (
-    <td ref={ref} className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)} {...props} />
-  ),
-);
-TableCell.displayName = "TableCell";
-
-const TableCaption = React.forwardRef<HTMLTableCaptionElement, React.HTMLAttributes<HTMLTableCaptionElement>>(
-  ({ className, ...props }, ref) => (
-    <caption ref={ref} className={cn("mt-4 text-sm text-muted-foreground", className)} {...props} />
-  ),
-);
-TableCaption.displayName = "TableCaption";
-
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell };

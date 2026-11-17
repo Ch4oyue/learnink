@@ -2,11 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Disclosure } from "@heroui/react";
 import {
     Table,
     TableBody,
@@ -80,8 +76,8 @@ function CollapsibleSection({ title, count, items, icon, type, defaultOpen = fal
     }
 
     return (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-            <CollapsibleTrigger
+        <Disclosure isExpanded={isOpen} onExpandedChange={setIsOpen}>
+            <Disclosure.Trigger
                 className={cn(
                     "flex items-center justify-between w-full py-2.5 px-4 rounded-xl transition-all duration-200 group",
                     styles.bg,
@@ -109,10 +105,10 @@ function CollapsibleSection({ title, count, items, icon, type, defaultOpen = fal
                         isOpen ? "rotate-180" : ""
                     )}
                 />
-            </CollapsibleTrigger>
+            </Disclosure.Trigger>
             <AnimatePresence>
                 {isOpen && (
-                    <CollapsibleContent forceMount asChild>
+                    <Disclosure.Content>
                         <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
@@ -144,10 +140,10 @@ function CollapsibleSection({ title, count, items, icon, type, defaultOpen = fal
                                 ))}
                             </ul>
                         </motion.div>
-                    </CollapsibleContent>
+                    </Disclosure.Content>
                 )}
             </AnimatePresence>
-        </Collapsible>
+        </Disclosure>
     );
 }
 

@@ -14,7 +14,7 @@ for(const [size,viewport] of [['desktop',{width:1440,height:900}],['mobile',{wid
     const box=await dialog.boundingBox();expect(box&&box.x>=0&&box.x+box.width<=viewport.width).toBe(true);
     await page.waitForTimeout(350);
     await page.screenshot({path:`/downloads/overlay-popover-${size}-${theme}.png`});
-    await page.keyboard.press('Escape');await expect(dialog).toHaveCount(0);await expect(trigger).toBeFocused();
+    await page.keyboard.press('Escape');await expect(dialog).toHaveCount(0);await expect(trigger).toBeFocused();await page.waitForTimeout(350);await expect(trigger).toBeFocused();
     await trigger.click();await dialog.getByRole('button',{name:/Request approved/}).click();
     await expect.poll(()=>app.db.notifications[0].is_read).toBe(true);
     await page.mouse.click(5,viewport.height-5);await expect(dialog).toHaveCount(0);
@@ -25,7 +25,7 @@ for(const [size,viewport] of [['desktop',{width:1440,height:900}],['mobile',{wid
     await trigger.focus();await trigger.press('ArrowDown');const menu=page.getByRole('menu');await expect(menu).toBeVisible();
     await expect(page.getByRole('menuitem',{name:'View'})).toBeFocused();
     await page.screenshot({path:`/downloads/overlay-menu-${size}-${theme}.png`,animations:'disabled'});
-    await page.keyboard.press('Escape');await expect(menu).toHaveCount(0);await expect(trigger).toBeFocused();
+    await page.keyboard.press('Escape');await expect(menu).toHaveCount(0);await expect(trigger).toBeFocused();await page.waitForTimeout(350);await expect(trigger).toBeFocused();
     await trigger.click();await page.getByRole('menuitem',{name:'Edit'}).click();await expect(page).toHaveURL(/\/dashboard\/modules\/edit\/m1$/);
    });
    if(size==='desktop')test('account menu preserves router links and tooltip focus is accessible',async({page})=>{

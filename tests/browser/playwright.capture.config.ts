@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 export default defineConfig({
   testDir: '.',
   testMatch: '**/*.capture.ts',
-  fullyParallel: false,
+  fullyParallel: true,
   timeout: 60_000,
   use: { baseURL: 'http://127.0.0.1:4176', headless: true },
   webServer: {

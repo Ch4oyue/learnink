@@ -93,7 +93,8 @@ export default function DashboardNotifications() {
     if (notification.related_module_id) {
       navigate(`/module/${notification.related_module_id}`);
     } else if (notification.related_request_id) {
-      navigate(`/request/${notification.related_request_id}`);
+      // No per-request route exists; the requests list is the destination.
+      navigate("/dashboard/requests");
     }
   };
 

@@ -337,10 +337,10 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
 
           {/* Right Column - Content Editor */}
           <Card className="lg:col-span-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-lg">Module Content</CardTitle>
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
                   <TabsList className="grid grid-cols-2 w-[200px]">
                     <TabsTrigger value="edit">Edit</TabsTrigger>
                     <TabsTrigger value="preview" className="gap-1">
@@ -348,11 +348,9 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                       Preview
                     </TabsTrigger>
                   </TabsList>
-                </Tabs>
               </div>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsContent value="edit" className="mt-0">
                   <FormField
                     control={control}
@@ -388,8 +386,8 @@ print('Hello World')
                   {/* Isolated Content Preview */}
                   <ModuleContentPreview control={control} />
                 </TabsContent>
-              </Tabs>
             </CardContent>
+            </Tabs>
           </Card>
         </div>
       </form>

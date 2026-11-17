@@ -79,9 +79,9 @@ export default function DashboardSettings() {
 
   // Theme options
   const themeOptions = [
-    { value: "light" as const, label: "Light", icon: Sun, description: "Light background with dark text" },
-    { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background with light text" },
-    { value: "system" as const, label: "System", icon: Monitor, description: "Follows your device settings" },
+    { value: "light" as const, label: "Light", icon: Sun },
+    { value: "dark" as const, label: "Dark", icon: Moon },
+    { value: "system" as const, label: "System", icon: Monitor },
   ];
 
   // Mobile Preferences State (Moved from BottomNavigation logic if needed, but handled here via localStorage)
@@ -105,7 +105,6 @@ export default function DashboardSettings() {
           <Card className="">
             <CardHeader>
               <CardTitle>Appearance</CardTitle>
-              <CardDescription>Customize how LearnInk looks on your device</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -118,7 +117,6 @@ export default function DashboardSettings() {
                     <option.icon className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"}`} />
                     <div className="text-center">
                       <span className={`text-sm font-bold block ${theme === option.value ? "text-primary" : "text-foreground"}`}>{option.label}</span>
-                      <span className="text-xs text-muted-foreground mt-1 block">{option.description}</span>
                     </div>
                   </button>
                 ))}

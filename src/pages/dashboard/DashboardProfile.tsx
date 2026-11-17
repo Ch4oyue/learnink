@@ -551,16 +551,13 @@ export default function DashboardProfile() {
             <Card>
               <CardHeader>
                 <CardTitle>Appearance</CardTitle>
-                <CardDescription>
-                  Customize how LearnInk looks on your device
-                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   {[
-                    { value: "light" as const, label: "Light", icon: Sun, description: "Light background" },
-                    { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background" },
-                    { value: "system" as const, label: "System", icon: Monitor, description: "Match device" },
+                    { value: "light" as const, label: "Light", icon: Sun },
+                    { value: "dark" as const, label: "Dark", icon: Moon },
+                    { value: "system" as const, label: "System", icon: Monitor },
                   ].map((option) => (
                     <button
                       key={option.value}
@@ -580,9 +577,6 @@ export default function DashboardProfile() {
                             }`}
                         >
                           {option.label}
-                        </span>
-                        <span className="text-xs text-muted-foreground mt-1 block">
-                          {option.description}
                         </span>
                       </div>
                     </button>

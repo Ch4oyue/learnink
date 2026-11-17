@@ -243,7 +243,7 @@ export default function Syllabus() {
                         Modules for "{path.title}" are coming soon
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Add modules with the categories: {path.categories.join(", ")}
+                        Topics planned: {path.categories.join(", ")}
                       </p>
                     </div>
                   ) : (

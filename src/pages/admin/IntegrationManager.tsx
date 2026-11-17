@@ -393,6 +393,7 @@ export default function IntegrationManager() {
                                                 </CardDescription>
                                             </div>
                                             <Switch
+                                                aria-label={`${integration.name} active`}
                                                 checked={integration.is_active}
                                                 onCheckedChange={(checked) =>
                                                     toggleActiveMutation.mutate({

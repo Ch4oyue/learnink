@@ -21,7 +21,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect(page.getByText('Nightly Import').first()).toBeVisible();
       await expect(page.getByText('Notion Sync').first()).toBeVisible();
 
-      await page.getByRole('switch').nth(1).click();
+      await page.getByRole('switch').nth(1).press('Space');
       await expect.poll(() => app.db.integrations.find((i) => i.id === 'i2')?.is_active).toBe(true);
 
       await page.getByRole('button', { name: 'Add Integration' }).first().click();

@@ -298,6 +298,7 @@ export default function SystemControl() {
                 <p className="text-sm text-muted-foreground">Enable during major updates.</p>
               </div>
               <Switch
+                aria-label="Maintenance mode"
                 checked={getSetting("maintenance_mode")?.value === "true" || getSetting("maintenance_mode")?.value === true}
                 onCheckedChange={(checked) => updateSetting.mutate({ key: "maintenance_mode", value: checked.toString() })}
               />
@@ -352,6 +353,7 @@ export default function SystemControl() {
               <div className="flex items-center justify-between mb-2">
                 <Label>Enable Announcement</Label>
                 <Switch
+                  aria-label="Enable announcement"
                   checked={broadcast.active}
                   onCheckedChange={(checked) => setBroadcast({ ...broadcast, active: checked })}
                 />

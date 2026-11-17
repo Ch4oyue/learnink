@@ -186,6 +186,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 <FormItem className="flex items-center gap-2 space-y-0">
                   <FormControl>
                     <Switch
+                      aria-label="Published"
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />

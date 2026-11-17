@@ -20,7 +20,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect(page.getByText('Coursera')).toHaveCount(0);
       await page.getByPlaceholder('Search sources...').fill('');
 
-      await page.getByRole('row').filter({ hasText: 'Udemy' }).getByRole('switch').click();
+      await page.getByRole('row').filter({ hasText: 'Udemy' }).getByRole('switch').press('Space');
       await expect.poll(() => app.db.learning_sources.find((s) => s.id === 's2')?.is_active).toBe(true);
 
       await page.getByRole('button', { name: /Add Source|Add/ }).first().click();

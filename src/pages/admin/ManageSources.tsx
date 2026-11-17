@@ -331,6 +331,7 @@ export default function ManageSources() {
                                         </TableCell>
                                         <TableCell>
                                             <Switch
+                                                aria-label={`${source.name} active`}
                                                 checked={source.is_active}
                                                 onCheckedChange={() => handleToggleActive(source)}
                                                 disabled={toggleActiveMutation.isPending}

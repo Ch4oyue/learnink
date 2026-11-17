@@ -23,7 +23,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await xp.fill('2.5');
       await page.getByRole('button', { name: 'Save' }).first().click();
       await expect.poll(() => app.db.system_settings.find((s) => s.key === 'global_xp_multiplier')?.value).toBe('2.5');
-      await page.getByRole('switch').first().click();
+      await page.getByRole('switch').first().press('Space');
       await expect.poll(() => app.db.system_settings.find((s) => s.key === 'maintenance_mode')?.value).toBe('true');
     });
 
@@ -109,7 +109,7 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await desc.fill('Closed beta');
       await desc.blur();
       await expect.poll(() => app.db.label_configs.find((l) => l.id === 'beta-tester')?.description).toBe('Closed beta');
-      await page.getByRole('switch', { name: 'Label beta-tester active' }).click();
+      await page.getByRole('switch', { name: 'Label beta-tester active' }).press('Space');
       await expect.poll(() => app.db.label_configs.find((l) => l.id === 'beta-tester')?.is_active).toBe(false);
     });
   });

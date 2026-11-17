@@ -54,7 +54,7 @@ export function GachaCompletionModal({
           {isSuccess ? (
             <>
               <div className="text-muted-foreground text-sm font-medium uppercase tracking-wider">XP Gained</div>
-              <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 flex items-center gap-2 animate-in zoom-in duration-300">
+              <div className="text-5xl font-black text-foreground flex items-center gap-2 animate-in zoom-in duration-300">
                 <Sparkles className="h-8 w-8 text-yellow-400 animate-spin-slow" />
                 {xpEarned} XP
               </div>

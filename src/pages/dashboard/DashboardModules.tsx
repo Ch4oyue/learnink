@@ -331,12 +331,10 @@ export default function DashboardModules() {
                   return (
                     <Link to={`/module/${module.id}`} key={module.id} className="group">
                       <Card className="glass-panel border-white/10 dark:border-white/5 h-full transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-glow group-hover:bg-white/10 dark:group-hover:bg-white/5 overflow-hidden relative">
-                        {/* Hover Gradient Effect */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
                         <CardContent className="p-6 relative z-10">
                           <div className="flex items-start justify-between mb-4">
-                            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center border border-white/10 shadow-sm group-hover:shadow-md transition-shadow">
+                            <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center border border-white/10 shadow-sm group-hover:shadow-md transition-shadow">
                               <BookOpen className="h-6 w-6 text-primary" />
                             </div>
                             {moduleProgress?.is_completed ? (

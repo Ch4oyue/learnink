@@ -185,7 +185,7 @@ export default function Changelog() {
                             </div>
                         </div>
                         <Badge
-                            className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground border-0 shadow-md shadow-primary/20"
+                            className="bg-primary text-primary-foreground border-0"
                         >
                             v{CHANGELOG_DATA[0]?.version}
                         </Badge>
@@ -219,7 +219,7 @@ export default function Changelog() {
                                     <span className={cn(
                                         "font-bold",
                                         index === 0
-                                            ? "text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70"
+                                            ? "text-primary"
                                             : "text-foreground"
                                     )}>
                                         {entry.version}
@@ -230,7 +230,7 @@ export default function Changelog() {
                                     {entry.date}
                                 </div>
                                 {index === 0 && (
-                                    <Badge className="bg-gradient-to-r from-emerald-500/20 to-emerald-400/10 text-emerald-500 border-emerald-500/30">
+                                    <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/30">
                                         <span className="relative flex h-2 w-2 mr-1.5">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />

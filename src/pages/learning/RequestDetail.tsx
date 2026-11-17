@@ -179,7 +179,7 @@ export default function RequestDetail() {
 
         {/* AI Summary */}
         {request.ai_summary && (
-          <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-8 mb-6">
+          <div className="bg-primary/5 border border-primary/20 rounded-2xl p-8 mb-6">
             <div className="flex items-center gap-2 mb-4">
               <Sparkles className="h-5 w-5 text-primary" />
               <h2 className="text-lg font-semibold text-foreground">

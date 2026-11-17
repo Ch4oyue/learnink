@@ -7,7 +7,7 @@ const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof AvatarPrimitive.Root> & { isPremium?: boolean }
 >(({ className, isPremium, ...props }, ref) => (
-  <div className={cn("relative", isPremium && "p-[2px] rounded-full bg-gradient-to-tr from-amber-500 via-yellow-300 to-amber-600 shadow-glow animate-pulse-slow")}>
+  <div className={cn("relative", isPremium && "p-[2px] rounded-full bg-amber-400")}>
     <AvatarPrimitive.Root
       ref={ref}
       className={cn("relative flex h-10 w-10 shrink-0 overflow-hidden rounded-full", className)}

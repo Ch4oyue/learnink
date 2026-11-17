@@ -107,7 +107,7 @@ export default function SecondBrain() {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center gap-3">
-                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30">
+                        <div className="p-2.5 rounded-xl bg-primary/10">
                             <Brain className="h-6 w-6 text-purple-400" />
                         </div>
                         <div>

@@ -46,8 +46,8 @@ const learningPaths = [
     description: "Understand the basic concepts of Artificial Intelligence and Machine Learning",
     icon: Brain,
     color: "from-blue-500 to-cyan-500",
-    bgColor: "bg-blue-500/10",
-    textColor: "text-blue-500",
+    bgColor: "bg-primary/10",
+    textColor: "text-primary",
     categories: ["AI Dasar"],
     levels: ["Pemula"],
   },
@@ -57,8 +57,8 @@ const learningPaths = [
     description: "Learn the fundamentals of workflow automation and processes",
     icon: Cog,
     color: "from-purple-500 to-pink-500",
-    bgColor: "bg-purple-500/10",
-    textColor: "text-purple-500",
+    bgColor: "bg-primary/10",
+    textColor: "text-primary",
     categories: ["Automation"],
     levels: ["Pemula", "Menengah"],
   },
@@ -68,8 +68,8 @@ const learningPaths = [
     description: "Master popular AI tools like ChatGPT, Midjourney, and more",
     icon: Bot,
     color: "from-orange-500 to-red-500",
-    bgColor: "bg-orange-500/10",
-    textColor: "text-orange-500",
+    bgColor: "bg-primary/10",
+    textColor: "text-primary",
     categories: ["AI Tools"],
     levels: ["Menengah", "Lanjutan"],
   },
@@ -79,8 +79,8 @@ const learningPaths = [
     description: "Build complex automation systems with AI integration",
     icon: Workflow,
     color: "from-amber-500 to-yellow-500",
-    bgColor: "bg-amber-500/10",
-    textColor: "text-amber-500",
+    bgColor: "bg-primary/10",
+    textColor: "text-primary",
     categories: ["Advanced"],
     levels: ["Lanjutan"],
   },
@@ -198,7 +198,7 @@ export default function Syllabus() {
                   {/* Path Header */}
                   <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
                     <div
-                      className={`h-16 w-16 rounded-2xl flex items-center justify-center bg-gradient-to-br ${path.color} text-white shadow-medium`}
+                      className={`h-16 w-16 rounded-2xl flex items-center justify-center bg-primary text-primary-foreground shadow-medium`}
                     >
                       <PathIcon className="h-7 w-7" />
                     </div>
@@ -236,7 +236,7 @@ export default function Syllabus() {
                     </div>
                   ) : pathModules.length === 0 ? (
                     <div
-                      className={`p-8 rounded-xl border-2 border-dashed ${path.bgColor} text-center`}
+                      className={`p-8 rounded-2xl ${path.bgColor} text-center`}
                     >
                       <PathIcon className={`h-8 w-8 mx-auto mb-3 ${path.textColor}`} />
                       <p className={`${path.textColor} font-medium`}>

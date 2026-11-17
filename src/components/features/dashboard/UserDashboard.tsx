@@ -73,7 +73,7 @@ function CourseCard({
         </div>
         {/* <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
           <div
-            className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-500`}
+            className={`h-full bg-primary rounded-full transition-all duration-500`}
             style={{ width: `${progress}%` }}
           />
         </div> */}
@@ -188,7 +188,6 @@ export function UserDashboardContent() {
       {!isLoading && currentModule && currentProgress && (
         <section className="mb-8">
           <div className="relative overflow-hidden rounded-xl bg-card border border-border">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-primary/10 opacity-50" />
             <div className="relative p-6 flex flex-col md:flex-row gap-6 items-start md:items-center">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">

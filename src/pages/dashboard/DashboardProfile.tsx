@@ -129,10 +129,12 @@ export default function DashboardProfile() {
       if (error) throw error;
 
       // Also update the profiles table
-      await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({ display_name: displayName })
         .eq("id", user.id);
+
+      if (profileError) throw profileError;
 
       toast({
         title: "Success",

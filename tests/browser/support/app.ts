@@ -84,6 +84,13 @@ export async function installApp(page: Page, opts: AppOptions = {}): Promise<App
       try { body = JSON.parse(req.postData() ?? 'null'); } catch { /* empty */ }
       return fn ? json(fn({ query: url.searchParams, body })) : json({ error: `no stand-in for ${name}` }, 404);
     }
+    if (url.pathname === '/auth/v1/user' && req.method() === 'PUT') {
+      writes.push('PUT auth/user');
+      let body: { data?: Row } = {};
+      try { body = JSON.parse(req.postData() ?? '{}'); } catch { /* empty */ }
+      const u = session().user;
+      return json({ ...u, user_metadata: { ...u.user_metadata, ...(body.data ?? {}) } });
+    }
     if (!url.pathname.startsWith('/rest/v1/')) return json({});
     const path = url.pathname.replace('/rest/v1/', '');
     if (path.startsWith('rpc/')) return json(opts.rpc?.[path.slice(4)] ?? 0);

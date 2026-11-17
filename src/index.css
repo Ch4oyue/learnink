@@ -324,7 +324,7 @@
 
     html {
         scroll-behavior: smooth;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        /* Theme colors switch atomically: inherited text must never lag dark surfaces. */
         min-height: 100dvh;
         -webkit-tap-highlight-color: transparent;
     }

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { DashboardLayout } from "@/components/features/dashboard/DashboardLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -42,12 +43,125 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-export default function DashboardSettings() {
+export default function DashboardSettings({ adminMode = false }: { adminMode?: boolean }) {
   const { isAdmin } = useAuth();
-  const { theme, setTheme } = useTheme();
-  const { toast } = useToast();
-  const { isInstalled, deferredPrompt, installApp } = usePWA();
+  if (adminMode && !isAdmin) return <Navigate to="/dashboard/settings" replace />;
+  return adminMode ? <AdminSettings /> : <PersonalSettings />;
+}
 
+function PersonalSettings() {
+  const { theme, setTheme } = useTheme();
+  const { isInstalled, deferredPrompt, installApp } = usePWA();
+  // Theme options
+  const themeOptions = [
+    { value: "light" as const, label: "Light", icon: Sun },
+    { value: "dark" as const, label: "Dark", icon: Moon },
+    { value: "system" as const, label: "System", icon: Monitor },
+  ];
+
+  // Mobile Preferences State (Moved from BottomNavigation logic if needed, but handled here via localStorage)
+  const [transparentNav, setTransparentNav] = useState(() => localStorage.getItem("transparentMobileNav") === "true");
+
+  const toggleTransparentNav = () => {
+    const newVal = !transparentNav;
+    setTransparentNav(newVal);
+    localStorage.setItem("transparentMobileNav", String(newVal));
+    window.dispatchEvent(new Event("storage")); // Notify other components
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6 max-w-3xl mx-auto">
+        <div>
+          <h1 className="text-2xl font-semibold">Settings</h1>
+          <p className="text-muted-foreground">Manage your preferences</p>
+        </div>
+        <Card className="">
+          <CardHeader>
+            <CardTitle>Appearance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {themeOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setTheme(option.value)}
+                  aria-pressed={theme === option.value}
+                  className={`flex flex-col items-center gap-3 p-6 rounded-2xl border transition-shadow duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background ${theme === option.value ? "border-primary bg-primary/10 shadow-md" : "  hover:bg-secondary/60"}`}
+                >
+                  <option.icon className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"}`} />
+                  <div className="text-center">
+                    <span className={`text-sm font-bold block ${theme === option.value ? "text-primary" : "text-foreground"}`}>{option.label}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {/* Mobile Preferences - Only visible on mobile/tablet */}
+            <div className="mt-8 border-t pt-6 md:hidden">
+              <h3 className="text-base font-bold mb-1">Mobile Preferences</h3>
+              <p className="text-sm text-muted-foreground mb-4">Adjust settings for mobile experience</p>
+              <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl border">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <Layers className="h-5 w-5 text-primary" />
+                  </div>
+                  <div>
+                    <span className="font-bold block text-sm">Transparent Navigation</span>
+                    <span className="text-xs text-muted-foreground">Make bottom navigation bar glass-like</span>
+                  </div>
+                </div>
+                <Button variant={transparentNav ? "default" : "outline"} size="sm" onClick={toggleTransparentNav} className="rounded-full">
+                  {transparentNav ? "Enabled" : "Disabled"}
+                </Button>
+              </div>
+            </div>
+
+            {/* Install PWA Section */}
+            <div className="mt-8 border-t pt-6">
+              <h3 className="text-base font-bold mb-1">Install Application</h3>
+              <p className="text-sm text-muted-foreground mb-4">Install LearnInk to your device for better experience.</p>
+              {isInstalled ? (
+                <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3 rounded-xl bg-secondary/50">
+                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold text-foreground">App Installed</span>
+                    <span className="text-xs font-normal">You are using the app version</span>
+                  </div>
+                </Button>
+              ) : deferredPrompt ? (
+                <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3 rounded-xl">
+                  <Download className="h-5 w-5" />
+                  <div className="flex flex-col items-start">
+                    <span className="font-bold">Install App</span>
+                    <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
+                  </div>
+                </Button>
+              ) : (
+                <div className="bg-secondary/50 rounded-xl p-4 border border-dashed">
+                  <p className="text-sm text-muted-foreground text-center">
+                    To install, use your browser's <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong> feature.
+                  </p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="mt-6">
+          <CardContent className="py-4">
+            <a href="/changelog" className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors group">
+              <span className="font-medium group-hover:text-primary transition-colors">View Changelog & Version History</span>
+              <span className="text-xs bg-secondary px-2 py-1 rounded-full">v1.8.0</span>
+            </a>
+          </CardContent>
+        </Card>
+      </div>
+    </DashboardLayout>
+  );
+}
+
+function AdminSettings() {
+  const { toast } = useToast();
   // Categories
   const { data: categories, isLoading: categoriesLoading } = useModuleCategories();
   const createCategory = useCreateCategory();
@@ -76,114 +190,6 @@ export default function DashboardSettings() {
     description: string;
     color: string;
   } | null>(null);
-
-  // Theme options
-  const themeOptions = [
-    { value: "light" as const, label: "Light", icon: Sun },
-    { value: "dark" as const, label: "Dark", icon: Moon },
-    { value: "system" as const, label: "System", icon: Monitor },
-  ];
-
-  // Mobile Preferences State (Moved from BottomNavigation logic if needed, but handled here via localStorage)
-  const [transparentNav, setTransparentNav] = useState(() => localStorage.getItem("transparentMobileNav") === "true");
-
-  const toggleTransparentNav = () => {
-    const newVal = !transparentNav;
-    setTransparentNav(newVal);
-    localStorage.setItem("transparentMobileNav", String(newVal));
-    window.dispatchEvent(new Event("storage")); // Notify other components
-  };
-
-  if (!isAdmin) {
-    return (
-      <DashboardLayout>
-        <div className="space-y-6 max-w-3xl mx-auto">
-          <div>
-            <h1 className="text-2xl font-semibold">Settings</h1>
-            <p className="text-muted-foreground">Manage your preferences</p>
-          </div>
-          <Card className="">
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                {themeOptions.map((option) => (
-                  <button
-                    key={option.value}
-                    onClick={() => setTheme(option.value)}
-                    className={`flex flex-col items-center gap-3 p-6 rounded-2xl border transition-all duration-300 ${theme === option.value ? "border-primary bg-primary/10 shadow-md" : "  hover:bg-secondary/60"}`}
-                  >
-                    <option.icon className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"}`} />
-                    <div className="text-center">
-                      <span className={`text-sm font-bold block ${theme === option.value ? "text-primary" : "text-foreground"}`}>{option.label}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {/* Mobile Preferences - Only visible on mobile/tablet */}
-              <div className="mt-8 border-t pt-6 md:hidden">
-                <h3 className="text-base font-bold mb-1">Mobile Preferences</h3>
-                <p className="text-sm text-muted-foreground mb-4">Adjust settings for mobile experience</p>
-                <div className="flex items-center justify-between p-4 bg-secondary/50 rounded-2xl border">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 bg-primary/10 rounded-xl">
-                      <Layers className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <span className="font-bold block text-sm">Transparent Navigation</span>
-                      <span className="text-xs text-muted-foreground">Make bottom navigation bar glass-like</span>
-                    </div>
-                  </div>
-                  <Button variant={transparentNav ? "default" : "outline"} size="sm" onClick={toggleTransparentNav} className="rounded-full">
-                    {transparentNav ? "Enabled" : "Disabled"}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Install PWA Section */}
-              <div className="mt-8 border-t pt-6">
-                <h3 className="text-base font-bold mb-1">Install Application</h3>
-                <p className="text-sm text-muted-foreground mb-4">Install LearnInk to your device for better experience.</p>
-                {isInstalled ? (
-                  <Button disabled variant="outline" className="w-full gap-2 justify-start h-auto py-3 rounded-xl bg-secondary/50">
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-bold text-foreground">App Installed</span>
-                      <span className="text-xs font-normal">You are using the app version</span>
-                    </div>
-                  </Button>
-                ) : deferredPrompt ? (
-                  <Button onClick={installApp} className="w-full gap-2 justify-start h-auto py-3 rounded-xl">
-                    <Download className="h-5 w-5" />
-                    <div className="flex flex-col items-start">
-                      <span className="font-bold">Install App</span>
-                      <span className="text-xs font-normal opacity-90">Add to Home Screen</span>
-                    </div>
-                  </Button>
-                ) : (
-                  <div className="bg-secondary/50 rounded-xl p-4 border border-dashed">
-                    <p className="text-sm text-muted-foreground text-center">
-                      To install, use your browser's <strong>"Add to Home Screen"</strong> or <strong>"Install App"</strong> feature.
-                    </p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="mt-6">
-            <CardContent className="py-4">
-              <a href="/changelog" className="flex items-center justify-between text-sm text-muted-foreground hover:text-foreground transition-colors group">
-                <span className="font-medium group-hover:text-primary transition-colors">View Changelog & Version History</span>
-                <span className="text-xs bg-secondary px-2 py-1 rounded-full">v1.8.0</span>
-              </a>
-            </CardContent>
-          </Card>
-        </div>
-      </DashboardLayout>
-    );
-  }
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
@@ -244,7 +250,7 @@ export default function DashboardSettings() {
     <DashboardLayout>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold">Settings</h1>
+          <h1 className="text-2xl font-semibold">Admin Settings</h1>
           <p className="text-muted-foreground">Manage learning module categories and levels</p>
         </div>
 

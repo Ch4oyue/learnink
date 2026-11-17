@@ -211,6 +211,14 @@ const App = () => (
                         }
                       />
                       <Route
+                        path="/dashboard/admin/settings"
+                        element={
+                          <ProtectedRoute>
+                            <DashboardSettings adminMode />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
                         path="/dashboard/settings"
                         element={
                           <ProtectedRoute>

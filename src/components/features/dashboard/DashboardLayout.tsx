@@ -176,7 +176,7 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
         { href: "/dashboard/admin/approval", label: "Inbox", icon: Inbox },
         { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
         { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
-        { href: "/dashboard/settings", label: "Admin Settings", icon: Settings },
+        { href: "/dashboard/admin/settings", label: "Admin Settings", icon: Settings },
       ],
     },
   ],
@@ -189,7 +189,7 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
         { href: "/dashboard/admin/approval", label: "Inbox", icon: Inbox },
         { href: "/dashboard/admin/integrations", label: "Integrations", icon: Plug },
         { href: "/dashboard/admin/sources", label: "Learning Sources", icon: Globe },
-        { href: "/dashboard/settings", label: "Admin Settings", icon: Settings },
+        { href: "/dashboard/admin/settings", label: "Admin Settings", icon: Settings },
       ],
     },
     {
@@ -239,7 +239,7 @@ function AppSidebar({ pendingCount = 0 }: SidebarProps) {
   };
 
   return (
-    <Sidebar collapsible="icon" className="hidden md:flex m-4 h-[calc(100vh-2rem)] border-none glass-liquid rounded-[32px] overflow-hidden transition-all duration-300 shadow-glow">
+    <Sidebar collapsible="icon" className="hidden md:flex m-4 h-[calc(100vh-2rem)] border-none glass-liquid rounded-[32px] overflow-hidden transition-[width,height] duration-300 shadow-glow">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
@@ -409,7 +409,7 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
 
   return (
     <div className="md:hidden fixed bottom-6 left-6 right-6 z-50 pb-[env(safe-area-inset-bottom)]">
-      <nav className="glass-liquid rounded-[32px] p-2 transition-all duration-300 shadow-glow">
+      <nav className="glass-liquid rounded-[32px] p-2 transition-transform duration-300 shadow-glow">
         <ul className="flex items-center justify-around">
           {primaryItems.map((item) => {
             const isActive = location.pathname === item.href;
@@ -421,7 +421,7 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
                   to={item.href}
                   aria-label={item.label}
                   className={cn(
-                    "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300",
+                    "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-transform duration-300",
                     isActive
                       ? "bg-primary/20 text-primary shadow-glow scale-110 border border-primary/20 backdrop-blur-md"
                       : "text-muted-foreground hover:bg-white/10 active:scale-95"
@@ -447,7 +447,7 @@ function MobileBottomNav({ pendingCount = 0 }: MobileNavProps) {
                 <button
                   aria-label="Menu"
                   className={cn(
-                    "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-all duration-300 text-muted-foreground hover:bg-white/5 active:scale-95"
+                    "flex flex-col items-center justify-center w-12 h-12 rounded-xl transition-transform duration-300 text-muted-foreground hover:bg-white/5 active:scale-95"
                   )}
                 >
                   <Menu className="w-5 h-5" />
@@ -613,7 +613,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     </div>
                 </header>
                 {/* Mobile Header (Simplified) */}
-                <header className="md:hidden sticky top-0 z-40 flex min-h-14 h-auto pt-[env(safe-area-inset-top)] shrink-0 items-center justify-between gap-2 border-b border-white/5 glass-liquid px-4 backdrop-blur-xl transition-all">
+                <header className="md:hidden sticky top-0 z-40 flex min-h-14 h-auto pt-[env(safe-area-inset-top)] shrink-0 items-center justify-between gap-2 border-b border-white/5 glass-liquid px-4 backdrop-blur-xl transition-transform">
                    <div className="flex items-center gap-2">
                       <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                         <Layers className="size-4" />

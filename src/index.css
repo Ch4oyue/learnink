@@ -32,10 +32,6 @@
 @import "@heroui/styles/components/select.css" layer(components);
 @import "@heroui/styles/components/popover.css" layer(components);
 @import "@heroui/styles/components/drawer.css" layer(components);
-@import "@heroui/styles/components/scroll-shadow.css" layer(components);
-@import "@heroui/styles/components/label.css" layer(components);
-@import "@heroui/styles/components/disclosure.css" layer(components);
-@import "@heroui/styles/components/table.css" layer(components);
 @import "@heroui/styles/components/tooltip.css" layer(components);
 @import "@heroui/styles/components/dropdown.css" layer(components);
 @import "@heroui/styles/components/menu-item.css" layer(components);

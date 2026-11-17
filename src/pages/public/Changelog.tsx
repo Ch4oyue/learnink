@@ -294,7 +294,7 @@ export default function Changelog() {
                         Version History Summary
                     </h2>
                     <div className="glass-liquid rounded-[24px] overflow-hidden">
-                        <Table>
+                        <Table aria-label="Version history">
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent border-b-black/5 dark:border-b-white/10">
                                     <TableHead className="w-[100px]">Version</TableHead>

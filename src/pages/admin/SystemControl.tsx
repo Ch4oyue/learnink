@@ -409,7 +409,7 @@ export default function SystemControl() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
+            <Table aria-label="Security audit trail">
               <TableHeader>
                 <TableRow>
                   <TableHead>Time</TableHead>
@@ -499,7 +499,7 @@ export default function SystemControl() {
                 )}
               </ul>
             ) : (
-            <Table>
+            <Table aria-label="Label multipliers">
               <TableHeader>
                 <TableRow>
                   <TableHead>Label ID</TableHead>

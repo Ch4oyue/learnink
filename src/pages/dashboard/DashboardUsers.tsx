@@ -264,7 +264,7 @@ export default function DashboardUsers() {
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
-              <Table>
+              <Table aria-label="Users">
                 <TableHeader className="hidden md:table-header-group">
                   <TableRow>
                     <TableHead>User</TableHead>

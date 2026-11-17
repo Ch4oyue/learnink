@@ -64,7 +64,7 @@ export function RequestReviewPanel({ requests, requestsLoading, statusFilter, on
           </div>
 
           <div className="bg-card border border-border rounded-xl shadow-soft overflow-hidden">
-            <Table>
+            <Table aria-label="Material requests awaiting review">
               <TableHeader>
                 <TableRow>
                   <TableHead>Topic</TableHead>

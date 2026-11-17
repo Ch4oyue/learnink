@@ -202,7 +202,7 @@ export default function DashboardModules() {
                 </Card>
               ) : (
                 <Card className="overflow-hidden">
-                  <Table className="max-md:table-fixed max-md:[&_th]:px-2 max-md:[&_td]:px-2 max-md:[&_th:nth-child(4)]:w-[88px] max-md:[&_th:last-child]:w-[52px] max-md:[&_th:nth-child(2)]:hidden max-md:[&_td:nth-child(2)]:hidden max-md:[&_th:nth-child(3)]:hidden max-md:[&_td:nth-child(3)]:hidden max-md:[&_th:nth-child(5)]:hidden max-md:[&_td:nth-child(5)]:hidden">
+                  <Table aria-label="Modules" className="max-md:table-fixed max-md:[&_th]:px-2 max-md:[&_td]:px-2 max-md:[&_th:nth-child(4)]:w-[88px] max-md:[&_th:last-child]:w-[52px] max-md:[&_th:nth-child(2)]:hidden max-md:[&_td:nth-child(2)]:hidden max-md:[&_th:nth-child(3)]:hidden max-md:[&_td:nth-child(3)]:hidden max-md:[&_th:nth-child(5)]:hidden max-md:[&_td:nth-child(5)]:hidden">
                     <TableHeader>
                       <TableRow className="hover:bg-transparent border-b">
                         <TableHead className="font-bold text-foreground/80">Modules</TableHead>

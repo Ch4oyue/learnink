@@ -168,7 +168,7 @@ export default function Syllabus() {
                   <span className="text-sm font-medium">Overall Progress</span>
                   <span className="text-2xl font-bold text-primary">{overallProgress}%</span>
                 </div>
-                <Progress value={overallProgress} className="h-2" />
+                <Progress value={overallProgress} className="h-2" aria-label="Overall progress" />
                 <p className="text-xs text-muted-foreground mt-2">
                   {completedModules} of {totalModules} modules completed
                 </p>
@@ -218,7 +218,7 @@ export default function Syllabus() {
                           <p className="text-xs text-muted-foreground">Completed</p>
                         </div>
                         <div className="w-24">
-                          <Progress value={pathProgress} className="h-2" />
+                          <Progress value={pathProgress} className="h-2" aria-label={`${path.title} progress`} />
                         </div>
                       </div>
                     )}
@@ -299,6 +299,7 @@ export default function Syllabus() {
                                 <Progress
                                   value={moduleProgress.progress_percent || 0}
                                   className="h-1"
+                                  aria-label={`${module.title} progress`}
                                 />
                               </div>
                             )}

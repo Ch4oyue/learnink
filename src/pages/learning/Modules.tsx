@@ -180,7 +180,7 @@ export default function Modules() {
                           <span className="text-xs text-muted-foreground">Progress</span>
                           <span className="text-xs font-medium text-foreground">{progress}%</span>
                         </div>
-                        <Progress value={progress} className="h-1.5" />
+                        <Progress value={progress} className="h-1.5" aria-label={`${module.title} progress`} />
                       </div>
                     )}
                   </div>

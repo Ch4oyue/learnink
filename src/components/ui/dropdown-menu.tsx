@@ -50,6 +50,7 @@ function DropdownMenu({
 }
 function DropdownMenuTrigger({
   asChild,
+  type,
   children,
   ...props
 }: React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }) {
@@ -61,7 +62,7 @@ function DropdownMenuTrigger({
           {children}
         </Slot>
       ) : (
-        <button {...props} ref={ctx?.trigger}>
+        <button type={type ?? "button"} {...props} ref={ctx?.trigger}>
           {children}
         </button>
       )}

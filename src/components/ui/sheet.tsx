@@ -52,13 +52,14 @@ function Sheet({
 const SheetTrigger = React.forwardRef<
   HTMLButtonElement,
   React.ButtonHTMLAttributes<HTMLButtonElement> & { asChild?: boolean }
->(({ asChild, onClick, ...props }, ref) => {
+>(({ asChild, type, onClick, ...props }, ref) => {
   const { setOpen } = useSheet();
   const Comp = asChild ? Slot : "button";
   return (
     <Comp
       {...props}
       ref={ref}
+      type={asChild ? type : (type ?? "button")}
       onClick={(e) => {
         onClick?.(e);
         if (!e.defaultPrevented) setOpen(true);

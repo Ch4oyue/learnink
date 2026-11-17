@@ -77,5 +77,16 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect.poll(() => app.db.label_configs.some((l) => l.id === 'beta-tester')).toBe(false);
       expect(nativeDialogs).toBe(0);
     });
+
+    test('system: Reset All User Points is disabled and says why', async ({ page }) => {
+      const app = await installApp(page, { role: 'superadmin', db: seed() });
+      await page.goto('/dashboard/admin/system');
+      const reset = page.getByRole('button', { name: 'Reset All User Points' });
+      await reset.scrollIntoViewIfNeeded();
+      await expect(reset).toBeDisabled();
+      await expect(page.getByText('Not available yet.')).toBeVisible();
+      await page.screenshot({ path: `/tmp/shots/system-danger-${label}.png` });
+      expect(app.writes).toHaveLength(0);
+    });
   });
 }

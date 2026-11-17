@@ -490,9 +490,12 @@ export default function SystemControl() {
                 <p className="text-sm text-muted-foreground mb-4">
                   The actions below are destructive or have a major impact on the system. Use them with extreme care.
                 </p>
-                <Button variant="destructive" className="gap-2">
+                <Button variant="destructive" className="gap-2" disabled aria-describedby="reset-points-note">
                   <Trash2 className="h-4 w-4" /> Reset All User Points
                 </Button>
+                <p id="reset-points-note" className="mt-3 text-sm text-muted-foreground">
+                  Not available yet. Resetting every user's points needs a server-side action that does not exist.
+                </p>
              </CardContent>
            </Card>
         </div>

@@ -1,0 +1,21 @@
+create publication supabase_realtime;
+do $$ begin
+ create role anon nologin noinherit; exception when duplicate_object then null; end $$;
+do $$ begin create role authenticated nologin noinherit; exception when duplicate_object then null; end $$;
+do $$ begin create role service_role nologin noinherit bypassrls; exception when duplicate_object then null; end $$;
+do $$ begin create role authenticator login noinherit password 'pw'; exception when duplicate_object then null; end $$;
+grant anon, authenticated, service_role to authenticator;
+create schema if not exists auth;
+create table if not exists auth.users(id uuid primary key default gen_random_uuid(), email text unique, raw_user_meta_data jsonb default '{}', raw_app_meta_data jsonb default '{}', encrypted_password text, email_confirmed_at timestamptz default now(), created_at timestamptz default now(), updated_at timestamptz default now(), last_sign_in_at timestamptz, phone text, role text default 'authenticated', aud text default 'authenticated');
+create or replace function auth.uid() returns uuid language sql stable as $$ select nullif(coalesce(current_setting('request.jwt.claim.sub',true),(nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'sub')),'')::uuid $$;
+create or replace function auth.role() returns text language sql stable as $$ select coalesce(current_setting('request.jwt.claim.role',true),(nullif(current_setting('request.jwt.claims',true),'')::jsonb->>'role')) $$;
+create or replace function auth.jwt() returns jsonb language sql stable as $$ select coalesce(nullif(current_setting('request.jwt.claim',true),''),nullif(current_setting('request.jwt.claims',true),''))::jsonb $$;
+create or replace function auth.email() returns text language sql stable as $$ select auth.jwt()->>'email' $$;
+grant usage on schema auth to anon, authenticated, service_role;
+create schema if not exists storage;
+create table if not exists storage.buckets(id text primary key, name text, public boolean default false, file_size_limit bigint, allowed_mime_types text[]);
+create table if not exists storage.objects(id uuid primary key default gen_random_uuid(), bucket_id text, name text, owner uuid, metadata jsonb, created_at timestamptz default now());
+alter table storage.objects enable row level security;
+create or replace function storage.foldername(name text) returns text[] language sql as $$ select string_to_array(name,'/') $$;
+create schema if not exists extensions;
+grant usage on schema extensions to anon, authenticated, service_role;

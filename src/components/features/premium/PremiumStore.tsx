@@ -17,7 +17,7 @@ import {
   Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 
 const PREMIUM_OFFERS = [
   { id: "7_days", label: "7 Days Premium", cost: 500, days: 7, icon: Zap },
@@ -32,10 +32,10 @@ export function PremiumStore() {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const buyPremium = useMutation({
-    mutationFn: async ({ days, cost, isStreakClaim }: { days: number; cost: number; isStreakClaim: boolean }) => {
+    mutationFn: async ({ offerId, cost, isStreakClaim }: { offerId: string; cost: number; isStreakClaim: boolean }) => {
       if (!user || !profile) throw new Error("Unauthorized");
 
-      // Validations
+      // Quick client-side checks for a clear message; the server repeats them and is the source of truth.
       if (!isStreakClaim && (profile.points || 0) < cost) {
         throw new Error("Not enough points");
       }
@@ -43,26 +43,10 @@ export function PremiumStore() {
         throw new Error("Streak has not reached 30 days");
       }
 
-      const currentPremiumUntil = profile.premium_until ? new Date(profile.premium_until) : new Date();
-      const baseDate = currentPremiumUntil > new Date() ? currentPremiumUntil : new Date();
-      const newPremiumUntil = addDays(baseDate, days).toISOString();
-
-      const updateData: { is_premium: boolean; premium_until: string; points?: number } = {
-        is_premium: true,
-        premium_until: newPremiumUntil,
-      };
-
-      if (!isStreakClaim) {
-        updateData.points = (profile.points || 0) - cost;
-      }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update(updateData)
-        .eq("id", user.id);
-
+      // Points, premium and streak are protected columns: redeem through the server function.
+      const { data, error } = await supabase.rpc("redeem_premium", { p_offer_id: offerId });
       if (error) throw error;
-      return { newPremiumUntil };
+      return { newPremiumUntil: String(data) };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["user-role"] });
@@ -85,7 +69,7 @@ export function PremiumStore() {
   const handleExchange = (offer: typeof PREMIUM_OFFERS[0]) => {
     setIsProcessing(offer.id);
     buyPremium.mutate({
-      days: offer.days,
+      offerId: offer.id,
       cost: offer.cost,
       isStreakClaim: !!offer.streakRequired
     });

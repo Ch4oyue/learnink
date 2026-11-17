@@ -63,13 +63,15 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       expect(app.writes.filter((w) => w.startsWith('PATCH profiles'))).toHaveLength(0);
     });
 
-    test('profile premium: redeeming 7 days deducts 500 points and sets premium', async ({ page }) => {
-      const app = await installApp(page, { role: 'user', db: { profiles: [{ id: USER_ID, display_name: 'Test Learner', avatar_url: null, current_streak: 3, longest_streak: 7, last_activity_date: '2026-11-17', points: 600, labels: [], is_premium: false, premium_until: null }] } });
+    test('profile premium: redeeming 7 days goes through the server function, not a direct profile write', async ({ page }) => {
+      const app = await installApp(page, { role: 'user', rpc: { redeem_premium: (_body, db) => { const p = db.profiles[0]; p.points = Number(p.points) - 500; p.is_premium = true; p.premium_until = '2026-11-24T00:00:00Z'; return p.premium_until; } }, db: { profiles: [{ id: USER_ID, display_name: 'Test Learner', avatar_url: null, current_streak: 3, longest_streak: 7, last_activity_date: '2026-11-17', points: 600, labels: [], is_premium: false, premium_until: null }] } });
       await page.goto('/dashboard/profile?tab=premium');
       await page.getByRole('button', { name: 'Redeem' }).first().click();
       await expect.poll(() => app.db.profiles[0]?.points).toBe(100);
       expect(app.db.profiles[0]).toMatchObject({ is_premium: true });
       expect(String(app.db.profiles[0]?.premium_until)).toMatch(/^2026-/);
+      expect(app.writes.some((w) => w.startsWith('RPC redeem_premium') && w.includes('"7_days"'))).toBe(true);
+      expect(app.writes.filter((w) => w.startsWith('PATCH profiles'))).toHaveLength(0);
     });
   });
 }

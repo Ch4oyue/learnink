@@ -266,7 +266,9 @@ export default function ModuleLearn() {
 
   useEffect(() => {
     // Only show if completed AND not claimed yet
-    if (currentProgress >= 100 && moduleId && progress && !progress.reward_claimed) {
+    // Hold the reward modal while the quiz dialog is open: with a real backend the 100% write lands a moment
+    // after the quiz opens, and the modal would cover the quiz. It shows once the quiz is closed.
+    if (currentProgress >= 100 && moduleId && progress && !progress.reward_claimed && !showQuiz) {
       const key = `gacha_shown_${moduleId}`;
       const shown = localStorage.getItem(key);
 
@@ -286,7 +288,7 @@ export default function ModuleLearn() {
         localStorage.setItem(key, "true");
       }
     }
-  }, [currentProgress, moduleId, progress]);
+  }, [currentProgress, moduleId, progress, showQuiz]);
 
   const handleClaimReward = async () => {
     if (!moduleId || !user) return;

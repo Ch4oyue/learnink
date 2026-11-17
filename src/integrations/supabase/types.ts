@@ -775,6 +775,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      redeem_premium: {
+        Args: { p_offer_id: string }
+        Returns: string
+      }
       get_popular_modules: {
         Args: { limit_count?: number }
         Returns: {

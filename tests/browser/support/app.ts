@@ -11,7 +11,8 @@ export type Db = Record<string, Row[]>;
 export interface AppOptions {
   role?: 'user' | 'tutor' | 'admin' | 'superadmin';
   db?: Db;
-  rpc?: Record<string, unknown>;
+  /** RPC stand-ins: a value is returned as is; a function receives the body and the db and may mutate it. */
+  rpc?: Record<string, unknown | ((body: unknown, db: Db) => unknown)>;
   /** Edge function stand-ins keyed by function name (query string stripped). */
   functions?: Record<string, (req: { query: URLSearchParams; body: unknown }) => unknown>;
 }
@@ -93,7 +94,16 @@ export async function installApp(page: Page, opts: AppOptions = {}): Promise<App
     }
     if (!url.pathname.startsWith('/rest/v1/')) return json({});
     const path = url.pathname.replace('/rest/v1/', '');
-    if (path.startsWith('rpc/')) return json(opts.rpc?.[path.slice(4)] ?? 0);
+    if (path.startsWith('rpc/')) {
+      const handler = opts.rpc?.[path.slice(4)];
+      if (typeof handler === 'function') {
+        let rpcBody: unknown = null;
+        try { rpcBody = JSON.parse(req.postData() ?? 'null'); } catch { /* empty */ }
+        writes.push(`RPC ${path.slice(4)} ${req.postData() ?? ''}`);
+        return json(handler(rpcBody, db));
+      }
+      return json(handler ?? 0);
+    }
     const rows = db[path] ?? [];
     const wantsObject = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object');
     const method = req.method();

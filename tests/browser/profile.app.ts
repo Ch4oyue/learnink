@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { installApp } from './support/app';
+import { installApp, USER_ID } from './support/app';
 
 for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mobile', { width: 390, height: 844 }]] as const) {
   test.describe(label, () => {
@@ -32,6 +32,44 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await page.getByRole('button', { name: 'Save Changes' }).click();
       await expect(page.getByText(/Failed to update profile|write denied/).first()).toBeVisible();
       await expect(page.getByText('Profile updated successfully')).toHaveCount(0);
+    });
+  });
+}
+
+for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mobile', { width: 390, height: 844 }]] as const) {
+  test.describe(`${label} tabs`, () => {
+    test.use({ viewport });
+
+    test('profile tabs: notes links to Second Brain, settings theme persists', async ({ page }) => {
+      await installApp(page, { role: 'user' });
+      await page.goto('/dashboard/profile?tab=notes');
+      await page.getByRole('button', { name: /Open Second Brain/ }).click();
+      await expect(page).toHaveURL(/\/dashboard\/second-brain$/);
+      await page.goto('/dashboard/profile?tab=settings');
+      await page.getByRole('button', { name: /^Dark/ }).click();
+      await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(true);
+      await page.reload();
+      await expect.poll(() => page.evaluate(() => document.documentElement.classList.contains('dark'))).toBe(true);
+    });
+
+    test('profile premium: blocked when points or streak are short', async ({ page }) => {
+      const app = await installApp(page, { role: 'user' });
+      await page.goto('/dashboard/profile?tab=premium');
+      await expect(page.getByText('LearnInk Elite')).toBeVisible();
+      await expect(page.getByText('120 Points')).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Not enough points' })).toHaveCount(2);
+      await expect(page.getByRole('button', { name: 'Not enough points' }).first()).toBeDisabled();
+      await expect(page.getByRole('button', { name: 'Streak too low' })).toBeDisabled();
+      expect(app.writes.filter((w) => w.startsWith('PATCH profiles'))).toHaveLength(0);
+    });
+
+    test('profile premium: redeeming 7 days deducts 500 points and sets premium', async ({ page }) => {
+      const app = await installApp(page, { role: 'user', db: { profiles: [{ id: USER_ID, display_name: 'Test Learner', avatar_url: null, current_streak: 3, longest_streak: 7, last_activity_date: '2026-11-17', points: 600, labels: [], is_premium: false, premium_until: null }] } });
+      await page.goto('/dashboard/profile?tab=premium');
+      await page.getByRole('button', { name: 'Redeem' }).first().click();
+      await expect.poll(() => app.db.profiles[0]?.points).toBe(100);
+      expect(app.db.profiles[0]).toMatchObject({ is_premium: true });
+      expect(String(app.db.profiles[0]?.premium_until)).toMatch(/^2026-/);
     });
   });
 }

@@ -88,5 +88,29 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await page.screenshot({ path: `/tmp/shots/system-danger-${label}.png` });
       expect(app.writes).toHaveLength(0);
     });
+
+    test('system: label rows are usable at this width (edit description, toggle, controls on screen, no sideways scroll)', async ({ page }) => {
+      const app = await installApp(page, { role: 'superadmin', db: seed() });
+      await page.goto('/dashboard/admin/system');
+      const del = page.getByRole('button', { name: 'Delete label beta-tester' });
+      await del.scrollIntoViewIfNeeded();
+      const vw = page.viewportSize()!.width;
+      for (const loc of [del, page.getByRole('switch', { name: 'Label beta-tester active' }), page.getByLabel('Description for beta-tester'), page.getByLabel('Multiplier for beta-tester')]) {
+        const box = await loc.boundingBox();
+        expect(box).not.toBeNull();
+        expect(box!.x).toBeGreaterThanOrEqual(0);
+        expect(box!.x + box!.width).toBeLessThanOrEqual(vw);
+      }
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+      expect(overflow).toBeLessThanOrEqual(0);
+      await page.screenshot({ path: `/tmp/shots/system-labels-${label}.png` });
+
+      const desc = page.getByLabel('Description for beta-tester');
+      await desc.fill('Closed beta');
+      await desc.blur();
+      await expect.poll(() => app.db.label_configs.find((l) => l.id === 'beta-tester')?.description).toBe('Closed beta');
+      await page.getByRole('switch', { name: 'Label beta-tester active' }).click();
+      await expect.poll(() => app.db.label_configs.find((l) => l.id === 'beta-tester')?.is_active).toBe(false);
+    });
   });
 }

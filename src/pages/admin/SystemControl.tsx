@@ -33,6 +33,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   AlertDialog,
@@ -80,6 +81,7 @@ interface SecurityLog {
 
 export default function SystemControl() {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const queryClient = useQueryClient();
 
   // --- LOCAL STATE ---
@@ -172,6 +174,52 @@ export default function SystemControl() {
       toast({ title: "Label deleted" });
     }
   });
+
+  // --- LABEL ROW CONTROLS (shared by the desktop table and the mobile cards) ---
+  const multiplierInput = (label: LabelConfig) => (
+    <Input
+      type="number"
+      step="0.1"
+      defaultValue={label.multiplier}
+      className="w-20"
+      aria-label={`Multiplier for ${label.id}`}
+      onBlur={(e) => {
+        const next = parseMultiplier(e.target.value);
+        if (next === null) {
+          e.target.value = String(label.multiplier);
+          toast({ title: "Invalid multiplier", description: "Enter a number, 0 or higher.", variant: "destructive" });
+          return;
+        }
+        if (next !== label.multiplier) manageLabel.mutate({ ...label, multiplier: next });
+      }}
+    />
+  );
+  const descriptionInput = (label: LabelConfig) => (
+    <Input
+      defaultValue={label.description}
+      aria-label={`Description for ${label.id}`}
+      placeholder="Description"
+      onBlur={(e) => { if (e.target.value !== label.description) manageLabel.mutate({ ...label, description: e.target.value }); }}
+    />
+  );
+  const activeSwitch = (label: LabelConfig) => (
+    <Switch
+      checked={label.is_active}
+      aria-label={`Label ${label.id} active`}
+      onCheckedChange={(checked) => manageLabel.mutate({ ...label, is_active: checked })}
+    />
+  );
+  const deleteButton = (label: LabelConfig) => (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="text-destructive-text"
+      aria-label={`Delete label ${label.id}`}
+      onClick={() => setLabelToDelete(label.id)}
+    >
+      <Trash2 className="h-4 w-4" />
+    </Button>
+  );
 
   // --- HELPERS ---
   const getSetting = (key: string) => settings?.find(s => s.key === key);
@@ -400,11 +448,11 @@ export default function SystemControl() {
 
         {/* Label Configs Management */}
         <Card className="glass-liquid">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Tags className="h-5 w-5 text-primary" />
-                Label Multiplier Management
+                <Tags className="h-5 w-5 shrink-0 text-primary" />
+                Label Multipliers
               </CardTitle>
               <CardDescription>
                 Set the XP multiplier for each user label/tag.
@@ -415,6 +463,28 @@ export default function SystemControl() {
             </Button>
           </CardHeader>
           <CardContent>
+            {isMobile ? (
+              <ul className="space-y-3">
+                {labelConfigs?.map((label) => (
+                  <li key={label.id} className="space-y-3 rounded-2xl bg-muted/40 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="break-all font-mono font-bold">{label.id}</span>
+                      <div className="flex items-center gap-2">
+                        {activeSwitch(label)}
+                        {deleteButton(label)}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-[6rem_1fr] gap-3">
+                      {multiplierInput(label)}
+                      {descriptionInput(label)}
+                    </div>
+                  </li>
+                ))}
+                {(!labelConfigs || labelConfigs.length === 0) && (
+                  <li className="py-6 text-center text-sm text-muted-foreground">No labels yet.</li>
+                )}
+              </ul>
+            ) : (
             <Table>
               <TableHeader>
                 <TableRow>
@@ -429,51 +499,15 @@ export default function SystemControl() {
                 {labelConfigs?.map((label) => (
                   <TableRow key={label.id}>
                     <TableCell className="font-mono font-bold">{label.id}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        defaultValue={label.multiplier}
-                        className="w-20"
-                        aria-label={`Multiplier for ${label.id}`}
-                        onBlur={(e) => {
-                          const next = parseMultiplier(e.target.value);
-                          if (next === null) {
-                            e.target.value = String(label.multiplier);
-                            toast({ title: "Invalid multiplier", description: "Enter a number, 0 or higher.", variant: "destructive" });
-                            return;
-                          }
-                          if (next !== label.multiplier) manageLabel.mutate({ ...label, multiplier: next });
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        defaultValue={label.description}
-                        onBlur={(e) => manageLabel.mutate({ ...label, description: e.target.value })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        checked={label.is_active}
-                        onCheckedChange={(checked) => manageLabel.mutate({ ...label, is_active: checked })}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive-text"
-                        aria-label={`Delete label ${label.id}`}
-                        onClick={() => setLabelToDelete(label.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+                    <TableCell>{multiplierInput(label)}</TableCell>
+                    <TableCell>{descriptionInput(label)}</TableCell>
+                    <TableCell>{activeSwitch(label)}</TableCell>
+                    <TableCell className="text-right">{deleteButton(label)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            )}
           </CardContent>
         </Card>
 

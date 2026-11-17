@@ -58,6 +58,26 @@ test('quiz: answers are graded by the real function and the attempt is stored', 
   expect(attempts.body).toEqual([{ score: 2, total_points: 2, percentage: 100, passed: true }]);
 });
 
+for (const [name, size] of [['desktop', { width: 1280, height: 900 }], ['mobile', { width: 390, height: 844 }]] as const) test(`quiz ${name}: a failed attempt shows its result without crashing, and stores passed=false`, async ({ page }) => {
+  await page.setViewportSize(size);
+  await signIn(page, 'learner');
+  await page.goto('/learn/11111111-1111-1111-1111-111111111111');
+  await page.getByRole('button', { name: 'Next Page' }).click();
+  await page.getByRole('button', { name: 'Take Quiz' }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Flexbox check')).toBeVisible({ timeout: 20000 });
+  await dialog.getByRole('button', { name: 'Start Quiz' }).click();
+  await dialog.getByText('z-index').click();
+  await dialog.getByRole('button', { name: 'Next' }).click();
+  await dialog.getByText('False', { exact: true }).click();
+  await page.waitForTimeout(4500);
+  await dialog.getByRole('button', { name: 'Finish' }).click();
+  await expect(dialog.getByText('0%', { exact: true }).first()).toBeVisible({ timeout: 20000 });
+  await expect(page.getByText('Something Went Wrong')).toHaveCount(0);
+  const attempts = await rest(`user_quiz_attempts?user_id=eq.${L}&select=score,passed`);
+  expect(attempts.body).toEqual([{ score: 0, passed: false }]);
+});
+
 test('admin users table is served by the real get-users function; a learner is refused', async ({ page }) => {
   await signIn(page, 'admin');
   await page.goto('/dashboard/users');

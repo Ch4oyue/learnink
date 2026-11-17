@@ -21,7 +21,7 @@ import {
 
 // True/false answers are stored as "benar"/"salah" (see generate-quiz); the buttons say True/False, so the review must too.
 function displayAnswer(type: QuizQuestionSafe["question_type"], value: string): string {
-  if (type !== "true_false") return value;
+  if (type !== "true_false" || typeof value !== "string") return value;
   const v = value.toLowerCase();
   if (v === "benar") return "True";
   if (v === "salah") return "False";
@@ -181,7 +181,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                     <p className="text-sm text-muted-foreground">
                       Your answer: {answers[q.id] ? displayAnswer(q.question_type, answers[q.id]) : "(not answered)"}
                     </p>
-                    {!results.correctAnswers[q.id] && (
+                    {!results.correctAnswers[q.id] && results.correctAnswerValues[q.id] && (
                       <p className="text-sm text-green-600 mt-1">
                         Correct answer: {displayAnswer(q.question_type, results.correctAnswerValues[q.id])}
                       </p>

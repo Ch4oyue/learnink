@@ -245,16 +245,26 @@ export default function IntegrationManager() {
                 .eq("id", integration.id);
 
             if (deleteError) {
-                throw new Error(`New key was created but the old one could not be removed: ${deleteError.message}`);
+                // Report the partial rotation honestly instead of hiding the new key behind an error.
+                logger.error("Old integration could not be removed:", deleteError);
+                return { ...data, oldRemoved: false as const };
             }
 
             return data;
         },
         onSuccess: (data) => {
-            toast({
-                title: "API Key Updated! 🔑",
-                description: "The old key is no longer valid. Save the new key!",
-            });
+            if ("oldRemoved" in data && data.oldRemoved === false) {
+                toast({
+                    title: "New key created, old key still active",
+                    description: "The old integration could not be removed. Save the new key, then delete the old entry manually.",
+                    variant: "destructive",
+                });
+            } else {
+                toast({
+                    title: "API Key Updated! 🔑",
+                    description: "The old key is no longer valid. Save the new key!",
+                });
+            }
             setNewApiKey(data.api_key);
             setRegenerate(null);
             setIsCreateOpen(true); // Open dialog to show new key

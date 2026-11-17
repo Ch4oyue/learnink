@@ -61,5 +61,16 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       expect(app.writes.filter((w) => w.startsWith('DELETE integrations'))).toHaveLength(0);
       expect(app.db.integrations.some((i) => i.id === 'i1')).toBe(true);
     });
+    test('integrations: replacement created but old delete fails is reported as a partial rotation', async ({ page }) => {
+      const app = await installApp(page, { role: 'admin', db: seed(), functions: { 'generate-api-key': () => ({ success: true, api_key: 'lk_partial_key' }) } });
+      await page.route('**/rest/v1/integrations*', (route) =>
+        route.request().method() === 'DELETE' ? route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'delete denied' }) }) : route.fallback());
+      await page.goto('/dashboard/admin/integrations');
+      await page.locator('button:has(svg[class*="lucide-refresh"])').first().click();
+      await page.getByRole('alertdialog').getByRole('button', { name: 'Regenerate' }).click();
+      await expect(page.getByText('New key created, old key still active').first()).toBeVisible();
+      await expect(page.getByText('lk_partial_key')).toBeVisible();
+      expect(app.db.integrations.some((i) => i.id === 'i1')).toBe(true);
+    });
   });
 }

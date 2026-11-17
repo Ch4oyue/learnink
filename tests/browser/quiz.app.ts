@@ -5,7 +5,7 @@ const content = ['# Flexbox Basics', 'Intro.', '## Axes', 'Axes text.'].join('\n
 const quiz = { id: 'q1', module_id: 'm1', title: 'Flexbox check', description: 'Two questions', time_limit_minutes: 5, passing_score: 70, created_by: 'x', created_at: '2026-11-01T00:00:00Z', updated_at: '2026-11-01T00:00:00Z' };
 const questions = [
   { id: 'qq1', quiz_id: 'q1', question_text: 'Which property sets the main axis?', question_type: 'multiple_choice', options: ['flex-direction', 'z-index'], points: 1, order_index: 0 },
-  { id: 'qq2', quiz_id: 'q1', question_text: 'Flex items wrap by default.', question_type: 'true_false', options: ['True', 'False'], points: 1, order_index: 1 },
+  { id: 'qq2', quiz_id: 'q1', question_text: 'Flex items stay on a single line by default.', question_type: 'true_false', options: ['True', 'False'], points: 1, order_index: 1 },
 ];
 const seed = (withQuiz = true) => ({
   user_roles: [{ user_id: USER_ID, role: 'user' }],
@@ -21,11 +21,14 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
 
     test('quiz: offered on the last section, answers go to the grading function, result is shown', async ({ page }) => {
       const submitted: unknown[] = [];
-      await installApp(page, {
+      const holder: { app?: Awaited<ReturnType<typeof installApp>> } = {};
+      holder.app = await installApp(page, {
         role: 'user', db: seed(), rpc: { get_quiz_questions_safe: questions },
         functions: {
           'validate-quiz-answers': ({ body }) => {
             submitted.push(body);
+            // The real function records the attempt server-side; mirror that so the list refreshes.
+            holder.app?.db.user_quiz_attempts.push({ id: 'a2', user_id: USER_ID, quiz_id: 'q1', score: 2, total_points: 2, percentage: 100, passed: true, started_at: '2026-11-17T00:00:00Z', completed_at: '2026-11-17T00:03:00Z' });
             return { attempt: { id: 'a2', user_id: USER_ID, quiz_id: 'q1', score: 2, total_points: 2, percentage: 100, passed: true, answers: {}, started_at: '', completed_at: '' },
               results: { score: 2, totalPoints: 2, percentage: 100, passed: true, correctAnswers: { qq1: true, qq2: true }, explanations: {}, correctAnswerValues: {} } };
           },
@@ -50,6 +53,12 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect(dialog.getByText('Your answer: True')).toBeVisible();
       expect(submitted[0]).toMatchObject({ answers: { qq2: 'benar' } });
       await page.screenshot({ path: `/tmp/shots/quiz-result-${label}.png` });
+      await dialog.getByRole('button', { name: 'Back to Modules' }).click();
+      await expect(dialog.getByText('Flexbox check')).toBeVisible();
+      await expect(dialog.getByText('2 attempts')).toBeVisible();
+      await page.getByRole('button', { name: 'Close' }).click();
+      await expect(page.getByRole('dialog')).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Take Quiz' })).toBeVisible();
     });
 
     test('quiz: no button when the module has no quiz', async ({ page }) => {

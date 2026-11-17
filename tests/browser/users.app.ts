@@ -30,7 +30,10 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       const app = await installApp(page, { role: 'admin', db: { user_roles: [{ user_id: USER_ID, role: 'admin' }, { user_id: 'u2', role: 'user' }], label_configs: [] }, functions: { 'get-users': payload } });
       await page.goto('/dashboard/users');
       const row = page.getByRole('row').filter({ hasText: 'Ayu Lestari' });
-      await row.locator('[data-slot="select-trigger"]').last().click();
+      const roleControl = row.locator('[data-slot="select-trigger"]').last();
+      const box = await roleControl.boundingBox();
+      expect(box && box.x >= 0 && box.x + box.width <= viewport.width).toBe(true);
+      await roleControl.click();
       await page.getByRole('option', { name: 'Tutor', exact: true }).click();
       await expect(page.getByRole('alertdialog')).toContainText('Confirm Role Change');
       expect(app.writes.filter((w) => w.startsWith('PATCH user_roles'))).toHaveLength(0);

@@ -202,7 +202,7 @@ export default function DashboardModules() {
                 </Card>
               ) : (
                 <Card className="overflow-hidden">
-                  <Table>
+                  <Table className="max-md:[&_th:nth-child(2)]:hidden max-md:[&_td:nth-child(2)]:hidden max-md:[&_th:nth-child(3)]:hidden max-md:[&_td:nth-child(3)]:hidden max-md:[&_th:nth-child(5)]:hidden max-md:[&_td:nth-child(5)]:hidden">
                     <TableHeader>
                       <TableRow className="hover:bg-transparent border-b">
                         <TableHead className="font-bold text-foreground/80">Modules</TableHead>
@@ -222,7 +222,8 @@ export default function DashboardModules() {
                                 <BookOpen className="h-5 w-5 text-primary" />
                               </div>
                               <div>
-                                <p className="font-bold text-foreground">{module.title}</p>
+                                <p className="font-bold text-foreground break-words">{module.title}</p>
+                                <p className="text-xs text-muted-foreground md:hidden">{displayCategory(module.category)} · {displayLevel(module.level)}</p>
                                 <p className="text-xs text-muted-foreground line-clamp-1">
                                   {module.summary}
                                 </p>

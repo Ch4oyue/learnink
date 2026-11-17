@@ -1,36 +1,10 @@
 import * as React from "react";
-import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { Circle } from "lucide-react";
-
-import { cn } from "@/lib/utils";
-
-const RadioGroup = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Root>
->(({ className, ...props }, ref) => {
-  return <RadioGroupPrimitive.Root className={cn("grid gap-2", className)} {...props} ref={ref} />;
-});
-RadioGroup.displayName = RadioGroupPrimitive.Root.displayName;
-
-const RadioGroupItem = React.forwardRef<
-  React.ElementRef<typeof RadioGroupPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof RadioGroupPrimitive.Item>
->(({ className, ...props }, ref) => {
-  return (
-    <RadioGroupPrimitive.Item
-      ref={ref}
-      className={cn(
-        "aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
-        className,
-      )}
-      {...props}
-    >
-      <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Circle className="h-2.5 w-2.5 fill-current text-current" />
-      </RadioGroupPrimitive.Indicator>
-    </RadioGroupPrimitive.Item>
-  );
-});
-RadioGroupItem.displayName = RadioGroupPrimitive.Item.displayName;
-
-export { RadioGroup, RadioGroupItem };
+import {RadioGroup as HeroRadioGroup,Radio} from "@heroui/react";
+import {cn} from "@/lib/utils";
+type GroupProps=Omit<React.ComponentPropsWithoutRef<typeof HeroRadioGroup>,"onChange"|"isDisabled"> & {onValueChange?:(value:string)=>void;disabled?:boolean};
+const RadioGroup=React.forwardRef<HTMLDivElement,GroupProps>(({className,onValueChange,disabled,...props},ref)=><HeroRadioGroup {...props} ref={ref} onChange={onValueChange} isDisabled={disabled} className={cn("grid gap-2",className)} />);
+RadioGroup.displayName="RadioGroup";
+type ItemProps=Omit<React.ComponentPropsWithoutRef<typeof Radio>,"isDisabled"|"children"> & {disabled?:boolean};
+const RadioGroupItem=React.forwardRef<HTMLInputElement,ItemProps>(({className,disabled,...props},ref)=><Radio {...props} inputRef={ref} isDisabled={disabled} className={cn("inline-flex shrink-0",className)}><Radio.Content className="min-h-11 min-w-11 justify-center"><Radio.Control className="border border-muted-foreground/60"><Radio.Indicator /></Radio.Control></Radio.Content></Radio>);
+RadioGroupItem.displayName="RadioGroupItem";
+export {RadioGroup,RadioGroupItem};

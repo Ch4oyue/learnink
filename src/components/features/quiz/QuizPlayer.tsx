@@ -246,7 +246,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
         <div className="space-y-3">
           {currentQuestion.question_type === "multiple_choice" &&
             currentQuestion.options && (
-              <RadioGroup
+              <RadioGroup aria-label={currentQuestion.question_text}
                 value={answers[currentQuestion.id] || ""}
                 onValueChange={(value) => handleAnswer(currentQuestion.id, value)}
               >
@@ -255,8 +255,8 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                     key={i}
                     className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                   >
-                    <RadioGroupItem value={option} id={`option-${i}`} />
-                    <Label htmlFor={`option-${i}`} className="flex-1 cursor-pointer">
+                    <RadioGroupItem value={option} id={`option-${i}`} aria-label={option} />
+                    <Label htmlFor={`option-${i}`} className="flex min-h-11 flex-1 items-center cursor-pointer">
                       {option}
                     </Label>
                   </div>
@@ -265,7 +265,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             )}
 
           {currentQuestion.question_type === "true_false" && (
-            <RadioGroup
+            <RadioGroup aria-label={currentQuestion.question_text}
               value={answers[currentQuestion.id] || ""}
               onValueChange={(value) => handleAnswer(currentQuestion.id, value)}
             >
@@ -274,8 +274,8 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                   key={option}
                   className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                 >
-                  <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} />
-                  <Label htmlFor={`option-${option}`} className="flex-1 cursor-pointer">
+                  <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} aria-label={option === "Benar" ? "True" : "False"} />
+                  <Label htmlFor={`option-${option}`} className="flex min-h-11 flex-1 items-center cursor-pointer">
                     {option === "Benar" ? "True" : "False"}
                   </Label>
                 </div>

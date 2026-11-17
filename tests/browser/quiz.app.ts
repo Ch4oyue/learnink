@@ -44,7 +44,11 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await expect(dialog.getByText('Best score: 50%')).toBeVisible();
       await dialog.getByRole('button', { name: 'Start Quiz' }).click();
       await expect(dialog.getByText('Which property sets the main axis?')).toBeVisible();
-      await dialog.getByText('flex-direction').click();
+      const answer = dialog.getByRole('radio', { name: 'flex-direction', exact: true });
+      await answer.focus();
+      await answer.press('Space');
+      await expect(answer).toBeChecked();
+      await page.screenshot({ path: `/downloads/radio-${label}.png`, animations: 'disabled' });
       await dialog.getByRole('button', { name: 'Next' }).click();
       await dialog.getByText('True', { exact: true }).click();
       await dialog.getByRole('button', { name: 'Finish' }).click();

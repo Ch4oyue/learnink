@@ -76,15 +76,15 @@ export function PremiumStore() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
             LearnInk Elite
           </h2>
           <p className="text-muted-foreground">1.5x XP and an Elite badge on your profile, for as long as it lasts.</p>
         </div>
-        <div className="text-right">
+        <div className="text-left sm:shrink-0 sm:text-right">
           <Badge variant="secondary" className="text-lg px-3 py-1 gap-2">
             <Coins className="h-5 w-5 text-amber-500" />
             {profile?.points || 0} Points

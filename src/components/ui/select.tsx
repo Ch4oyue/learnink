@@ -17,7 +17,7 @@ const Select = ({value, defaultValue, onValueChange, disabled, required, ...prop
 
 type ValueProps = React.ComponentProps<typeof HeroSelect.Value> & { placeholder?: string };
 const SelectValue = ({placeholder, children, ...props}: ValueProps) => (
-  <HeroSelect.Value {...props}>{children ?? (({isPlaceholder, selectedText}) => isPlaceholder ? placeholder : selectedText)}</HeroSelect.Value>
+  <HeroSelect.Value {...props} className="data-[placeholder=true]:text-muted-foreground">{children ?? (({isPlaceholder, selectedText}) => isPlaceholder ? placeholder : selectedText)}</HeroSelect.Value>
 );
 
 const SelectTrigger = React.forwardRef<HTMLButtonElement, Omit<React.ComponentPropsWithoutRef<typeof HeroSelect.Trigger>, "children"> & {disabled?: boolean; children?:React.ReactNode}>(

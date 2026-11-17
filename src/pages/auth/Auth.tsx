@@ -254,10 +254,11 @@ export default function Auth() {
               <div className="flex items-center gap-2 pt-1">
                 <Checkbox
                   id="remember"
+                  aria-label="Remember me for 30 days"
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked as boolean)}
                 />
-                <label htmlFor="remember" className="text-[13px] text-muted-foreground">
+                <label htmlFor="remember" className="inline-flex min-h-11 items-center text-[13px] text-muted-foreground">
                   Remember me for 30 days
                 </label>
               </div>

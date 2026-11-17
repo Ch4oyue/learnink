@@ -37,10 +37,15 @@ for (const [label, viewport] of [['desktop', { width: 1440, height: 900 }], ['mo
       await installApp(page, { role: 'tutor', db: { ...seed(), user_roles: [{ user_id: USER_ID, role: 'tutor' }] } });
       await page.goto('/dashboard/modules');
       const row = page.getByRole('row').filter({ hasText: 'CSS Layout' });
-      await row.getByRole('button', { name: 'Module Options' }).click();
+      const options = row.getByRole('button', { name: 'Module Options' });
+      const box = await options.boundingBox();
+      expect(box && box.x >= 0 && box.x + box.width <= viewport.width).toBe(true);
+      await options.click();
       await page.getByRole('menuitem', { name: /edit/i }).click();
       await expect(page).toHaveURL(/\/dashboard\/modules\/edit\/m1$/);
       await expect(page.getByRole('heading', { name: 'Edit Module' })).toBeVisible();
+      await expect(page.getByRole('button', {name:'general Category'})).toContainText('general');
+      await expect(page.getByRole('button', {name:'beginner Level'})).toContainText('beginner');
     });
 
     test('modules (tutor): delete asks first, then sends DELETE for that module', async ({ page }) => {

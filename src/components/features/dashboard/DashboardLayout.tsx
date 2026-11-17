@@ -140,13 +140,13 @@ const MENU_CONFIG: Record<AppRole, NavGroup[]> = {
       ],
     },
     {
-      title: "THE SPECIALIST",
+      title: "Technical skills",
       items: [
         { href: "/dashboard/courses?track=specialist", label: "AI & Automation", icon: BookOpen },
       ],
     },
     {
-      title: "LIFE OS",
+      title: "Life skills",
       items: [
         { href: "/dashboard/courses?track=life-os", label: "Life Skills", icon: BookOpen },
       ],
@@ -601,7 +601,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                         <Badge
                             variant="outline"
                             className={cn(
-                                "text-[13px] font-bold uppercase tracking-wider",
+                                "text-[13px] font-medium",
                                 roleBadgeColors[currentRole]
                             )}
                         >
@@ -625,7 +625,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                      <Badge
                         variant="outline"
                         className={cn(
-                            "text-[13px] font-bold uppercase tracking-wider",
+                            "text-[13px] font-medium",
                             roleBadgeColors[currentRole]
                         )}
                     >

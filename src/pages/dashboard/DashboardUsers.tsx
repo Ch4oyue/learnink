@@ -265,7 +265,7 @@ export default function DashboardUsers() {
           ) : (
             <div className="w-full overflow-x-auto">
               <Table>
-                <TableHeader>
+                <TableHeader className="hidden md:table-header-group">
                   <TableRow>
                     <TableHead>User</TableHead>
                     <TableHead>Role</TableHead>
@@ -274,7 +274,7 @@ export default function DashboardUsers() {
                     <TableHead>Change Role</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="block md:table-row-group">
                   {filteredUsers?.map((user) => {
                     const config = roleConfig[user.role];
                     const isSelf = user.id === currentUser?.id;
@@ -282,8 +282,8 @@ export default function DashboardUsers() {
                     const isProtected = user.role === 'superadmin';
 
                     return (
-                      <TableRow key={user.id}>
-                        <TableCell>
+                      <TableRow key={user.id} className="grid grid-cols-2 md:table-row">
+                        <TableCell className="col-span-2 md:table-cell">
                           <div className="flex items-center gap-3">
                             <Avatar isPremium={user.is_premium} className="h-9 w-9">
                               <AvatarImage src={user.avatar_url || undefined} />
@@ -310,6 +310,7 @@ export default function DashboardUsers() {
                           </div>
                         </TableCell>
                         <TableCell>
+                          <p className="text-xs text-muted-foreground mb-2 md:hidden">Role</p>
                           <Badge variant={config.variant} className="gap-1">
                             {config.icon}
                             {config.label}
@@ -322,6 +323,7 @@ export default function DashboardUsers() {
                           }
                         </TableCell>
                         <TableCell>
+                          <p className="text-xs text-muted-foreground mb-2 md:hidden">Labels</p>
                           <div className="flex flex-wrap gap-1 max-w-[200px]">
                             {user.labels?.map(l => (
                               <Badge key={l} variant="secondary" className="text-[13px] px-1 h-5">
@@ -357,7 +359,8 @@ export default function DashboardUsers() {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="col-span-2 md:table-cell">
+                          <p className="text-xs text-muted-foreground mb-2 md:hidden">Change role</p>
                           {isProtected ? (
                             <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
                               <Shield className="h-3 w-3 mr-1" />

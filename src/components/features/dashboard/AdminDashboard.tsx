@@ -164,8 +164,8 @@ export function AdminDashboardContent() {
         </div>
         <div className="bg-card border border-border rounded-xl p-5 shadow-soft">
           <div className="flex items-center gap-4">
-            <div className="h-11 w-11 rounded-lg bg-purple-500/10 flex items-center justify-center">
-              <GraduationCap className="h-5 w-5 text-purple-500" />
+            <div className="h-11 w-11 rounded-lg bg-primary/10 flex items-center justify-center">
+              <GraduationCap className="h-5 w-5 text-primary" />
             </div>
             <div>
               <p className="text-2xl font-semibold text-foreground">{tutorCount}</p>

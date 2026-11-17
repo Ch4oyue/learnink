@@ -108,7 +108,7 @@ export default function SecondBrain() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex items-center gap-3">
                         <div className="p-2.5 rounded-xl bg-primary/10">
-                            <Brain className="h-6 w-6 text-purple-400" />
+                            <Brain className="h-6 w-6 text-primary" />
                         </div>
                         <div>
                             <h1 className="text-2xl font-bold tracking-tight">Second Brain</h1>
@@ -211,8 +211,8 @@ export default function SecondBrain() {
                                     <Card
                                         key={note.id}
                                         className={cn(
-                                            "group relative hover:border-purple-500/50 transition-all duration-200",
-                                            "hover:shadow-lg hover:shadow-purple-500/5"
+                                            "group relative transition-shadow duration-200",
+                                            "hover:shadow-md"
                                         )}
                                     >
                                         <CardHeader className="pb-2">
@@ -220,7 +220,7 @@ export default function SecondBrain() {
                                             <div className="flex items-start justify-between">
                                                 <Link
                                                     to={`/modules/${note.module_id}/learn`}
-                                                    className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-colors group/link"
+                                                    className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/80 transition-colors group/link"
                                                 >
                                                     <span className="truncate max-w-[180px]">
                                                         {moduleInfo?.title ?? "Modul"}
@@ -252,7 +252,7 @@ export default function SecondBrain() {
                                         <CardContent className="space-y-2">
                                             {/* Highlighted Text */}
                                             {note.highlighted_text && (
-                                                <div className="p-2 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-xs text-yellow-200/80 italic">
+                                                <div className="p-2 rounded-lg bg-amber-500/10 text-xs text-foreground/80 italic">
                                                     "{note.highlighted_text}"
                                                 </div>
                                             )}

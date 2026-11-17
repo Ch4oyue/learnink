@@ -373,7 +373,7 @@ export default function SystemControl() {
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Tags className="h-5 w-5 text-purple-500" />
+                <Tags className="h-5 w-5 text-primary" />
                 Label Multiplier Management
               </CardTitle>
               <CardDescription>

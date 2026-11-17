@@ -33,6 +33,27 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+// Settings are stored as text ("1.0"), read back with parseFloat by the award-xp function.
+// The UI only accepts a finite number >= 0 so a typo can never be saved as "abc" or "NaN".
+const parseMultiplier = (raw: string): number | null => {
+  const trimmed = raw.trim();
+  if (trimmed === "") return null;
+  const n = Number(trimmed);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+};
+const LABEL_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
 
 interface SystemSetting {
   key: string;
@@ -64,6 +85,9 @@ export default function SystemControl() {
   // --- LOCAL STATE ---
   const [globalXp, setGlobalXp] = useState("1.0");
   const [apkBonus, setApkBonus] = useState("1.0");
+  const [newLabelOpen, setNewLabelOpen] = useState(false);
+  const [newLabelId, setNewLabelId] = useState("");
+  const [labelToDelete, setLabelToDelete] = useState<string | null>(null);
   const [broadcast, setBroadcast] = useState({ title: "", content: "", active: false });
 
   // --- QUERIES ---
@@ -197,11 +221,14 @@ export default function SystemControl() {
                   className="max-w-[120px]"
                 />
                 <Button
-                  onClick={() => updateSetting.mutate({ key: "global_xp_multiplier", value: globalXp })}
-                  disabled={updateSetting.isPending}
+                  onClick={() => updateSetting.mutate({ key: "global_xp_multiplier", value: String(parseMultiplier(globalXp)) })}
+                  disabled={updateSetting.isPending || parseMultiplier(globalXp) === null}
                 >
                   Save
                 </Button>
+                {parseMultiplier(globalXp) === null && (
+                  <p role="alert" className="text-sm text-destructive-text">Enter a number, 0 or higher.</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -250,11 +277,14 @@ export default function SystemControl() {
                   className="max-w-[120px]"
                 />
                 <Button
-                  onClick={() => updateSetting.mutate({ key: "apk_base_bonus", value: apkBonus })}
-                  disabled={updateSetting.isPending}
+                  onClick={() => updateSetting.mutate({ key: "apk_base_bonus", value: String(parseMultiplier(apkBonus)) })}
+                  disabled={updateSetting.isPending || parseMultiplier(apkBonus) === null}
                 >
                   Save
                 </Button>
+                {parseMultiplier(apkBonus) === null && (
+                  <p role="alert" className="text-sm text-destructive-text">Enter a number, 0 or higher.</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -380,10 +410,7 @@ export default function SystemControl() {
                 Set the XP multiplier for each user label/tag.
               </CardDescription>
             </div>
-            <Button onClick={() => {
-              const id = prompt("Enter a new label ID (e.g. beta-tester):");
-              if (id) manageLabel.mutate({ id, multiplier: 1.0, description: "", is_active: true });
-            }} size="sm">
+            <Button onClick={() => { setNewLabelId(""); setNewLabelOpen(true); }} size="sm">
               <Plus className="h-4 w-4 mr-2" /> Add Label
             </Button>
           </CardHeader>
@@ -408,7 +435,16 @@ export default function SystemControl() {
                         step="0.1"
                         defaultValue={label.multiplier}
                         className="w-20"
-                        onBlur={(e) => manageLabel.mutate({ ...label, multiplier: parseFloat(e.target.value) })}
+                        aria-label={`Multiplier for ${label.id}`}
+                        onBlur={(e) => {
+                          const next = parseMultiplier(e.target.value);
+                          if (next === null) {
+                            e.target.value = String(label.multiplier);
+                            toast({ title: "Invalid multiplier", description: "Enter a number, 0 or higher.", variant: "destructive" });
+                            return;
+                          }
+                          if (next !== label.multiplier) manageLabel.mutate({ ...label, multiplier: next });
+                        }}
                       />
                     </TableCell>
                     <TableCell>
@@ -428,9 +464,8 @@ export default function SystemControl() {
                         variant="ghost"
                         size="icon"
                         className="text-destructive-text"
-                        onClick={() => {
-                          if (confirm(`Delete label ${label.id}?`)) deleteLabel.mutate(label.id);
-                        }}
+                        aria-label={`Delete label ${label.id}`}
+                        onClick={() => setLabelToDelete(label.id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -462,6 +497,52 @@ export default function SystemControl() {
            </Card>
         </div>
       </div>
+      <Dialog open={newLabelOpen} onOpenChange={setNewLabelOpen}>
+        <DialogContent>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const id = newLabelId.trim();
+              if (!LABEL_ID_PATTERN.test(id) || labelConfigs?.some((l) => l.id === id)) return;
+              manageLabel.mutate({ id, multiplier: 1.0, description: "", is_active: true });
+              setNewLabelOpen(false);
+            }}
+            className="space-y-4"
+          >
+            <DialogHeader>
+              <DialogTitle>Add label</DialogTitle>
+              <DialogDescription>Labels tag users and carry an XP multiplier. Start with 1.0 and edit it in the table.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2">
+              <Label htmlFor="new-label-id">Label ID</Label>
+              <Input id="new-label-id" value={newLabelId} onChange={(e) => setNewLabelId(e.target.value)} placeholder="e.g. beta-tester" autoFocus />
+              {newLabelId.trim() !== "" && !LABEL_ID_PATTERN.test(newLabelId.trim()) && (
+                <p role="alert" className="text-sm text-destructive-text">Use letters, numbers, dashes or underscores, without spaces.</p>
+              )}
+              {labelConfigs?.some((l) => l.id === newLabelId.trim()) && (
+                <p role="alert" className="text-sm text-destructive-text">This label already exists.</p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setNewLabelOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={!LABEL_ID_PATTERN.test(newLabelId.trim()) || !!labelConfigs?.some((l) => l.id === newLabelId.trim())}>Add label</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={labelToDelete !== null} onOpenChange={(open) => { if (!open) setLabelToDelete(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete label {labelToDelete}?</AlertDialogTitle>
+            <AlertDialogDescription>The label and its multiplier are removed. This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { if (labelToDelete) deleteLabel.mutate(labelToDelete); setLabelToDelete(null); }}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

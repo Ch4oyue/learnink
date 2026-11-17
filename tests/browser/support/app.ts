@@ -113,8 +113,13 @@ export async function installApp(page: Page, opts: AppOptions = {}): Promise<App
       writes.push(`POST ${path}`);
       let body: Row | Row[] = {};
       try { body = JSON.parse(req.postData() ?? '{}'); } catch { /* empty */ }
-      const added = (Array.isArray(body) ? body : [body]).map((r, i) => ({ id: `new-${rows.length + i}`, ...r }));
-      db[path] = [...rows, ...added];
+      const incoming = (Array.isArray(body) ? body : [body]).map((r, i) => ({ id: `new-${rows.length + i}`, ...r }));
+      // PostgREST upsert (Prefer: resolution=merge-duplicates) replaces the row with the same id instead of appending.
+      const upsert = (req.headers()['prefer'] ?? '').includes('resolution=merge-duplicates');
+      const added = incoming;
+      db[path] = upsert
+        ? [...rows.map((r) => incoming.find((n) => n.id === r.id) ? { ...r, ...incoming.find((n) => n.id === r.id) } : r), ...incoming.filter((n) => !rows.some((r) => r.id === n.id))]
+        : [...rows, ...added];
       return json(wantsObject ? added[0] : added, 201);
     }
     const filtered = rows.filter((r) => matches(r, url.searchParams));

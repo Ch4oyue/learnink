@@ -16,7 +16,7 @@ test('admin vs tutor columns, fallbacks, action eligibility and status mutation'
   await expect(page.getByRole('columnheader')).toHaveCount(5);
   await expect(page.getByRole('cell', { name: '11/16/2026', exact: true })).toHaveCount(4);
   const row = page.getByRole('row').filter({ hasText: 'Topic 0' });
-  await row.getByRole('combobox').click();
+  await row.locator('[data-slot="select-trigger"]').click();
   await page.getByRole('option', { name: 'Rejected', exact: true }).click();
   await expect(page.getByTestId('events')).toHaveText('[{"update":{"id":"request-0","status":"rejected"}}]');
   await expect(row.getByRole('button', { name: 'Generate AI' })).toHaveCount(0);
@@ -24,21 +24,21 @@ test('admin vs tutor columns, fallbacks, action eligibility and status mutation'
 
 test('generate requires confirmation, cancel is inert, and next dialog uses next request', async ({ page }) => {
   await page.getByRole('row').filter({ hasText: 'Topic 0' }).getByRole('button', { name: 'Generate AI' }).click();
-  await expect(page.getByRole('alertdialog')).toContainText('Topic 0');
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toContainText('Topic 0');
   await expect(page.getByTestId('events')).toHaveText('[]');
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();
-  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toHaveCount(0);
   await expect(page.getByTestId('events')).toHaveText('[]');
   await page.getByRole('row').filter({ hasText: 'Topic 1' }).getByRole('button', { name: 'Generate AI' }).click();
-  await expect(page.getByRole('alertdialog')).toContainText('Topic 1');
-  await expect(page.getByRole('alertdialog')).not.toContainText('Topic 0');
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toContainText('Topic 1');
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).not.toContainText('Topic 0');
   await page.getByRole('button', { name: 'Generate Module', exact: true }).click();
-  await expect(page.getByRole('alertdialog')).toHaveCount(0);
+  await expect(page.locator('[role=alertdialog]:not([aria-modal=false])')).toHaveCount(0);
   await expect(page.getByTestId('events')).toHaveText('[{"generate":"request-1"}]');
 });
 
 test('raw filter values, loading, empty states and pending disabled buttons', async ({ page }) => {
-  await page.getByRole('combobox').first().click();
+  await page.locator('[data-slot="select-trigger"]').first().click();
   await page.getByRole('option', { name: 'Under Review', exact: true }).click();
   await expect(page.getByRole('row').filter({ hasText: 'Topic' })).toHaveCount(2);
   await expect(page.getByRole('row').filter({ hasText: 'Topic 1' })).toBeVisible();

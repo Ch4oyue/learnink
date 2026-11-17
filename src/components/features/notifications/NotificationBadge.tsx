@@ -109,6 +109,7 @@ export function NotificationBadge() {
     <Popover>
       <PopoverTrigger asChild>
         <Button
+          aria-label="Notifications"
           variant="ghost"
           size="icon"
           className="relative h-9 w-9 rounded-full hover:bg-secondary/80 transition-colors"
@@ -122,6 +123,7 @@ export function NotificationBadge() {
         </Button>
       </PopoverTrigger>
       <PopoverContent
+        aria-label="Notifications"
         className="w-80 p-0 rounded-2xl shadow-elevated border-border/50"
         align="end"
       >

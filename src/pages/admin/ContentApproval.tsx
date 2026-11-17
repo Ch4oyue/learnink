@@ -473,7 +473,7 @@ export default function ContentApproval() {
                                 value={formData.title}
                                 onChange={e => setFormData({...formData, title: e.target.value})}
                                 required
-                                className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
+                                className="bg-black/20 rounded-2xl focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
                             />
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -482,14 +482,14 @@ export default function ContentApproval() {
                                 <Textarea
                                     value={formData.summary}
                                     onChange={e => setFormData({...formData, summary: e.target.value})}
-                                    className="h-20 resize-none bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
+                                    className="h-20 resize-none bg-black/20 rounded-2xl focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
                                 />
                             </div>
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <Label>Category</Label>
-                                    <Select value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
-                                        <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
+                                    <Select aria-label="Category" value={formData.category} onValueChange={v => setFormData({...formData, category: v})}>
+                                        <SelectTrigger className="bg-black/20 rounded-2xl focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             {categories.map(c => <SelectItem key={c.id} value={c.name}>{displayCategory(c.name)}</SelectItem>)}
                                         </SelectContent>
@@ -497,8 +497,8 @@ export default function ContentApproval() {
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Level</Label>
-                                    <Select value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
-                                        <SelectTrigger className="bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
+                                    <Select aria-label="Level" value={formData.level} onValueChange={v => setFormData({...formData, level: v})}>
+                                        <SelectTrigger className="bg-black/20 rounded-2xl focus:bg-black/40 transition-all duration-300"><SelectValue /></SelectTrigger>
                                         <SelectContent>
                                             {levels.map(l => <SelectItem key={l.id} value={l.name}>{displayLevel(l.name)}</SelectItem>)}
                                         </SelectContent>
@@ -512,7 +512,7 @@ export default function ContentApproval() {
                             <div className="hidden md:block flex-1 overflow-hidden min-h-0">
                                 <ResizablePanelGroup direction="horizontal" className="gap-4">
                                     <ResizablePanel defaultSize={50} minSize={30}>
-                                        <div className="h-full flex flex-col p-4 overflow-y-auto bg-black/20 border border-white/10 rounded-2xl backdrop-blur-sm">
+                                        <div className="h-full flex flex-col p-4 overflow-y-auto bg-black/20 border rounded-2xl">
                                             <span className="text-xs font-semibold text-muted-foreground mb-4 flex items-center gap-1 sticky top-0 bg-transparent z-10">
                                                 <FileText className="h-3 w-3" /> Editor
                                             </span>
@@ -526,7 +526,7 @@ export default function ContentApproval() {
                                     </ResizablePanel>
                                     <ResizableHandle withHandle />
                                     <ResizablePanel defaultSize={50} minSize={30}>
-                                        <div className="h-full flex flex-col p-4 bg-black/20 border border-white/10 rounded-2xl backdrop-blur-sm">
+                                        <div className="h-full flex flex-col p-4 bg-black/20 border rounded-2xl">
                                             <span className="text-xs font-semibold text-muted-foreground mb-4 flex items-center gap-1">
                                                 <Eye className="h-3 w-3" /> Live Preview
                                             </span>
@@ -554,12 +554,12 @@ export default function ContentApproval() {
                                             <AutoResizeTextarea
                                                 value={formData.content}
                                                 onChange={e => setFormData({...formData, content: e.target.value})}
-                                                className="font-mono text-sm min-h-[300px] bg-black/20 border-white/10 rounded-2xl backdrop-blur-sm focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
+                                                className="font-mono text-sm min-h-[300px] bg-black/20 rounded-2xl focus:bg-black/40 transition-all duration-300 placeholder:text-muted-foreground/50"
                                                 placeholder="Write content in Markdown..."
                                             />
                                         </TabsContent>
                                         <TabsContent value="preview" className="mt-0">
-                                            <div className="border border-white/10 rounded-2xl p-4 min-h-[300px] bg-black/20 backdrop-blur-sm">
+                                            <div className="border rounded-2xl p-4 min-h-[300px] bg-black/20">
                                                 <MarkdownRenderer content={formData.content} />
                                             </div>
                                         </TabsContent>

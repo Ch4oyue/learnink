@@ -220,17 +220,7 @@ export default function IntegrationManager() {
     // Regenerate key mutation
     const regenerateMutation = useMutation({
         mutationFn: async (integration: Integration) => {
-            // Delete old integration
-            const { error: deleteError } = await supabase
-                .from("integrations")
-                .delete()
-                .eq("id", integration.id);
-
-            if (deleteError) {
-                throw new Error(`Failed to delete old integration: ${deleteError.message}`);
-            }
-
-            // Create new one
+            // Create the replacement first: if this fails the existing integration and its key stay intact.
             const { data, error } = await supabase.functions.invoke("generate-api-key", {
                 body: {
                     name: integration.name,
@@ -248,13 +238,33 @@ export default function IntegrationManager() {
                 throw new Error(data?.error || "Failed to generate API key");
             }
 
+            // Only now retire the old key.
+            const { error: deleteError } = await supabase
+                .from("integrations")
+                .delete()
+                .eq("id", integration.id);
+
+            if (deleteError) {
+                // Report the partial rotation honestly instead of hiding the new key behind an error.
+                logger.error("Old integration could not be removed:", deleteError);
+                return { ...data, oldRemoved: false as const };
+            }
+
             return data;
         },
         onSuccess: (data) => {
-            toast({
-                title: "API Key Updated! 🔑",
-                description: "The old key is no longer valid. Save the new key!",
-            });
+            if ("oldRemoved" in data && data.oldRemoved === false) {
+                toast({
+                    title: "New key created, old key still active",
+                    description: "The old integration could not be removed. Save the new key, then delete the old entry manually.",
+                    variant: "destructive",
+                });
+            } else {
+                toast({
+                    title: "API Key Updated! 🔑",
+                    description: "The old key is no longer valid. Save the new key!",
+                });
+            }
             setNewApiKey(data.api_key);
             setRegenerate(null);
             setIsCreateOpen(true); // Open dialog to show new key
@@ -383,6 +393,7 @@ export default function IntegrationManager() {
                                                 </CardDescription>
                                             </div>
                                             <Switch
+                                                aria-label={`${integration.name} active`}
                                                 checked={integration.is_active}
                                                 onCheckedChange={(checked) =>
                                                     toggleActiveMutation.mutate({
@@ -620,7 +631,7 @@ export default function IntegrationManager() {
 
                             <div className="space-y-2">
                                 <Label htmlFor="source">Source</Label>
-                                <Select
+                                <Select aria-label="Source"
                                     value={formData.source}
                                     onValueChange={(value: IntegrationSource) =>
                                         setFormData({ ...formData, source: value })

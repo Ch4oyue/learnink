@@ -9,10 +9,10 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { usePWA } from "@/contexts/PWAContext";
 import { useUserProgress } from "@/hooks/useUserProgress";
 import { useLearningStats } from "@/hooks/useLearningStats";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
@@ -27,20 +27,14 @@ import {
   Users,
   CheckCircle2,
   Download,
-  MapPin,
   Flame,
-  Trophy,
   Brain,
-  Lock,
   ChevronRight,
   Loader2,
   Save,
   BookOpen,
   Clock,
   LogOut,
-  Sun,
-  Moon,
-  Monitor,
   Construction,
   Sparkles,
   StickyNote,
@@ -59,50 +53,6 @@ const roleLabels: Record<string, string> = {
   superadmin: "Super Admin",
 };
 
-// Dummy activity data for the chart
-const activityData = [
-  { day: "Mon", minutes: 45, height: 40 },
-  { day: "Tue", minutes: 70, height: 65 },
-  { day: "Wed", minutes: 30, height: 30 },
-  { day: "Thu", minutes: 105, height: 85 },
-  { day: "Fri", minutes: 130, height: 95, isToday: true },
-  { day: "Sat", minutes: 55, height: 50 },
-  { day: "Sun", minutes: 15, height: 20 },
-];
-
-const achievements = [
-  {
-    id: 1,
-    title: "Fast Learner",
-    description: "Completed 5 lessons in one day",
-    icon: Trophy,
-    bgColor: "from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30",
-    borderColor: "border-yellow-200 dark:border-yellow-800/50",
-    iconColor: "text-yellow-600 dark:text-yellow-500",
-    unlocked: true,
-  },
-  {
-    id: 2,
-    title: "Deep Focus",
-    description: "2 hours of uninterrupted study",
-    icon: Brain,
-    bgColor: "from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30",
-    borderColor: "border-blue-200 dark:border-blue-800/50",
-    iconColor: "text-blue-600 dark:text-blue-500",
-    unlocked: true,
-  },
-  {
-    id: 3,
-    title: "Note Master",
-    description: "Create 50 notes (18/50)",
-    icon: Lock,
-    bgColor: "",
-    borderColor: "border-border",
-    iconColor: "text-muted-foreground",
-    unlocked: false,
-  },
-];
-
 // ============================================
 // MAIN COMPONENT
 // ============================================
@@ -110,7 +60,6 @@ const achievements = [
 export default function DashboardProfile() {
   const navigate = useNavigate();
   const { user, role, profile, signOut } = useAuth();
-  const { theme, setTheme } = useTheme();
   const { isInstalled, deferredPrompt, installApp } = usePWA();
   const { toast } = useToast();
   const { data: progress } = useUserProgress(user?.id);
@@ -175,10 +124,12 @@ export default function DashboardProfile() {
       if (error) throw error;
 
       // Also update the profiles table
-      await supabase
+      const { error: profileError } = await supabase
         .from("profiles")
         .update({ display_name: displayName })
         .eq("id", user.id);
+
+      if (profileError) throw profileError;
 
       toast({
         title: "Success",
@@ -202,14 +153,13 @@ export default function DashboardProfile() {
     navigate("/");
   };
 
-  const formatMinutes = (mins: number) => {
-    if (mins >= 60) {
-      const hours = Math.floor(mins / 60);
-      const minutes = mins % 60;
-      return `${hours}h ${minutes}m`;
-    }
-    return `${mins} mins`;
-  };
+  const { data: analytics, isLoading: isAnalyticsLoading } = useAnalytics(user?.id);
+  const week = (analytics?.activity ?? []).slice(-7).map((d) => {
+    const total = d.completions + d.quizAttempts;
+    return { key: d.day, label: new Date(d.day + "T00:00:00Z").toLocaleDateString("en-US", { weekday: "short", timeZone: "UTC" }), total };
+  });
+  const weekMax = Math.max(1, ...week.map((d) => d.total));
+  const weekTotal = week.reduce((n, d) => n + d.total, 0);
 
   return (
     <DashboardLayout>
@@ -248,9 +198,8 @@ export default function DashboardProfile() {
         {activeTab === "profile" && (
           <>
             {/* Glass Hero Profile Header */}
-            <div className="relative rounded-3xl overflow-hidden glass-panel border border-white/20 dark:border-white/5 shadow-2xl">
+            <div className="relative rounded-3xl overflow-hidden border shadow-2xl">
               {/* Background Gradient Blob */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-purple-500/10 dark:from-primary/10 dark:to-purple-900/20 blur-3xl opacity-50" />
 
               <div className="relative z-10 p-8 sm:p-10 flex flex-col md:flex-row items-center md:items-start gap-8">
                 {/* Glass Avatar Container */}
@@ -258,17 +207,17 @@ export default function DashboardProfile() {
                   <div className="absolute inset-0 bg-primary/20 blur-2xl rounded-full scale-110 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <Avatar
                     isPremium={profile?.is_premium}
-                    className="h-40 w-40 border-4 border-white/50 dark:border-white/10 shadow-xl ring-4 ring-white/20 dark:ring-black/20 backdrop-blur-md"
+                    className="h-40 w-40 border-4 shadow-xl ring-4 ring-white/20 dark:ring-black/20 backdrop-blur-md"
                   >
                     <AvatarImage src={profile?.avatar_url || undefined} alt={userName} className="object-cover" />
-                    <AvatarFallback className="text-5xl font-extrabold bg-gradient-to-br from-primary/20 to-primary/5 text-primary backdrop-blur-md">
+                    <AvatarFallback className="text-5xl font-extrabold bg-primary/10 text-primary">
                       {userInitials}
                     </AvatarFallback>
                   </Avatar>
 
                   {/* Glass Streak Badge */}
                   <div
-                    className="absolute -bottom-2 -right-2 flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-md border border-white/40 dark:border-white/10 shadow-lg z-20 transition-transform hover:scale-105"
+                    className="absolute -bottom-2 -right-2 flex flex-col items-center justify-center p-3 rounded-2xl bg-white/80 dark:bg-black/60 backdrop-blur-md border shadow-lg z-20 transition-transform hover:scale-105"
                     title={`${streak}-Day Streak!`}
                   >
                     <Flame className="h-6 w-6 text-orange-500 fill-orange-500 animate-pulse-slow" />
@@ -279,7 +228,7 @@ export default function DashboardProfile() {
 
                   {/* Glass Camera Button */}
                   <button
-                    className="absolute top-2 right-2 h-10 w-10 rounded-full bg-white/20 dark:bg-black/40 backdrop-blur-md flex items-center justify-center text-foreground hover:bg-primary hover:text-white transition-all border border-white/20 shadow-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300"
+                    className="absolute top-2 right-2 h-10 w-10 rounded-full bg-white/20 dark:bg-black/40 backdrop-blur-md flex items-center justify-center text-foreground hover:bg-primary hover:text-white transition-all border shadow-sm opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0 duration-300"
                     aria-label="Change Avatar"
                   >
                     <Camera className="h-5 w-5" />
@@ -289,32 +238,25 @@ export default function DashboardProfile() {
                 {/* Profile Info */}
                 <div className="flex-1 text-center md:text-left space-y-4">
                   <div>
-                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
+                    <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">
                       {userName}
                     </h1>
                     <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-3">
                       {role === 'superadmin' ? (
-                        <Badge variant="outline" className="glass-button border-amber-500/30 text-amber-600 dark:text-amber-400">
+                        <Badge variant="outline" className="border-amber-500/30 text-amber-600 dark:text-amber-400">
                           <Crown className="h-3 w-3 mr-1" /> Super Admin
                         </Badge>
                       ) : role ? (
-                        <Badge variant="outline" className="glass-button border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
+                        <Badge variant="outline" className="border-emerald-500/30 text-emerald-600 dark:text-emerald-400">
                           <CheckCircle className="h-3 w-3 mr-1" /> {roleLabels[role] || "Member"}
                         </Badge>
                       ) : null}
-                      <Badge variant="outline" className="glass-button">
-                        <MapPin className="h-3 w-3 mr-1" /> Earth
-                      </Badge>
                     </div>
                   </div>
 
-                  <p className="text-lg text-muted-foreground/80 max-w-xl font-medium leading-relaxed">
-                    "Lifelong learner exploring new skills and building the future."
-                  </p>
-
                   {/* Action Buttons */}
                   <div className="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
-                    <Button onClick={() => setIsEditing(true)} className="glass-button-primary h-12 px-8 rounded-2xl shadow-lg hover:shadow-primary/20">
+                    <Button onClick={() => setIsEditing(true)} className="h-12 px-8 rounded-2xl shadow-lg hover:shadow-primary/20">
                       <Edit className="h-4 w-4 mr-2" /> Edit Profile
                     </Button>
                     <Button variant="ghost" onClick={handleSignOut} className="h-12 px-6 rounded-2xl text-muted-foreground hover:bg-destructive/10 hover:text-destructive-text transition-colors">
@@ -332,48 +274,35 @@ export default function DashboardProfile() {
                   <div>
                     <CardTitle>Learning Activity</CardTitle>
                     <p className="text-sm text-muted-foreground mt-1">
-                      Your daily progress over the last week
+                      Modules completed and quizzes taken, last 7 days
                     </p>
                   </div>
-                  <div className="hidden sm:flex bg-muted p-1 rounded-lg">
-                    <button className="px-3 py-1 text-xs font-bold text-primary bg-card shadow-sm rounded-md">
-                      Weekly
-                    </button>
-                    <button className="px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
-                      Monthly
-                    </button>
-                  </div>
-                </CardHeader>
+                  </CardHeader>
                 <CardContent>
-                  {/* Activity Chart */}
-                  <div className="w-full h-48 flex items-end justify-between gap-2 sm:gap-4 mt-4">
-                    {activityData.map((item) => (
-                      <div key={item.day} className="group flex flex-col items-center gap-2 flex-1 cursor-pointer">
-                        <div className="relative w-full bg-muted rounded-t-lg h-32 flex items-end overflow-hidden">
-                          <div
-                            className={`w-full transition-all rounded-t-lg relative ${item.isToday
-                              ? "bg-primary hover:bg-primary/90 shadow-glow"
-                              : "bg-primary/40 group-hover:bg-primary/60"
-                              }`}
-                            style={{ height: `${item.height}%` }}
-                          >
-                            <div
-                              className={`absolute -top-8 left-1/2 -translate-x-1/2 bg-foreground text-background text-[13px] py-1 px-2 rounded transition-opacity whitespace-nowrap z-10 ${item.isToday ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                                }`}
-                            >
-                              {formatMinutes(item.minutes)}
+                  {/* Activity Chart: real completions + quiz attempts per day */}
+                  {isAnalyticsLoading ? (
+                    <p role="status" className="mt-4 text-sm text-muted-foreground">Loading activity…</p>
+                  ) : weekTotal === 0 ? (
+                    <p className="mt-4 text-sm text-muted-foreground">No activity in the last 7 days.</p>
+                  ) : (
+                    <div className="w-full h-48 flex items-end justify-between gap-2 sm:gap-4 mt-4" role="img" aria-label={`${weekTotal} learning events in the last 7 days`}>
+                      {week.map((item, i) => {
+                        const isToday = i === week.length - 1;
+                        return (
+                          <div key={item.key} className="group flex flex-col items-center gap-2 flex-1">
+                            <div className="relative w-full bg-muted rounded-t-lg h-32 flex items-end overflow-hidden">
+                              <div
+                                className={`w-full rounded-t-lg ${isToday ? "bg-primary" : "bg-primary/40"}`}
+                                style={{ height: `${item.total === 0 ? 0 : Math.max(8, (item.total / weekMax) * 100)}%` }}
+                              />
                             </div>
+                            <span className="text-[13px] tabular-nums text-muted-foreground">{item.total}</span>
+                            <span className={`text-xs font-medium ${isToday ? "text-primary font-bold" : "text-muted-foreground"}`}>{item.label}</span>
                           </div>
-                        </div>
-                        <span
-                          className={`text-xs font-medium ${item.isToday ? "text-primary font-bold" : "text-muted-foreground"
-                            }`}
-                        >
-                          {item.day}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {/* Stats Footer */}
                   <div className="mt-6 pt-6 border-t border-border flex flex-wrap justify-between items-center gap-4">
@@ -472,9 +401,9 @@ export default function DashboardProfile() {
 
             {/* Two Column Layout - Hidden during edit mode for focus */}
             {!isEditing && (
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 gap-8">
                 {/* Personal Information */}
-                <div className="lg:col-span-2">
+                <div>
                   <Card>
                     <CardHeader>
                       <CardTitle>Personal Information</CardTitle>
@@ -565,39 +494,6 @@ export default function DashboardProfile() {
                     </CardContent>
                   </Card>
                 </div>
-
-                {/* Achievements */}
-                <div className="lg:col-span-1">
-                  <Card className="h-full">
-                    <CardHeader className="flex flex-row items-center justify-between">
-                      <CardTitle className="text-lg">Recent Achievements</CardTitle>
-                      <Link to="/dashboard/achievements" className="text-xs font-bold text-primary hover:text-primary/80">
-                        View All
-                      </Link>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {achievements.map((achievement) => (
-                          <div
-                            key={achievement.id}
-                            className={`flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer ${!achievement.unlocked ? "opacity-60 grayscale" : ""
-                              }`}
-                          >
-                            <div
-                              className={`h-12 w-12 rounded-full bg-gradient-to-br ${achievement.bgColor || "bg-muted"} flex items-center justify-center shrink-0 border ${achievement.borderColor}`}
-                            >
-                              <achievement.icon className={`h-5 w-5 ${achievement.iconColor}`} />
-                            </div>
-                            <div>
-                              <h3 className="text-sm font-bold">{achievement.title}</h3>
-                              <p className="text-xs text-muted-foreground">{achievement.description}</p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
               </div>
             )}
           </>
@@ -652,43 +548,11 @@ export default function DashboardProfile() {
             <Card>
               <CardHeader>
                 <CardTitle>Appearance</CardTitle>
-                <CardDescription>
-                  Customize how LearnInk looks on your device
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  {[
-                    { value: "light" as const, label: "Light", icon: Sun, description: "Light background" },
-                    { value: "dark" as const, label: "Dark", icon: Moon, description: "Dark background" },
-                    { value: "system" as const, label: "System", icon: Monitor, description: "Match device" },
-                  ].map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => setTheme(option.value)}
-                      className={`flex flex-col items-center gap-3 p-6 rounded-xl border-2 transition-all ${theme === option.value
-                        ? "border-primary bg-primary/5"
-                        : "border-border hover:border-primary/50 hover:bg-muted/50"
-                        }`}
-                    >
-                      <option.icon
-                        className={`h-8 w-8 ${theme === option.value ? "text-primary" : "text-muted-foreground"
-                          }`}
-                      />
-                      <div className="text-center">
-                        <span
-                          className={`text-sm font-medium block ${theme === option.value ? "text-primary" : "text-foreground"
-                            }`}
-                        >
-                          {option.label}
-                        </span>
-                        <span className="text-xs text-muted-foreground mt-1 block">
-                          {option.description}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
+                <Link to="/dashboard/settings" className="text-sm text-primary hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring">
+                  Open settings
+                </Link>
               </CardContent>
             </Card>
 
@@ -806,7 +670,7 @@ export default function DashboardProfile() {
                       className={`flex flex-col items-center gap-2 group ${!contrib.url && "cursor-default"}`}
                     >
                       <div className="relative">
-                        <Avatar className="h-14 w-14 border-2 border-background shadow-sm group-hover:scale-110 transition-transform duration-200 group-hover:shadow-glow">
+                        <Avatar className="h-14 w-14 border-2 border-background shadow-sm group-hover:scale-110 transition-transform duration-200 group-hover:shadow-md">
                           <AvatarImage src={contrib.image} alt={contrib.name} className="object-cover" />
                           <AvatarFallback className={`${contrib.color} text-white font-bold`}>
                             {contrib.initial}

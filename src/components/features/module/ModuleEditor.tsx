@@ -186,6 +186,7 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 <FormItem className="flex items-center gap-2 space-y-0">
                   <FormControl>
                     <Switch
+                      aria-label="Published"
                       checked={field.value}
                       onCheckedChange={field.onChange}
                     />
@@ -256,13 +257,14 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select aria-label="Category" value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        {field.value && !categories.includes(field.value as typeof categories[number]) && <SelectItem value={field.value}>{displayCategory(field.value)}</SelectItem>}
                         {categories.map((cat) => (
                           <SelectItem key={cat} value={cat}>
                             {displayCategory(cat)}
@@ -281,13 +283,14 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Level</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select aria-label="Level" value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
+                        {field.value && !levels.includes(field.value as typeof levels[number]) && <SelectItem value={field.value}>{displayLevel(field.value)}</SelectItem>}
                         {levels.map((level) => (
                           <SelectItem key={level} value={level}>
                             {displayLevel(level)}
@@ -336,22 +339,20 @@ export function ModuleEditor({ module, mode }: ModuleEditorProps) {
 
           {/* Right Column - Content Editor */}
           <Card className="lg:col-span-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
             <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <CardTitle className="text-lg">Module Content</CardTitle>
-                <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid grid-cols-2 w-[200px]">
+                  <TabsList className="grid grid-cols-2 w-full sm:w-[200px]">
                     <TabsTrigger value="edit">Edit</TabsTrigger>
                     <TabsTrigger value="preview" className="gap-1">
                       <Eye className="h-3 w-3" />
                       Preview
                     </TabsTrigger>
                   </TabsList>
-                </Tabs>
               </div>
             </CardHeader>
             <CardContent>
-              <Tabs value={activeTab} onValueChange={setActiveTab}>
                 <TabsContent value="edit" className="mt-0">
                   <FormField
                     control={control}
@@ -387,8 +388,8 @@ print('Hello World')
                   {/* Isolated Content Preview */}
                   <ModuleContentPreview control={control} />
                 </TabsContent>
-              </Tabs>
             </CardContent>
+            </Tabs>
           </Card>
         </div>
       </form>

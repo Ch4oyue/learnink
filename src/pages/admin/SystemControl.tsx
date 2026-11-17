@@ -33,6 +33,28 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
+// Settings are stored as text ("1.0"), read back with parseFloat by the award-xp function.
+// The UI only accepts a finite number >= 0 so a typo can never be saved as "abc" or "NaN".
+const parseMultiplier = (raw: string): number | null => {
+  const trimmed = raw.trim();
+  if (trimmed === "") return null;
+  const n = Number(trimmed);
+  return Number.isFinite(n) && n >= 0 ? n : null;
+};
+const LABEL_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
 
 interface SystemSetting {
   key: string;
@@ -59,11 +81,15 @@ interface SecurityLog {
 
 export default function SystemControl() {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   const queryClient = useQueryClient();
 
   // --- LOCAL STATE ---
   const [globalXp, setGlobalXp] = useState("1.0");
   const [apkBonus, setApkBonus] = useState("1.0");
+  const [newLabelOpen, setNewLabelOpen] = useState(false);
+  const [newLabelId, setNewLabelId] = useState("");
+  const [labelToDelete, setLabelToDelete] = useState<string | null>(null);
   const [broadcast, setBroadcast] = useState({ title: "", content: "", active: false });
 
   // --- QUERIES ---
@@ -135,6 +161,9 @@ export default function SystemControl() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["label-configs"] });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to save label", variant: "destructive" });
     }
   });
 
@@ -146,8 +175,63 @@ export default function SystemControl() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["label-configs"] });
       toast({ title: "Label deleted" });
+    },
+    onError: () => {
+      toast({ title: "Error", description: "Failed to delete label", variant: "destructive" });
     }
   });
+
+  // Keep the validated text form: parseFloat in award-xp reads it, and "1.0" stays "1.0".
+  const saveMultiplier = (key: string, raw: string) => {
+    if (parseMultiplier(raw) === null) return;
+    updateSetting.mutate({ key, value: raw.trim() });
+  };
+
+  // --- LABEL ROW CONTROLS (shared by the desktop table and the mobile cards) ---
+  const multiplierInput = (label: LabelConfig) => (
+    <Input
+      type="number"
+      step="0.1"
+      defaultValue={label.multiplier}
+      className="w-20"
+      aria-label={`Multiplier for ${label.id}`}
+      onBlur={(e) => {
+        const next = parseMultiplier(e.target.value);
+        if (next === null) {
+          e.target.value = String(label.multiplier);
+          toast({ title: "Invalid multiplier", description: "Enter a number, 0 or higher.", variant: "destructive" });
+          return;
+        }
+        if (next !== label.multiplier) manageLabel.mutate({ ...label, multiplier: next });
+      }}
+    />
+  );
+  const descriptionInput = (label: LabelConfig) => (
+    <Input
+      defaultValue={label.description}
+      aria-label={`Description for ${label.id}`}
+      placeholder="Description"
+      onBlur={(e) => { if (e.target.value !== label.description) manageLabel.mutate({ ...label, description: e.target.value }); }}
+    />
+  );
+  const activeSwitch = (label: LabelConfig) => (
+    <Switch
+      checked={label.is_active}
+      aria-label={`Label ${label.id} active`}
+      onCheckedChange={(checked) => manageLabel.mutate({ ...label, is_active: checked })}
+    />
+  );
+  const deleteButton = (label: LabelConfig) => (
+    <Button
+      variant="ghost"
+      size="icon"
+      className="text-destructive-text"
+      aria-label={`Delete label ${label.id}`}
+      onClick={() => setLabelToDelete(label.id)}
+    >
+      <Trash2 className="h-4 w-4" />
+    </Button>
+  );
 
   // --- HELPERS ---
   const getSetting = (key: string) => settings?.find(s => s.key === key);
@@ -177,7 +261,7 @@ export default function SystemControl() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Global Multiplier */}
-          <Card className="glass-liquid border-white/10">
+          <Card className="glass-liquid">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-green-500" />
@@ -197,17 +281,20 @@ export default function SystemControl() {
                   className="max-w-[120px]"
                 />
                 <Button
-                  onClick={() => updateSetting.mutate({ key: "global_xp_multiplier", value: globalXp })}
-                  disabled={updateSetting.isPending}
+                  onClick={() => saveMultiplier("global_xp_multiplier", globalXp)}
+                  disabled={updateSetting.isPending || parseMultiplier(globalXp) === null}
                 >
                   Save
                 </Button>
+                {parseMultiplier(globalXp) === null && (
+                  <p role="alert" className="text-sm text-destructive-text">Enter a number, 0 or higher.</p>
+                )}
               </div>
             </CardContent>
           </Card>
 
           {/* Maintenance Mode */}
-          <Card className="glass-liquid border-white/10">
+          <Card className="glass-liquid">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShieldAlert className="h-5 w-5 text-red-500" />
@@ -223,6 +310,7 @@ export default function SystemControl() {
                 <p className="text-sm text-muted-foreground">Enable during major updates.</p>
               </div>
               <Switch
+                aria-label="Maintenance mode"
                 checked={getSetting("maintenance_mode")?.value === "true" || getSetting("maintenance_mode")?.value === true}
                 onCheckedChange={(checked) => updateSetting.mutate({ key: "maintenance_mode", value: checked.toString() })}
               />
@@ -230,7 +318,7 @@ export default function SystemControl() {
           </Card>
 
           {/* APK Base Bonus */}
-          <Card className="glass-liquid border-white/10">
+          <Card className="glass-liquid">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Smartphone className="h-5 w-5 text-blue-500" />
@@ -250,17 +338,20 @@ export default function SystemControl() {
                   className="max-w-[120px]"
                 />
                 <Button
-                  onClick={() => updateSetting.mutate({ key: "apk_base_bonus", value: apkBonus })}
-                  disabled={updateSetting.isPending}
+                  onClick={() => saveMultiplier("apk_base_bonus", apkBonus)}
+                  disabled={updateSetting.isPending || parseMultiplier(apkBonus) === null}
                 >
                   Save
                 </Button>
+                {parseMultiplier(apkBonus) === null && (
+                  <p role="alert" className="text-sm text-destructive-text">Enter a number, 0 or higher.</p>
+                )}
               </div>
             </CardContent>
           </Card>
 
           {/* Broadcast Message */}
-          <Card className="glass-liquid border-white/10 md:col-span-1">
+          <Card className="glass-liquid md:col-span-1">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Megaphone className="h-5 w-5 text-amber-500" />
@@ -274,6 +365,7 @@ export default function SystemControl() {
               <div className="flex items-center justify-between mb-2">
                 <Label>Enable Announcement</Label>
                 <Switch
+                  aria-label="Enable announcement"
                   checked={broadcast.active}
                   onCheckedChange={(checked) => setBroadcast({ ...broadcast, active: checked })}
                 />
@@ -306,7 +398,7 @@ export default function SystemControl() {
         </div>
 
         {/* Security Audit Trail (Quick View) */}
-        <Card className="glass-liquid border-white/10">
+        <Card className="glass-liquid">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <History className="h-5 w-5 text-amber-500" />
@@ -317,7 +409,8 @@ export default function SystemControl() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Table>
+            <p className="mb-3 text-xs text-muted-foreground sm:hidden">Swipe horizontally to see every column.</p>
+            <Table aria-label="Security audit trail">
               <TableHeader>
                 <TableRow>
                   <TableHead>Time</TableHead>
@@ -369,26 +462,45 @@ export default function SystemControl() {
         </Card>
 
         {/* Label Configs Management */}
-        <Card className="glass-liquid border-white/10">
-          <CardHeader className="flex flex-row items-center justify-between">
+        <Card className="glass-liquid">
+          <CardHeader className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
-                <Tags className="h-5 w-5 text-purple-500" />
-                Label Multiplier Management
+                <Tags className="h-5 w-5 shrink-0 text-primary" />
+                Label Multipliers
               </CardTitle>
               <CardDescription>
                 Set the XP multiplier for each user label/tag.
               </CardDescription>
             </div>
-            <Button onClick={() => {
-              const id = prompt("Enter a new label ID (e.g. beta-tester):");
-              if (id) manageLabel.mutate({ id, multiplier: 1.0, description: "", is_active: true });
-            }} size="sm">
+            <Button onClick={() => { setNewLabelId(""); setNewLabelOpen(true); }} size="sm">
               <Plus className="h-4 w-4 mr-2" /> Add Label
             </Button>
           </CardHeader>
           <CardContent>
-            <Table>
+            {isMobile ? (
+              <ul className="space-y-3">
+                {labelConfigs?.map((label) => (
+                  <li key={label.id} className="space-y-3 rounded-2xl bg-muted/40 p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="break-all font-mono font-bold">{label.id}</span>
+                      <div className="flex items-center gap-2">
+                        {activeSwitch(label)}
+                        {deleteButton(label)}
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-[6rem_1fr] gap-3">
+                      {multiplierInput(label)}
+                      {descriptionInput(label)}
+                    </div>
+                  </li>
+                ))}
+                {(!labelConfigs || labelConfigs.length === 0) && (
+                  <li className="py-6 text-center text-sm text-muted-foreground">No labels yet.</li>
+                )}
+              </ul>
+            ) : (
+            <Table aria-label="Label multipliers">
               <TableHeader>
                 <TableRow>
                   <TableHead>Label ID</TableHead>
@@ -402,43 +514,15 @@ export default function SystemControl() {
                 {labelConfigs?.map((label) => (
                   <TableRow key={label.id}>
                     <TableCell className="font-mono font-bold">{label.id}</TableCell>
-                    <TableCell>
-                      <Input
-                        type="number"
-                        step="0.1"
-                        defaultValue={label.multiplier}
-                        className="w-20"
-                        onBlur={(e) => manageLabel.mutate({ ...label, multiplier: parseFloat(e.target.value) })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        defaultValue={label.description}
-                        onBlur={(e) => manageLabel.mutate({ ...label, description: e.target.value })}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Switch
-                        checked={label.is_active}
-                        onCheckedChange={(checked) => manageLabel.mutate({ ...label, is_active: checked })}
-                      />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-destructive-text"
-                        onClick={() => {
-                          if (confirm(`Delete label ${label.id}?`)) deleteLabel.mutate(label.id);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+                    <TableCell>{multiplierInput(label)}</TableCell>
+                    <TableCell>{descriptionInput(label)}</TableCell>
+                    <TableCell>{activeSwitch(label)}</TableCell>
+                    <TableCell className="text-right">{deleteButton(label)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+            )}
           </CardContent>
         </Card>
 
@@ -455,13 +539,73 @@ export default function SystemControl() {
                 <p className="text-sm text-muted-foreground mb-4">
                   The actions below are destructive or have a major impact on the system. Use them with extreme care.
                 </p>
-                <Button variant="destructive" className="gap-2">
+                <Button variant="destructive" className="gap-2" disabled aria-describedby="reset-points-note">
                   <Trash2 className="h-4 w-4" /> Reset All User Points
                 </Button>
+                <p id="reset-points-note" className="mt-3 text-sm text-muted-foreground">
+                  Not available yet. Resetting every user's points needs a server-side action that does not exist.
+                </p>
              </CardContent>
            </Card>
         </div>
       </div>
+      <Dialog open={newLabelOpen} onOpenChange={setNewLabelOpen}>
+        <DialogContent>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              const id = newLabelId.trim();
+              if (!LABEL_ID_PATTERN.test(id) || labelConfigs?.some((l) => l.id === id)) return;
+              manageLabel.mutate(
+                { id, multiplier: 1.0, description: "", is_active: true },
+                { onSuccess: () => { setNewLabelOpen(false); setNewLabelId(""); } },
+              );
+            }}
+            className="space-y-4"
+          >
+            <DialogHeader>
+              <DialogTitle>Add label</DialogTitle>
+              <DialogDescription>Labels tag users and carry an XP multiplier. Start with 1.0 and edit it in the table.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2">
+              <Label htmlFor="new-label-id">Label ID</Label>
+              <Input id="new-label-id" value={newLabelId} onChange={(e) => setNewLabelId(e.target.value)} placeholder="e.g. beta-tester" autoFocus />
+              {newLabelId.trim() !== "" && !LABEL_ID_PATTERN.test(newLabelId.trim()) && (
+                <p role="alert" className="text-sm text-destructive-text">Use letters, numbers, dashes or underscores, without spaces.</p>
+              )}
+              {labelConfigs?.some((l) => l.id === newLabelId.trim()) && (
+                <p role="alert" className="text-sm text-destructive-text">This label already exists.</p>
+              )}
+            </div>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setNewLabelOpen(false)}>Cancel</Button>
+              <Button type="submit" disabled={manageLabel.isPending || !LABEL_ID_PATTERN.test(newLabelId.trim()) || !!labelConfigs?.some((l) => l.id === newLabelId.trim())}>Add label</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={labelToDelete !== null} onOpenChange={(open) => { if (!open) setLabelToDelete(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete label {labelToDelete}?</AlertDialogTitle>
+            <AlertDialogDescription>The label and its multiplier are removed. This cannot be undone.</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteLabel.isPending}
+              onClick={(e) => {
+                // Keep the dialog open until the delete resolves; Radix closes on click otherwise.
+                e.preventDefault();
+                const id = labelToDelete;
+                if (!id) return;
+                deleteLabel.mutate(id, { onSuccess: () => setLabelToDelete(null) });
+              }}
+            >Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </DashboardLayout>
   );
 }

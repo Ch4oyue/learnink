@@ -1,53 +1,73 @@
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
-import { cva, type VariantProps } from "class-variance-authority"
+import { Button as HeroButton } from "@heroui/react"
+import { buttonVariants as heroButton } from "@heroui/styles"
 
 import { cn } from "@/lib/utils"
 
-const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
-  {
-    variants: {
-      variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-      },
-      size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "default",
-    },
-  }
-)
+// Buttons render the real HeroUI v3 Button (react-aria: press, focus ring, disabled, keyboard).
+// Links and Radix triggers (`asChild`) keep their own element and take the same HeroUI v3 button styles.
+type Variant = "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+type Size = "default" | "sm" | "lg" | "icon"
 
-export interface ButtonProps
-  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+const VARIANT = { default: "primary", destructive: "danger", outline: "outline", secondary: "secondary", ghost: "ghost", link: "ghost" } as const
+const SIZE = { default: "md", sm: "sm", lg: "lg", icon: "md" } as const
+const LINK_STYLE = "text-primary underline-offset-4 hover:underline hover:bg-transparent"
+
+function buttonVariants({ variant = "default", size = "default", className }: { variant?: Variant | null; size?: Size | null; className?: string } = {}) {
+  const v: Variant = variant ?? "default"
+  const s: Size = size ?? "default"
+  return cn(
+    heroButton({ variant: VARIANT[v], size: SIZE[s], isIconOnly: s === "icon" }),
+    v === "link" && LINK_STYLE,
+    className
+  )
+}
+
+export interface ButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "onClick"> {
+  variant?: Variant | null
+  size?: Size | null
   asChild?: boolean
+  onClick?: React.MouseEventHandler<HTMLElement> | (() => void)
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : "button"
+  ({ className, variant, size, asChild = false, onClick, disabled, type, children, ...props }, ref) => {
+    if (asChild) {
+      // Slot merges onto a link/trigger, so `disabled` cannot be forwarded as an
+      // attribute: mirror native disabled semantics (out of tab order, no pointer
+      // activation) and announce the state instead.
+      return (
+        <Slot
+          className={cn(buttonVariants({ variant, size, className }), disabled && "pointer-events-none opacity-50")}
+          ref={ref}
+          aria-disabled={disabled || undefined}
+          data-disabled={disabled ? "true" : undefined}
+          tabIndex={disabled ? -1 : undefined}
+          {...(type === undefined ? {} : { type })}
+          onClick={onClick as React.MouseEventHandler<HTMLElement>}
+          {...props}
+        >
+          {children}
+        </Slot>
+      )
+    }
+    const v: Variant = variant ?? "default"
+    const s: Size = size ?? "default"
     return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+      <HeroButton
         ref={ref}
-        {...props}
-      />
+        variant={VARIANT[v]}
+        size={SIZE[s]}
+        isIconOnly={s === "icon"}
+        isDisabled={disabled}
+        type={type ?? "button"}
+        className={cn(v === "link" && LINK_STYLE, className)}
+        onClick={onClick as React.MouseEventHandler<HTMLButtonElement> | undefined}
+        {...(props as object)}
+      >
+        {children}
+      </HeroButton>
     )
   }
 )

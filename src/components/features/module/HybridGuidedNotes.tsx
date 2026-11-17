@@ -72,14 +72,14 @@ export const HybridGuidedNotes = memo(function HybridGuidedNotes({
     };
 
     return (
-        <aside className="w-[360px] bg-sidebar border-l border-border flex flex-col shrink-0 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.1)]">
+        <aside className="h-full w-full min-w-0 flex-1 lg:w-[360px] bg-sidebar border-l border-border flex flex-col shrink-0 z-20 shadow-[-10px_0_30px_rgba(0,0,0,0.1)]">
             {/* Notes Header - Sticky with backdrop blur */}
-            <div className="px-6 py-5 border-b border-border flex justify-between items-center bg-sidebar/90 backdrop-blur sticky top-0 z-10">
-                <div className="flex items-center gap-3">
+            <div className="px-4 py-5 pr-14 lg:px-6 border-b border-border flex flex-wrap gap-3 justify-between items-center bg-sidebar/90 backdrop-blur sticky top-0 z-10">
+                <div className="flex min-w-0 items-center gap-2">
                     <div className="p-1.5 bg-primary/10 rounded-md shadow-sm">
                         <FileText className="h-5 w-5 text-primary" />
                     </div>
-                    <h2 className="font-bold text-foreground text-lg tracking-tight">
+                    <h2 className="font-semibold text-foreground text-base tracking-tight">
                         Guided Notes
                     </h2>
                 </div>

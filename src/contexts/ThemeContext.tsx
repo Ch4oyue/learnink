@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type Theme = "system" | "light" | "dark";
+import {resolveTheme,type Theme} from "@/lib/themeResolution";
 
 interface ThemeContextType {
     theme: Theme;
@@ -10,26 +10,27 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const prefersDark = () =>
+    typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const [theme, setTheme] = useState<Theme>(() => {
         if (typeof window !== "undefined") {
-            return (localStorage.getItem("theme") as Theme) || "system";
+            // Default to light for first-time visitors; a stored choice
+            // (light/dark/system) always wins and dark stays fully manual.
+            return (localStorage.getItem("theme") as Theme) || "light";
         }
-        return "system";
+        return "light";
     });
 
-    const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
+    const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">(() =>
+        resolveTheme(theme, prefersDark()));
 
     useEffect(() => {
         const root = window.document.documentElement;
         root.classList.remove("light", "dark");
 
-        let resolved: "light" | "dark";
-        if (theme === "system") {
-            resolved = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        } else {
-            resolved = theme;
-        }
+        const resolved = resolveTheme(theme, prefersDark());
 
         root.classList.add(resolved);
         setResolvedTheme(resolved);

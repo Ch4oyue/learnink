@@ -125,7 +125,7 @@ export default function DashboardRequestMaterial() {
 
                 <div className="space-y-2">
                   <Label htmlFor="category">Category</Label>
-                  <Select value={category} onValueChange={setCategory}>
+                  <Select aria-label="Category" value={category} onValueChange={setCategory}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>

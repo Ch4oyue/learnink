@@ -1,6 +1,50 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* HeroUI v3 - selective component styles only (full bundle is ~940 kB and
+   would blow the PWA precache budget + low-end device cost).
+   Layered imports: HeroUI's base ships an unlayered universal
+   `* { border-color: var(--border, currentColor) }` that would otherwise beat
+   every Tailwind border-color utility (and computes black here because the
+   app's shadcn --border is an HSL triplet). Pinning HeroUI into Tailwind's
+   cascade layers keeps utilities authoritative. */
+@import "@heroui/styles/base" layer(base);
+/* utilities stays unlayered: it uses @utility, which Tailwind 4 forbids
+   inside a cascade layer. It carries no universal border-color rule. */
+@import "@heroui/styles/utilities";
+@import "@heroui/styles/themes/default" layer(theme);
+@import "@heroui/styles/components/button.css" layer(components);
+@import "@heroui/styles/components/input.css" layer(components);
+@import "@heroui/styles/components/textfield.css" layer(components);
+@import "@heroui/styles/components/card.css" layer(components);
+@import "@heroui/styles/components/surface.css" layer(components);
+@import "@heroui/styles/components/checkbox.css" layer(components);
+@import "@heroui/styles/components/radio.css" layer(components);
+@import "@heroui/styles/components/radio-group.css" layer(components);
+@import "@heroui/styles/components/switch.css" layer(components);
+@import "@heroui/styles/components/chip.css" layer(components);
+@import "@heroui/styles/components/avatar.css" layer(components);
+@import "@heroui/styles/components/separator.css" layer(components);
+@import "@heroui/styles/components/spinner.css" layer(components);
+@import "@heroui/styles/components/progress-bar.css" layer(components);
+@import "@heroui/styles/components/tabs.css" layer(components);
+@import "@heroui/styles/components/scroll-shadow.css" layer(components);
+@import "@heroui/styles/components/select.css" layer(components);
+@import "@heroui/styles/components/popover.css" layer(components);
+@import "@heroui/styles/components/drawer.css" layer(components);
+@import "@heroui/styles/components/label.css" layer(components);
+@import "@heroui/styles/components/disclosure.css" layer(components);
+@import "@heroui/styles/components/table.css" layer(components);
+@import "@heroui/styles/components/toast.css" layer(components);
+@import "@heroui/styles/components/tooltip.css" layer(components);
+@import "@heroui/styles/components/dropdown.css" layer(components);
+@import "@heroui/styles/components/menu-item.css" layer(components);
+@import "@heroui/styles/components/menu-section.css" layer(components);
+@import "@heroui/styles/components/list-box.css" layer(components);
+@import "@heroui/styles/components/list-box-item.css" layer(components);
+@import "@heroui/styles/components/modal.css" layer(components);
+
+@config "../tailwind.config.ts";
 
 /* ======================================
    LEARNINK DESIGN SYSTEM - DARK MODE OPTIMIZED
@@ -11,97 +55,175 @@
    ====================================== */
 @layer base {
     :root {
-        /* Base colors - Light mode */
-        --background: 0 0% 100%;
-        --foreground: 240 10% 3.9%;
+        /* Base colors - Light mode (Apple HIG: white canvas, #1d1d1f label) */
+        --background-hsl: 0 0% 100%;
+        --background: hsl(0 0% 100%);
+        --foreground-hsl: 240 4% 12%;
+        --foreground: hsl(240 4% 12%);
 
-        --card: 0 0% 100%;
-        --card-foreground: 240 10% 3.9%;
+        --card-hsl: 0 0% 100%;
 
-        --popover: 0 0% 100%;
-        --popover-foreground: 240 10% 3.9%;
+        --card: hsl(0 0% 100%);
+        --card-foreground-hsl: 240 10% 3.9%;
+        --card-foreground: hsl(240 10% 3.9%);
 
-        --primary: 221.2 83.2% 53.3%;
-        --primary-foreground: 210 40% 98%;
+        --popover-hsl: 0 0% 100%;
 
-        --secondary: 240 4.8% 95.9%;
-        --secondary-foreground: 240 5.9% 10%;
+        --popover: hsl(0 0% 100%);
+        --popover-foreground-hsl: 240 10% 3.9%;
+        --popover-foreground: hsl(240 10% 3.9%);
 
-        --muted: 240 4.8% 95.9%;
-        --muted-foreground: 240 3.8% 46.1%;
+        --primary-hsl: 211 100% 50%;
 
-        --accent: 240 4.8% 95.9%;
-        --accent-foreground: 240 5.9% 10%;
+        --primary: hsl(211 100% 50%);
+        --primary-foreground-hsl: 0 0% 100%;
+        --primary-foreground: hsl(0 0% 100%);
 
-        --destructive: 0 84.2% 60.2%;
-        --destructive-foreground: 0 0% 98%;
+        --secondary-hsl: 240 11% 96%;
+
+        --secondary: hsl(240 11% 96%);
+        --secondary-foreground-hsl: 240 4% 12%;
+        --secondary-foreground: hsl(240 4% 12%);
+
+        --muted-hsl: 240 11% 96%;
+
+        --muted: hsl(240 11% 96%);
+        --muted-foreground-hsl: 240 4% 45%;
+        --muted-foreground: hsl(240 4% 45%);
+
+        /* shadcn `accent` (subtle hover surface) renamed: HeroUI v3 owns
+           color-valued --accent for its components */
+        --accent-muted: 240 11% 96%;
+        --accent-muted-foreground: 240 4% 12%;
+        --accent: #007aff;
+        --accent-foreground: #ffffff;
+
+        --destructive-hsl: 0 84.2% 60.2%;
+
+        --destructive: hsl(0 84.2% 60.2%);
+        --destructive-foreground-hsl: 0 0% 98%;
+        --destructive-foreground: hsl(0 0% 98%);
         /* Text variants, all >= 4.5:1 on --background (WCAG AA) */
-        --destructive-text: 0 72% 45%;
-        --success: 160 84% 24%;
-        --success-foreground: 0 0% 100%;
-        --warning: 32 95% 32%;
-        --warning-foreground: 0 0% 100%;
-        --info: 221 83% 45%;
-        --info-foreground: 0 0% 100%;
+        --destructive-text-hsl: 0 72% 45%;
+        --destructive-text: hsl(0 72% 45%);
+        --success-hsl: 160 84% 24%;
+        --success: hsl(160 84% 24%);
+        --success-foreground-hsl: 0 0% 100%;
+        --success-foreground: hsl(0 0% 100%);
+        --warning-hsl: 32 95% 32%;
+        --warning: hsl(32 95% 32%);
+        --warning-foreground-hsl: 0 0% 100%;
+        --warning-foreground: hsl(0 0% 100%);
+        --info-hsl: 221 83% 45%;
+        --info: hsl(221 83% 45%);
+        --info-foreground-hsl: 0 0% 100%;
+        --info-foreground: hsl(0 0% 100%);
 
-        --border: 240 5.9% 90%;
-        --input: 240 5.9% 90%;
-        --ring: 221.2 83.2% 53.3%;
+        --border-hsl: 240 6% 90%;
 
-        --radius: 1rem;
+        --border: hsl(240 6% 90%);
+        --input-hsl: 240 6% 90%;
+        --input: hsl(240 6% 90%);
+        --ring-hsl: 211 100% 50%;
+        --ring: hsl(211 100% 50%);
+
+        --radius: 1.125rem;
 
         /* Sidebar - Light mode */
-        --sidebar: 220 14% 96%;
-        --sidebar-foreground: 240 5.9% 10%;
-        --sidebar-border: 240 5.9% 90%;
-        --sidebar-accent: 240 4.8% 95.9%;
-        --sidebar-accent-foreground: 240 5.9% 10%;
+        --sidebar-hsl: 240 11% 96%;
+        --sidebar: hsl(240 11% 96%);
+        --sidebar-foreground-hsl: 240 4% 12%;
+        --sidebar-foreground: hsl(240 4% 12%);
+        --sidebar-border-hsl: 240 6% 90%;
+        --sidebar-border: hsl(240 6% 90%);
+        --sidebar-accent-hsl: 240 11% 94%;
+        --sidebar-accent: hsl(240 11% 94%);
+        --sidebar-accent-foreground-hsl: 240 4% 12%;
+        --sidebar-accent-foreground: hsl(240 4% 12%);
     }
 
     /* Dark mode colors */
     .dark {
-        --background: 240 10% 3.9%;
-        --foreground: 0 0% 95%;
+        --background-hsl: 0 0% 0%;
+        --background: hsl(0 0% 0%);
+        --foreground-hsl: 240 11% 96%;
+        --foreground: hsl(240 11% 96%);
 
-        --card: 240 10% 3.9%;
-        --card-foreground: 0 0% 95%;
+        --card-hsl: 240 3% 11%;
 
-        --popover: 240 10% 3.9%;
-        --popover-foreground: 0 0% 95%;
+        --card: hsl(240 3% 11%);
+        --card-foreground-hsl: 240 11% 96%;
+        --card-foreground: hsl(240 11% 96%);
 
-        --primary: 217.2 91.2% 59.8%;
-        --primary-foreground: 222.2 47.4% 11.2%;
+        --popover-hsl: 240 3% 11%;
 
-        --secondary: 240 3.7% 15.9%;
-        --secondary-foreground: 0 0% 98%;
+        --popover: hsl(240 3% 11%);
+        --popover-foreground-hsl: 240 11% 96%;
+        --popover-foreground: hsl(240 11% 96%);
 
-        --muted: 240 3.7% 15.9%;
-        --muted-foreground: 240 5% 64.9%;
+        --primary-hsl: 210 100% 52%;
 
-        --accent: 240 3.7% 15.9%;
-        --accent-foreground: 0 0% 98%;
+        --primary: hsl(210 100% 52%);
+        --primary-foreground-hsl: 0 0% 100%;
+        --primary-foreground: hsl(0 0% 100%);
 
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 85.7% 97.3%;
+        --secondary-hsl: 240 3% 17%;
+
+        --secondary: hsl(240 3% 17%);
+        --secondary-foreground-hsl: 240 11% 96%;
+        --secondary-foreground: hsl(240 11% 96%);
+
+        --muted-hsl: 240 3% 17%;
+
+        --muted: hsl(240 3% 17%);
+        --muted-foreground-hsl: 240 5% 64.9%;
+        --muted-foreground: hsl(240 5% 64.9%);
+
+        --accent-muted: 240 3% 17%;
+        --accent-muted-foreground: 240 11% 96%;
+        --accent: #0a84ff;
+        --accent-foreground: #ffffff;
+
+        --destructive-hsl: 0 62.8% 30.6%;
+
+        --destructive: hsl(0 62.8% 30.6%);
+        --destructive-foreground-hsl: 0 85.7% 97.3%;
+        --destructive-foreground: hsl(0 85.7% 97.3%);
         /* Text variants, all >= 4.5:1 on --background (WCAG AA) */
-        --destructive-text: 0 72% 62%;
-        --success: 152 60% 50%;
-        --success-foreground: 240 10% 3.9%;
-        --warning: 38 92% 50%;
-        --warning-foreground: 240 10% 3.9%;
-        --info: 213 94% 68%;
-        --info-foreground: 240 10% 3.9%;
+        --destructive-text-hsl: 0 72% 62%;
+        --destructive-text: hsl(0 72% 62%);
+        --success-hsl: 152 60% 50%;
+        --success: hsl(152 60% 50%);
+        --success-foreground-hsl: 240 10% 3.9%;
+        --success-foreground: hsl(240 10% 3.9%);
+        --warning-hsl: 38 92% 50%;
+        --warning: hsl(38 92% 50%);
+        --warning-foreground-hsl: 240 10% 3.9%;
+        --warning-foreground: hsl(240 10% 3.9%);
+        --info-hsl: 213 94% 68%;
+        --info: hsl(213 94% 68%);
+        --info-foreground-hsl: 240 10% 3.9%;
+        --info-foreground: hsl(240 10% 3.9%);
 
-        --border: 240 3.7% 15.9%;
-        --input: 240 3.7% 15.9%;
-        --ring: 224.3 76.3% 48%;
+        --border-hsl: 240 3% 20%;
+
+        --border: hsl(240 3% 20%);
+        --input-hsl: 240 3% 20%;
+        --input: hsl(240 3% 20%);
+        --ring-hsl: 210 100% 52%;
+        --ring: hsl(210 100% 52%);
 
         /* Sidebar - Dark mode */
-        --sidebar: 220 13% 8%;
-        --sidebar-foreground: 0 0% 95%;
-        --sidebar-border: 240 3.7% 15.9%;
-        --sidebar-accent: 240 3.7% 15.9%;
-        --sidebar-accent-foreground: 0 0% 98%;
+        --sidebar-hsl: 0 0% 4%;
+        --sidebar: hsl(0 0% 4%);
+        --sidebar-foreground-hsl: 240 11% 96%;
+        --sidebar-foreground: hsl(240 11% 96%);
+        --sidebar-border-hsl: 240 3% 20%;
+        --sidebar-border: hsl(240 3% 20%);
+        --sidebar-accent-hsl: 240 3% 17%;
+        --sidebar-accent: hsl(240 3% 17%);
+        --sidebar-accent-foreground-hsl: 240 11% 96%;
+        --sidebar-accent-foreground: hsl(240 11% 96%);
     }
 
     /* ======================================
@@ -118,29 +240,43 @@
     @media (max-width: 768px) {
         .transparent-mode {
             /* Light Mode - Ultra transparent */
-            --background: 220 14% 97%;
+            --background-hsl: 220 14% 97%;
+            --background: hsl(220 14% 97%);
             /* Very light gray */
             /* Content surfaces stay opaque: glass belongs to the functional layer */
-            --card: 0 0% 100%;
-            --popover: 0 0% 100% / 0.35;
-            --muted: 220 14% 96%;
-            --sidebar: 0 0% 100% / 0.2;
-            --border: 0 0% 100% / 0.4;
+            --card-hsl: 0 0% 100%;
+            --card: hsl(0 0% 100%);
+            --popover-hsl: 0 0% 100% / 0.35;
+            --popover: hsl(0 0% 100% / 0.35);
+            --muted-hsl: 220 14% 96%;
+            --muted: hsl(220 14% 96%);
+            --sidebar-hsl: 0 0% 100% / 0.2;
+            --sidebar: hsl(0 0% 100% / 0.2);
+            --border-hsl: 0 0% 100% / 0.4;
+            --border: hsl(0 0% 100% / 0.4);
             /* Slightly visible border */
-            --input: 0 0% 100% / 0.3;
+            --input-hsl: 0 0% 100% / 0.3;
+            --input: hsl(0 0% 100% / 0.3);
         }
 
         .transparent-mode.dark {
             /* Dark Mode - Ultra subtle dark glass */
-            --background: 225 10% 5%;
+            --background-hsl: 225 10% 5%;
+            --background: hsl(225 10% 5%);
             /* Very dark */
             /* Content surfaces stay opaque: glass belongs to the functional layer */
-            --card: 225 10% 8%;
-            --popover: 0 0% 100% / 0.12;
-            --muted: 225 10% 11%;
-            --sidebar: 0 0% 100% / 0.06;
-            --border: 0 0% 100% / 0.12;
-            --input: 0 0% 100% / 0.08;
+            --card-hsl: 225 10% 8%;
+            --card: hsl(225 10% 8%);
+            --popover-hsl: 0 0% 100% / 0.12;
+            --popover: hsl(0 0% 100% / 0.12);
+            --muted-hsl: 225 10% 11%;
+            --muted: hsl(225 10% 11%);
+            --sidebar-hsl: 0 0% 100% / 0.06;
+            --sidebar: hsl(0 0% 100% / 0.06);
+            --border-hsl: 0 0% 100% / 0.12;
+            --border: hsl(0 0% 100% / 0.12);
+            --input-hsl: 0 0% 100% / 0.08;
+            --input: hsl(0 0% 100% / 0.08);
         }
     }
 }
@@ -188,9 +324,13 @@
 
     html {
         scroll-behavior: smooth;
-        transition: background-color 0.3s ease, color 0.3s ease;
+        /* Theme colors switch atomically: inherited text must never lag dark surfaces. */
         min-height: 100dvh;
         -webkit-tap-highlight-color: transparent;
+    }
+
+    h1, h2, h3, h4 {
+        letter-spacing: -0.022em;
     }
 
     body {
@@ -296,10 +436,10 @@
         input:-webkit-autofill:hover,
         input:-webkit-autofill:focus,
         input:-webkit-autofill:active {
-            -webkit-box-shadow: 0 0 0 1000px hsl(var(--muted)) inset !important;
-            -webkit-text-fill-color: hsl(var(--foreground)) !important;
-            box-shadow: 0 0 0 1000px hsl(var(--muted)) inset !important;
-            caret-color: hsl(var(--foreground)) !important;
+            -webkit-box-shadow: 0 0 0 1000px hsl(var(--muted-hsl)) inset !important;
+            -webkit-text-fill-color: hsl(var(--foreground-hsl)) !important;
+            box-shadow: 0 0 0 1000px hsl(var(--muted-hsl)) inset !important;
+            caret-color: hsl(var(--foreground-hsl)) !important;
             transition: background-color 5000s ease-in-out 0s;
         }
     }
@@ -317,47 +457,45 @@
     }
 
     ::-webkit-scrollbar-thumb {
-        background: hsl(var(--muted));
+        background: hsl(var(--muted-hsl));
         border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: hsl(var(--muted-foreground) / 0.5);
+        background: hsl(var(--muted-foreground-hsl) / 0.5);
     }
 
     /* Firefox */
     * {
         scrollbar-width: thin;
-        scrollbar-color: hsl(var(--muted)) transparent;
+        scrollbar-color: hsl(var(--muted-hsl)) transparent;
     }
 
     /* ======================================
    CUSTOM UTILITIES
    ====================================== */
     @layer utilities {
+        /* Apple-style soft, diffuse elevation - no colored glow */
         .shadow-glow {
             box-shadow:
-                0 0 20px -5px hsl(var(--primary) / 0.4),
-                0 0 40px -10px hsl(var(--primary) / 0.2);
+                0 12px 32px -12px rgba(0, 0, 0, 0.12),
+                0 2px 8px -4px rgba(0, 0, 0, 0.06);
         }
 
         .dark .shadow-glow {
             box-shadow:
-                0 0 30px -5px hsl(var(--primary) / 0.3),
-                0 0 60px -10px hsl(var(--primary) / 0.15);
+                0 12px 32px -12px rgba(0, 0, 0, 0.55),
+                0 2px 8px -4px rgba(0, 0, 0, 0.35);
         }
 
-        /* Gradient text helper */
+        /* Solid accent text (kept name for compatibility; gradients read as template slop) */
         .gradient-text {
-            background: linear-gradient(135deg, hsl(var(--primary)), hsl(217 91% 60%), hsl(192 91% 60%));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: hsl(var(--primary-hsl));
         }
 
         /* Glass effect */
         .glass {
-            background: hsl(var(--background) / 0.8);
+            background: hsl(var(--background-hsl) / 0.8);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
         }
@@ -410,7 +548,7 @@
            ====================================== */
         [data-perf="low"] .glass-liquid,
         [data-perf="low"] .glass {
-            background: hsl(var(--card));
+            background: hsl(var(--card-hsl));
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
             box-shadow: none;
@@ -445,7 +583,7 @@
             .transparent-mode .bg-sidebar,
             .transparent-mode.dark .bg-popover,
             .transparent-mode.dark .bg-sidebar {
-                background: hsl(var(--card));
+                background: hsl(var(--card-hsl));
                 backdrop-filter: none;
                 -webkit-backdrop-filter: none;
             }
@@ -454,7 +592,7 @@
         @media (prefers-contrast: more) {
             .glass-liquid,
             .glass {
-                box-shadow: inset 0 0 0 1.5px hsl(var(--foreground) / 0.4);
+                box-shadow: inset 0 0 0 1.5px hsl(var(--foreground-hsl) / 0.4);
             }
         }
 

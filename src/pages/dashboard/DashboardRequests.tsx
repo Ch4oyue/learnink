@@ -266,7 +266,7 @@ export default function DashboardRequests() {
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <Select aria-label="Status filter" value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter status" />
               </SelectTrigger>
@@ -311,7 +311,7 @@ export default function DashboardRequests() {
               </Card>
             ) : (
               <Card>
-                <Table>
+                <Table aria-label="Material requests">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Topic / Title</TableHead>
@@ -397,7 +397,7 @@ export default function DashboardRequests() {
               {activeTab === 'bug' && "Report a Bug"}
             </DialogTitle>
             <DialogDescription>
-              Fill in the details below. You can also paste a screenshot straight into the description field.
+              Describe the material you want to learn.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreate} className="space-y-4">
@@ -438,7 +438,7 @@ export default function DashboardRequests() {
                     rows={4}
                   />
                   {uploading && (
-                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md backdrop-blur-sm">
+                    <div className="absolute inset-0 bg-background/50 flex items-center justify-center rounded-md">
                         <Loader2 className="h-6 w-6 animate-spin text-primary" />
                     </div>
                   )}
@@ -490,7 +490,7 @@ export default function DashboardRequests() {
 
             <div className="space-y-2">
               <Label htmlFor="priority">Priority</Label>
-              <Select
+              <Select aria-label="Priority"
                 value={formData.priority}
                 onValueChange={(val) => setFormData({ ...formData, priority: val })}
               >

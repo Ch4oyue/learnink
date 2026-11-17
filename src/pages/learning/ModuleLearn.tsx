@@ -38,7 +38,10 @@ const GachaCompletionModal = lazy(() =>
   import("@/components/features/module/GachaCompletionModal").then((m) => ({ default: m.GachaCompletionModal }))
 );
 import { NotesPrintView } from "@/components/features/module/NotesPrintView";
-import { RefreshCcw, Gift } from "lucide-react";
+import { RefreshCcw, Gift, FileQuestion } from "lucide-react";
+import { useQuizzes } from "@/hooks/useQuiz";
+
+const ModuleQuizDialog = lazy(() => import("@/components/features/module/ModuleQuizDialog"));
 
 /**
  * ModuleLearn - Hybrid View with 4-Panel Layout
@@ -247,6 +250,9 @@ export default function ModuleLearn() {
   }, [handleSectionClick]);
 
   // Gacha Logic
+  const [showQuiz, setShowQuiz] = useState(false);
+  const { data: moduleQuizzes } = useQuizzes(moduleId);
+  const hasQuiz = (moduleQuizzes?.length ?? 0) > 0;
   const [showGacha, setShowGacha] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [xpEarned, setXpEarned] = useState<number | null>(null);
@@ -260,7 +266,9 @@ export default function ModuleLearn() {
 
   useEffect(() => {
     // Only show if completed AND not claimed yet
-    if (currentProgress >= 100 && moduleId && progress && !progress.reward_claimed) {
+    // Hold the reward modal while the quiz dialog is open: with a real backend the 100% write lands a moment
+    // after the quiz opens, and the modal would cover the quiz. It shows once the quiz is closed.
+    if (currentProgress >= 100 && moduleId && progress && !progress.reward_claimed && !showQuiz) {
       const key = `gacha_shown_${moduleId}`;
       const shown = localStorage.getItem(key);
 
@@ -280,7 +288,7 @@ export default function ModuleLearn() {
         localStorage.setItem(key, "true");
       }
     }
-  }, [currentProgress, moduleId, progress]);
+  }, [currentProgress, moduleId, progress, showQuiz]);
 
   const handleClaimReward = async () => {
     if (!moduleId || !user) return;
@@ -653,6 +661,12 @@ export default function ModuleLearn() {
               >
                 <RefreshCcw className="h-4 w-4" />
               </Button>
+              {hasQuiz && (
+                <Button variant="outline" onClick={() => setShowQuiz(true)} aria-label="Take Quiz">
+                  <FileQuestion className="h-4 w-4 mr-2" />
+                  Quiz
+                </Button>
+              )}
               {!progress?.reward_claimed ? (
                 <Button
                   onClick={() => setShowGacha(true)}
@@ -700,6 +714,12 @@ export default function ModuleLearn() {
         notes={notes || []}
         moduleTitle={module.title}
       />
+
+      {showQuiz && moduleId && (
+        <Suspense fallback={null}>
+          <ModuleQuizDialog moduleId={moduleId} open={showQuiz} onOpenChange={setShowQuiz} />
+        </Suspense>
+      )}
 
       {modalMounted && (
         <Suspense fallback={null}>

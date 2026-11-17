@@ -277,13 +277,13 @@ export default function ManageSources() {
                 {isLoading ? (
                     <TableSkeleton />
                 ) : (
-                    <Table>
+                    <Table aria-label="Learning sources">
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-[60px]">Logo</TableHead>
+                                <TableHead className="hidden md:table-cell w-[60px]">Logo</TableHead>
                                 <TableHead>Name</TableHead>
-                                <TableHead>Category</TableHead>
-                                <TableHead>Order</TableHead>
+                                <TableHead className="hidden md:table-cell">Category</TableHead>
+                                <TableHead className="hidden md:table-cell">Order</TableHead>
                                 <TableHead>Status</TableHead>
                                 <TableHead className="text-right">Actions</TableHead>
                             </TableRow>
@@ -292,7 +292,7 @@ export default function ManageSources() {
                             {filteredSources && filteredSources.length > 0 ? (
                                 filteredSources.map((source) => (
                                     <TableRow key={source.id}>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             <div className="h-10 w-10 rounded bg-muted flex items-center justify-center overflow-hidden">
                                                 {source.logo_url ? (
                                                     <img
@@ -307,7 +307,8 @@ export default function ManageSources() {
                                         </TableCell>
                                         <TableCell>
                                             <div>
-                                                <p className="font-medium text-foreground">{source.name}</p>
+                                                <p className="font-medium text-foreground break-words">{source.name}</p>
+                                                <p className="text-xs text-muted-foreground md:hidden">{source.category} · Order {source.display_order}</p>
                                                 {source.website_url && (
                                                     <a
                                                         href={source.website_url}
@@ -321,16 +322,17 @@ export default function ManageSources() {
                                                 )}
                                             </div>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             <Badge variant="outline" className="capitalize">
                                                 {source.category}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="hidden md:table-cell">
                                             <span className="text-muted-foreground">{source.display_order}</span>
                                         </TableCell>
                                         <TableCell>
                                             <Switch
+                                                aria-label={`${source.name} active`}
                                                 checked={source.is_active}
                                                 onCheckedChange={() => handleToggleActive(source)}
                                                 disabled={toggleActiveMutation.isPending}
@@ -359,7 +361,7 @@ export default function ManageSources() {
                                 ))
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground">
+                                    <TableCell colSpan={6} className="text-center py-12 text-muted-foreground whitespace-normal">
                                         {searchQuery
                                             ? "No sources found matching your search"
                                             : "No learning sources yet. Add your first one!"}
@@ -444,7 +446,7 @@ export default function ManageSources() {
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <Label htmlFor="category">Category</Label>
-                                <Select
+                                <Select aria-label="Category"
                                     value={formData.category}
                                     onValueChange={(value) => setFormData({ ...formData, category: value })}
                                 >

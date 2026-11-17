@@ -237,7 +237,7 @@ export default function DashboardUsers() {
               className="pl-10"
             />
           </div>
-          <Select value={roleFilter} onValueChange={(v) => setRoleFilter(v as AppRole | "all")}>
+          <Select aria-label="Role filter" value={roleFilter} onValueChange={(v) => setRoleFilter(v as AppRole | "all")}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter Role" />
             </SelectTrigger>
@@ -264,8 +264,8 @@ export default function DashboardUsers() {
             </div>
           ) : (
             <div className="w-full overflow-x-auto">
-              <Table>
-                <TableHeader>
+              <Table aria-label="Users">
+                <TableHeader className="hidden md:table-header-group">
                   <TableRow>
                     <TableHead>User</TableHead>
                     <TableHead>Role</TableHead>
@@ -274,7 +274,7 @@ export default function DashboardUsers() {
                     <TableHead>Change Role</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="block md:table-row-group">
                   {filteredUsers?.map((user) => {
                     const config = roleConfig[user.role];
                     const isSelf = user.id === currentUser?.id;
@@ -282,8 +282,8 @@ export default function DashboardUsers() {
                     const isProtected = user.role === 'superadmin';
 
                     return (
-                      <TableRow key={user.id}>
-                        <TableCell>
+                      <TableRow key={user.id} className="grid grid-cols-2 md:table-row">
+                        <TableCell className="col-span-2 md:table-cell">
                           <div className="flex items-center gap-3">
                             <Avatar isPremium={user.is_premium} className="h-9 w-9">
                               <AvatarImage src={user.avatar_url || undefined} />
@@ -310,6 +310,7 @@ export default function DashboardUsers() {
                           </div>
                         </TableCell>
                         <TableCell>
+                          <p className="text-xs text-muted-foreground mb-2 md:hidden">Role</p>
                           <Badge variant={config.variant} className="gap-1">
                             {config.icon}
                             {config.label}
@@ -321,7 +322,8 @@ export default function DashboardUsers() {
                             : "-"
                           }
                         </TableCell>
-                        <TableCell>
+                        <TableCell className={user.labels?.length || currentRole === "superadmin" ? undefined : "hidden md:table-cell"}>
+                          <p className="text-xs text-muted-foreground mb-2 md:hidden">Labels</p>
                           <div className="flex flex-wrap gap-1 max-w-[200px]">
                             {user.labels?.map(l => (
                               <Badge key={l} variant="secondary" className="text-[13px] px-1 h-5">
@@ -340,7 +342,7 @@ export default function DashboardUsers() {
                               </Badge>
                             ))}
                             {currentRole === "superadmin" && (
-                              <Select onValueChange={(val) => {
+                              <Select aria-label="Add label" onValueChange={(val) => {
                                 if (user.labels?.includes(val)) return;
                                 const newLabels = [...(user.labels || []), val];
                                 updateLabels.mutate({ userId: user.id, labels: newLabels });
@@ -357,14 +359,15 @@ export default function DashboardUsers() {
                             )}
                           </div>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="col-span-2 md:table-cell">
+                          <p className="text-xs text-muted-foreground mb-2 md:hidden">Change role</p>
                           {isProtected ? (
                             <Badge variant="outline" className="bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 border-amber-200 dark:border-amber-800">
                               <Shield className="h-3 w-3 mr-1" />
                               Immutable
                             </Badge>
                           ) : (
-                            <Select
+                            <Select aria-label="User role"
                               value={user.role}
                               onValueChange={(v) => handleRoleChange(user, v as AppRole)}
                               disabled={isSelf || updateRole.isPending}

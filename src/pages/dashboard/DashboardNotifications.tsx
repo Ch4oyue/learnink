@@ -47,7 +47,7 @@ const typeColors: Record<string, string> = {
   info: "bg-primary/10 text-primary",
   success: "bg-success/10 text-success",
   warning: "bg-warning/10 text-warning",
-  module: "bg-purple-500/10 text-purple-500",
+  module: "bg-primary/10 text-primary",
   request: "bg-orange-500/10 text-orange-500",
 };
 
@@ -93,7 +93,8 @@ export default function DashboardNotifications() {
     if (notification.related_module_id) {
       navigate(`/module/${notification.related_module_id}`);
     } else if (notification.related_request_id) {
-      navigate(`/request/${notification.related_request_id}`);
+      // No per-request route exists; the requests list is the destination.
+      navigate("/dashboard/requests");
     }
   };
 
@@ -171,9 +172,9 @@ export default function DashboardNotifications() {
                     <button
                       key={notification.id}
                       onClick={() => handleNotificationClick(notification)}
-                      className={`w-full text-left p-4 rounded-lg border transition-all hover:shadow-soft ${notification.is_read
-                          ? "bg-background"
-                          : "bg-primary/5 border-primary/20"
+                      className={`w-full text-left p-4 rounded-2xl transition-all hover:shadow-soft ${notification.is_read
+                          ? "bg-secondary/40"
+                          : "bg-primary/5"
                         }`}
                     >
                       <div className="flex gap-4">

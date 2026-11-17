@@ -265,7 +265,7 @@ export default function ModuleDetail() {
                     {/* Progress indicator */}
                     {hasStartedLearning && !isCompleted && (
                       <div className="flex items-center gap-3">
-                        <Progress value={currentProgress} className="h-2 w-32" />
+                        <Progress value={currentProgress} className="h-2 w-32" aria-label="Module progress" />
                         <span className="text-sm text-muted-foreground font-medium">
                           {currentProgress}%
                         </span>

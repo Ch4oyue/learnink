@@ -5,7 +5,6 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Label } from "@/components/ui/label";
 import { Quiz, QuizQuestionSafe, QuizAttempt, QuizValidationResult, useValidateQuizAnswers } from "@/hooks/useQuiz";
 import { useAuth } from "@/contexts/AuthContext";
 import { logger } from "@/lib/logger";
@@ -18,6 +17,15 @@ import {
   AlertCircle,
   Loader2,
 } from "lucide-react";
+
+// True/false answers are stored as "benar"/"salah" (see generate-quiz); the buttons say True/False, so the review must too.
+function displayAnswer(type: QuizQuestionSafe["question_type"], value: string): string {
+  if (type !== "true_false" || typeof value !== "string") return value;
+  const v = value.toLowerCase();
+  if (v === "benar") return "True";
+  if (v === "salah") return "False";
+  return value;
+}
 
 interface QuizPlayerProps {
   quiz: Quiz;
@@ -170,11 +178,11 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                       {i + 1}. {q.question_text}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      Your answer: {answers[q.id] || "(not answered)"}
+                      Your answer: {answers[q.id] ? displayAnswer(q.question_type, answers[q.id]) : "(not answered)"}
                     </p>
-                    {!results.correctAnswers[q.id] && (
+                    {!results.correctAnswers[q.id] && results.correctAnswerValues[q.id] && (
                       <p className="text-sm text-green-600 mt-1">
-                        Correct answer: {results.correctAnswerValues[q.id]}
+                        Correct answer: {displayAnswer(q.question_type, results.correctAnswerValues[q.id])}
                       </p>
                     )}
                     {results.explanations[q.id] && (
@@ -210,7 +218,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
             <span className="font-mono font-medium">{formatTime(timeLeft)}</span>
           </div>
         </div>
-        <Progress value={progress} className="h-1.5" />
+        <Progress value={progress} className="h-1.5" aria-label="Quiz progress" />
         <p className="text-sm text-muted-foreground mt-2">
           Question {currentIndex + 1} of {questions.length}
         </p>
@@ -237,7 +245,7 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
         <div className="space-y-3">
           {currentQuestion.question_type === "multiple_choice" &&
             currentQuestion.options && (
-              <RadioGroup
+              <RadioGroup aria-label={currentQuestion.question_text}
                 value={answers[currentQuestion.id] || ""}
                 onValueChange={(value) => handleAnswer(currentQuestion.id, value)}
               >
@@ -246,17 +254,16 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                     key={i}
                     className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                   >
-                    <RadioGroupItem value={option} id={`option-${i}`} />
-                    <Label htmlFor={`option-${i}`} className="flex-1 cursor-pointer">
-                      {option}
-                    </Label>
+                    <RadioGroupItem value={option} id={`option-${i}`} aria-label={option}>
+                      <span className="text-sm font-medium">{option}</span>
+                    </RadioGroupItem>
                   </div>
                 ))}
               </RadioGroup>
             )}
 
           {currentQuestion.question_type === "true_false" && (
-            <RadioGroup
+            <RadioGroup aria-label={currentQuestion.question_text}
               value={answers[currentQuestion.id] || ""}
               onValueChange={(value) => handleAnswer(currentQuestion.id, value)}
             >
@@ -265,10 +272,9 @@ export function QuizPlayer({ quiz, questions, onComplete, onCancel }: QuizPlayer
                   key={option}
                   className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors"
                 >
-                  <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} />
-                  <Label htmlFor={`option-${option}`} className="flex-1 cursor-pointer">
-                    {option === "Benar" ? "True" : "False"}
-                  </Label>
+                  <RadioGroupItem value={option.toLowerCase()} id={`option-${option}`} aria-label={option === "Benar" ? "True" : "False"}>
+                    <span className="text-sm font-medium">{option === "Benar" ? "True" : "False"}</span>
+                  </RadioGroupItem>
                 </div>
               ))}
             </RadioGroup>

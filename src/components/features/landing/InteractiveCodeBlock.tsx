@@ -166,7 +166,7 @@ export function InteractiveCodeBlock({
     return (
         <div className="relative group">
             {/* Glow effect on hover */}
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-cyan-500/20 rounded-xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute -inset-1 bg-primary/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
             <div className="relative bg-[#1e1e1e] rounded-xl border border-zinc-800/60 shadow-2xl overflow-hidden">
                 {/* Mac-style Window Header */}

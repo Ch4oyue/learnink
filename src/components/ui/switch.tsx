@@ -1,27 +1,38 @@
 import * as React from "react";
-import * as SwitchPrimitives from "@radix-ui/react-switch";
+import { Switch as HeroSwitch } from "@heroui/react";
 
 import { cn } from "@/lib/utils";
 
-const Switch = React.forwardRef<
-  React.ElementRef<typeof SwitchPrimitives.Root>,
-  React.ComponentPropsWithoutRef<typeof SwitchPrimitives.Root>
->(({ className, ...props }, ref) => (
-  <SwitchPrimitives.Root
-    className={cn(
-      "peer inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors data-[state=checked]:bg-primary data-[state=unchecked]:bg-input focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:cursor-not-allowed disabled:opacity-50",
-      className,
-    )}
-    {...props}
-    ref={ref}
-  >
-    <SwitchPrimitives.Thumb
-      className={cn(
-        "pointer-events-none block h-5 w-5 rounded-full bg-background shadow-lg ring-0 transition-transform data-[state=checked]:translate-x-5 data-[state=unchecked]:translate-x-0",
-      )}
-    />
-  </SwitchPrimitives.Root>
-));
-Switch.displayName = SwitchPrimitives.Root.displayName;
+export interface SwitchProps extends Omit<React.ComponentProps<typeof HeroSwitch>, "children" | "onChange" | "isSelected" | "defaultSelected" | "isDisabled" | "ref"> {
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  disabled?: boolean;
+}
+
+// Field semantics and accessible names belong to the root. The forwarded ref
+// points to the focusable input, including when used by react-hook-form.
+const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
+  ({ className, checked, defaultChecked, onCheckedChange, disabled, onFocus, ...props }, ref) => (
+    <HeroSwitch
+      {...props}
+      inputRef={ref}
+      // Keep a parent data grid from redirecting focus away from the input.
+      onFocus={event => { onFocus?.(event); event.stopPropagation(); }}
+      isSelected={checked}
+      defaultSelected={defaultChecked}
+      onChange={onCheckedChange}
+      isDisabled={disabled}
+      className={cn("inline-flex shrink-0", className)}
+    >
+      <HeroSwitch.Content className="min-h-11 min-w-11 justify-center">
+        <HeroSwitch.Control>
+          <HeroSwitch.Thumb />
+        </HeroSwitch.Control>
+      </HeroSwitch.Content>
+    </HeroSwitch>
+  ),
+);
+Switch.displayName = "Switch";
 
 export { Switch };

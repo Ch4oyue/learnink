@@ -2,11 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+import { Disclosure } from "@heroui/react";
 import {
     Table,
     TableBody,
@@ -80,8 +76,8 @@ function CollapsibleSection({ title, count, items, icon, type, defaultOpen = fal
     }
 
     return (
-        <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-            <CollapsibleTrigger
+        <Disclosure isExpanded={isOpen} onExpandedChange={setIsOpen}>
+            <Disclosure.Trigger
                 className={cn(
                     "flex items-center justify-between w-full py-2.5 px-4 rounded-xl transition-all duration-200 group",
                     styles.bg,
@@ -109,10 +105,10 @@ function CollapsibleSection({ title, count, items, icon, type, defaultOpen = fal
                         isOpen ? "rotate-180" : ""
                     )}
                 />
-            </CollapsibleTrigger>
+            </Disclosure.Trigger>
             <AnimatePresence>
                 {isOpen && (
-                    <CollapsibleContent forceMount asChild>
+                    <Disclosure.Content>
                         <motion.div
                             initial={{ height: 0, opacity: 0 }}
                             animate={{ height: "auto", opacity: 1 }}
@@ -144,10 +140,10 @@ function CollapsibleSection({ title, count, items, icon, type, defaultOpen = fal
                                 ))}
                             </ul>
                         </motion.div>
-                    </CollapsibleContent>
+                    </Disclosure.Content>
                 )}
             </AnimatePresence>
-        </Collapsible>
+        </Disclosure>
     );
 }
 
@@ -161,7 +157,7 @@ export default function Changelog() {
     return (
         <div className="min-h-screen bg-background">
             {/* Header */}
-            <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-10">
+            <div className="border-b border-border bg-card/50 sticky top-0 z-10">
                 <div className="max-w-4xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
@@ -185,7 +181,7 @@ export default function Changelog() {
                             </div>
                         </div>
                         <Badge
-                            className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground border-0 shadow-md shadow-primary/20"
+                            className="bg-primary text-primary-foreground border-0"
                         >
                             v{CHANGELOG_DATA[0]?.version}
                         </Badge>
@@ -219,7 +215,7 @@ export default function Changelog() {
                                     <span className={cn(
                                         "font-bold",
                                         index === 0
-                                            ? "text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70"
+                                            ? "text-primary"
                                             : "text-foreground"
                                     )}>
                                         {entry.version}
@@ -230,7 +226,7 @@ export default function Changelog() {
                                     {entry.date}
                                 </div>
                                 {index === 0 && (
-                                    <Badge className="bg-gradient-to-r from-emerald-500/20 to-emerald-400/10 text-emerald-500 border-emerald-500/30">
+                                    <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/30">
                                         <span className="relative flex h-2 w-2 mr-1.5">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                                             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
@@ -298,7 +294,7 @@ export default function Changelog() {
                         Version History Summary
                     </h2>
                     <div className="glass-liquid rounded-[24px] overflow-hidden">
-                        <Table>
+                        <Table aria-label="Version history">
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent border-b-black/5 dark:border-b-white/10">
                                     <TableHead className="w-[100px]">Version</TableHead>

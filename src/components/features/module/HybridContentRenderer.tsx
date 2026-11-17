@@ -62,7 +62,7 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
             <main
                 ref={ref}
                 className="md:flex-1 md:overflow-y-auto overflow-visible bg-background relative scroll-smooth"
-                style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted)) transparent" }}
+                style={{ scrollbarWidth: "thin", scrollbarColor: "hsl(var(--muted-hsl)) transparent" }}
             >
                 {/* Floating Selection Menu - Only render if selection is active to avoid null ref errors */}
                 {selection && (
@@ -159,11 +159,11 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
 
                     {/* End of Section Divider - Style from variant_2 */}
                     <div className="h-32 w-full flex items-center justify-center">
-                        <div className="h-[1px] w-24 bg-border" />
-                        <span className="mx-4 text-muted-foreground text-sm font-medium tracking-widest uppercase">
+                        <div className="h-[1px] w-10 sm:w-24 bg-border" />
+                        <span className="mx-3 sm:mx-4 whitespace-nowrap text-muted-foreground text-xs sm:text-sm font-medium tracking-widest uppercase">
                             End of Section
                         </span>
-                        <div className="h-[1px] w-24 bg-border" />
+                        <div className="h-[1px] w-10 sm:w-24 bg-border" />
                     </div>
                 </div>
             </main>

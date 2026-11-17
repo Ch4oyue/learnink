@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Terminal, Moon, Sun, Heart, Github, BookOpen, LayoutDashboard, Menu } from "lucide-react";
 import { Hero } from "@/components/features/landing/Hero";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/AuthContext";
 import { useSimpleSmoothScroll } from "@/hooks/useSmoothScroll";
 import { lazy, Suspense, useState } from "react";
@@ -35,22 +35,22 @@ export default function LandingPage() {
                 description="Stop watching endless tutorials. Build real projects with Guided Notes that track your progress automatically."
             />
             {/* Header */}
-            <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-background/80 border-b border-border pt-[env(safe-area-inset-top)] transition-all">
+            <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-background/70 border-b border-border/60 pt-[env(safe-area-inset-top)] transition-all">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex justify-between items-center h-16">
                         {/* Logo */}
-                        <Link to="/" className="flex items-center gap-2">
-                            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-primary-foreground font-bold text-lg">
-                                <Terminal className="h-5 w-5" />
+                        <Link to="/" className="flex items-center gap-2.5">
+                            <div className="w-8 h-8 bg-foreground rounded-[10px] flex items-center justify-center text-background">
+                                <Terminal className="h-5 w-5" strokeWidth={2.25} />
                             </div>
-                            <span className="font-bold text-xl tracking-tight text-foreground">LearnInk</span>
+                            <span className="font-semibold text-[17px] tracking-tight text-foreground">LearnInk</span>
                         </Link>
 
                         {/* Nav Links - Desktop */}
                         <div className="hidden md:flex items-center gap-4">
                             <button
                                 onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                             >
                                 Features
                             </button>
@@ -59,7 +59,7 @@ export default function LandingPage() {
                                 <Link
                                     to="/dashboard"
                                     onMouseEnter={() => prefetch(() => import("@/pages/dashboard/DashboardHome"))}
-                                    className="flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                                    className="flex items-center gap-2 text-sm text-primary hover:text-primary/70 transition-colors"
                                 >
                                     <LayoutDashboard className="h-4 w-4" />
                                     Dashboard
@@ -68,16 +68,16 @@ export default function LandingPage() {
                                 <Link
                                     to="/auth"
                                     onMouseEnter={() => prefetch(() => import("@/pages/auth/Auth"))}
-                                    className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+                                    className="inline-flex items-center h-8 px-4 rounded-full bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors"
                                 >
                                     Sign In
                                 </Link>
                             )}
                             <Button
-                                variant="outline"
+                                variant="ghost"
                                 size="icon"
                                 onClick={toggleTheme}
-                                className="rounded-lg"
+                                className="rounded-full h-9 w-9 text-muted-foreground hover:text-foreground"
                                 aria-label="Toggle Theme"
                             >
                                 {resolvedTheme === "dark" ? (
@@ -115,6 +115,7 @@ export default function LandingPage() {
                                     </Button>
                                 </SheetTrigger>
                                 <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                                    <SheetTitle className="sr-only">Main Menu</SheetTitle>
                                     <nav className="flex flex-col gap-4 mt-8">
                                         {user ? (
                                             <Link
@@ -171,17 +172,16 @@ export default function LandingPage() {
                 </Suspense>
 
                 {/* Open Source & Free Section */}
-                <section className="py-28 sm:py-32 bg-muted/30 border-t border-border cv-auto">
+                <section className="py-28 sm:py-32 bg-secondary/50 cv-auto">
                     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-8">
-                            <Heart className="h-8 w-8 text-primary" />
+                        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 mb-8">
+                            <Heart className="h-6 w-6 text-primary" />
                         </div>
-                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-foreground mb-6 leading-tight">
-                            Open Source & Free Forever
+                        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-semibold text-foreground mb-5 leading-[1.08]">
+                            Open source. Free forever.
                         </h2>
-                        <p className="text-lg sm:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
-                            We believe education should be accessible to everyone. LearnInk is completely free - no premium tiers, no hidden costs.
-                            Transparent learning materials, built by the community for the community.
+                        <p className="text-lg text-muted-foreground mb-10 max-w-xl mx-auto leading-relaxed">
+                            No premium tiers, no hidden costs. Built by the community, for the community.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">

@@ -9,20 +9,17 @@ import { useToast } from "@/hooks/use-toast";
 import {
   Crown,
   Sparkles,
-  Zap,
-  Flame,
   Coins,
-  Check,
   Loader2,
   Clock
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format, addDays } from "date-fns";
+import { format } from "date-fns";
 
 const PREMIUM_OFFERS = [
-  { id: "7_days", label: "7 Days Premium", cost: 500, days: 7, icon: Zap },
-  { id: "30_days", label: "30 Days Premium", cost: 1500, days: 30, icon: Crown, popular: true },
-  { id: "streak_claim", label: "Streak Reward (30 Days)", cost: 0, streakRequired: 30, days: 14, icon: Flame },
+  { id: "7_days", label: "7 Days Premium", cost: 500, days: 7 },
+  { id: "30_days", label: "30 Days Premium", cost: 1500, days: 30, popular: true },
+  { id: "streak_claim", label: "Streak Reward (30 Days)", cost: 0, streakRequired: 30, days: 14 },
 ];
 
 export function PremiumStore() {
@@ -32,10 +29,10 @@ export function PremiumStore() {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   const buyPremium = useMutation({
-    mutationFn: async ({ days, cost, isStreakClaim }: { days: number; cost: number; isStreakClaim: boolean }) => {
+    mutationFn: async ({ offerId, cost, isStreakClaim }: { offerId: string; cost: number; isStreakClaim: boolean }) => {
       if (!user || !profile) throw new Error("Unauthorized");
 
-      // Validations
+      // Quick client-side checks for a clear message; the server repeats them and is the source of truth.
       if (!isStreakClaim && (profile.points || 0) < cost) {
         throw new Error("Not enough points");
       }
@@ -43,26 +40,10 @@ export function PremiumStore() {
         throw new Error("Streak has not reached 30 days");
       }
 
-      const currentPremiumUntil = profile.premium_until ? new Date(profile.premium_until) : new Date();
-      const baseDate = currentPremiumUntil > new Date() ? currentPremiumUntil : new Date();
-      const newPremiumUntil = addDays(baseDate, days).toISOString();
-
-      const updateData: { is_premium: boolean; premium_until: string; points?: number } = {
-        is_premium: true,
-        premium_until: newPremiumUntil,
-      };
-
-      if (!isStreakClaim) {
-        updateData.points = (profile.points || 0) - cost;
-      }
-
-      const { error } = await supabase
-        .from("profiles")
-        .update(updateData)
-        .eq("id", user.id);
-
+      // Points, premium and streak are protected columns: redeem through the server function.
+      const { data, error } = await supabase.rpc("redeem_premium", { p_offer_id: offerId });
       if (error) throw error;
-      return { newPremiumUntil };
+      return { newPremiumUntil: String(data) };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["user-role"] });
@@ -85,7 +66,7 @@ export function PremiumStore() {
   const handleExchange = (offer: typeof PREMIUM_OFFERS[0]) => {
     setIsProcessing(offer.id);
     buyPremium.mutate({
-      days: offer.days,
+      offerId: offer.id,
       cost: offer.cost,
       isStreakClaim: !!offer.streakRequired
     });
@@ -95,15 +76,15 @@ export function PremiumStore() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <h2 className="text-2xl font-bold flex items-center gap-2">
             <Sparkles className="h-6 w-6 text-primary" />
             LearnInk Elite
           </h2>
-          <p className="text-muted-foreground">Redeem points or streaks for exclusive feature access.</p>
+          <p className="text-muted-foreground">1.5x XP and an Elite badge on your profile, for as long as it lasts.</p>
         </div>
-        <div className="text-right">
+        <div className="text-left sm:shrink-0 sm:text-right">
           <Badge variant="secondary" className="text-lg px-3 py-1 gap-2">
             <Coins className="h-5 w-5 text-amber-500" />
             {profile?.points || 0} Points
@@ -125,7 +106,6 @@ export function PremiumStore() {
               </p>
             </div>
           </div>
-          <Badge variant="outline" className="border-amber-500/50 text-amber-500">ELITE MEMBER</Badge>
         </div>
       )}
 
@@ -139,29 +119,14 @@ export function PremiumStore() {
           return (
             <Card key={offer.id} className={cn(
               "glass-liquid transition-all duration-300 relative overflow-hidden",
-              offer.popular && "border-primary shadow-glow scale-105 z-10"
+              offer.popular && "border-primary"
             )}>
-              {offer.popular && (
-                <div className="absolute top-0 right-0 bg-primary text-primary-foreground text-[13px] font-bold px-2 py-1 rounded-bl-lg">
-                  POPULAR
-                </div>
-              )}
               <CardHeader>
-                <div className="h-12 w-12 rounded-2xl bg-white/5 flex items-center justify-center mb-2">
-                  <offer.icon className={cn("h-6 w-6", isStreak ? "text-orange-500" : "text-primary")} />
-                </div>
                 <CardTitle>{offer.label}</CardTitle>
                 <CardDescription>
                   {isStreak ? `Requires a ${offer.streakRequired}-Day Streak` : `${offer.cost} InkPoints`}
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <ul className="text-sm space-y-2 text-muted-foreground">
-                  <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Multiplier XP 1.5x</li>
-                  <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Elite Badge on Profile</li>
-                  <li className="flex items-center gap-2"><Check className="h-3 w-3 text-primary" /> Ad-Free (Coming Soon)</li>
-                </ul>
-              </CardContent>
               <CardFooter>
                 <Button
                   className="w-full rounded-xl"
@@ -179,30 +144,6 @@ export function PremiumStore() {
             </Card>
           );
         })}
-      </div>
-
-      <div className="pt-4">
-        <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Elite Benefits</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-           <div className="p-4 rounded-2xl bg-white/5 flex gap-4">
-             <div className="h-10 w-10 shrink-0 rounded-xl bg-primary/10 flex items-center justify-center">
-               <Zap className="h-5 w-5 text-primary" />
-             </div>
-             <div>
-               <p className="font-bold text-sm">Turbo Learning</p>
-               <p className="text-xs text-muted-foreground">Earn XP faster with the premium multiplier.</p>
-             </div>
-           </div>
-           <div className="p-4 rounded-2xl bg-white/5 flex gap-4">
-             <div className="h-10 w-10 shrink-0 rounded-xl bg-amber-500/10 flex items-center justify-center">
-               <Crown className="h-5 w-5 text-amber-500" />
-             </div>
-             <div>
-               <p className="font-bold text-sm">Exclusive Badge</p>
-               <p className="text-xs text-muted-foreground">Show off your status with a crown icon and VFX.</p>
-             </div>
-           </div>
-        </div>
       </div>
     </div>
   );

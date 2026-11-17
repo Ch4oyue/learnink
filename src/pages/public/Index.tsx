@@ -92,7 +92,7 @@ const Index = () => {
                     className="group relative bg-card border border-border rounded-2xl p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
                   >
                     {/* Gradient Background */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${path.color} rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity`} />
+                    <div className={`absolute inset-0 bg-primary/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity`} />
                     
                     <div className="relative">
                       {/* Icon */}

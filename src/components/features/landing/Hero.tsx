@@ -21,9 +21,9 @@ export function Hero() {
     const [selectedLanguage, setSelectedLanguage] = useState<"javascript" | "python" | "typescript">("javascript");
 
     const languageOptions = [
-        { key: "javascript" as const, label: "React", icon: "⚛️" },
-        { key: "python" as const, label: "Python", icon: "🐍" },
-        { key: "typescript" as const, label: "TypeScript", icon: "📘" },
+        { key: "javascript" as const, label: "React", dot: "#61DAFB" },
+        { key: "python" as const, label: "Python", dot: "#3776AB" },
+        { key: "typescript" as const, label: "TypeScript", dot: "#3178C6" },
     ];
 
     return (
@@ -32,24 +32,22 @@ export function Hero() {
                 {/* Version Badge */}
                 <Badge
                     variant="outline"
-                    className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border-primary/30 text-primary text-sm font-medium mb-10"
+                    className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-secondary border-transparent text-muted-foreground text-[13px] font-medium mb-8"
                 >
-                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse motion-reduce:animate-none" />
-                    V2.0 IS LIVE
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    V2.0 is live
                 </Badge>
 
                 {/* Main Heading */}
-                <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground mb-8 leading-[1.1] text-balance">
-                    Master Technical Skills,
+                <h1 className="text-[2.75rem] sm:text-6xl md:text-7xl font-semibold tracking-[-0.03em] text-foreground mb-6 leading-[1.04] text-balance">
+                    Master technical skills,
                     <br className="hidden sm:block" />
-                    <span className="text-primary">The Lazy Way.</span>
+                    <span className="text-primary">the lazy way.</span>
                 </h1>
 
                 {/* Subtitle */}
-                <p className="max-w-2xl mx-auto text-lg sm:text-xl text-muted-foreground mb-12 leading-relaxed">
-                    Stop watching endless tutorials. Build real projects with{" "}
-                    <strong className="text-foreground font-semibold">Guided Notes</strong>{" "}
-                    that tracks your progress automatically.
+                <p className="max-w-xl mx-auto text-lg text-muted-foreground mb-10 leading-relaxed">
+                    Real projects, guided notes, progress that tracks itself.
                 </p>
 
                 {/* CTA Buttons */}
@@ -57,23 +55,23 @@ export function Hero() {
                     <Button
                         asChild
                         size="lg"
-                        className="w-full sm:w-auto px-8 py-3.5 shadow-glow group"
+                        className="w-full sm:w-auto group"
                     >
                         <Link to="/auth">
-                            Start Learning Now
-                            <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" aria-hidden="true" />
+                            Start Learning
+                            <ArrowRight className="ml-1.5 h-4 w-4 group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
                         </Link>
                     </Button>
                     <Button
-                        variant="outline"
+                        variant="link"
                         size="lg"
                         asChild
-                        className="w-full sm:w-auto px-8 py-3.5"
+                        className="w-full sm:w-auto text-primary hover:no-underline hover:text-primary/70"
                     >
                         {/* The label says what actually happens next. */}
                         <Link to={user ? "/dashboard" : "/auth"}>
-                            <PlayCircle className="mr-2 h-5 w-5" aria-hidden="true" />
-                            {user ? "Open Dashboard" : "Sign In to Try"}
+                            {user ? "Open Dashboard" : "Sign in to try"}
+                            <PlayCircle className="ml-1.5 h-4 w-4" aria-hidden="true" />
                         </Link>
                     </Button>
                 </div>
@@ -88,12 +86,12 @@ export function Hero() {
                                 type="button"
                                 aria-pressed={isSelected}
                                 onClick={() => setSelectedLanguage(option.key)}
-                                className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${isSelected
-                                    ? "bg-primary text-primary-foreground shadow-lg shadow-primary/30 ring-2 ring-primary/40 ring-offset-2 ring-offset-background"
-                                    : "bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground"
+                                className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium transition-colors duration-150 ${isSelected
+                                    ? "bg-foreground text-background"
+                                    : "bg-secondary text-muted-foreground hover:text-foreground"
                                     }`}
                             >
-                                <span className="mr-1.5" aria-hidden="true">{option.icon}</span>
+                                <span className="mr-2 h-2 w-2 rounded-full" style={{ backgroundColor: option.dot }} aria-hidden="true" />
                                 {option.label}
                                 {isSelected && <Check className="ml-1.5 h-4 w-4" aria-hidden="true" />}
                             </button>

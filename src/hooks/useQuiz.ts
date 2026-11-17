@@ -233,15 +233,9 @@ export function useValidateQuizAnswers() {
       
       return data as QuizValidationResult;
     },
-    onSuccess: (data) => {
+    // The result panel already shows pass or fail and the score, so no toast on success.
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["quiz-attempts"] });
-      toast({
-        title: data.results.passed ? "Congratulations!" : "Try Again",
-        description: data.results.passed 
-          ? `You passed with a score of ${data.results.percentage}%` 
-          : `Your score is ${data.results.percentage}%. A minimum score is required to pass.`,
-        variant: data.results.passed ? "default" : "destructive",
-      });
     },
     onError: (error) => {
       logger.error("Error validating quiz:", error);

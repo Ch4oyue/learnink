@@ -1,32 +1,26 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
+import { Chip } from "@heroui/react";
 
 import { cn } from "@/lib/utils";
 
-const badgeVariants = cva(
-  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
-  {
-    variants: {
-      variant: {
-        default: "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
-        secondary: "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        destructive: "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
-  },
-);
+// Real HeroUI v3 Chip. The old variant names map to Chip color + variant.
+type BadgeVariant = "default" | "secondary" | "destructive" | "outline";
 
-export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {}
+const CHIP: Record<BadgeVariant, { color: "accent" | "default" | "danger"; variant: "primary" | "soft" | "tertiary" }> = {
+  default: { color: "accent", variant: "primary" },
+  secondary: { color: "default", variant: "soft" },
+  destructive: { color: "danger", variant: "primary" },
+  outline: { color: "default", variant: "tertiary" },
+};
 
-const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
-  ({ className, variant, ...props }, ref) => {
-    return <div ref={ref} className={cn(badgeVariants({ variant }), className)} {...props} />;
-  }
-);
+export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, "color"> {
+  variant?: BadgeVariant | null;
+}
+
+const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(({ className, variant, children, ...props }, ref) => {
+  const { color, variant: chipVariant } = CHIP[variant ?? "default"];
+  return <Chip ref={ref} color={color} variant={chipVariant} size="sm" className={cn("w-fit", className)} {...props}>{children}</Chip>;
+});
 Badge.displayName = "Badge";
 
-export { Badge, badgeVariants };
+export { Badge };

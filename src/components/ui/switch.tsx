@@ -13,10 +13,12 @@ export interface SwitchProps extends Omit<React.ComponentProps<typeof HeroSwitch
 // Field semantics and accessible names belong to the root. The forwarded ref
 // points to the focusable input, including when used by react-hook-form.
 const Switch = React.forwardRef<HTMLInputElement, SwitchProps>(
-  ({ className, checked, defaultChecked, onCheckedChange, disabled, ...props }, ref) => (
+  ({ className, checked, defaultChecked, onCheckedChange, disabled, onFocus, ...props }, ref) => (
     <HeroSwitch
       {...props}
       inputRef={ref}
+      // Keep a parent data grid from redirecting focus away from the input.
+      onFocus={event => { onFocus?.(event); event.stopPropagation(); }}
       isSelected={checked}
       defaultSelected={defaultChecked}
       onChange={onCheckedChange}

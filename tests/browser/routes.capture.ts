@@ -86,7 +86,7 @@ for (const [size, viewport] of [
       test.use({ viewport });
       for (const [path, role] of routes) {
         test(`route ${path}`, async ({ page }) => {
-          const dir = `/downloads/route-qa/${size}-${theme}`;
+          const dir = `/downloads/route-qa-${process.env.CAPTURE_SHA ?? "current"}/${size}-${theme}`;
           mkdirSync(dir, { recursive: true });
           const errors: string[] = [];
           page.on("pageerror", (e) => errors.push(e.message));
@@ -186,7 +186,7 @@ for (const [size, viewport] of [
           await expect(page.locator(".skeleton")).toHaveCount(0, {
             timeout: 20000,
           });
-          await page.waitForTimeout(350);
+          await page.waitForTimeout(850);
           await expect(page.locator("body")).not.toBeEmpty();
           const slug = path.replaceAll("/", "_");
           const before = await page.evaluate(() => ({
@@ -215,8 +215,16 @@ for (const [size, viewport] of [
           }));
           await page.screenshot({
             path: `${dir}/${slug}-viewport.png`,
-            animations: "disabled",
+            animations: path === "/" ? "allow" : "disabled",
+            timeout: 12000,
           });
+          // Reveal in-view sections by scrolling before evidence-only expansion.
+          for (const heading of await page.locator("h2").all()) {
+            if (!await heading.isVisible()) continue;
+            await heading.evaluate(e => e.scrollIntoView({block:"center"}));
+            await page.waitForTimeout(40);
+          }
+          await page.waitForTimeout(400);
           // Evidence-only expansion: let Playwright capture the content of nested app scroll panes.
           await page.evaluate(() => {
             document.documentElement.style.height = "auto";
@@ -245,13 +253,15 @@ for (const [size, viewport] of [
           await page.screenshot({
             path: `${dir}/${slug}-full.png`,
             fullPage: true,
-            animations: "disabled",
+            animations: path === "/" ? "allow" : "disabled",
+            timeout: 12000,
           });
           writeFileSync(
             `${dir}/${slug}.json`,
             JSON.stringify(
               {
                 ...before,
+                sourceCommit:process.env.CAPTURE_SHA ?? "current",
                 errors,
                 capture:
                   "Fixture data; full capture expands nested scroll panes and hides fixed bottom overlays. Viewport capture preserves normal layout.",

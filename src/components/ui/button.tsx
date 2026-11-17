@@ -44,7 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           aria-disabled={disabled || undefined}
           data-disabled={disabled ? "true" : undefined}
           tabIndex={disabled ? -1 : undefined}
-          type={type}
+          {...(type === undefined ? {} : { type })}
           onClick={onClick as React.MouseEventHandler<HTMLElement>}
           {...props}
         >

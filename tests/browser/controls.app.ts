@@ -27,7 +27,7 @@ for (const [name,viewport] of [['desktop',{width:1440,height:900}],['mobile',{wi
       const bar=page.getByRole('progressbar');
       await expect(bar).toHaveAttribute('aria-valuenow','50');
       await expect(bar).toHaveAttribute('aria-valuemax','100');
-      await expect(bar).toHaveAccessibleName('Progress');
+      await expect(bar).toHaveAccessibleName('Course progress');
       await page.screenshot({path:`/downloads/progress-${name}.png`,fullPage:true});
     });
   });

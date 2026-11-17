@@ -41,7 +41,7 @@ const DashboardModules = lazy(() => import("./pages/dashboard/DashboardModules")
 const DashboardNotifications = lazy(() => import("./pages/dashboard/DashboardNotifications"));
 const DashboardRequests = lazy(() => import("./pages/dashboard/DashboardRequests"));
 const CourseDetail = lazy(() => import("./pages/dashboard/CourseDetail"));
-const ComingSoon = lazy(() => import("./pages/dashboard/ComingSoon"));
+const DashboardAchievements = lazy(() => import("./pages/dashboard/DashboardAchievements"));
 const SecondBrain = lazy(() => import("./pages/dashboard/SecondBrain"));
 const DashboardAnalytics = lazy(() => import("./pages/dashboard/DashboardAnalytics"));
 const ShareTargetHandler = lazy(() => import("./pages/dashboard/ShareTargetHandler"));
@@ -230,7 +230,7 @@ const App = () => (
                         path="/dashboard/achievements"
                         element={
                           <ProtectedRoute>
-                            <ComingSoon title="Achievements" description="The achievements feature for viewing all your learning achievements is under development." />
+                            <DashboardAchievements />
                           </ProtectedRoute>
                         }
                       />

@@ -159,11 +159,11 @@ export const HybridContentRenderer = memo(forwardRef<HTMLElement, HybridContentR
 
                     {/* End of Section Divider - Style from variant_2 */}
                     <div className="h-32 w-full flex items-center justify-center">
-                        <div className="h-[1px] w-24 bg-border" />
-                        <span className="mx-4 text-muted-foreground text-sm font-medium tracking-widest uppercase">
+                        <div className="h-[1px] w-10 sm:w-24 bg-border" />
+                        <span className="mx-3 sm:mx-4 whitespace-nowrap text-muted-foreground text-xs sm:text-sm font-medium tracking-widest uppercase">
                             End of Section
                         </span>
-                        <div className="h-[1px] w-24 bg-border" />
+                        <div className="h-[1px] w-10 sm:w-24 bg-border" />
                     </div>
                 </div>
             </main>

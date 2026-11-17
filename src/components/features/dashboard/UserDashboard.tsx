@@ -43,27 +43,15 @@ function CourseCard({
 }: CourseCardProps) {
   const navigate = useNavigate();
 
-  // Generate gradient based on category
-  const gradientMap: Record<string, string> = {
-    Frontend: "from-indigo-500 to-purple-600",
-    Backend: "from-emerald-500 to-teal-600",
-    DevOps: "from-slate-600 to-slate-800",
-    AI: "from-pink-500 to-rose-600",
-    Database: "from-amber-500 to-orange-600",
-    default: "from-primary to-blue-600",
-  };
-
-  const gradient = gradientMap[category] || gradientMap.default;
-
   return (
     <div
       onClick={() => navigate(`/dashboard/course/${id}`)}
       className="group bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all cursor-pointer"
     >
-      {/* Card Header with Gradient */}
-      <div className={`h-28 bg-gradient-to-br ${gradient} relative overflow-hidden`}>
-        <div className="absolute inset-0 opacity-20 mix-blend-overlay bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.3),transparent)]" />
-        <div className="absolute bottom-3 left-4 bg-zinc-900/90 backdrop-blur text-white text-[13px] font-bold px-2 py-1 rounded border border-white/10 uppercase tracking-wide">
+      {/* Card Header: flat tinted surface (no gradient slop) */}
+      <div className="h-28 bg-primary/[0.06] relative overflow-hidden flex items-center justify-center">
+        <BookOpen className="h-8 w-8 text-primary/30" />
+        <div className="absolute bottom-3 left-4 bg-card/90 backdrop-blur text-foreground text-[13px] font-bold px-2 py-1 rounded border border-border uppercase tracking-wide">
           {category || "General"}
         </div>
       </div>
